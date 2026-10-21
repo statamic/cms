@@ -152,22 +152,58 @@ test('the editor is rebuilt when the value loses nodes while the editor is focus
     expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'A'), set('set-b', 'B')]);
 });
 
-// Typing inside a set's fields changes the value from within the editor. Rebuilding the
-// editor for that would destroy the field being typed in.
-test('the editor is left alone when only set values change while the editor is focused', async () => {
+// Sets sync their own values into the editor. Rebuilding for that would destroy their fields, whether
+// the change came from typing in them or from a save response handing the values back. See #15687.
+test('the editor is left alone when only set values change', async () => {
     const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
-    focusEditor(wrapper);
-    const setContent = vi.spyOn(wrapper.vm.editor.commands, 'setContent');
+    const element = wrapper.find('[data-type="card"]').element;
 
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
-    expect(setContent).not.toHaveBeenCalled();
+    expect(wrapper.find('[data-type="card"]').element).toBe(element);
 });
 
-test('the editor is rebuilt when the value changes while the editor is not focused', async () => {
+// With remove_empty_nodes, a save strips empty nodes. Deleting them in place keeps the set fields alive.
+test('empty nodes the value no longer has are deleted in place', async () => {
+    const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
+    const wrapper = await mountField({ sets, remove_empty_nodes: true }, [set('set-a', 'A'), { type: 'paragraph' }, text]);
+    const element = wrapper.find('[data-type="card"]').element;
+
+    await wrapper.setProps({ value: [set('set-a', 'A'), text] });
+
+    expect(wrapper.find('[data-type="card"]').element).toBe(element);
+    expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'A'), text]);
+});
+
+test('with trim, only leading and trailing empty nodes are deleted in place', async () => {
+    const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
+    const wrapper = await mountField({ sets, remove_empty_nodes: 'trim' }, [
+        { type: 'paragraph' },
+        set('set-a', 'A'),
+        { type: 'paragraph' },
+        text,
+        { type: 'paragraph' },
+    ]);
+    const element = wrapper.find('[data-type="card"]').element;
+
+    await wrapper.setProps({ value: [set('set-a', 'A'), { type: 'paragraph' }, text] });
+
+    expect(wrapper.find('[data-type="card"]').element).toBe(element);
+    expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'A'), { type: 'paragraph' }, text]);
+});
+
+test('the editor is rebuilt when every node was empty', async () => {
+    const wrapper = await mountField({ sets, remove_empty_nodes: true }, [{ type: 'paragraph' }, { type: 'paragraph' }]);
+
+    await wrapper.setProps({ value: [] });
+
+    expect(wrapper.vm.editor.getJSON().content).toEqual([{ type: 'paragraph' }]);
+});
+
+test('the editor is rebuilt when the value changes structurally while the editor is not focused', async () => {
     const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
 
-    await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
+    await wrapper.setProps({ value: [{ type: 'paragraph' }, set('set-a', 'A')] });
 
-    expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+    expect(wrapper.vm.editor.getJSON().content).toEqual([{ type: 'paragraph' }, set('set-a', 'A')]);
 });
