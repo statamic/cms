@@ -106,7 +106,7 @@
   "devDependencies": {
     "@storybook/addon-a11y": "^10.6.0",
     "@storybook/addon-docs": "^10.6.0",
-    "@storybook/addon-mcp": "^10.6.0",
+    "@storybook/addon-mcp": "^10.6.2",
     "@storybook/addon-vitest": "^10.6.0",
     "@storybook/vue3-vite": "^10.6.0",
     "@tailwindcss/vite": "^4.1.8",
@@ -120,7 +120,7 @@
     "storybook": "^10.6.0",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.9.2",
-    "vite": "^8.0.16",
+    "vite": "^8.3.5",
     "vitest": "^4.1.11",
     "vitest-browser-vue": "^2.0.1",
     "vue-component-debug": "^0.1.0",
