@@ -4,10 +4,12 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldRepository;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
+use Statamic\Fields\Section;
 use Statamic\Fields\Tab;
 use Tests\TestCase;
 
@@ -359,5 +361,118 @@ class TabTest extends TestCase
         $metaDescription = $fields->firstWhere('handle', 'meta_description');
         $this->assertNull($metaDescription['instructions']);
         $this->assertEquals('Meta Description', $metaDescription['display']);
+    }
+
+    #[Test]
+    public function it_gets_expanded_sections()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('address')
+            ->andReturn((new Fieldset)->setHandle('address')->setContents([
+                'fields' => [
+                    ['handle' => 'street', 'field' => ['type' => 'text']],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'display' => 'SEO',
+                        'instructions' => 'Search engines',
+                        'collapsible' => true,
+                        'collapsed' => true,
+                        'fields' => [
+                            ['handle' => 'meta_title', 'field' => ['type' => 'text', 'display' => 'Meta Title']],
+                            ['import' => 'address', 'prefix' => 'office_'],
+                        ],
+                    ],
+                    [
+                        'display' => 'Social',
+                        'fields' => [
+                            ['handle' => 'og_title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ]));
+
+        $tab = (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        ['handle' => 'title', 'field' => ['type' => 'text']],
+                        [
+                            'import' => 'seo',
+                            'prefix' => 'seo_',
+                            'config' => [
+                                'meta_title' => ['instructions' => 'Keep it short.'],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'display' => 'Empty',
+                ],
+            ],
+        ]);
+
+        $sections = $tab->expandedSections();
+
+        $this->assertCount(4, $sections);
+        $this->assertContainsOnlyInstancesOf(Section::class, $sections);
+        $this->assertEquals(['Main', 'SEO', 'Social', 'Empty'], $sections->map->display()->all());
+
+        $this->assertEquals(['title'], $sections[0]->fields()->all()->keys()->all());
+
+        $seo = $sections[1];
+        $this->assertEquals('Search engines', $seo->instructions());
+        $this->assertTrue($seo->collapsible());
+        $this->assertTrue($seo->collapsed());
+
+        $fields = $seo->fields()->all();
+        $this->assertEquals(['seo_meta_title', 'seo_office_street'], $fields->keys()->all());
+        $this->assertEquals('seo_', $fields['seo_meta_title']->prefix());
+        $this->assertEquals('seo_office_', $fields['seo_office_street']->prefix());
+        $this->assertEquals('Keep it short.', $fields['seo_meta_title']->get('instructions'));
+        $this->assertEquals('Meta Title', $fields['seo_meta_title']->display());
+
+        $this->assertEquals(['seo_og_title'], $sections[2]->fields()->all()->keys()->all());
+        $this->assertEquals([], $sections[3]->fields()->all()->all());
+
+        $this->assertCount(2, $tab->sections());
+        $this->assertEquals(
+            ['title', 'seo_meta_title', 'seo_office_street', 'seo_og_title'],
+            $tab->fields()->all()->keys()->all()
+        );
+    }
+
+    #[Test]
+    public function it_does_not_allow_recursive_imports_inside_imported_fieldset_sections()
+    {
+        $this->expectException(FieldsetRecursionException::class);
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('seo')
+            ->andReturn((new Fieldset)->setHandle('seo')->setContents([
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['import' => 'seo'],
+                        ],
+                    ],
+                ],
+            ]));
+
+        (new Tab('main'))->setContents([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['import' => 'seo'],
+                    ],
+                ],
+            ],
+        ])->toPublishArray();
     }
 }
