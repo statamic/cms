@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -82,7 +83,7 @@ class Tab
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'handle' => $this->handle,
-            'sections' => $this->expandedSections(),
+            'sections' => $this->expandedSections()->map->toPublishArray()->all(),
         ];
     }
 
@@ -96,13 +97,13 @@ class Tab
         return Arr::get($this->contents, 'instructions');
     }
 
-    private function expandedSections(): array
+    public function expandedSections(): Collection
     {
         return $this->sections()->reduce(function ($carry, Section $section) {
             $fields = Arr::get($section->contents(), 'fields', []);
 
             if (empty($fields)) {
-                return $carry->push($section->toPublishArray());
+                return $carry->push($section);
             }
 
             $sectionContents = $section->contents();
@@ -119,21 +120,21 @@ class Tab
                 }
 
                 if (! empty($bufferedFields)) {
-                    $carry->push((new Section($sectionMeta + ['fields' => $bufferedFields]))->toPublishArray());
+                    $carry->push(new Section($sectionMeta + ['fields' => $bufferedFields]));
                     $bufferedFields = [];
                 }
 
                 foreach ($importedFieldset->sections() as $importedSection) {
-                    $carry->push($this->toImportedPublishSection($importedSection, $field));
+                    $carry->push($this->toImportedSection($importedSection, $field));
                 }
             }
 
             if (! empty($bufferedFields)) {
-                $carry->push((new Section($sectionMeta + ['fields' => $bufferedFields]))->toPublishArray());
+                $carry->push(new Section($sectionMeta + ['fields' => $bufferedFields]));
             }
 
             return $carry;
-        }, collect())->all();
+        }, collect());
     }
 
     private function sectionedFieldsetImport(array $field): ?Fieldset
@@ -151,18 +152,19 @@ class Tab
         return $fieldset && $fieldset->hasSections() ? $fieldset : null;
     }
 
-    private function toImportedPublishSection(array $section, array $import): array
+    private function toImportedSection(array $section, array $import): Section
     {
-        $fields = (new Fields(Arr::get($section, 'fields', [])))->all();
+        $fields = new Fields(Arr::get($section, 'fields', []));
+        $resolved = $fields->all();
 
         if ($overrides = $import['config'] ?? null) {
-            $fields = $fields->map(function ($field, $handle) use ($overrides) {
+            $resolved = $resolved->map(function ($field, $handle) use ($overrides) {
                 return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
             });
         }
 
         if ($prefix = Arr::get($import, 'prefix')) {
-            $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+            $resolved = $resolved->mapWithKeys(function ($field) use ($prefix) {
                 $field = clone $field;
                 $handle = $prefix.$field->handle();
                 $fieldPrefix = $prefix.$field->prefix();
@@ -171,13 +173,9 @@ class Tab
             });
         }
 
-        return Arr::removeNullValues([
-            'display' => Arr::get($section, 'display'),
-            'instructions' => Arr::get($section, 'instructions'),
-            'collapsible' => ($collapsible = Arr::get($section, 'collapsible')) ?: null,
-            'collapsed' => ($collapsible && Arr::get($section, 'collapsed')) ?: null,
-        ]) + [
-            'fields' => $fields->map->toPublishArray()->values()->all(),
-        ];
+        return new Section(
+            Arr::only($section, ['display', 'instructions', 'collapsible', 'collapsed']),
+            $fields->setFields($resolved)
+        );
     }
 }
