@@ -30,6 +30,15 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'status' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'require_login' => [
+                'type' => GraphQL::nonNull(GraphQL::boolean()),
+            ],
+            'closed_message' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
+            'require_login_message' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
             'fields' => [
                 'type' => GraphQL::listOf(GraphQL::type(FieldType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {
@@ -59,7 +68,13 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'sections' => [
                 'type' => GraphQL::listOf(GraphQL::type(SectionType::NAME)),
                 'resolve' => function ($form, $args, $context, $info) {
-                    return $form->blueprint()->tabs()->first()->sections()->all();
+                    return $form->sections()->all();
+                },
+            ],
+            'pages' => [
+                'type' => GraphQL::listOf(GraphQL::type(FormPageType::NAME)),
+                'resolve' => function ($form, $args, $context, $info) {
+                    return $form->pages()->all();
                 },
             ],
         ])->map(function (array $arr) {

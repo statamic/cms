@@ -4,10 +4,13 @@ namespace Tests\Feature\GraphQL;
 
 use Closure;
 use Facades\Statamic\API\ResourceAuthorizer;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -316,6 +319,288 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_pages()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Form::make('contact')->title('Contact Us')->formFields([
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+        }
+        pages {
+            id
+            display
+            instructions
+            sections {
+                display
+                instructions
+                fields {
+                    handle
+                    type
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        ['display' => 'Your Details'],
+                        ['display' => null],
+                    ],
+                    'pages' => [
+                        [
+                            'id' => 'about_you',
+                            'display' => 'About You',
+                            'instructions' => 'Tell us who you are',
+                            'sections' => [
+                                [
+                                    'display' => 'Your Details',
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'name', 'type' => 'text'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 'your_message',
+                            'display' => null,
+                            'instructions' => null,
+                            'sections' => [
+                                [
+                                    'display' => null,
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'message', 'type' => 'textarea'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_pages_of_a_single_page_form()
+    {
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        pages {
+            id
+            display
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'pages' => [
+                        [
+                            'id' => 'main',
+                            'display' => null,
+                            'sections' => [
+                                ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_expands_imported_fieldset_sections()
+    {
+        Fieldset::make('address')->setContents([
+            'sections' => [
+                [
+                    'display' => 'Street',
+                    'fields' => [
+                        ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                [
+                    'display' => 'Location',
+                    'fields' => [
+                        ['handle' => 'city', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'address', 'prefix' => 'home_'],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            fields {
+                handle
+            }
+        }
+        pages {
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $expected = [
+            ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
+            ['display' => 'Street', 'fields' => [['handle' => 'home_street']]],
+            ['display' => 'Location', 'fields' => [['handle' => 'home_city']]],
+        ];
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => $expected,
+                    'pages' => [
+                        ['sections' => $expected],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_access_restrictions()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Form::make('contact')->save();
+        Form::make('members')->data(['require_login' => true, 'require_login_message' => 'Members only.'])->save();
+        Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+        $limited = tap(Form::make('limited')->data(['submission_limit' => 1]))->save();
+        $limited->makeSubmission()->save();
+
+        $query = <<<'GQL'
+{
+    forms {
+        handle
+        status
+        require_login
+        closed_message
+        require_login_message
+    }
+}
+GQL;
+
+        $closed = 'This form is no longer accepting submissions.';
+        $login = 'You must be logged in to submit this form.';
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'forms' => [
+                    ['handle' => 'applications', 'status' => 'closed', 'require_login' => false, 'closed_message' => 'Applications have closed.', 'require_login_message' => $login],
+                    ['handle' => 'contact', 'status' => 'open', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'limited', 'status' => 'limit_reached', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'members', 'status' => 'open', 'require_login' => true, 'closed_message' => $closed, 'require_login_message' => 'Members only.'],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_cannot_query_the_restriction_message()
+    {
+        Form::make('contact')->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        restriction_message
+    }
+}
+GQL;
+
+        $this
+            ->post('/graphql', ['query' => $query])
+            ->assertSee('Cannot query field \"restriction_message\" on type \"Form\"', false);
     }
 
     #[Test]

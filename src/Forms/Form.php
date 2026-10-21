@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -27,6 +28,7 @@ use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Tab;
 use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
@@ -361,6 +363,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->blueprint()->fields()->all();
     }
 
+    public function sections(): Collection
+    {
+        return $this->pages()->flatMap(fn (Tab $page) => $page->expandedSections());
+    }
+
+    public function pages(): Collection
+    {
+        $pages = $this->formFields()->pages()->keyBy('id');
+
+        return $this->blueprint()->tabs()->values()->map(fn (Tab $tab) => (new Tab($tab->handle()))->setContents([
+            ...$tab->contents(),
+            'display' => $pages->has($tab->handle()) ? ($pages->get($tab->handle())['display'] ?? null) : $tab->display(),
+        ]));
+    }
+
     /**
      * Get path.
      *
@@ -555,14 +572,24 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function restrictionMessage(): ?string
     {
         if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
-            return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+            return $this->closedMessage();
         }
 
         if ($this->get('require_login') && ! User::current()) {
-            return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
+            return $this->requireLoginMessage();
         }
 
         return null;
+    }
+
+    public function closedMessage(): string
+    {
+        return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+    }
+
+    public function requireLoginMessage(): string
+    {
+        return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
     }
 
     private function closingDateHasPassed(): bool
