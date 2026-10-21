@@ -353,7 +353,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->fluentlyGetOrSet('charts')->args(func_get_args());
     }
 
-    public function fields(): Collection
+    /**
+     * Get the form fields off the blueprint.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function fields()
     {
         return $this->blueprint()->fields()->all();
     }
