@@ -1,5 +1,5 @@
 <script setup>
-import { useAttrs } from 'vue';
+import { inject, useAttrs } from 'vue';
 import { cva } from 'cva';
 import { DropdownMenuContent, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui';
 import Button from '../Button/Button.vue';
@@ -9,6 +9,10 @@ defineOptions({
 });
 
 const attrs = useAttrs();
+
+// Modal menus mark everything else aria-hidden, including the editor's other nodes, which makes
+// ProseMirror re-parse them and recreate the set the dropdown lives in.
+const modal = !inject('isInBardField', false);
 
 const emit = defineEmits(['closed']);
 
@@ -37,7 +41,7 @@ const dropdownContentClasses = cva({
 </script>
 
 <template>
-    <DropdownMenuRoot @update:open="onOpenChange">
+    <DropdownMenuRoot :modal @update:open="onOpenChange">
         <DropdownMenuTrigger as-child data-ui-dropdown-trigger>
             <slot name="trigger">
                 <Button icon="dots" variant="ghost" size="sm" v-bind="attrs" :aria-label="__('Open dropdown menu')" />
