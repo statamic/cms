@@ -12,12 +12,14 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
 use Statamic\Forms\Uploaders\FormFileUpload;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -319,6 +321,83 @@ class EmailTest extends TestCase
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 
         $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function it_excludes_the_entry_from_the_fields_data()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar'])->set('_entry', 'event-1');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('event-1', $email->viewData['entry']->value()->id());
+    }
+
+    #[Test]
+    public function the_entry_is_the_localization_for_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        Collection::make('events')->sites(['en', 'fr'])->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->create();
+        (new EntryFactory)->collection('events')->id('event-1-fr')->locale('fr')->origin('event-1')->slug('evenement-un')->create();
+
+        $form = tap(Form::make('test')->formFields(['fields' => []]))->save();
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::get('fr')))->build();
+
+        $this->assertEquals('event-1-fr', $email->viewData['entry']->value()->id());
+    }
+
+    #[Test]
+    public function it_excludes_a_field_named_entry_from_the_fields_data_when_an_entry_is_attached()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'entry' => 'Raffle ticket'])->set('_entry', 'event-1');
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('event-1', $email->viewData['entry']->value()->id());
+    }
+
+    #[Test]
+    public function it_includes_a_field_named_entry_in_the_fields_data_without_an_attached_entry()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'entry' => 'Raffle ticket']);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name', 'entry'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals('Raffle ticket', $email->viewData['entry']->value());
     }
 
     #[Test]

@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Carbon\Carbon;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -15,6 +16,8 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
@@ -23,6 +26,7 @@ use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
 use Statamic\Forms\SendEmail;
 use Statamic\Forms\SendEmails;
+use Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -231,6 +235,148 @@ class SubmissionTest extends TestCase
 
         $this->assertFalse($submission->isPartial());
         $this->assertEquals('de', $submission->get('_site'));
+    }
+
+    #[Test]
+    public function setting_data_preserves_the_entry_key()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->set('_entry', 'event-1');
+
+        $submission->data(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $submission->get('foo'));
+        $this->assertEquals('event-1', $submission->get('_entry'));
+    }
+
+    #[Test]
+    public function the_entry_is_included_in_to_array()
+    {
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'San Holo']);
+
+        $this->assertArrayNotHasKey('entry', $submission->toArray());
+
+        $submission->set('_entry', 'event-1');
+
+        $this->assertEquals('event-1', $submission->toArray()['entry']);
+    }
+
+    #[Test]
+    public function the_entry_is_augmented_to_the_entry_object()
+    {
+        $entry = (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'San Holo'])->set('_entry', 'event-1');
+
+        $this->assertEquals($entry->id(), $submission->entry()->id());
+        $this->assertEquals($entry->id(), $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function the_entry_is_augmented_to_the_localization_for_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        CollectionFacade::make('events')->sites(['en', 'fr'])->routes('/events/{slug}')->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->data(['title' => 'Event One'])->create();
+        (new EntryFactory)->collection('events')->id('event-1-fr')->locale('fr')->origin('event-1')->slug('evenement-un')->data(['title' => 'Événement Un'])->create();
+
+        $form = tap(Form::make('contact_us')->formFields(['sections' => []]))->save();
+
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $entry = $submission->augmentedArrayData()['entry'];
+        $this->assertEquals('event-1-fr', $entry->id());
+        $this->assertEquals('Événement Un', $entry->get('title'));
+        $this->assertEquals('/fr/events/evenement-un', $entry->url());
+        $this->assertEquals('event-1', $submission->entry()->id());
+        $this->assertEquals('event-1', $submission->toArray()['entry']);
+    }
+
+    #[Test]
+    public function the_entry_is_augmented_to_the_root_when_it_isnt_localized_into_the_submissions_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        CollectionFacade::make('events')->sites(['en', 'fr'])->routes('/events/{slug}')->save();
+        (new EntryFactory)->collection('events')->id('event-1')->locale('en')->slug('event-one')->create();
+
+        $form = tap(Form::make('contact_us')->formFields(['sections' => []]))->save();
+
+        $submission = $form->makeSubmission()->set('_entry', 'event-1')->site('fr');
+
+        $this->assertEquals('event-1', $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function the_entry_is_only_resolved_when_it_is_used()
+    {
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'San Holo'])->set('_entry', 'event-1');
+
+        $augmented = $submission->augmented();
+        $this->assertEquals('San Holo', $augmented->get('name')->value());
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $this->assertEquals('event-1', $augmented->get('entry')->value()->id());
+    }
+
+    #[Test]
+    public function the_attached_entry_replaces_a_form_field_named_entry()
+    {
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['entry' => 'Raffle ticket'])->set('_entry', 'event-1');
+
+        $this->assertEquals('event-1', $submission->entry()->id());
+        $this->assertEquals('event-1', $submission->toArray()['entry']);
+        $this->assertEquals('event-1', $submission->augmentedArrayData()['entry']->id());
+    }
+
+    #[Test]
+    public function a_form_field_named_entry_is_kept_without_an_attached_entry()
+    {
+        $form = tap(Form::make('contact_us')->formFields([
+            'sections' => [['fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'text']],
+            ]]],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['entry' => 'Raffle ticket']);
+
+        $this->assertEquals('Raffle ticket', $submission->toArray()['entry']);
+        $this->assertEquals('Raffle ticket', $submission->augmentedArrayData()['entry']);
     }
 
     #[Test]
@@ -531,6 +677,70 @@ class SubmissionTest extends TestCase
 
         // Cleanup waits for the connection jobs to count down.
         Bus::assertNotDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    #[DataProvider('connectionOverrideProvider')]
+    public function finalizing_resolves_the_entrys_connection_override($formInstances, string $expectedUrl)
+    {
+        Bus::fake();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true, 'unique_instances_collections' => ['events']])->connections([
+            'webhook' => [['url' => 'https://example.com/form-webhook']],
+        ]))->save();
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'form_instances' => $formInstances,
+        ])->create();
+
+        $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
+
+        Bus::assertDispatchedTimes(SendWebhook::class, 1);
+        Bus::assertDispatched(SendWebhook::class, fn (SendWebhook $job) => $job->config['url'] === $expectedUrl);
+    }
+
+    #[Test]
+    public function finalizing_dispatches_no_connections_when_the_entry_overrides_them_to_none()
+    {
+        Bus::fake();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = tap(Form::make('contact_us')->data(['unique_instances' => true, 'unique_instances_collections' => ['events']])->connections([
+            'webhook' => [['url' => 'https://example.com/form-webhook']],
+        ]))->save();
+
+        Blueprint::make('event')->setNamespace('collections.events')->setContents(['fields' => [
+            ['handle' => 'form_instances', 'field' => ['type' => 'form_instances']],
+        ]])->save();
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data([
+            'form_instances' => ['contact_us' => ['connections' => []]],
+        ])->create();
+
+        $form->makeSubmission()->set('_entry', 'event-1')->asPartial()->finalize();
+
+        Bus::assertNotDispatched(SendWebhook::class);
+    }
+
+    public static function connectionOverrideProvider(): array
+    {
+        return [
+            'entry overrides the connection' => [
+                ['contact_us' => [
+                    'connections' => ['webhook' => [['url' => 'https://example.com/entry-webhook']]],
+                ]],
+                'https://example.com/entry-webhook',
+            ],
+            'entry has no override' => [
+                ['contact_us' => []],
+                'https://example.com/form-webhook',
+            ],
+        ];
     }
 
     #[Test]

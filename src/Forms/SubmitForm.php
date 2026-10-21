@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
@@ -13,10 +14,14 @@ use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class SubmitForm
 {
@@ -24,6 +29,7 @@ class SubmitForm
 
     protected Form $form;
     protected ?string $page = null;
+    protected ?string $entry = null;
     protected ?Submission $submission = null;
     protected bool $retainedSpam = false;
 
@@ -41,11 +47,25 @@ class SubmitForm
         return $this;
     }
 
+    public function entry(?string $entry): static
+    {
+        $this->entry = $entry;
+
+        return $this;
+    }
+
     public function resume(Submission $submission): static
     {
         $this->submission = $submission;
 
         return $this;
+    }
+
+    public static function partialSubmissionSessionKey(Form $form, ?string $entry = null): string
+    {
+        return $entry && $form->hasUniqueInstances()
+            ? "form.{$form->handle()}.{$entry}.partial_submission"
+            : "form.{$form->handle()}.partial_submission";
     }
 
     public function submission(): ?Submission
@@ -55,7 +75,12 @@ class SubmitForm
 
     public function submit(array $data, array $files = []): SubmissionResult
     {
-        throw_if($this->form->restricted(), new FormRestrictedException($this->form));
+        $entry = $this->getEntry();
+        $instance = $this->form->instance($entry?->id());
+
+        if ($instance->restricted()) {
+            throw new FormRestrictedException($instance);
+        }
 
         $nextPage = null;
         $uploadedAssets = [];
@@ -64,7 +89,15 @@ class SubmitForm
 
         $this->validate($data, $files);
 
+        if ($entry && $this->submission && $this->submission->get('_entry') !== $entry->id()) {
+            $this->submission = null;
+        }
+
         $this->submission = $this->submission ?? $this->form->makeSubmission()->asPartial()->site($this->site());
+
+        if ($entry) {
+            $this->submission->set('_entry', $entry->id());
+        }
 
         try {
             $uploadedAssets = $this->submission->uploadFiles($files);
@@ -108,6 +141,21 @@ class SubmitForm
         $this->shouldFinalize($nextPage) ? $this->submission->finalize() : $this->submission->save();
 
         return new SubmissionResult($this->submission, $nextPage);
+    }
+
+    private function getEntry(): ?EntryContract
+    {
+        if (! $this->form->hasUniqueInstances()) {
+            return null;
+        }
+
+        $entry = $this->entry ? Entry::find($this->entry) : null;
+
+        if (! $entry || ! array_key_exists($this->form->handle(), FormInstances::forEntry($entry))) {
+            throw ValidationException::withMessages(['*' => [__('statamic::validation.form_must_be_submitted_from_an_entry')]]);
+        }
+
+        return $entry->root();
     }
 
     /**

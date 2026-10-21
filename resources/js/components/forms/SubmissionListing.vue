@@ -26,7 +26,12 @@ const props = defineProps<{
     sortDirection: string;
     columns: any[];
     filters: any[];
-    can: Record<string, boolean>;
+    can?: Record<string, boolean>;
+    viewInStack?: boolean;
+}>();
+
+const emit = defineEmits<{
+    view: [submission: any];
 }>();
 
 const listing = useTemplateRef('listing');
@@ -45,6 +50,11 @@ const refresh = (): void => {
 
 watch(view, (view: View): void => preferences.set(`${preferencesPrefix}.view`, view));
 
+const viewSubmission = (event: Event, submission: any): void => {
+    if (props.viewInStack) event.preventDefault();
+    emit('view', submission);
+};
+
 defineExpose({ parameters, refresh });
 </script>
 
@@ -59,7 +69,8 @@ defineExpose({ parameters, refresh });
         :sort-direction="sortDirection"
         :preferences-prefix="preferencesPrefix"
         :filters="filters"
-        push-query
+        :allow-presets="!viewInStack"
+        :push-query="!viewInStack"
     >
         <template #default="{ items, showPresets, allowSearch, allowCustomizingColumns, hasFilters, meta }">
             <Presets v-if="showPresets" />
@@ -97,16 +108,26 @@ defineExpose({ parameters, refresh });
                 <Panel v-else class="relative overflow-x-auto" style="container-type: scroll-state;">
                     <Table>
                         <template #cell-datestamp="{ row: submission, value, isColumnVisible }">
-                            <Link class="title-index-field" :href="submission.url" @click.stop>
+                            <component
+                                :is="viewInStack ? 'a' : Link"
+                                class="title-index-field"
+                                :href="submission.url"
+                                @click.stop="viewSubmission($event, submission)"
+                            >
                                 <SubmissionStatusIndicator v-if="!isColumnVisible('status')" :status="submission.status" />
                                 <span><date-time :of="value" /></span>
-                            </Link>
+                            </component>
                         </template>
                         <template #cell-status="{ row: submission }">
                             <SubmissionStatusIndicator :status="submission.status" show-label :show-dot="false" />
                         </template>
                         <template #prepended-row-actions="{ row: submission }">
-                            <DropdownItem :text="__('View')" :href="submission.url" icon="eye" />
+                            <DropdownItem
+                                :text="__('View')"
+                                icon="eye"
+                                :href="viewInStack ? undefined : submission.url"
+                                @click="viewSubmission($event, submission)"
+                            />
                         </template>
                     </Table>
                     <PanelFooter v-if="meta">
@@ -121,7 +142,7 @@ defineExpose({ parameters, refresh });
                     :form
                     :summary-url
                     :charts-update-url
-                    :can-edit="can.edit"
+                    :can-edit="can?.edit"
                 />
             </template>
         </template>

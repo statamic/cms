@@ -18,12 +18,14 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\Entry;
 use Statamic\Facades\File;
 use Statamic\Facades\FormConnector;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Forms\Connectors\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
@@ -74,9 +76,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing _partial, _marked_spam_at and _site values
-        // unless the incoming payload provides its own.
-        foreach (['_partial', '_marked_spam_at', '_site'] as $key) {
+        // keys, so carry over the existing _partial, _marked_spam_at, _site and _entry
+        // values unless the incoming payload provides its own.
+        foreach (['_partial', '_marked_spam_at', '_site', '_entry'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
@@ -132,6 +134,16 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $this->set('_site', $site instanceof Site ? $site->handle() : $site);
 
         return $this;
+    }
+
+    /**
+     * Get the entry this submission is attached to.
+     *
+     * @return \Statamic\Contracts\Entries\Entry|null
+     */
+    public function entry()
+    {
+        return Entry::find($this->get('_entry'));
     }
 
     /**
@@ -328,7 +340,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function connectionJobs(): array
     {
-        return $this->form()->connections()
+        return $this->form()->instance($this->get('_entry'))->connections()
             ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
             ->flatten()
             ->filter()
@@ -398,8 +410,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function toArray()
     {
         $data = $this->data();
+        $fields = $this->form()->fields()->keys();
 
-        return $this->form()->fields()->keys()->flip()
+        return $fields->flip()
             ->reject(function ($field, $key) {
                 return in_array($key, ['id', 'date', 'form']);
             })
@@ -410,14 +423,27 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
                 'id' => $this->id(),
                 'date' => $this->date(),
             ])
+            ->when($this->has('_entry'), fn ($values) => $values->merge([
+                'entry' => $this->get('_entry'),
+            ]))
             ->all();
     }
 
     public function augmentedArrayData()
     {
-        return array_merge($this->toArray(), [
+        $data = array_merge($this->toArray(), [
             'form' => $this->form,
         ]);
+
+        if ($this->has('_entry')) {
+            $data['entry'] = new Value(function () {
+                $root = $this->entry();
+
+                return $root?->in($this->site()->handle()) ?? $root;
+            }, 'entry');
+        }
+
+        return $data;
     }
 
     public function blueprint()

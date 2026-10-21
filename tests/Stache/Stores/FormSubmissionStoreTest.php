@@ -92,4 +92,20 @@ class FormSubmissionStoreTest extends TestCase
 
         $this->assertEquals($path, $this->parent->store('test_form')->paths()->get('test_form::'.$submission->id()));
     }
+
+    #[Test]
+    public function it_indexes_the_entry_id()
+    {
+        $form = tap(Facades\Form::make('test_form'))->save();
+        $submission = Facades\FormSubmission::make()->form($form)->set('_entry', 'event-1');
+
+        $this->parent->store('test_form')->save($submission);
+        @unlink($this->directory.'/test_form/'.$submission->id().'.yaml');
+
+        $this->assertArrayHasKey('_entry', $this->parent->store('test_form')->indexes(false)->all());
+        $this->assertEquals(
+            ['test_form::'.$submission->id() => 'event-1'],
+            $this->parent->store('test_form')->index('_entry')->items()->all()
+        );
+    }
 }

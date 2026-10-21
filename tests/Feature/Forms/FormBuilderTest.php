@@ -903,6 +903,129 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_reserves_the_entry_handle_on_unique_instances_forms()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test')->merge(['unique_instances' => true]))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'entry',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Entry'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.handle' => __('statamic::validation.form_unique_instances_reserved_entry_handle')]);
+    }
+
+    #[Test]
+    public function it_reserves_the_entry_handle_from_a_fieldset_import_on_unique_instances_forms()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test')->merge(['unique_instances' => true]))->save();
+
+        $fieldset = Fieldset::make('contest')->setContents([
+            'fields' => [
+                ['handle' => 'try', 'field' => ['type' => 'text']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('contest')->andReturn($fieldset);
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'import1',
+                                    'type' => 'import',
+                                    'fieldset' => 'contest',
+                                    'prefix' => 'en',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['import1.handle' => __('statamic::validation.form_unique_instances_reserved_entry_handle')]);
+    }
+
+    #[Test]
+    public function it_allows_the_entry_handle_on_forms_without_unique_instances()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer', 'display' => 'Entry']],
+            ],
+        ]))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'entry',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Contest Entry'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue(Form::find('test')->fields()->has('entry'));
+    }
+
+    #[Test]
     public function it_can_save_page_rules()
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);

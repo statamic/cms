@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\FormConnector;
@@ -24,6 +25,7 @@ class FormConnectController extends CpController
         return Inertia::render('forms/connect/Index', [
             'form' => $form,
             'can' => $this->formAbilities($form),
+            'uniqueInstancesEnabled' => $form->hasUniqueInstances(),
             'connectors' => FormConnector::all()->map(fn (Connector $connector): array => [
                 'handle' => $connector->handle(),
                 'title' => $connector->title(),
@@ -45,6 +47,7 @@ class FormConnectController extends CpController
         return Inertia::render('forms/connect/Edit', [
             'form' => $form,
             'can' => $this->formAbilities($form),
+            'uniqueInstancesEnabled' => $form->hasUniqueInstances(),
             'connector' => [
                 'handle' => $connector->handle(),
                 'title' => $connector->title(),
@@ -63,17 +66,52 @@ class FormConnectController extends CpController
     {
         $this->authorize('edit', $form);
 
-        throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
+        [$connector, $connections] = $this->validatedConnections($request, $form, $handle);
 
-        Validator::make($request->except('_save'), $connector->rules())->validate();
-
-        $connections = $connector->process($request->except('_save'));
-
-        if ($request->boolean('_save', true)) {
-            $form->connections($form->connections()->put($connector->handle(), $connections))->save();
-        }
+        $form->connections($form->connections()->put($connector->handle(), $connections))->save();
 
         return $connector->setConnections($connections)->preProcess($connections);
+    }
+
+    public function validateConnections(Request $request, $form, string $handle)
+    {
+        $this->authorize('edit', $form);
+
+        [$connector, $connections] = $this->validatedConnections($request, $form, $handle);
+
+        return $connector->setConnections($connections)->preProcess($connections);
+    }
+
+    public function editor(Request $request, $form, string $handle)
+    {
+        $this->authorize('edit', $form);
+
+        throw_unless($connector = FormConnector::find($handle)?->setForm($form), NotFoundHttpException::class);
+
+        // Only check the shape. Stored connections that fail the connector's rules must still open so they can be fixed.
+        Validator::make($request->all(), [
+            '*' => ['array'],
+            '*.id' => ['nullable', Rule::anyOf(['string', 'integer:strict'])],
+            '*.enabled' => ['nullable', 'boolean'],
+            '*.conditions' => ['nullable', 'array'],
+            '*.conditions.*' => ['array'],
+        ])->validate();
+
+        $connections = $connector->process($request->all());
+
+        return [
+            'component' => $connector->setConnections($connections)->render()->toArray(),
+            'value' => $connector->preProcess($connections),
+        ];
+    }
+
+    private function validatedConnections(Request $request, $form, string $handle): array
+    {
+        throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
+
+        Validator::make($request->all(), $connector->rules())->validate();
+
+        return [$connector, $connector->process($request->all())];
     }
 
     private function suggestableFields($form): array

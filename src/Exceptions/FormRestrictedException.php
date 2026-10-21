@@ -3,16 +3,17 @@
 namespace Statamic\Exceptions;
 
 use Statamic\Contracts\Forms\Form;
+use Statamic\Forms\Instance;
 
 class FormRestrictedException extends \Exception
 {
-    public function __construct(protected Form $form)
+    public function __construct(protected Instance $instance)
     {
-        parent::__construct($form->restrictionMessage());
+        parent::__construct($instance->restrictionMessage());
     }
 
     public function form(): Form
     {
-        return $this->form;
+        return $this->instance->form();
     }
 }
