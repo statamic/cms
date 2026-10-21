@@ -187,7 +187,7 @@ class GlideController extends Controller
         $method = 'generateBy'.ucfirst($type);
 
         try {
-            return $this->generator->$method($item, $params ?? $this->request->all());
+            return $this->generator->$method($item, $params ?? $this->request->query->all());
         } catch (InvalidRemoteUrlException $e) {
             abort(400, $e->getMessage());
         } catch (UnableToReadFile $e) {
