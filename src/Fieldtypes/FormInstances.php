@@ -3,17 +3,21 @@
 namespace Statamic\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Forms\ConfigFields;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Fieldtype as FormFieldtype;
 use Statamic\Statamic;
+use Throwable;
 
 use function Statamic\trans as __;
 
@@ -156,18 +160,118 @@ class FormInstances extends FormFieldtype
     public function rules(): array
     {
         return [...parent::rules(), function ($attribute, $value, $fail) {
+            // Localizations post the origin's overrides read-only, and never store them.
+            if ($this->parentEntry()?->hasOrigin()) {
+                return;
+            }
+
+            $stored = $this->storedValue();
+
             foreach (static::toMap($value['config'] ?? []) as $handle => $overrides) {
                 if (! $form = $this->configurableForm($handle)) {
                     continue;
                 }
 
-                $validator = $this->overrideFields($form)->only(array_keys($overrides))->addValues($overrides)->validator()->validator();
+                // Stored overrides are re-posted on every save, and may no longer pass if the form changed since.
+                if (! $overrides = $this->changedOverrides($form, $overrides, $stored[$handle] ?? [])) {
+                    continue;
+                }
 
-                if ($validator->fails()) {
-                    return $fail($validator->errors()->first());
+                try {
+                    $validator = $this->overrideFields($form)->only(array_keys($overrides))->addValues($overrides)->validator()->validator();
+
+                    if ($validator->fails()) {
+                        return $fail($validator->errors()->first());
+                    }
+                } catch (ValidationException $e) {
+                    return $fail($e->validator->errors()->first());
                 }
             }
         }];
+    }
+
+    private function changedOverrides(FormContract $form, array $overrides, array $stored): array
+    {
+        $changed = collect($overrides)
+            ->except('connections')
+            ->reject(fn ($value, $key) => array_key_exists($key, $stored) && $this->overrideIsUnchanged($form, $key, $value, $stored[$key]));
+
+        if ($connections = $this->changedConnections($form, $overrides['connections'] ?? null, $stored['connections'] ?? null)) {
+            $changed->put('connections', $connections);
+        }
+
+        return $changed->all();
+    }
+
+    private function overrideIsUnchanged(FormContract $form, string $key, $value, $stored): bool
+    {
+        if (static::same($value, $stored)) {
+            return true;
+        }
+
+        try {
+            return static::same($this->overrideFields($form)->only([$key])->addValues([$key => $value])->process()->values()->get($key), $stored);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private function changedConnections(FormContract $form, $connections, $stored): array
+    {
+        $stored = is_array($stored) ? $stored : [];
+
+        return collect(is_array($connections) ? $connections : [])
+            ->map(function ($rows, $handle) use ($form, $stored) {
+                $rows = Connector::normalizeConnections($rows);
+
+                if (! $connector = FormConnector::find($handle)?->setForm($form)) {
+                    return $rows;
+                }
+
+                $storedRows = collect(Connector::normalizeConnections($stored[$handle] ?? []))
+                    ->filter(fn (array $row) => isset($row['id']))
+                    ->keyBy('id');
+
+                return collect($rows)
+                    ->reject(fn (array $row) => isset($row['id']) && $storedRows->has($row['id']) && $this->connectionIsUnchanged($connector, $row, $storedRows->get($row['id'])))
+                    ->values()
+                    ->all();
+            })
+            ->filter()
+            ->all();
+    }
+
+    private function connectionIsUnchanged(Connector $connector, array $row, array $stored): bool
+    {
+        if (static::same($row, $stored)) {
+            return true;
+        }
+
+        try {
+            return static::same($connector->process([$row])[0], $stored);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    private static function same($a, $b): bool
+    {
+        return static::normalize($a) === static::normalize($b);
+    }
+
+    private static function normalize($value)
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        $value = array_map(fn ($item) => static::normalize($item), $value);
+
+        if (! array_is_list($value)) {
+            ksort($value);
+        }
+
+        return $value;
     }
 
     private function configurableForm(string $handle): ?FormContract

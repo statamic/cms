@@ -27,6 +27,12 @@ class ConfigureFormInstancesTest extends TestCase
         'connections' => ['webhook' => [['id' => 'abc', 'url' => 'https://example.com/hook']]],
     ];
 
+    private const DRIFTED = [
+        'id' => 'drift',
+        'to' => ['field:email'],
+        'conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Bob']],
+    ];
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
@@ -238,18 +244,150 @@ class ConfigureFormInstancesTest extends TestCase
         $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
     }
 
+    #[Test]
+    public function an_unchanged_drifted_connection_override_doesnt_block_a_save()
+    {
+        $stored = ['connections' => ['email' => [self::DRIFTED]]];
+
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => $stored]);
+
+        $this->save($user, $entry, $this->posted($user, $entry));
+
+        $this->assertSame('Updated', Entry::find($entry->id())->get('title'));
+        $this->assertEquals(['contact' => $stored], Entry::find($entry->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function a_changed_drifted_connection_override_is_still_validated()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+            'contact' => ['connections' => ['email' => [self::DRIFTED]]],
+        ]);
+
+        $posted = $this->posted($user, $entry);
+        $posted['config']['contact']['connections']['email'][0]['subject'] = 'Changed';
+
+        $this->update($user, $entry, $posted)->assertUnprocessable()->assertJsonValidationErrors(['form_instances' => 'Invalid connections.']);
+    }
+
+    #[Test]
+    public function a_new_invalid_connection_next_to_an_unchanged_drifted_one_is_validated()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+            'contact' => ['connections' => ['email' => [self::DRIFTED]]],
+        ]);
+
+        $posted = $this->posted($user, $entry);
+        $posted['config']['contact']['connections']['email'][] = ['to' => ['admin@example.com'], 'html' => 'statamic::auth.login'];
+
+        $this->update($user, $entry, $posted)->assertUnprocessable()->assertJsonValidationErrors(['form_instances' => 'Invalid connections.']);
+    }
+
+    #[Test]
+    public function a_changed_connection_next_to_an_unchanged_drifted_one_can_be_saved()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+            'contact' => ['connections' => ['email' => [self::DRIFTED, ['id' => 'ok', 'to' => ['admin@example.com']]]]],
+        ]);
+
+        $posted = $this->posted($user, $entry);
+        $posted['config']['contact']['connections']['email'][1]['to'] = ['other@example.com'];
+
+        $this->save($user, $entry, $posted);
+
+        $this->assertEquals(
+            ['contact' => ['connections' => ['email' => [self::DRIFTED, ['id' => 'ok', 'to' => ['other@example.com']]]]]],
+            Entry::find($entry->id())->get('form_instances')
+        );
+    }
+
+    #[Test]
+    public function an_unchanged_invalid_access_override_doesnt_block_a_save()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+            'contact' => ['submission_limit' => 'lots'],
+        ]);
+
+        $this->save($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => ['submission_limit' => 'lots']]]);
+
+        $this->assertSame('Updated', Entry::find($entry->id())->get('title'));
+    }
+
+    #[Test]
+    public function a_changed_invalid_access_override_is_still_validated()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+            'contact' => ['submission_limit' => 'lots'],
+        ]);
+
+        $this->update($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => ['submission_limit' => 'many']]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('form_instances');
+    }
+
+    #[Test]
+    public function overrides_arent_validated_on_a_localization()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        $stored = ['connections' => ['email' => [self::DRIFTED]]];
+
+        [$user, $origin] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'access fr site', 'edit contact form'], ['contact' => $stored]);
+        $origin->collection()->sites(['en', 'fr'])->save();
+
+        $localization = EntryFactory::collection($origin->collection())->locale('fr')->origin($origin)->slug('a')->create();
+
+        $this->update($user, $localization, $this->posted($user, $origin), ['_localized' => ['title']])->assertOk();
+
+        $this->update($user, $localization, ['forms' => ['contact'], 'config' => [
+            'contact' => ['connections' => ['email' => [['to' => ['admin@example.com'], 'html' => 'statamic::auth.login']]]],
+        ]], ['_localized' => ['title']])->assertOk();
+
+        $this->assertSame('Updated', Entry::find($localization->id())->get('title'));
+        $this->assertEquals(['contact' => $stored], Entry::find($origin->id())->get('form_instances'));
+        $this->assertNull(Entry::find($localization->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function an_invalid_date_override_error_lands_on_the_field()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+
+        $this->update($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => ['close_date' => 'bad-date']]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('form_instances')
+            ->assertJsonMissingValidationErrors('close_date');
+
+        $this->assertEquals(['contact' => self::STORED], Entry::find($entry->id())->get('form_instances'));
+    }
+
     private function save($user, $entry, array $formInstances): void
     {
         $this->update($user, $entry, $formInstances)->assertOk();
     }
 
-    private function update($user, $entry, array $formInstances)
+    private function update($user, $entry, array $formInstances, array $extra = [])
     {
         return $this->actingAs($user)->patchJson($entry->updateUrl(), [
             'title' => 'Updated',
             'slug' => 'a',
             'form_instances' => $formInstances,
+            ...$extra,
         ]);
+    }
+
+    private function posted($user, $entry): array
+    {
+        $this->actingAs($user);
+
+        return $entry->blueprint()->field('form_instances')
+            ->setParent($entry)
+            ->setValue($entry->get('form_instances'))
+            ->preProcess()
+            ->value();
     }
 
     private function seedEntry(array $permissions, ?array $formInstances): array
