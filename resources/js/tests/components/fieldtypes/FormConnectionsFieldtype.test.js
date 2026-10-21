@@ -223,3 +223,26 @@ test('a stale validation failure is not shown on another connector', async () =>
 
     expect(wrapper.findComponent({ name: 'ConnectionEditor' }).props('errors')).toEqual({});
 });
+
+test('a failed apply shows an error and keeps the editor open', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+    axios.post.mockRejectedValueOnce({ response: { status: 500 } });
+    apply(wrapper);
+    await flushPromises();
+
+    expect(toast.error).toHaveBeenCalled();
+    expect(editorStack(wrapper).props('open')).toBe(true);
+    expect(editorStack(wrapper).props('beforeClose')()).toBe(true);
+});
+
+test('a validation failure on apply shows the errors without a toast', async () => {
+    const wrapper = mountFieldtype();
+    await openEditor(wrapper, 'email');
+    axios.post.mockRejectedValueOnce({ response: { status: 422, data: { errors: { to: ['Required'] } } } });
+    apply(wrapper);
+    await flushPromises();
+
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(wrapper.findComponent({ name: 'ConnectionEditor' }).props('errors')).toEqual({ to: ['Required'] });
+});

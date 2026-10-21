@@ -112,7 +112,10 @@ function applyConnector() {
 
             if (e.response?.status === 422) {
                 errors.value = e.response.data.errors;
+                return;
             }
+
+            toast.error(__('Something went wrong'));
         })
         .finally(() => {
             if (request === editorRequest) saving.value = false;
