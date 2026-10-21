@@ -3,8 +3,11 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\Checkboxes;
+use Statamic\Forms\Summary\FieldResponses;
 use Tests\TestCase;
 
 class CheckboxesTest extends TestCase
@@ -51,5 +54,37 @@ class CheckboxesTest extends TestCase
             ],
             'default' => ['music'],
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    public function it_defaults_to_a_bar_chart()
+    {
+        $this->assertEquals(HorizontalBar::class, (new Checkboxes)->defaultChart());
+    }
+
+    #[Test]
+    public function it_stores_multiple_choice_values()
+    {
+        $this->assertSame(FormValueType::Choices, (new Checkboxes)->valueType());
+    }
+
+    #[Test]
+    public function it_returns_its_options_as_chart_options_with_checkbox_icons()
+    {
+        $fieldtype = (new Checkboxes)->setField(new FormField('interests', [
+            'type' => 'checkboxes',
+            'options' => ['music' => 'Music', 'sports' => 'Sports'],
+        ]));
+
+        $options = $fieldtype->chartOptions($this->responses([]));
+
+        $this->assertEquals(['music', 'sports'], $options->map->key->all());
+        $this->assertEquals(['Music', 'Sports'], $options->map->label->all());
+        $this->assertEquals(['checkbox-filled', 'checkbox-filled'], $options->map->icon->all());
+    }
+
+    private function responses(iterable $values): FieldResponses
+    {
+        return FieldResponses::fromValues(new FormField('field', ['type' => 'checkboxes']), $values);
     }
 }

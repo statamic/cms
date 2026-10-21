@@ -3,10 +3,13 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue';
+import { computed, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import useCopy from '@/composables/copy';
+import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
 defineEmits(['update:modelValue']);
+
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps({
     /** When `true`, the textarea will automatically grow/shrink to fit content */
@@ -14,7 +17,7 @@ const props = defineProps({
     /** When `true`, shows a copy button to copy the value to clipboard */
     copyable: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    /** ID attribute for the textarea element */
+    /** ID attribute for the textarea element. Inherits from parent `Field` when omitted. */
     id: { type: String, default: null },
     readOnly: { type: Boolean, default: false },
     required: { type: Boolean, default: false },
@@ -28,6 +31,18 @@ const props = defineProps({
     limit: { type: Number, default: null },
 });
 
+const attrs = useAttrs();
+const { id, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+
+const resolvedDescribedBy = computed(() =>
+    mergeAriaDescribedBy(describedBy.value, attrs['aria-describedby']),
+);
+
+const textareaAttrs = computed(() => {
+    const { 'aria-describedby': _describedBy, 'aria-invalid': _invalid, ...rest } = attrs;
+    return rest;
+});
+
 const { copySupported, copied, copy } = useCopy();
 const canCopy = computed(() => props.copyable && copySupported.value);
 
@@ -36,7 +51,8 @@ const classes = cva({
         'w-full block bg-white dark:bg-gray-900 px-3 pt-2.5 pb-3 rounded-lg',
         'border border-gray-300 with-contrast:border-gray-500 dark:border-gray-700',
         'text-gray-900 dark:text-gray-300',
-        'appearance-none antialiased shadow-ui-sm disabled:shadow-none read-only:border-dashed not-prose'
+        'appearance-none antialiased shadow-ui-sm disabled:shadow-none read-only:border-dashed not-prose',
+        'read-only-field:not-dark:read-only:enabled:bg-gray-100 read-only-field:read-only:enabled:text-gray-600 read-only-field:not-dark:read-only:enabled:shadow-none dark:read-only-field:read-only:enabled:text-gray-500',
     ],
     variants: {
         resize: {
@@ -52,18 +68,30 @@ const classes = cva({
 })({ ...props });
 
 const textarea = useTemplateRef('textarea');
+let resizeObserver;
 
 onMounted(() => {
     if (props.elastic) {
         autosize(textarea.value);
-        setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+        let width;
+        resizeObserver = new ResizeObserver(([entry]) => {
+            if (entry.contentRect.width === width) return;
+            width = entry.contentRect.width;
+            requestAnimationFrame(() => autosize.update(textarea.value));
+        });
+        resizeObserver.observe(textarea.value);
     }
 });
+
+if (props.elastic) {
+    watch(() => props.modelValue, () => autosize.update(textarea.value), { flush: 'post' });
+}
 
 onBeforeUnmount(() => {
     if (props.elastic) {
         autosize.destroy(textarea.value);
     }
+    resizeObserver?.disconnect();
 });
 </script>
 
@@ -74,11 +102,13 @@ onBeforeUnmount(() => {
             :class="classes"
             :rows="rows"
             :id="id"
-            v-bind="$attrs"
+            v-bind="textareaAttrs"
             :value="modelValue"
             :disabled="disabled"
             :readonly="readOnly"
             :required="required"
+            :aria-describedby="resolvedDescribedBy"
+            :aria-invalid="invalid ? 'true' : undefined"
             data-ui-control
             @input="$emit('update:modelValue', $event.target.value)"
         />

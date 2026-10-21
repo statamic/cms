@@ -3,12 +3,14 @@
 namespace Statamic\Forms;
 
 use Closure;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\FormRepository as Contract;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Exceptions\FormNotFoundException;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Exporters\ExporterRepository;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -17,6 +19,7 @@ class FormRepository implements Contract
 {
     private $configs = [];
     private $redirects = [];
+    private $additionalMentions = [];
 
     /**
      * Find a form.
@@ -85,25 +88,27 @@ class FormRepository implements Contract
         return $form;
     }
 
-    public function appendConfigFields($handles, string $display, array $fields)
+    public function appendConfigFields($handles, string $display, array $fields, ?string $beforeSection = null, ?string $afterSection = null)
     {
+        if ($beforeSection && $afterSection) {
+            throw new InvalidArgumentException('Pass only beforeSection or afterSection, not both.');
+        }
+
         $this->configs[] = [
             'display' => $display,
             'handles' => Arr::wrap($handles),
             'fields' => $fields,
+            'beforeSection' => $beforeSection,
+            'afterSection' => $afterSection,
         ];
     }
 
     public function extraConfigFor($handle)
     {
-        $reserved = ['title', 'honeypot', 'store', 'email'];
+        $reserved = ['title', 'honeypot', 'store', 'email', 'connections', 'fields'];
 
-        return collect($this->configs)
-            ->filter(function ($config) use ($handle) {
-                return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
-            })
+        return $this->configsFor($handle)
             ->flatMap(function ($config) use ($reserved) {
-
                 return [
                     Str::snake($config['display']) => [
                         'display' => $config['display'],
@@ -116,11 +121,48 @@ class FormRepository implements Contract
             ->all();
     }
 
+    public function extraConfigPositionsFor($handle)
+    {
+        return $this->configsFor($handle)
+            ->flatMap(fn ($config) => [
+                Str::snake($config['display']) => Arr::only($config, ['beforeSection', 'afterSection']),
+            ])
+            ->filter(fn ($position) => $position['beforeSection'] || $position['afterSection'])
+            ->all();
+    }
+
+    private function configsFor($handle)
+    {
+        return collect($this->configs)->filter(function ($config) use ($handle) {
+            return in_array('*', $config['handles']) || in_array($handle, $config['handles']);
+        });
+    }
+
     public function redirect(string $form, Closure $callback)
     {
         $this->redirects[$form] = $callback;
 
         return $this;
+    }
+
+    public function addMention(string $handle, string $label, Closure $value)
+    {
+        if (! str_contains($handle, '.') || ! Mentions::isValidValue($handle)) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. It must contain a dot and only use letters, numbers, underscores, dashes and dots.");
+        }
+
+        if (str_starts_with($handle, 'form.') || str_starts_with($handle, 'site.') || str_starts_with($handle, 'globals.') || str_starts_with($handle, 'config.')) {
+            throw new InvalidArgumentException("Invalid mention handle [{$handle}]. The [form.], [site.], [globals.] and [config.] prefixes are reserved.");
+        }
+
+        $this->additionalMentions[$handle] = ['label' => $label, 'value' => $value];
+
+        return $this;
+    }
+
+    public function additionalMentions(): array
+    {
+        return $this->additionalMentions;
     }
 
     public function getSubmissionRedirect(SubmissionContract $submission)

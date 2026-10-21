@@ -55,11 +55,18 @@ class FormSubmissionsController extends CpController
             ]),
             'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
             'generateFakeSubmissionUrl' => cp_route('forms.submissions.generate-fake', $form->handle()),
+            'summaryUrl' => Statamic::formsProInstalled() ? cp_route('forms.submissions.summary', $form->handle()) : null,
+            'chartsUpdateUrl' => Statamic::formsProInstalled() ? cp_route('forms.submissions.charts.update', $form->handle()) : null,
             'exporters' => $form->exporters()->map(fn ($exporter) => [
                 'handle' => $exporter->handle(),
                 'title' => $exporter->title(),
                 'downloadUrl' => $exporter->downloadUrl(),
+                'supportsColumnSelection' => $exporter->supportsColumnSelection(),
             ])->values(),
+            'exportColumns' => $form->fields()
+                ->map(fn ($field) => ['handle' => $field->handle(), 'title' => __($field->display())])
+                ->push(['handle' => 'date', 'title' => __('Date')])
+                ->values(),
             'redirectUrl' => cp_route('forms.index'),
         ]);
     }

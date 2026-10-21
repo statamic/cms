@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Contracts\Query\ContainsQueryableValues;
@@ -18,9 +19,12 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\File;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site as Sites;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Field;
+use Statamic\Forms\Connectors\RecordConnectionSuccess;
 use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Forms\Uploaders\FilesUploader;
 use Statamic\Forms\Uploaders\FormFileUpload;
@@ -70,15 +74,20 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $data = collect($data);
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing partial and site values unless the
-        // incoming payload provides its own.
-        foreach (['partial', 'site'] as $key) {
+        // keys, so carry over the existing _partial, _marked_spam_at and _site values
+        // unless the incoming payload provides its own.
+        foreach (['_partial', '_marked_spam_at', '_site'] as $key) {
             if ($this->has($key) && ! $data->has($key)) {
                 $data[$key] = $this->get($key);
             }
         }
 
         return $this->traitData($data);
+    }
+
+    public function values()
+    {
+        return $this->data()->reject(fn ($value, $key) => Str::startsWith($key, '_'));
     }
 
     /**
@@ -117,10 +126,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     public function site(Site|string|null $site = null): Site|static
     {
         if (func_num_args() === 0) {
-            return Sites::get($this->get('site')) ?? Sites::default();
+            return Sites::get($this->get('_site')) ?? Sites::default();
         }
 
-        $this->set('site', $site instanceof Site ? $site->handle() : $site);
+        $this->set('_site', $site instanceof Site ? $site->handle() : $site);
 
         return $this;
     }
@@ -157,19 +166,44 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function asPartial(): self
     {
-        $this->set('partial', true);
+        $this->set('_partial', true);
 
         return $this;
     }
 
     public function isPartial(): bool
     {
-        return (bool) $this->get('partial');
+        // Spam submissions aren't in progress, so they shouldn't be resumed.
+        // The "_partial" key sticks around to indicate that the submission was
+        // never finalized, so marking it as not spam can finalize it as normal.
+        return $this->get('_partial') && ! $this->isSpam();
+    }
+
+    public function markAsSpam(): self
+    {
+        if (! $this->isSpam()) {
+            $this->set('_marked_spam_at', now()->timestamp);
+        }
+
+        return $this;
+    }
+
+    public function markAsNotSpam(): self
+    {
+        $this->remove('_marked_spam_at');
+
+        return $this;
+    }
+
+    public function isSpam(): bool
+    {
+        return $this->get('_marked_spam_at') !== null;
     }
 
     public function status(): string
     {
         return match (true) {
+            $this->isSpam() => 'spam',
             $this->isPartial() => 'partial',
             default => 'finalized',
         };
@@ -254,7 +288,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
-        $this->remove('partial');
+        $this->remove('_partial');
 
         if ($this->form()->store()) {
             $this->save();
@@ -271,10 +305,42 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
         SubmissionFinalized::dispatch($this);
 
+        // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
-        SendEmails::dispatch($this, $this->site());
+
+        $jobs = $this->connectionJobs();
+
+        if ($this->shouldDeleteTemporaryFiles()) {
+            if ($jobs) {
+                RecordConnectionSuccess::countDown($this, $jobs);
+            } else {
+                rescue(fn () => Bus::dispatch(new DeleteTemporaryFiles($this)));
+            }
+        }
+
+        // Dispatched independently so one failing connection (e.g. on the sync queue) doesn't stop the others.
+        foreach ($jobs as $job) {
+            rescue(fn () => Bus::dispatch($job));
+        }
 
         return $this;
+    }
+
+    public function connectionJobs(): array
+    {
+        return $this->form()->connections()
+            ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
+            ->flatten()
+            ->filter()
+            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
+            ->values()
+            ->all();
+    }
+
+    private function shouldDeleteTemporaryFiles(): bool
+    {
+        return $this->form()->blueprint()->fields()->all()
+            ->contains(fn (Field $field) => in_array($field->type(), ['files', 'form_upload']));
     }
 
     public function deleteQuietly()

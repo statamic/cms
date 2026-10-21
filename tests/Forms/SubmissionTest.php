@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\SubmissionCreated;
@@ -15,9 +16,12 @@ use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
+use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
+use Statamic\Forms\SendEmail;
 use Statamic\Forms\SendEmails;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -129,17 +133,91 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function setting_data_preserves_the_partial_and_site_keys()
+    public function it_gets_values_without_internal_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->asPartial()->site('fr');
+        $submission = $form->makeSubmission()
+            ->data(['name' => 'Olaf', 'email' => 'olaf@example.com', '_fake' => true])
+            ->asPartial()
+            ->site('en');
+
+        $this->assertInstanceOf(Collection::class, $submission->values());
+        $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->values()->all());
+        $this->assertEquals([
+            'name' => 'Olaf',
+            'email' => 'olaf@example.com',
+            '_fake' => true,
+            '_partial' => true,
+            '_site' => 'en',
+        ], $submission->data()->all());
+    }
+
+    #[Test]
+    public function data_remains_the_live_collection_including_internal_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial();
+        $submission->data()->put('name', 'Olaf');
+
+        $this->assertEquals(['name' => 'Olaf'], $submission->values()->all());
+        $this->assertEquals(['_partial' => true, 'name' => 'Olaf'], $submission->data()->all());
+    }
+
+    #[Test]
+    public function setting_data_preserves_the_partial_spam_and_site_keys()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->asPartial()->markAsSpam()->site('fr');
 
         $submission->data(['foo' => 'bar']);
 
         $this->assertEquals('bar', $submission->get('foo'));
-        $this->assertTrue($submission->isPartial());
-        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertTrue($submission->get('_partial'));
+        $this->assertTrue($submission->isSpam());
+        $this->assertEquals('fr', $submission->get('_site'));
+    }
+
+    #[Test]
+    public function marking_as_spam_stores_a_timestamp_once()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = $form->makeSubmission();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission->markAsSpam();
+        $timestamp = Carbon::now()->timestamp;
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+        $this->assertTrue($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+        $submission->data(['foo' => 'bar']);
+        $submission->save();
+
+        $this->assertSame($timestamp, $submission->get('_marked_spam_at'));
+    }
+
+    #[Test]
+    public function marking_as_not_spam_removes_the_timestamp_and_remarking_gets_a_new_one()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        Carbon::setTestNow('2025-05-01 12:00:00');
+        $submission = $form->makeSubmission()->markAsSpam();
+
+        $submission->markAsNotSpam();
+
+        $this->assertFalse($submission->has('_marked_spam_at'));
+        $this->assertFalse($submission->isSpam());
+
+        Carbon::setTestNow('2025-05-05 12:00:00');
+        $submission->markAsSpam();
+
+        $this->assertSame(Carbon::now()->timestamp, $submission->get('_marked_spam_at'));
     }
 
     #[Test]
@@ -149,10 +227,10 @@ class SubmissionTest extends TestCase
 
         $submission = $form->makeSubmission()->asPartial()->site('fr');
 
-        $submission->data(['foo' => 'bar', 'partial' => false, 'site' => 'de']);
+        $submission->data(['foo' => 'bar', '_partial' => false, '_site' => 'de']);
 
         $this->assertFalse($submission->isPartial());
-        $this->assertEquals('de', $submission->get('site'));
+        $this->assertEquals('de', $submission->get('_site'));
     }
 
     #[Test]
@@ -311,6 +389,20 @@ class SubmissionTest extends TestCase
         $partial = $form->makeSubmission()->asPartial();
         $this->assertTrue($partial->isPartial());
         $this->assertEquals('partial', $partial->status());
+
+        $spam = $form->makeSubmission()->markAsSpam();
+        $this->assertTrue($spam->isSpam());
+        $this->assertEquals('spam', $spam->status());
+
+        // Submissions caught by spam protection keep their raw partial
+        // key, but report as spam rather than partial.
+        $partialSpam = $form->makeSubmission()->asPartial()->markAsSpam();
+        $this->assertFalse($partialSpam->isPartial());
+        $this->assertEquals('spam', $partialSpam->status());
+
+        $notSpam = $spam->markAsNotSpam();
+        $this->assertFalse($notSpam->isSpam());
+        $this->assertEquals('finalized', $notSpam->status());
     }
 
     #[Test]
@@ -346,16 +438,16 @@ class SubmissionTest extends TestCase
         // It can be set by handle, storing the handle in the data.
         $return = $submission->site('fr');
         $this->assertSame($submission, $return);
-        $this->assertEquals('fr', $submission->get('site'));
+        $this->assertEquals('fr', $submission->get('_site'));
         $this->assertEquals('fr', $submission->site()->handle());
 
         // It can be set with a Site instance, which also stores the handle.
         $submission->site(Site::get('en'));
-        $this->assertEquals('en', $submission->get('site'));
+        $this->assertEquals('en', $submission->get('_site'));
         $this->assertEquals('en', $submission->site()->handle());
 
         // An invalid handle falls back to the default.
-        $submission->set('site', 'nonexistent');
+        $submission->set('_site', 'nonexistent');
         $this->assertEquals('en', $submission->site()->handle());
     }
 
@@ -366,7 +458,7 @@ class SubmissionTest extends TestCase
 
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('partial', true);
+        $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
         // A partial submission is still saved and created, so its events are never withheld.
@@ -381,14 +473,14 @@ class SubmissionTest extends TestCase
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->set('partial', true);
+        $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
         Event::fake();
 
         // The created event already fired when the partial was first saved. Removing the
         // partial key and saving again won't re-dispatch it, because the record exists.
-        $submission->remove('partial');
+        $submission->remove('_partial');
         $submission->save();
 
         Event::assertNotDispatched(SubmissionCreating::class);
@@ -410,23 +502,63 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
 
         $this->assertNotNull($form->submission($submission->id()));
     }
 
     #[Test]
-    public function finalizing_dispatches_asset_creation_synchronously_then_sends_emails()
+    public function finalizing_dispatches_each_connection_job_independently()
     {
         Bus::fake();
 
-        $form = tap(Form::make('contact_us'))->save();
-        $submission = $form->makeSubmission()->asPartial();
+        $form = tap(Form::make('contact_us')->connections([
+            'email' => [['to' => 'test@example.com'], ['to' => 'test2@example.com']],
+            'webhook' => [['url' => 'https://example.com/webhook'], ['url' => 'https://example.com/webhook2']],
+        ])->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
+            ],
+        ]))->save();
 
-        $submission->finalize();
+        $form->makeSubmission()->asPartial()->finalize();
 
         Bus::assertDispatchedSync(CreateAssetsFromFileUploads::class);
-        Bus::assertDispatched(SendEmails::class);
+        Bus::assertDispatchedTimes(SendEmail::class, 2);
+        Bus::assertDispatchedTimes(SendWebhook::class, 2);
+        Bus::assertDispatchedWithoutChain(SendEmail::class);
+        Bus::assertDispatchedWithoutChain(SendWebhook::class);
+        Bus::assertNotDispatched(SendEmails::class);
+
+        // Cleanup waits for the connection jobs to count down.
+        Bus::assertNotDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function finalizing_with_uploads_but_no_connection_jobs_dispatches_the_cleanup_immediately()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us')->formFields([
+            'fields' => [
+                ['handle' => 'document', 'field' => ['type' => 'form_upload', 'store' => false]],
+            ],
+        ]))->save();
+
+        $form->makeSubmission()->asPartial()->finalize();
+
+        Bus::assertDispatched(DeleteTemporaryFiles::class);
+    }
+
+    #[Test]
+    public function finalizing_without_connections_or_uploads_doesnt_dispatch_anything()
+    {
+        Queue::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+
+        $form->makeSubmission()->asPartial()->finalize();
+
+        Queue::assertNothingPushed();
     }
 
     #[Test]
@@ -436,7 +568,7 @@ class SubmissionTest extends TestCase
         Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
 
         $form = tap(Form::make('contact_us'))->save();
-        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
 
         $submission->finalize();
 
@@ -447,7 +579,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]
@@ -464,7 +595,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
         $this->assertNull($form->submission($submission->id()));
     }
 
@@ -476,7 +606,7 @@ class SubmissionTest extends TestCase
 
         $form = tap(Form::make('contact_us')->store(false))->save();
 
-        $submission = tap($form->makeSubmission()->set('partial', true))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
         $this->assertNotNull($form->submission($submission->id()));
 
         $submission->finalize();
@@ -486,7 +616,6 @@ class SubmissionTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
         Event::assertNotDispatched(SubmissionDeleted::class);
     }
 
@@ -505,7 +634,6 @@ class SubmissionTest extends TestCase
         // The second call is a no-op because the submission is no longer partial.
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
-        Bus::assertDispatched(SendEmails::class, 1);
     }
 
     #[Test]
@@ -526,5 +654,18 @@ class SubmissionTest extends TestCase
 
         $this->assertEquals('A', $submission->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function deleting_the_form_deletes_partial_submissions_too()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+        $finalized = tap($form->makeSubmission())->save();
+        $partial = tap($form->makeSubmission()->asPartial())->save();
+
+        $form->delete();
+
+        $this->assertNull(FormSubmission::find($finalized->id()));
+        $this->assertNull(FormSubmission::find($partial->id()));
     }
 }

@@ -181,7 +181,7 @@ onMounted(() => {
                                 </template>
                             </Combobox>
 
-                            <Switch v-if="allowCustomConditions" class="ms-4" size="sm" :model-value="isCustom" @update:model-value="toggleCustom" />
+                            <Switch v-if="allowCustomConditions" class="ms-4" size="sm" :label="__('Custom method passes')" :model-value="isCustom" @update:model-value="toggleCustom" />
                             <Text v-if="allowCustomConditions" class="ms-2" :text="__('Custom method passes')" />
                         </div>
                     </template>
@@ -261,7 +261,7 @@ onMounted(() => {
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"
             >
-                <Switch v-model="alwaysSave" />
+                <Switch v-model="alwaysSave" :label="__('Always Save')" />
             </Field>
 
             <Field
@@ -269,7 +269,7 @@ onMounted(() => {
                 :label="__('Reserve Space When Hidden')"
                 :instructions="__('messages.field_conditions_reserve_space_when_hidden_instructions')"
             >
-                <Switch v-model="reserveSpaceWhenHidden" />
+                <Switch v-model="reserveSpaceWhenHidden" :label="__('Reserve Space When Hidden')" />
             </Field>
         </div>
     </div>

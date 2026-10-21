@@ -1,4 +1,5 @@
 @import './vendors/codemirror.css';
+@import './vendors/cropper.css';
 
 @import './core/animation.css';
 @import './core/layout.css';
@@ -19,6 +20,7 @@
 @import './components/page-tree.css';
 @import './components/forms.css';
 @import './components/forms/logic-tree.css';
+@import './components/forms/charts.css';
 @import './components/pagination.css';
 @import './components/popover.css';
 @import './components/preview.css';

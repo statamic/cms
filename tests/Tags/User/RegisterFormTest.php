@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
@@ -392,6 +393,42 @@ EOT
         $this->assertEquals($user->roles()->count(), 0);
         $this->assertNull($user->get('super'));
         $this->assertNull($user->get('password_confirmation'));
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_renders_core_fieldtypes_using_their_form_field_views($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $blueprint = Blueprint::make()->setContents([
+            'fields' => [
+                ['handle' => 'bio', 'field' => ['type' => 'textarea']],
+                ['handle' => 'country', 'field' => ['type' => 'select', 'options' => ['uk' => 'United Kingdom', 'us' => 'United States']]],
+                ['handle' => 'plan', 'field' => ['type' => 'radio', 'options' => ['free' => 'Free', 'pro' => 'Pro']]],
+                ['handle' => 'avatar', 'field' => ['type' => 'assets', 'max_files' => 1]],
+                ['handle' => 'age', 'field' => ['type' => 'integer']],
+            ],
+        ]);
+
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $output = $this->normalizeHtml($this->tag('{{ user:register_form }}{{ fields }}{{ field }}{{ /fields }}{{ /user:register_form }}'));
+
+        $this->assertStringContainsString('<textarea id="userregister-form-bio-field" name="bio" rows="5"></textarea>', $output);
+        $this->assertStringContainsString('<select id="userregister-form-country-field" name="country">', $output);
+        $this->assertStringContainsString('<option value="uk">United Kingdom</option>', $output);
+        $this->assertStringContainsString('<input id="userregister-form-plan-field-pro-option" type="radio" name="plan" value="pro">', $output);
+        $this->assertStringContainsString('<input id="userregister-form-avatar-field" type="file" name="avatar">', $output);
+        $this->assertStringContainsString('<input id="userregister-form-age-field" type="number" name="age" value="">', $output);
+    }
+
+    public static function templateLanguageProvider()
+    {
+        return [
+            'antlers' => ['antlers'],
+            'blade' => ['blade'],
+        ];
     }
 
     private function useCustomBlueprint()

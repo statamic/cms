@@ -49,6 +49,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Connections Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | The cache store used to track when a submission's connections have all
+    | finished, so its temporary files can be deleted. A persistent store
+    | such as "database" or "redis" is recommended. Null uses the default.
+    |
+    */
+
+    'connections_cache_store' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Partial Submissions
     |--------------------------------------------------------------------------
     |
@@ -58,6 +71,20 @@ return [
     */
 
     'delete_partial_submissions_after' => 7,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Spam Submissions
+    |--------------------------------------------------------------------------
+    |
+    | Spam submissions are automatically deleted a set number of days after
+    | being marked as spam. Files uploaded through form upload fields are
+    | kept for the same period, so that submissions marked as not spam
+    | can still be finalized. Set this to null to prevent their deletion.
+    |
+    */
+
+    'delete_spam_submissions_after' => 30,
 
     /*
     |--------------------------------------------------------------------------

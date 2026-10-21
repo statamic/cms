@@ -3,7 +3,12 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Statamic\Facades\Dictionary;
+use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Insights\Average;
+use Statamic\Forms\Insights\Insight;
+use Statamic\Forms\Insights\MinMax;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -39,6 +44,31 @@ class Currency extends FormFieldtype
             'prepend' => $symbol = Arr::get($currency->extra(), 'symbol'),
             'currency_symbol' => $symbol,
             ...Arr::except($this->config(), ['type', 'currency']),
+        ];
+    }
+
+    public function valueType(): ?FormValueType
+    {
+        return FormValueType::Number;
+    }
+
+    public function defaultChart(): ?string
+    {
+        return VerticalBar::class;
+    }
+
+    public function defaultInsights(): array
+    {
+        return [MinMax::class, Average::class];
+    }
+
+    public function insightConfig(Insight $insight): array
+    {
+        $extra = Dictionary::find('currencies')?->get($this->config('currency'))?->extra() ?? [];
+
+        return [
+            'prefix' => Arr::get($extra, 'symbol'),
+            'precision' => Arr::get($extra, 'decimals', 2),
         ];
     }
 

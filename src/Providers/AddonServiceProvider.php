@@ -21,7 +21,10 @@ use Statamic\Facades\Fieldset;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\Charts\Chart;
+use Statamic\Forms\Connectors\Connector as FormConnector;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Insights\Insight;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes\Scope;
@@ -72,9 +75,24 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $fieldtypes = [];
 
     /**
+     * @var list<class-string<FormConnector>>
+     */
+    protected $formConnectors = [];
+
+    /**
      * @var list<class-string<FormFieldtype>>
      */
     protected $formFieldtypes = [];
+
+    /**
+     * @var list<class-string<Chart>>
+     */
+    protected $formCharts = [];
+
+    /**
+     * @var list<class-string<Insight>>
+     */
+    protected $formInsights = [];
 
     /**
      * @var list<class-string<Modifier>>
@@ -122,7 +140,9 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
-     * @var list<string> - URLs of Vite entry points
+     * Vite entry point(s). A string or list is shorthand for the `input` key.
+     *
+     * @var string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}|null
      */
     protected $vite = null;
 
@@ -209,7 +229,10 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootActions()
                 ->bootDictionaries()
                 ->bootFieldtypes()
+                ->bootFormConnectors()
                 ->bootFormFieldtypes()
+                ->bootFormCharts()
+                ->bootFormInsights()
                 ->bootModifiers()
                 ->bootWidgets()
                 ->bootFormJsDrivers()
@@ -368,6 +391,19 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function bootFormConnectors()
+    {
+        $formConnectors = collect($this->formConnectors)
+            ->merge($this->autoloadFilesFromFolder('FormConnectors', FormConnector::class))
+            ->unique();
+
+        foreach ($formConnectors as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
     protected function bootFormFieldtypes()
     {
         $formFieldtypes = collect($this->formFieldtypes)
@@ -375,6 +411,32 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->unique();
 
         foreach ($formFieldtypes as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormCharts()
+    {
+        $formCharts = collect($this->formCharts)
+            ->merge($this->autoloadFilesFromFolder('FormCharts', Chart::class))
+            ->unique();
+
+        foreach ($formCharts as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootFormInsights()
+    {
+        $formInsights = collect($this->formInsights)
+            ->merge($this->autoloadFilesFromFolder('FormInsights', Insight::class))
+            ->unique();
+
+        foreach ($formInsights as $class) {
             $class::register();
         }
 
@@ -687,6 +749,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::script($name, "{$filename}.js?v=".md5($version));
     }
 
+    /**
+     * @param  string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}  $config
+     */
     public function registerVite($config)
     {
         $name = $this->getAddon()->packageName();

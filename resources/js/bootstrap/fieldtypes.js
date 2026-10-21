@@ -9,6 +9,7 @@ import ArrayFieldtype from '../components/fieldtypes/ArrayFieldtype.vue';
 import AssetsFieldtype from '../components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetsIndexFieldtype from '../components/fieldtypes/assets/AssetsIndexFieldtype.vue';
 import AssetFolderFieldtype from '../components/fieldtypes/AssetFolderFieldtype.vue';
+import AutocompleteEditorFieldtype from '../components/fieldtypes/AutocompleteEditorFieldtype.vue';
 import BardButtonsSettingFieldtype from '../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue';
 import BlueprintsFieldtype from '../components/fieldtypes/BlueprintsFieldtype.vue';
 import ButtonGroupFieldtype from '../components/fieldtypes/ButtonGroupFieldtype.vue';
@@ -31,6 +32,7 @@ import Sites from '../components/globals/Sites.vue';
 import Grid from '../components/fieldtypes/grid/Grid.vue';
 import GridIndex from '../components/fieldtypes/grid/GridIndex.vue';
 import GroupFieldtype from '../components/fieldtypes/GroupFieldtype.vue';
+import FormFieldsFieldtype from '../components/fieldtypes/FormFieldsFieldtype.vue';
 import FormHeadingFieldtype from '../components/fieldtypes/FormHeadingFieldtype.vue';
 import FormParagraphFieldtype from '@/components/fieldtypes/FormParagraphFieldtype.vue';
 import FormUploadFieldtype from '@/components/fieldtypes/FormUploadFieldtype.vue';
@@ -80,6 +82,7 @@ export default function registerFieldtypes(app) {
     app.component('assets-fieldtype', AssetsFieldtype);
     app.component('assets-fieldtype-index', AssetsIndexFieldtype);
     app.component('asset_folder-fieldtype', AssetFolderFieldtype);
+    app.component('autocomplete_editor-fieldtype', AutocompleteEditorFieldtype);
     app.component(
         'bard-fieldtype',
         defineAsyncComponent(() => import('../components/fieldtypes/bard/BardFieldtype.vue')),
@@ -114,6 +117,7 @@ export default function registerFieldtypes(app) {
     app.component('grid-fieldtype', Grid);
     app.component('grid-fieldtype-index', GridIndex);
     app.component('group-fieldtype', GroupFieldtype);
+    app.component('form_fields-fieldtype', FormFieldsFieldtype);
     app.component('form_heading-fieldtype', FormHeadingFieldtype);
     app.component('form_paragraph-fieldtype', FormParagraphFieldtype);
     app.component('form_upload-fieldtype', FormUploadFieldtype);

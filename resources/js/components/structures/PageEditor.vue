@@ -129,8 +129,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -304,7 +309,7 @@ export default {
     },
 
     created() {
-        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+enter', 'mod+s', 'mod+shift+s'], (e) => {
             e.preventDefault();
             this.submit();
         });

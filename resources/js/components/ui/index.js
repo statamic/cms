@@ -1,5 +1,6 @@
 export { default as Alert } from './Alert.vue';
 export { default as AuthCard } from './AuthCard.vue';
+export { default as AutocompleteEditor } from './AutocompleteEditor/AutocompleteEditor.vue';
 export { default as Badge } from './Badge.vue';
 export { default as Button } from './Button/Button.vue';
 export { default as ButtonGroup } from './Button/Group.vue';
@@ -9,6 +10,10 @@ export { default as CardList } from './Card/List.vue';
 export { default as CardListItem } from './Card/ListItem.vue';
 export { default as CardPanel } from './Card/Panel.vue';
 export { default as CharacterCounter } from './CharacterCounter.vue';
+export { default as HorizontalBarChart } from './Chart/HorizontalBarChart.vue';
+export { default as HorizontalLollipopChart } from './Chart/HorizontalLollipopChart.vue';
+export { default as PieChart } from './Chart/PieChart.vue';
+export { default as VerticalBarChart } from './Chart/VerticalBarChart.vue';
 export { default as Checkbox } from './Checkbox/Item.vue';
 export { default as CheckboxGroup } from './Checkbox/Group.vue';
 export { default as ChoiceGrid } from './ChoiceGrid.vue';

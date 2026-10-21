@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\FormConnector;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
@@ -12,6 +13,7 @@ use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainersController;
 use Statamic\Http\Controllers\CP\Assets\AssetsController;
 use Statamic\Http\Controllers\CP\Assets\BrowserController;
+use Statamic\Http\Controllers\CP\Assets\ContainerActionController;
 use Statamic\Http\Controllers\CP\Assets\FieldtypeController;
 use Statamic\Http\Controllers\CP\Assets\FolderActionController;
 use Statamic\Http\Controllers\CP\Assets\FoldersController;
@@ -73,8 +75,10 @@ use Statamic\Http\Controllers\CP\Forms\FormFieldsetPreviewsController;
 use Statamic\Http\Controllers\CP\Forms\FormLogicController;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Controllers\CP\Forms\FormSubmissionsController;
+use Statamic\Http\Controllers\CP\Forms\FormSummaryController;
 use Statamic\Http\Controllers\CP\Forms\GenerateFakeSubmissionController;
 use Statamic\Http\Controllers\CP\Forms\SubmissionActionController;
+use Statamic\Http\Controllers\CP\Forms\UpdateFormChartsController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsBlueprintController;
 use Statamic\Http\Controllers\CP\Globals\GlobalsController;
 use Statamic\Http\Controllers\CP\Globals\GlobalSetActionController;
@@ -256,6 +260,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::patch('globals/{global_set}/variables', [GlobalVariablesController::class, 'update'])->name('globals.variables.update');
 
     Route::resource('asset-containers', AssetContainersController::class)->except('index');
+    Route::post('asset-containers/actions', [ContainerActionController::class, 'run'])->name('asset-containers.actions.run');
+    Route::post('asset-containers/actions/list', [ContainerActionController::class, 'bulkActions'])->name('asset-containers.actions.bulk');
     Route::post('asset-containers/{asset_container}/folders', [FoldersController::class, 'store']);
     Route::post('assets/actions', [AssetActionController::class, 'run'])->name('assets.actions.run');
     Route::post('assets/actions/list', [AssetActionController::class, 'bulkActions'])->name('assets.actions.bulk');
@@ -354,6 +360,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/{form}/submissions/generate-fake', GenerateFakeSubmissionController::class)->name('forms.submissions.generate-fake');
     Route::resource('forms', FormsController::class);
     Route::get('forms/{form}/submissions', [FormSubmissionsController::class, 'index'])->name('forms.submissions.index');
+    Route::get('forms/{form}/submissions/summary', FormSummaryController::class)->name('forms.submissions.summary');
+    Route::patch('forms/{form}/submissions/charts', UpdateFormChartsController::class)->name('forms.submissions.charts.update');
     Route::get('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'show'])->name('forms.submissions.show');
     Route::delete('forms/{form}/submissions/{submission}', [FormSubmissionsController::class, 'destroy'])->name('forms.submissions.destroy');
     Route::get('forms/{form}/builder', [FormBuilderController::class, 'edit'])->name('forms.builder.edit');
@@ -363,7 +371,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::post('forms/{form}/builder/fieldset-previews', FormFieldsetPreviewsController::class)->name('forms.builder.fieldset-previews');
     Route::get('forms/{form}/logic', [FormLogicController::class, 'edit'])->name('forms.logic.edit');
     Route::patch('forms/{form}/logic', [FormLogicController::class, 'update'])->name('forms.logic.update');
-    Route::get('forms/{form}/connect', FormConnectController::class)->name('forms.connect.index');
+    Route::get('forms/{form}/connect', [FormConnectController::class, 'index'])->name('forms.connect.index');
+    Route::get('forms/{form}/connect/{connector}', [FormConnectController::class, 'edit'])->name('forms.connect.edit');
+    Route::patch('forms/{form}/connect/{connector}', [FormConnectController::class, 'update'])->name('forms.connect.update');
+    FormConnector::routes();
     Route::get('forms/{form}/export/{type}', [FormExportController::class, 'export'])->name('forms.export');
 
     Route::post('users/actions', [UserActionController::class, 'run'])->name('users.actions.run');
@@ -471,10 +482,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     if (config('statamic.users.elevated_sessions_enabled')) {
         Route::get('auth/confirm-password', [ElevatedSessionController::class, 'showForm'])->name('confirm-password');
-        Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
-        Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
-        Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
-        Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+
+        Route::withoutMiddleware(RedirectIfTwoFactorSetupIncomplete::class)->group(function () {
+            Route::get('elevated-session', [ElevatedSessionController::class, 'status'])->name('elevated-session.status');
+            Route::get('elevated-session/passkey-options', [ElevatedSessionController::class, 'options'])->name('elevated-session.passkey-options')->middleware('throttle:statamic.cp.passkeys');
+            Route::post('elevated-session', [ElevatedSessionController::class, 'confirm'])->name('elevated-session.confirm')->middleware('throttle:statamic.cp.auth');
+            Route::get('elevated-session/resend-code', [ElevatedSessionController::class, 'resendCode'])->name('elevated-session.resend-code')->middleware('throttle:send-elevated-session-code');
+        });
     }
 
     Route::get('playground', PlaygroundController::class)->name('playground');

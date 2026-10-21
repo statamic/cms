@@ -18,6 +18,7 @@ const operatorOptions = computed(() => [
     { label: __('Does not equal'), value: 'not' },
     { label: __('Contains'), value: 'contains' },
     { label: __('Contains Any'), value: 'contains_any' },
+    { label: __('Includes Any'), value: 'includes_any' },
     { label: '===', value: '===' },
     { label: '!==', value: '!==' },
     { label: '>', value: '>' },
@@ -47,6 +48,12 @@ const fieldOptions = computed(() => {
 
 const isToggleField = (field) => ['toggle', 'revealer', 'yes_no'].includes(field?.config?.type);
 const showValueToggle = computed(() => isToggleField(selectedField.value) && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
+
+const valueToggleLabel = computed(() => {
+    const field = __(selectedField.value?.config.display) || props.condition.field;
+
+    return field ? __('Value for :field', { field }) : __('Value');
+});
 
 const showValueDropdown = computed(() => {
     const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking', 'image_choice'];
@@ -123,6 +130,7 @@ const update = (key, value) => {
     <li>
         <Switch
             v-if="showValueToggle"
+            :label="valueToggleLabel"
             :model-value="condition.value === 'true'"
             @update:model-value="onValueToggle"
         />

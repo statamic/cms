@@ -29,6 +29,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Tab;
+use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Statamic;
@@ -47,7 +48,8 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     protected $fields;
     protected $honeypot;
     protected $store;
-    protected $email;
+    protected $connections;
+    protected $charts;
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
 
@@ -294,14 +296,61 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     }
 
     /**
+     * Get or set the connection configs.
+     *
+     * @param  mixed  $connections
+     * @return mixed
+     */
+    public function connections($connections = null)
+    {
+        return $this->fluentlyGetOrSet('connections')
+            ->getter(fn ($connections) => collect($connections))
+            ->setter(fn ($connections) => collect($connections)->map(fn ($config) => $this->ensureConnectionIds($config)))
+            ->args(func_get_args());
+    }
+
+    private function ensureConnectionIds($config): array
+    {
+        return array_map(
+            fn (array $connection) => ['id' => Str::random(8), ...$connection],
+            Connector::normalizeConnections($config)
+        );
+    }
+
+    /**
      * Get or set the email field.
+     *
+     * @deprecated Use connections() instead.
      *
      * @param  mixed  $emails
      * @return mixed
      */
     public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')->args(func_get_args());
+        if (func_num_args() === 0) {
+            $emails = $this->connections()->get('email');
+
+            return is_null($emails) ? null : array_map(fn ($email) => Arr::except($email, 'id'), $emails);
+        }
+
+        $connections = $this->connections();
+
+        is_null($emails)
+            ? $connections->forget('email')
+            : $connections->put('email', $emails);
+
+        return $this->connections($connections);
+    }
+
+    /**
+     * Get or set the submission summary charts.
+     *
+     * @param  mixed  $charts
+     * @return mixed
+     */
+    public function charts($charts = null)
+    {
+        return $this->fluentlyGetOrSet('charts')->args(func_get_args());
     }
 
     public function fields(): Collection
@@ -369,17 +418,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         $data = $this->data->merge(collect([
             'title' => $this->title,
             'fields' => $this->formFields()->contents(),
+            'charts' => $this->charts,
             'honeypot' => $this->honeypot,
-            'email' => collect(isset($this->email['to']) ? [$this->email] : $this->email)->map(function ($email) {
-                $email['markdown'] = Arr::get($email, 'markdown') === true ? true : null;
-                $email['attachments'] = Arr::get($email, 'attachments') === true ? true : null;
-
-                return Arr::removeNullValues($email);
-            })->all(),
+            'connections' => $this->connectionsFileData(),
         ]))->filter()->all();
 
         if ($this->store === false) {
             $data['store'] = false;
+        }
+
+        if ($this->charts === []) {
+            $data['charts'] = [];
         }
 
         if ($this->get('generate_fake_submissions') === false) {
@@ -403,6 +452,14 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
             FormSaved::dispatch($this);
         }
+    }
+
+    private function connectionsFileData(): array
+    {
+        return $this->connections()
+            ->filter()
+            ->map(fn (array $connections) => array_map(fn (array $connection) => Arr::removeNullValues($connection), $connections))
+            ->all();
     }
 
     public function deleteQuietly()
@@ -446,12 +503,13 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         $methods = [
             'title',
+            'charts',
             'honeypot',
             'store',
-            'email',
+            'connections',
         ];
 
-        $this->merge(collect($contents)->except([...$methods, 'fields']));
+        $this->merge(collect($contents)->except([...$methods, 'email', 'fields']));
 
         collect($contents)
             ->filter(function ($value, $property) use ($methods) {
@@ -460,6 +518,10 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             ->each(function ($value, $property) {
                 $this->{$property}($value);
             });
+
+        if (! is_null($emails = Arr::get($contents, 'connections.email', $contents['email'] ?? null))) {
+            $this->connections($this->connections()->put('email', $emails));
+        }
 
         if (isset($contents['fields'])) {
             $this->formFields($contents['fields']);
@@ -530,7 +592,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     private function submissionCount(): int
     {
-        $query = $this->querySubmissions()->whereNull('partial');
+        $query = $this->querySubmissions()->whereStatus('finalized');
 
         if ($start = $this->submissionLimitPeriodStart()) {
             $query->where('date', '>=', $start);

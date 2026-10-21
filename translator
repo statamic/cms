@@ -84,6 +84,7 @@ $additionalKeys = [
         'hidden.title',
         'html.title',
         'icon.title',
+        'info.title',
         'integer.title',
         'link.title',
         'list.title',

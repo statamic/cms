@@ -69,6 +69,10 @@ abstract class DataReferenceUpdater
         $this->originalValue = $originalValue;
         $this->newValue = $newValue;
 
+        if (! $this->itemMayContainReferences()) {
+            return false;
+        }
+
         $this->recursivelyUpdateFields($this->getTopLevelFields());
 
         if ($this->updated) {
@@ -76,6 +80,29 @@ abstract class DataReferenceUpdater
         }
 
         return (bool) $this->updated;
+    }
+
+    private function itemMayContainReferences(): bool
+    {
+        if (! is_string($this->originalValue) || $this->originalValue === '') {
+            return true;
+        }
+
+        try {
+            $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+            if (! is_string($data = json_encode($this->item->data()->all(), $flags))) {
+                return true;
+            }
+
+            if (! is_string($needle = json_encode($this->originalValue, $flags))) {
+                return true;
+            }
+
+            return str_contains($data, substr($needle, 1, -1));
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     /**

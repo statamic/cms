@@ -17,6 +17,10 @@ it('exports modules', async () => {
 
 it('exports core', async () => {
     const expected = [
+        'ConnectionFields',
+        'ConnectionList',
+        'ConnectionRules',
+        'ConnectionSummary',
         'DateFormatter',
         'Fieldtype',
         'FieldtypeMixin',
@@ -125,6 +129,7 @@ it('exports ui', async () => {
     const expectedCmsPackageExports = [
         'Alert',
         'AuthCard',
+        'AutocompleteEditor',
         'Badge',
         'Button',
         'ButtonGroup',
@@ -168,6 +173,8 @@ it('exports ui', async () => {
         'Field',
         'Header',
         'Heading',
+        'HorizontalBarChart',
+        'HorizontalLollipopChart',
         'HoverCard',
         'Icon',
         'Input',
@@ -183,6 +190,7 @@ it('exports ui', async () => {
         'Panel',
         'PanelFooter',
         'PanelHeader',
+        'PieChart',
         'Popover',
         'Radio',
         'RadioGroup',
@@ -219,6 +227,7 @@ it('exports ui', async () => {
         'Timezones',
         'ToggleGroup',
         'ToggleItem',
+        'VerticalBarChart',
         'registerIconSet',
         'registerIconSetFromStrings',
         'Avatar',
