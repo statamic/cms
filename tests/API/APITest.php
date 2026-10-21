@@ -324,7 +324,11 @@ class APITest extends TestCase
                         'message' => ['type' => 'textarea', 'display' => 'Message', 'width' => 50, 'handle' => 'message'],
                     ],
                 ],
-            ]);
+            ])
+            ->assertJsonCount(1, 'data.pages')
+            ->assertJsonPath('data.pages.0.id', 'main')
+            ->assertJsonPath('data.pages.0.display', null)
+            ->assertJsonPath('data.pages.0.sections.*.display', ['Your Details', null]);
     }
 
     #[Test]
@@ -382,7 +386,7 @@ class APITest extends TestCase
                 ],
                 [
                     'id' => 'your_message',
-                    'display' => 'Page 2 of 2',
+                    'display' => null,
                     'instructions' => null,
                     'sections' => [
                         [

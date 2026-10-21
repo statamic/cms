@@ -365,7 +365,12 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
     public function pages(): Collection
     {
-        return $this->blueprint()->tabs()->values();
+        $pages = $this->formFields()->pages()->keyBy('id');
+
+        return $this->blueprint()->tabs()->values()->map(fn (Tab $tab) => (new Tab($tab->handle()))->setContents([
+            ...$tab->contents(),
+            'display' => $pages->has($tab->handle()) ? ($pages->get($tab->handle())['display'] ?? null) : $tab->display(),
+        ]));
     }
 
     /**

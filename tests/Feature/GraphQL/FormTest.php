@@ -403,7 +403,7 @@ GQL;
                         ],
                         [
                             'id' => 'your_message',
-                            'display' => 'Page 2 of 2',
+                            'display' => null,
                             'instructions' => null,
                             'sections' => [
                                 [
@@ -413,6 +413,56 @@ GQL;
                                         ['handle' => 'message', 'type' => 'textarea'],
                                     ],
                                 ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_pages_of_a_single_page_form()
+    {
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        pages {
+            id
+            display
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'pages' => [
+                        [
+                            'id' => 'main',
+                            'display' => null,
+                            'sections' => [
+                                ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
                             ],
                         ],
                     ],
