@@ -160,11 +160,6 @@ class FormInstances extends FormFieldtype
     public function rules(): array
     {
         return [...parent::rules(), function ($attribute, $value, $fail) {
-            // Localizations post the origin's overrides read-only, and never store them.
-            if ($this->parentEntry()?->hasOrigin()) {
-                return;
-            }
-
             $stored = $this->storedValue();
 
             foreach (static::toMap($value['config'] ?? []) as $handle => $overrides) {

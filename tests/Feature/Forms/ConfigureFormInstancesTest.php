@@ -326,28 +326,35 @@ class ConfigureFormInstancesTest extends TestCase
     }
 
     #[Test]
-    public function overrides_arent_validated_on_a_localization()
+    public function an_unchanged_drifted_override_doesnt_block_a_localization_save()
     {
-        $this->setSites([
-            'en' => ['locale' => 'en', 'url' => '/'],
-            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
-        ]);
+        [$user, $origin, $localization] = $this->seedLocalization(['contact' => ['connections' => ['email' => [self::DRIFTED]]]]);
 
-        $stored = ['connections' => ['email' => [self::DRIFTED]]];
-
-        [$user, $origin] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'access fr site', 'edit contact form'], ['contact' => $stored]);
-        $origin->collection()->sites(['en', 'fr'])->save();
-
-        $localization = EntryFactory::collection($origin->collection())->locale('fr')->origin($origin)->slug('a')->create();
-
-        $this->update($user, $localization, $this->posted($user, $origin), ['_localized' => ['title']])->assertOk();
-
-        $this->update($user, $localization, ['forms' => ['contact'], 'config' => [
-            'contact' => ['connections' => ['email' => [['to' => ['admin@example.com'], 'html' => 'statamic::auth.login']]]],
-        ]], ['_localized' => ['title']])->assertOk();
+        $this->update($user, $localization, $this->posted($user, $localization), ['_localized' => ['title']])->assertOk();
 
         $this->assertSame('Updated', Entry::find($localization->id())->get('title'));
-        $this->assertEquals(['contact' => $stored], Entry::find($origin->id())->get('form_instances'));
+        $this->assertEquals(['contact' => ['connections' => ['email' => [self::DRIFTED]]]], Entry::find($origin->id())->get('form_instances'));
+        $this->assertNull(Entry::find($localization->id())->get('form_instances'));
+    }
+
+    #[Test]
+    public function a_changed_override_is_validated_on_a_localization()
+    {
+        [$user, $origin, $localization] = $this->seedLocalization(['contact' => self::STORED]);
+
+        $invalid = ['forms' => ['contact'], 'config' => [
+            'contact' => ['connections' => ['email' => [['to' => ['admin@example.com'], 'html' => 'statamic::auth.login']]]],
+        ]];
+
+        $this->update($user, $localization, $invalid, ['_localized' => ['title']])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['form_instances' => 'Invalid connections.']);
+
+        $this->update($user, $localization, $invalid, ['_localized' => ['title', 'form_instances']])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['form_instances' => 'Invalid connections.']);
+
+        $this->assertSame('A', Entry::find($localization->id())->get('title'));
         $this->assertNull(Entry::find($localization->id())->get('form_instances'));
     }
 
@@ -385,7 +392,7 @@ class ConfigureFormInstancesTest extends TestCase
 
         return $entry->blueprint()->field('form_instances')
             ->setParent($entry)
-            ->setValue($entry->get('form_instances'))
+            ->setValue($entry->value('form_instances'))
             ->preProcess()
             ->value();
     }
@@ -409,5 +416,20 @@ class ConfigureFormInstancesTest extends TestCase
         $entry = EntryFactory::collection($collection)->slug('a')->data(['title' => 'A', 'form_instances' => $formInstances])->create();
 
         return [$user, $entry];
+    }
+
+    private function seedLocalization(?array $formInstances): array
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr/'],
+        ]);
+
+        [$user, $origin] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'access fr site', 'edit contact form'], $formInstances);
+        $origin->collection()->sites(['en', 'fr'])->save();
+
+        $localization = EntryFactory::collection($origin->collection())->locale('fr')->origin($origin)->slug('a')->data(['title' => 'A'])->create();
+
+        return [$user, $origin, $localization];
     }
 }
