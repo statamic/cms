@@ -92,7 +92,7 @@ class ConnectorEditorTest extends TestCase
     {
         return [
             'non-array connection' => [['x'], '0'],
-            'non-string id' => [[['id' => ['a']]], '0.id'],
+            'array id' => [[['id' => ['a']]], '0.id'],
             'non-boolean enabled' => [[['enabled' => 'x']], '0.enabled'],
             'non-array conditions' => [[['conditions' => 'x']], '0.conditions'],
             'non-array condition row' => [[['conditions' => ['x']]], '0.conditions.0'],
@@ -116,6 +116,20 @@ class ConnectorEditorTest extends TestCase
             ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), $connections)
             ->assertOk()
             ->assertJsonPath('value.0.id', 'a');
+    }
+
+    #[Test]
+    public function it_opens_connections_with_numeric_ids()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), [['id' => 1, 'rows' => []]])
+            ->assertOk()
+            ->assertJsonPath('value.0.id', 1);
     }
 
     #[Test]

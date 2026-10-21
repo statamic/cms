@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\FormConnector;
@@ -90,7 +91,7 @@ class FormConnectController extends CpController
         // Only check the shape. Stored connections that fail the connector's rules must still open so they can be fixed.
         Validator::make($request->all(), [
             '*' => ['array'],
-            '*.id' => ['nullable', 'string'],
+            '*.id' => ['nullable', Rule::anyOf(['string', 'integer'])],
             '*.enabled' => ['nullable', 'boolean'],
             '*.conditions' => ['nullable', 'array'],
             '*.conditions.*' => ['array'],
