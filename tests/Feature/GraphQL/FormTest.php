@@ -427,8 +427,10 @@ GQL;
         Carbon::setTestNow('2026-07-06 12:00:00');
 
         Form::make('contact')->save();
-        Form::make('members')->data(['require_login' => true])->save();
+        Form::make('members')->data(['require_login' => true, 'require_login_message' => 'Members only.'])->save();
         Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+        $limited = tap(Form::make('limited')->data(['submission_limit' => 1]))->save();
+        $limited->makeSubmission()->save();
 
         $query = <<<'GQL'
 {
@@ -436,10 +438,14 @@ GQL;
         handle
         status
         require_login
-        restriction_message
+        closed_message
+        require_login_message
     }
 }
 GQL;
+
+        $closed = 'This form is no longer accepting submissions.';
+        $login = 'You must be logged in to submit this form.';
 
         $this
             ->withoutExceptionHandling()
@@ -447,11 +453,30 @@ GQL;
             ->assertGqlOk()
             ->assertExactJson(['data' => [
                 'forms' => [
-                    ['handle' => 'applications', 'status' => 'closed', 'require_login' => false, 'restriction_message' => 'Applications have closed.'],
-                    ['handle' => 'contact', 'status' => 'open', 'require_login' => false, 'restriction_message' => null],
-                    ['handle' => 'members', 'status' => 'open', 'require_login' => true, 'restriction_message' => null],
+                    ['handle' => 'applications', 'status' => 'closed', 'require_login' => false, 'closed_message' => 'Applications have closed.', 'require_login_message' => $login],
+                    ['handle' => 'contact', 'status' => 'open', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'limited', 'status' => 'limit_reached', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'members', 'status' => 'open', 'require_login' => true, 'closed_message' => $closed, 'require_login_message' => 'Members only.'],
                 ],
             ]]);
+    }
+
+    #[Test]
+    public function it_cannot_query_the_restriction_message()
+    {
+        Form::make('contact')->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        restriction_message
+    }
+}
+GQL;
+
+        $this
+            ->post('/graphql', ['query' => $query])
+            ->assertSee('Cannot query field \"restriction_message\" on type \"Form\"', false);
     }
 
     #[Test]

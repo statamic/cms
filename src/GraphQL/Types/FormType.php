@@ -33,8 +33,11 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'require_login' => [
                 'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
-            'restriction_message' => [
-                'type' => GraphQL::string(),
+            'closed_message' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
+            'require_login_message' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'fields' => [
                 'type' => GraphQL::listOf(GraphQL::type(FieldType::NAME)),

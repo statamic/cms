@@ -407,29 +407,45 @@ class APITest extends TestCase
         Facades\Config::set('statamic.api.resources.forms', true);
 
         Facades\Form::make('contact')->save();
-        Facades\Form::make('members')->data(['require_login' => true])->save();
+        Facades\Form::make('members')->data(['require_login' => true, 'require_login_message' => 'Members only.'])->save();
         Facades\Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+        $limited = tap(Facades\Form::make('limited')->data(['submission_limit' => 1]))->save();
+        $limited->makeSubmission()->save();
 
         $this
             ->get('/api/forms/contact')
             ->assertSuccessful()
             ->assertJsonPath('data.status', 'open')
             ->assertJsonPath('data.require_login', false)
-            ->assertJsonPath('data.restriction_message', null);
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonPath('data.require_login_message', 'You must be logged in to submit this form.')
+            ->assertJsonMissingPath('data.restriction_message');
 
         $this
             ->get('/api/forms/members')
             ->assertSuccessful()
             ->assertJsonPath('data.status', 'open')
             ->assertJsonPath('data.require_login', true)
-            ->assertJsonPath('data.restriction_message', null);
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonPath('data.require_login_message', 'Members only.')
+            ->assertJsonMissingPath('data.restriction_message');
 
         $this
             ->get('/api/forms/applications')
             ->assertSuccessful()
             ->assertJsonPath('data.status', 'closed')
             ->assertJsonPath('data.require_login', false)
-            ->assertJsonPath('data.restriction_message', 'Applications have closed.');
+            ->assertJsonPath('data.closed_message', 'Applications have closed.')
+            ->assertJsonPath('data.require_login_message', 'You must be logged in to submit this form.')
+            ->assertJsonMissingPath('data.restriction_message');
+
+        $this
+            ->get('/api/forms/limited')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'limit_reached')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonMissingPath('data.restriction_message');
     }
 
     #[Test]
