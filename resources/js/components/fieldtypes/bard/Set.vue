@@ -443,9 +443,11 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
-                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+                const json = JSON.stringify(values);
+                if (json === JSON.stringify(this.node.attrs.values)) return;
 
-                this.updateAttributes({ values });
+                // A copy, so later edits to the container's object can't change the node without a transaction.
+                this.updateAttributes({ values: JSON.parse(json) });
             },
             { deep: true }
         );

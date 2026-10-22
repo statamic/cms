@@ -454,10 +454,9 @@ export default {
         value(value) {
             if (!this.editor) return;
 
-            const oldContent = this.editor.getJSON();
-            const content = this.valueToContent(value);
+            if (this.valueMatchesEditor(value)) return;
 
-            if (JSON.stringify(content) === JSON.stringify(oldContent)) return;
+            const oldContent = this.editor.getJSON();
 
             // Sets sync their own values into the editor, so a rebuild for those would only destroy their fields.
             const oldNodes = oldContent.content ?? [];
@@ -472,7 +471,7 @@ export default {
             }
 
             this.editor.commands.clearContent(false);
-            this.editor.commands.setContent(content, true);
+            this.editor.commands.setContent(this.valueToContent(value), true);
         },
 
         readOnly(readOnly) {
@@ -905,7 +904,12 @@ export default {
                         return count;
                     };
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Sets look up their values by index, so moving them can't wait for the debounce.
+                    const setPositions = (nodes) => (nodes ?? []).map((node) => (node.type === 'set' ? node.attrs.id : '')).join();
+
+                    if (countNodes(oldJson) !== countNodes(newJson) || setPositions(oldJson) !== setPositions(newJson)) {
+                        this.debounceNextUpdate = false;
+                    }
 
                     this.json = newJson;
 
@@ -999,8 +1003,34 @@ export default {
             this.editor.view.dispatch(tr);
         },
 
-        onlySetValuesDiffer(nodes, oldNodes) {
-            return JSON.stringify(this.withoutSetValues(nodes)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
+        valueMatchesEditor(value) {
+            const content = this.valueToContent(value);
+            const current = this.editor.getJSON();
+
+            if (JSON.stringify(content) === JSON.stringify(current)) return true;
+
+            const node = this.contentToNode(content);
+
+            return node !== null && node.eq(this.editor.state.doc);
+        },
+
+        contentToNode(content) {
+            try {
+                return this.editor.schema.nodeFromJSON(
+                    content ?? { type: 'doc', content: [{ type: 'paragraph' }] },
+                );
+            } catch (error) {
+                return null;
+            }
+        },
+
+        onlySetValuesDiffer(value, oldNodes) {
+            const node = this.contentToNode(this.valueToContent(value));
+
+            if (node === null) return false;
+
+            return JSON.stringify(this.withoutSetValues(node.toJSON().content)) === JSON.stringify(this.withoutSetValues(oldNodes));
         },
 
         withoutSetValues(nodes) {
