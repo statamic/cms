@@ -166,6 +166,11 @@ const showDiff = computed(() => result.value?.mode === 'improve' && original.val
 const instruction = ref('');
 const chips = ['Shorter', 'More formal', 'Friendlier'];
 
+// Safari and Firefox on macOS don't focus a button when it's clicked, as Chrome does. Focusing it ourselves means you can press Enter to go again after clicking.
+function focusClicked(event) {
+    event.currentTarget.focus();
+}
+
 function follow(text) {
     if (!text.trim()) return;
     instruction.value = '';
@@ -257,7 +262,7 @@ function follow(text) {
                         type="button"
                         class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
                         :aria-disabled="loading"
-                        @click="!loading && follow(chip)"
+                        @click="focusClicked($event); !loading && follow(chip)"
                     >
                         {{ __(chip) }}
                     </button>
@@ -266,7 +271,7 @@ function follow(text) {
 
             <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
                 <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. -->
-                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="!loading && generate()" />
+                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="focusClicked($event); !loading && generate()" />
             </div>
         </div>
     </Popover>
