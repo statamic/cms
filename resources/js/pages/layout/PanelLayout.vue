@@ -3,8 +3,8 @@ import { computed, provide, ref, watch, onMounted, onUnmounted, useTemplateRef }
 import useResizable from '@/composables/use-resizable.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
+import AiChatCloseControl from '@/components/ai-chat/AiChatCloseControl.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
-import AiChatNewControl from '@/components/ai-chat/AiChatNewControl.vue';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -172,7 +172,7 @@ onUnmounted(() => {
             <div v-show="showChat" class="layout-panel-content group/chat relative flex flex-1 flex-col min-h-0" :data-mobile-open="chatOpen">
                 <template v-if="!chatFloating">
                     <AiChat />
-                    <AiChatNewControl />
+                    <AiChatCloseControl />
                     <AiChatDockControl />
                 </template>
             </div>
@@ -194,7 +194,7 @@ onUnmounted(() => {
             class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
-            <AiChatNewControl />
+            <AiChatCloseControl />
             <AiChatDockControl />
         </div>
     </Transition>

@@ -218,9 +218,9 @@ function scrollToBottom() {
                 elastic
                 :class="[inputClasses, floating ? 'ps-8.5!' : 'ps-9.5!']"
             />
-            <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed. Just a hint, not a button. -->
+            <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Just a hint, not a button. -->
             <div
-                v-show="!prompt && !showHelp"
+                v-show="!prompt && !showHelp && !messages.length"
                 aria-hidden="true"
                 :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
                 class="pointer-events-none absolute flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
@@ -229,6 +229,17 @@ function scrollToBottom() {
                 <kbd class="translate-y-[0.5px] rounded-md bg-gray-950/5 px-[0.3125rem] py-[0.0625rem] font-sans text-[0.625rem]/4 font-medium ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/10"><span class="inline-block -translate-y-[0.75px]">/</span></kbd>
                 {{ __('help') }}
             </div>
+            <!-- Once a chat has started, a small link to clear it takes the / hint's place, while nothing has been typed. (Typing /clear does the same.) -->
+            <button
+                v-if="messages.length"
+                v-show="!prompt"
+                type="button"
+                :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
+                class="absolute flex h-6.5 cursor-pointer items-center px-1.5 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
+                @click="newChat"
+            >
+                {{ __('Clear') }}
+            </button>
             <Button
                 type="submit"
                 icon="arrow-up"

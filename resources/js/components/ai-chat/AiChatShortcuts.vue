@@ -8,7 +8,7 @@ const props = defineProps({
     hasExamples: { type: Boolean, default: false },
 });
 
-// Prototype: the chat's keyboard shortcuts. (Alt+Enter also adds a new line, but isn't listed.) Each has the keys, then what they do.
+// Prototype: the chat's keyboard shortcuts, and the /clear command. (Alt+Enter also adds a new line, but isn't listed.) Each has the keys, then what they do.
 const shortcuts = [
     { keys: ['⌘', '/'], text: 'Open or close' },
     { keys: ['/'], text: 'Show this help' },
@@ -16,6 +16,7 @@ const shortcuts = [
     { keys: ['Shift', 'Enter'], text: 'New line' },
     { keys: ['↑'], text: 'Pick an example', or: ['↓'], needsExamples: true },
     { keys: ['Esc'], text: 'Back to the page' },
+    { keys: ['/clear'], text: 'Start a new chat' },
 ];
 
 // Choosing an example only makes sense while they're showing
