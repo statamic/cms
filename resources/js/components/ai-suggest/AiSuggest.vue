@@ -86,15 +86,18 @@ function apply(text) {
 }
 
 // Hovering or focusing a suggestion previews it in the field, in grey (gray-500, the lightest that passes AA). It's laid over the field, matching its padding and font, until you move off it.
+// The preview is an input or textarea like the field, so the browser places the text exactly where the field will. A div with the same styles sits half a pixel higher than an input's text.
 const preview = ref(null);
 const overlay = useTemplateRef('overlay');
+const overlayTag = ref('input');
 const overlayStyle = ref({});
 
 function showPreview(text) {
-    const field = overlay.value?.parentElement?.querySelector('input, textarea');
+    const field = overlay.value?.parentElement?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
 
     if (field) {
         const css = getComputedStyle(field);
+        overlayTag.value = field.tagName.toLowerCase();
         overlayStyle.value = {
             // The field's own padding, so the preview wraps exactly where the text will once it's picked
             padding: css.padding,
@@ -108,7 +111,6 @@ function showPreview(text) {
             lineHeight: css.lineHeight,
             borderWidth: css.borderWidth,
             borderRadius: css.borderRadius,
-            whiteSpace: field.tagName === 'TEXTAREA' ? 'pre-wrap' : 'nowrap',
         };
     }
 
@@ -271,12 +273,15 @@ function follow(text) {
 
 
     <!-- The previewed suggestion, laid over the field -->
-    <div
+    <component
+        :is="overlayTag"
         ref="overlay"
         v-show="preview"
         aria-hidden="true"
+        tabindex="-1"
+        readonly
+        :value="preview"
         :style="overlayStyle"
-        class="pointer-events-none absolute inset-0 z-[5] overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
-        v-text="preview"
+        class="pointer-events-none absolute inset-0 z-[5] size-full resize-none appearance-none overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
     />
 </template>
