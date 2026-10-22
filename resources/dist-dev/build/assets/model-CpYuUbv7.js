@@ -1,0 +1,19 @@
+import { n as __exportAll } from "./rolldown-runtime-SbdDWaPq.js";
+import { a as Mark, c as NodeRange, d as ResolvedPos, f as Schema, i as Fragment, l as NodeType, n as DOMParser, o as MarkType, p as Slice, r as DOMSerializer, s as Node, t as ContentMatch, u as ReplaceError } from "./dist-ONvBImsx.js";
+// node_modules/@tiptap/pm/dist/model/index.js
+var model_exports = /* @__PURE__ */ __exportAll({
+	ContentMatch: () => ContentMatch,
+	DOMParser: () => DOMParser,
+	DOMSerializer: () => DOMSerializer,
+	Fragment: () => Fragment,
+	Mark: () => Mark,
+	MarkType: () => MarkType,
+	Node: () => Node,
+	NodeRange: () => NodeRange,
+	NodeType: () => NodeType,
+	ReplaceError: () => ReplaceError,
+	ResolvedPos: () => ResolvedPos,
+	Schema: () => Schema,
+	Slice: () => Slice
+});
+export { model_exports as t };
