@@ -170,6 +170,12 @@ function diffWords(from, to) {
     return parts;
 }
 
+const status = computed(() => {
+    if (loading.value) return __('Finding suggestions…');
+    if (result.value) return __n(':count suggestion|:count suggestions', result.value.suggestions.length);
+    return '';
+});
+
 const showDiff = computed(() => result.value?.mode === 'improve' && original.value);
 
 // The "Make it…" box: type an instruction or pick a chip, and the suggestions are reworked to follow it
@@ -211,6 +217,9 @@ function follow(text) {
                     {{ __('Suggestions') }}
                 </span>
             </div>
+
+            <!-- Tells screen readers when it's thinking and when the suggestions are in, including after Try again or reworking them -->
+            <p class="sr-only" role="status">{{ status }}</p>
 
             <!-- Eases to the height of what's inside, so it doesn't snap when the suggestions arrive -->
             <div :style="{ height: bodyHeight }" :class="['overflow-hidden', easeHeight ? 'transition-[height] duration-150 ease-out motion-reduce:transition-none' : '']">
@@ -263,6 +272,7 @@ function follow(text) {
                         v-model="instruction"
                         type="text"
                         :placeholder="__('Make it…')"
+                        :aria-label="__('Rework the suggestions')"
                         class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
                     />
                 </form>
