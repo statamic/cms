@@ -139,6 +139,7 @@ import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -457,9 +458,17 @@ export default {
 
             const oldContent = this.editor.getJSON();
 
-            // Sets sync their own values into the editor, so while it's focused those changes
-            // don't need a rebuild, which would destroy the field being typed in.
-            if (this.editorIsFocused() && this.onlySetValuesDiffer(value, oldContent.content ?? [])) return;
+            // Sets sync their own values into the editor, so a rebuild for those would only destroy their fields.
+            const oldNodes = oldContent.content ?? [];
+            if (this.onlySetValuesDiffer(value, oldNodes)) return;
+
+            // Same when the server has only stripped empty nodes, which can be deleted in place.
+            const emptyNodes = this.removableEmptyNodes(oldNodes);
+            const keptNodes = oldNodes.filter((node, i) => !emptyNodes.includes(i));
+            if (keptNodes.length && keptNodes.length < oldNodes.length && this.onlySetValuesDiffer(value, keptNodes)) {
+                this.deleteNodes(emptyNodes);
+                return;
+            }
 
             this.editor.commands.clearContent(false);
             this.editor.commands.setContent(this.valueToContent(value), true);
@@ -959,6 +968,41 @@ export default {
             return value.length ? { type: 'doc', content: value } : null;
         },
 
+        // Mirrors Bard::removeEmptyNodes() on the PHP side.
+        removableEmptyNodes(nodes) {
+            const isEmpty = (node) => ['heading', 'paragraph'].includes(node.type) && !node.content;
+
+            if (this.config.remove_empty_nodes === true) {
+                return nodes.flatMap((node, i) => (isEmpty(node) ? [i] : []));
+            }
+
+            if (this.config.remove_empty_nodes !== 'trim') return [];
+
+            let start = 0;
+            while (start < nodes.length && isEmpty(nodes[start])) start++;
+
+            let end = nodes.length - 1;
+            while (end > start && isEmpty(nodes[end])) end--;
+
+            return nodes.flatMap((node, i) => (i < start || i > end ? [i] : []));
+        },
+
+        deleteNodes(indexes) {
+            const { tr, doc } = this.editor.state;
+            const ranges = [];
+
+            doc.forEach((node, offset, i) => {
+                if (indexes.includes(i)) ranges.push([offset, offset + node.nodeSize]);
+            });
+
+            ranges.reverse().forEach(([from, to]) => tr.delete(from, to));
+
+            // A selection that lands on a set would change its decorations and recreate its node view.
+            tr.setSelection(TextSelection.between(tr.selection.$from, tr.selection.$from, -1));
+
+            this.editor.view.dispatch(tr);
+        },
+
         // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
         valueMatchesEditor(value) {
             const content = this.valueToContent(value);
@@ -979,10 +1023,6 @@ export default {
             } catch (error) {
                 return null;
             }
-        },
-
-        editorIsFocused() {
-            return this.editor.view.dom.contains(document.activeElement);
         },
 
         onlySetValuesDiffer(value, oldNodes) {
