@@ -895,7 +895,12 @@ export default {
                         return count;
                     };
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Sets look up their values by index, so moving them can't wait for the debounce.
+                    const setPositions = (nodes) => (nodes ?? []).map((node) => (node.type === 'set' ? node.attrs.id : '')).join();
+
+                    if (countNodes(oldJson) !== countNodes(newJson) || setPositions(oldJson) !== setPositions(newJson)) {
+                        this.debounceNextUpdate = false;
+                    }
 
                     this.json = newJson;
 
