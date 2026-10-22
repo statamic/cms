@@ -92,6 +92,20 @@ function apply(text) {
     emit('apply', text);
     open.value = false;
     preview.value = null;
+
+    focusField();
+}
+
+// After picking one, focus goes into the field, with the cursor at the end of the new text, so you can carry on editing it (and screen readers read out what went in). The dropdown hands focus back to the suggest button as it closes, so wait for that first.
+function focusField() {
+    nextTick(() =>
+        setTimeout(() => {
+            const field = overlay.value?.parentElement?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
+            if (!field) return;
+            field.focus();
+            field.setSelectionRange(field.value.length, field.value.length);
+        }),
+    );
 }
 
 // Hovering or focusing a suggestion previews it in the field, in grey (gray-500, the lightest that passes AA). It's laid over the field, matching its padding and font, until you move off it.
