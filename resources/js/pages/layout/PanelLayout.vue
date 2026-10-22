@@ -33,7 +33,9 @@ watch(chatFloating, () => {
 }, { flush: 'sync' });
 
 // A quiet card until the input is focused: a plain grey 1px edge. Focusing it brings in the purple-to-blue gradient edge, a 1px blue line just inside it (so 2px in all, like a focused field's outline), and a purple glow. The outline is drawn over the edge, so nothing moves.
-const chatCardClasses = 'rounded-xl border border-transparent ps-2.25 focus-within:outline-1 focus-within:-outline-offset-2 focus-within:outline-blue-400 focus-within:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(var(--color-gray-200),var(--color-gray-200))_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(var(--color-gray-700),var(--color-gray-700))_border-box] focus-within:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:focus-within:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]';// The chat only uses the right panel when it's docked there, rather than floating in the corner.
+// While you hover the floating chat (and it isn't focused, which has its own stronger glow), a softer version of the focus glow, at about half its strength. It eases in slowly, over 700ms, and out quicker.
+const chatCardClasses = 'rounded-xl border border-transparent ps-2.25 [&:hover:not(:focus-within)]:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_22%,transparent)] focus-within:outline-1 focus-within:-outline-offset-2 focus-within:outline-blue-400 focus-within:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(var(--color-gray-200),var(--color-gray-200))_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(var(--color-gray-700),var(--color-gray-700))_border-box] focus-within:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:focus-within:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box]';
+
 // The chat only uses the right panel when it's docked there, rather than floating in the corner.
 const chatInPanel = computed(() => chatOpen.value && !chatFloating.value);
 const rightTab = ref('chat');
@@ -191,7 +193,7 @@ onUnmounted(() => {
             v-if="chatFloating"
             v-show="chatOpen"
             :class="chatCardClasses"
-            class="fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+            class="transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatCloseControl />
