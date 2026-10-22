@@ -207,13 +207,13 @@ function follow(text) {
                     </div>
 
                     <!-- Picking one puts it in the field, replacing what's there -->
-                    <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. -->
+                    <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. The first and last reach to 1px short of the borders above and below the list, so the focus outline (which pokes 1px past the ::after) meets those borders without covering them. The focus outline is drawn on the same ::after so it reaches the lines too, and hides them either side. A focused suggestion sits above a hovered one, so a hovered neighbour's background can't cover its outline. -->
                     <div v-else-if="result" data-suggestions class="p-1.5">
                         <button
                             v-for="suggestion in result.suggestions"
                             :key="suggestion.text"
                             type="button"
-                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] after:-z-10 after:rounded-lg hover:z-10 hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5"
+                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:-top-[5px] last:after:-bottom-[5px] after:-z-10 after:rounded-lg hover:z-10 hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-20 focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
                             @click="apply(suggestion.text)"
                             @mouseenter="showPreview(suggestion.text)"
                             @mouseleave="hidePreview"
