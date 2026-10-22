@@ -1,10 +1,13 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { nextTick, ref } from 'vue';
 import { Editor } from '@tiptap/vue-3';
+import { closeHistory } from '@tiptap/pm/history';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
 import Provider from '@/components/portals/Provider.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants.js';
 
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 window.cp_url = (url) => url;
@@ -21,7 +24,7 @@ function set(id, label) {
     return { type: 'set', attrs: { id, enabled: true, values: { type: 'card', label } } };
 }
 
-async function mountField(config = {}, initialValue = value) {
+async function mountField(config = {}, initialValue = value, container = {}) {
     const wrapper = mount(BardFieldtype, {
         props: {
             value: initialValue,
@@ -51,6 +54,7 @@ async function mountField(config = {}, initialValue = value) {
                     errors: { value: {} },
                     setFieldValue: vi.fn(),
                     setFieldMeta: vi.fn(),
+                    ...container,
                 },
             },
         },
@@ -60,6 +64,24 @@ async function mountField(config = {}, initialValue = value) {
     await wrapper.vm.$nextTick();
 
     return wrapper;
+}
+
+async function mountFieldInContainer(config, initialValue) {
+    const values = ref({ content: initialValue });
+    const wrapper = await mountField(config, initialValue, { values });
+
+    await wrapper.setProps({
+        'onUpdate:value': (value) => {
+            data_set(values.value, 'content', value);
+            wrapper.setProps({ value });
+        },
+    });
+
+    return { wrapper, values };
+}
+
+function waitForDebounce() {
+    return new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
 }
 
 async function type(wrapper, text) {
@@ -170,4 +192,43 @@ test('the editor is rebuilt when the value changes while the editor is not focus
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
     expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+});
+
+async function editSetLabel(values, label) {
+    data_set(values.value, 'content.1.attrs.values.label', label);
+    await nextTick();
+}
+
+test('set field edits made while an update is debounced are kept', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    await editSetLabel(values, 'AB');
+    await editSetLabel(values, 'ABC');
+    await waitForDebounce();
+
+    expect(values.value.content[1].attrs.values.label).toBe('ABC');
+    expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('ABC');
+});
+
+test('each set field edit can be undone', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    for (const label of ['AB', 'ABC', 'ABCD']) {
+        await editSetLabel(values, label);
+        await waitForDebounce();
+        editor.view.dispatch(closeHistory(editor.state.tr));
+    }
+
+    editor.commands.undo();
+    await waitForDebounce();
+
+    expect(editor.getJSON().content[1].attrs.values.label).toBe('ABC');
+    expect(values.value.content[1].attrs.values.label).toBe('ABC');
 });
