@@ -4,7 +4,7 @@
             <ui-icon name="chevron-right" class="size-4 text-gray-500" v-if="index !== 0" />
             <ui-button
                 variant="ghost"
-                :icon="isHomeFolder(part) ? 'home' : !isLastFolder(index) ? 'folder' : 'folder-open'"
+                :icon="iconFor(part, index)"
                 :text="isHomeFolder(part) ? __('All') : part"
                 @click="selectFolder(index)"
                 @dragover="dragOver($event, index)"
@@ -24,6 +24,8 @@ export default {
         droppable: Boolean,
         /** Search results come from any folder, so the current folder becomes a valid drop target. */
         currentDroppable: Boolean,
+        /** The paths of folders that are currently receiving a drop. */
+        openPaths: { type: Array, default: () => [] },
     },
 
     emits: ['navigated', 'dropped'],
@@ -55,6 +57,14 @@ export default {
     methods: {
         pathFor(index) {
             return index === 0 ? '/' : this.pathParts.slice(1, index + 1).join('/');
+        },
+
+        iconFor(part, index) {
+            if (this.openPaths.includes(this.pathFor(index))) return 'folder-open';
+
+            if (this.isHomeFolder(part)) return 'home';
+
+            return this.isLastFolder(index) ? 'folder-open' : 'folder';
         },
 
         selectFolder(index) {

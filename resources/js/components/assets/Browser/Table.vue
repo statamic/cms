@@ -1,12 +1,23 @@
 <template>
-    <Card inset variant="flat" class="[&_tr:has([data-moving])]:pointer-events-none">
+    <Card
+        inset
+        variant="flat"
+        class="
+            [&_tr:has([data-moving])]:pointer-events-none
+            [&_tr:has([data-moved])]:pointer-events-none
+            [&_tr:has([data-moved])]:opacity-0
+            [&_tr:has([data-moved])]:transition-opacity
+            [&_tr:has([data-moved])]:duration-300
+            [&_tr:has([data-removed])]:hidden
+        "
+    >
         <ListingTable contained>
             <template #tbody-start>
                 <tr
                     v-if="!restrictFolderNavigation"
-                    v-for="(folder, i) in folders"
+                    v-for="(folder, i) in visibleFolders"
                     :key="folder.path"
-                    :class="isMoving(folder.path) ? 'pointer-events-none' : 'pointer-events-auto'"
+                    class="pointer-events-auto"
                     :draggable="canMoveFolder(folder)"
                     @dragover="folderDragOver($event, folder)"
                     @dragleave="folderDragLeave"
@@ -22,21 +33,26 @@
                         <template v-if="column.field === 'basename'">
                             <a
                                 class="group -m-1 -me-2.5 flex w-fit cursor-pointer items-center rounded-lg p-1 pe-2.5"
-                                :class="{
-                                    'ring-2 ring-blue-400': dragOverFolder === folder.path,
-                                    'text-gray-400 dark:text-gray-500': isMoving(folder.path),
-                                }"
+                                :class="[
+                                    moveStateClasses(folder.path),
+                                    { 'ring-2 ring-blue-400': dragOverFolder === folder.path },
+                                ]"
+                                :data-moving="isMoving(folder.path) || null"
+                                :data-moved="isMoved(folder.path) || null"
                                 @click="selectFolder(folder.path)"
                             >
-                                <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
-                                <div v-if="isMoving(folder.path)" class="me-2 flex size-8 shrink-0 items-center justify-center">
-                                    <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                                <div class="relative me-2 flex size-8 shrink-0 items-center justify-center">
+                                    <AnimatedFolder
+                                        :drop="dropFor(folder)"
+                                        class="w-6.5 text-blue-400/90 group-hover:text-blue-400"
+                                    />
+                                    <div
+                                        v-if="isMoving(folder.path)"
+                                        class="absolute inset-0 flex animate-in fade-in fill-mode-both items-center justify-center [animation-delay:400ms]"
+                                    >
+                                        <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                                    </div>
                                 </div>
-                                <file-icon
-                                    v-else
-                                    extension="folder"
-                                    class="me-2 inline-block size-8 shrink-0 text-blue-400/90 group-hover:text-blue-400"
-                                />
                                 {{ folder.basename }}
                             </a>
                         </template>
@@ -100,26 +116,34 @@
             <template #cell-basename="{ row: asset, checkboxId }">
                 <div
                     class="group flex w-fit items-center gap-2 sm:gap-3"
+                    :class="[
+                        moveStateClasses(asset.id),
+                        { 'text-gray-400 dark:text-gray-500': isDragging(asset.id) },
+                    ]"
                     :draggable="true"
                     @dragover.prevent
                     @dragstart="draggingAsset = asset.id"
                     @dragend="draggingAsset = null"
                     :data-moving="isMoving(asset.id) || null"
-                    :class="{ 'text-gray-400 dark:text-gray-500': isDragging(asset.id) || isMoving(asset.id) }"
+                    :data-moved="isMoved(asset.id) || null"
+                    :data-removed="isRemoved(asset.id) || null"
                 >
-                    <!-- Icons load asynchronously, so reserve the space to stop the row jumping. -->
-                    <div v-if="isMoving(asset.id)" class="flex size-8 shrink-0 items-center justify-center">
-                        <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                    <div class="relative shrink-0">
+                        <asset-thumbnail
+                            :asset="asset"
+                            alt=""
+                            :square="true"
+                            class="size-8 cursor-pointer"
+                            :class="{ 'opacity-50': isDragging(asset.id) }"
+                            @click.native.stop="$emit('edit-asset', asset)"
+                        />
+                        <div
+                            v-if="isMoving(asset.id)"
+                            class="absolute inset-0 flex animate-in fade-in fill-mode-both items-center justify-center [animation-delay:400ms]"
+                        >
+                            <ui-icon name="loading" class="size-5 text-gray-700 dark:text-gray-200" />
+                        </div>
                     </div>
-                    <asset-thumbnail
-                        v-else
-                        :asset="asset"
-                        alt=""
-                        :square="true"
-                        class="size-8 cursor-pointer"
-                        :class="{ 'opacity-50': isDragging(asset.id) }"
-                        @click.native.stop="$emit('edit-asset', asset)"
-                    />
                     <button
                         class="cursor-pointer normal-nums select-none group-hover:text-ui-accent-text/80 dark:group-hover:text-ui-accent-text text-start"
                         @click="$emit('edit-asset', asset)"
@@ -137,6 +161,7 @@
 
 <script>
 import AssetBrowserMixin from './AssetBrowserMixin';
+import AnimatedFolder from './AnimatedFolder.vue';
 import AssetThumbnail from './Thumbnail.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -158,6 +183,7 @@ export default {
     mixins: [AssetBrowserMixin],
 
     components: {
+        AnimatedFolder,
         AssetThumbnail,
         Breadcrumbs,
         Card,

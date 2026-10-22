@@ -9,7 +9,11 @@ export default {
         restrictFolderNavigation: Boolean,
         creatingFolder: Boolean,
         creatingFolderError: Boolean,
+        selectedAssets: { type: Array, default: () => [] },
         moving: { type: Array, default: () => [] },
+        moved: { type: Array, default: () => [] },
+        removed: { type: Array, default: () => [] },
+        drops: { type: Array, default: () => [] },
     },
 
     data() {
@@ -22,8 +26,19 @@ export default {
     },
 
     computed: {
+        visibleFolders() {
+            return this.folders.filter((folder) => !this.isRemoved(folder.path));
+        },
+
         draggedAssetIds() {
-            return this.draggingAsset ? [this.draggingAsset] : [];
+            if (!this.draggingAsset) return [];
+
+            if (!this.selectedAssets.includes(this.draggingAsset)) return [this.draggingAsset];
+
+            // Dragging a selected asset brings the rest of the selection along, as long as it can be moved.
+            return this.assets
+                .filter((asset) => this.selectedAssets.includes(asset.id) && this.canMoveAsset(asset))
+                .map((asset) => asset.id);
         },
 
         draggingMovable() {
@@ -162,6 +177,30 @@ export default {
 
         isMoving(item) {
             return this.moving.includes(item);
+        },
+
+        isMoved(item) {
+            return this.moved.includes(item);
+        },
+
+        isRemoved(item) {
+            return this.removed.includes(item);
+        },
+
+        moveStateClasses(item) {
+            if (this.isMoved(item)) {
+                return 'pointer-events-none opacity-0 transition-opacity duration-300';
+            }
+
+            if (this.isMoving(item)) {
+                return 'pointer-events-none opacity-50 transition-opacity duration-150';
+            }
+
+            return null;
+        },
+
+        dropFor(folder) {
+            return this.drops.find((drop) => drop.path === folder.path) ?? null;
         },
     },
 };
