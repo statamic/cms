@@ -53,7 +53,7 @@ class TrackableEmbedUrlTest extends TestCase
     #[Test]
     public function it_transforms_cloudflare_stream_urls()
     {
-        $this->assertEquals('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/iframe', $this->embed('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8'));
+        $this->assertEquals('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/iframe', $this->embed('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/watch'));
     }
 
     public function it_ensures_url_with_query_parameters_are_valid()

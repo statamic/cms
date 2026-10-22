@@ -60,8 +60,8 @@ const preview = async (value) => {
     return wrapper.find('iframe');
 };
 
-test('it previews a cloudflare manifest url as its iframe', async () => {
-    expect((await preview(`${cloudflare}/manifest/video.m3u8`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+test('it does not preview a cloudflare manifest url', async () => {
+    expect((await preview(`${cloudflare}/manifest/video.m3u8`)).exists()).toBe(false);
 });
 
 test('it previews a cloudflare iframe url', async () => {
