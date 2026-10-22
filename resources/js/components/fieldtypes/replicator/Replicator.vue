@@ -19,58 +19,95 @@
                     <section :class="{ 'mt-12 p-4': fullScreenMode }">
                         <sortable-list
                             :model-value="value"
-                            :vertical="true"
+                            :vertical="!hasMultiColumnCards"
                             :item-class="sortableItemClass"
-                            :handle-class="sortableHandleClass"
+                            :handle-class="sortableRowHandleClass"
                             :distance="pointerDragThreshold"
                             append-to="body"
                             constrain-dimensions
-                            @update:model-value="sorted($event)"
-                            @dragstart="$emit('focus')"
-                            @dragend="$emit('blur')"
+                            :animate="false"
+                            @update:model-value="sorted"
+                            @dragstart="startDragging"
+                            @dragend="stopDragging"
                             v-slot="{}"
                         >
-                            <div class="relative">
-                                <ReplicatorSet
+                            <div
+                                ref="setList"
+                                class="replicator-set-list relative"
+                                :data-replicator-dragging="dragging || undefined"
+                            >
+                                <div
                                     v-for="(set, index) in value"
                                     :key="set._id"
-                                    :id="set._id"
-                                    :index
-                                    :field-path="setFieldPathPrefix"
-                                    :meta-path="setMetaPathPrefix"
-                                    :values="set"
-                                    :config="setConfig(set.type)"
-                                    :sortable-item-class="sortableItemClass"
-                                    :sortable-handle-class="sortableHandleClass"
-                                    :collapsed="collapsed.includes(set._id)"
-                                    :enabled="set.enabled"
-                                    :read-only="isReadOnly"
-                                    :can-add-set="canAddSet"
-                                    :can-reorder="!isReadOnly && value.length > 1"
-                                    :total-sets="value.length"
-                                    :has-error="setHasError(set._id)"
-                                    :show-field-previews="config.previews"
-                                    @collapsed="collapseSet(set._id)"
-                                    @expanded="expandSet(set._id)"
-                                    @duplicated="duplicateSet(set._id)"
-                                    @removed="removed(set, index)"
-                                    @moved="moved"
+                                    :data-set-id="set._id"
+                                    :class="[
+                                        sortableItemClass,
+                                        cardLayouts[index].className,
+                                        {
+                                            'replicator-card-set-inset-picker': showCardInsetPicker(
+                                                cardLayouts[index].groupSize,
+                                            ),
+                                            'replicator-card-set-row-start': cardLayouts[index].isCard
+                                                && cardLayouts[index].positionInGroup === 0
+                                                && cardLayouts[index].groupSize > 1,
+                                            'replicator-card-set-has-entry-connector': showCardEntryConnector(index),
+                                            'replicator-card-set-third-column': cardLayouts[index].columns === 3
+                                                && cardLayouts[index].positionInGroup === 2,
+                                        },
+                                    ]"
                                 >
-                                    <template v-slot:picker>
-                                        <add-set-button
-                                            variant="between"
-                                            :groups="groupConfigs"
-                                            :sets="setConfigs"
-                                            :index="index"
-                                            :enabled="canAddSet"
-                                            :read-only="isReadOnly"
-                                            :is-first="index === 0"
-                                            :show-connector="!(index === 0 && config.hide_display)"
-                                            :loading-set="loadingSet"
-                                            @added="addSet"
-                                        />
-                                    </template>
-                                </ReplicatorSet>
+                                    <ReplicatorSet
+                                        :id="set._id"
+                                        :index="index"
+                                        :field-path="setFieldPathPrefix"
+                                        :meta-path="setMetaPathPrefix"
+                                        :values="set"
+                                        :config="setConfig(set.type)"
+                                        :sortable-item-class="''"
+                                        :sortable-handle-class="sortableRowHandleClass"
+                                        :collapsed="collapsed.includes(set._id)"
+                                        :enabled="set.enabled"
+                                        :read-only="isReadOnly"
+                                        :can-add-set="canAddSet"
+                                        :can-reorder="!isReadOnly && value.length > 1"
+                                        :total-sets="value.length"
+                                        :has-error="setHasError(set._id)"
+                                        :show-field-previews="config.previews"
+                                        @collapsed="collapseSet(set._id)"
+                                        @expanded="expandSet(set._id)"
+                                        @duplicated="duplicateSet(set._id)"
+                                        @removed="removed(set, index)"
+                                        @moved="moved"
+                                    >
+                                        <template v-slot:picker>
+                                            <add-set-button
+                                                variant="between"
+                                                :groups="groupConfigs"
+                                                :sets="setConfigs"
+                                                :index="index"
+                                                :enabled="canAddSet"
+                                                :read-only="isReadOnly"
+                                                :is-first="index === 0"
+                                                :show-connector="showPickerConnector(index)"
+                                                :loading-set="loadingSet"
+                                                @added="addSet"
+                                            />
+                                            <add-set-button
+                                                v-if="canAddSet && cardLayouts[index].isCard
+                                                    && cardLayouts[index].groupSize > 1
+                                                    && cardLayouts[index].positionInGroup === cardLayouts[index].groupSize - 1"
+                                                variant="between"
+                                                after
+                                                :groups="groupConfigs"
+                                                :sets="setConfigs"
+                                                :index="index + 1"
+                                                :show-connector="false"
+                                                :loading-set="loadingSet"
+                                                @added="addSet"
+                                            />
+                                        </template>
+                                    </ReplicatorSet>
+                                </div>
                             </div>
                         </sortable-list>
 
@@ -78,7 +115,7 @@
                             v-if="canAddSet"
                             :groups="groupConfigs"
                             :sets="setConfigs"
-                            :show-connector="value.length > 0"
+                            :show-connector="value.length > 0 && !setConfig(value[value.length - 1].type).card"
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
@@ -101,6 +138,14 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
+import {
+    buildCardLayouts,
+    getCardGroupMemberIds,
+    shouldShowPickerConnector,
+} from './cardLayouts.js';
+
+const CARD_MULTI_COLUMN_MIN_WIDTH = 635;
+const CARD_THREE_COLUMN_MIN_WIDTH = 935;
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -118,6 +163,7 @@ export default {
     data() {
         return {
             focused: false,
+            dragging: false,
             collapsed: clone(this.meta.collapsed),
             fullScreenMode: false,
             escBinding: null,
@@ -128,6 +174,9 @@ export default {
             errorsById: {},
             setsCache: {},
             loadingSet: null,
+            cardMultiColumnLayout: false,
+            cardMaxColumns: 2,
+            cardLayoutObserver: null,
         };
     },
 
@@ -160,8 +209,21 @@ export default {
             return `${this.fieldId}-sortable-item`;
         },
 
-        sortableHandleClass() {
-            return `${this.fieldId}-sortable-handle`;
+        sortableRowHandleClass() {
+            return `${this.fieldId}-sortable-row-handle`;
+        },
+
+        cardLayouts() {
+            return buildCardLayouts(
+                this.value,
+                (type) => this.setConfig(type).card,
+                (a, b) => this.isSameCardGroup(a, b),
+                (type) => this.setConfig(type).fields,
+            );
+        },
+
+        hasMultiColumnCards() {
+            return this.cardMultiColumnLayout && this.cardLayouts.some((layout) => layout.isCard && layout.columns > 1);
         },
 
         replicatorPreview() {
@@ -202,8 +264,67 @@ export default {
     },
 
     methods: {
+        startDragging() {
+            this.dragging = true;
+            this.$emit('focus');
+        },
+
+        stopDragging() {
+            this.dragging = false;
+            this.$emit('blur');
+        },
+
         setConfig(handle) {
             return this.setConfigs.find((c) => c.handle === handle) || {};
+        },
+
+        isSameCardGroup(a, b) {
+            return (
+                this.setConfig(a.type).card
+                && this.setConfig(b.type).card
+                && a.type === b.type
+            );
+        },
+
+        showSetConnector(index) {
+            if (index === 0) {
+                return !this.config.hide_display;
+            }
+
+            const set = this.value[index];
+            const previous = this.value[index - 1];
+
+            if (
+                this.setConfig(set.type).card
+                && this.setConfig(previous.type).card
+                && previous.type === set.type
+            ) {
+                return false;
+            }
+
+            return true;
+        },
+
+        showCardEntryConnector(index) {
+            const layout = this.cardLayouts[index];
+
+            if (layout.isCard && layout.positionInGroup !== 0) {
+                return false;
+            }
+
+            return this.showSetConnector(index);
+        },
+
+        showPickerConnector(index) {
+            return shouldShowPickerConnector({
+                index,
+                layouts: this.cardLayouts,
+                showCardEntryConnector: (i) => this.showCardEntryConnector(i),
+            });
+        },
+
+        showCardInsetPicker(cardCount) {
+            return cardCount > 1;
         },
 
         updated(index, set) {
@@ -217,7 +338,36 @@ export default {
         },
 
         sorted(value) {
-            this.update(value);
+            const byId = new Map(this.value.map((set) => [set._id, set]));
+            const seen = new Set();
+            const unique = [];
+
+            for (const set of value) {
+                if (seen.has(set._id)) {
+                    continue;
+                }
+
+                seen.add(set._id);
+
+                const existing = byId.get(set._id);
+
+                if (!existing) {
+                    return;
+                }
+
+                unique.push(existing);
+            }
+
+            if (unique.length === this.value.length) {
+                this.update(unique);
+                return;
+            }
+
+            const fromDom = this.sortedValueFromDom(byId);
+
+            if (fromDom) {
+                this.update(fromDom);
+            }
         },
 
         moved(from, to) {
@@ -319,21 +469,22 @@ export default {
         },
 
         collapseSet(id) {
-            if (!this.collapsed.includes(id)) {
-                this.collapsed.push(id);
-            }
+            const collapsed = new Set(this.collapsed);
+
+            this.cardGroupMemberIds(id).forEach((setId) => collapsed.add(setId));
+
+            this.collapsed = [...collapsed];
         },
 
         expandSet(id) {
+            const ids = this.cardGroupMemberIds(id);
+
             if (this.config.collapse === 'accordion') {
-                this.collapsed = this.value.map((v) => v._id).filter((v) => v !== id);
+                this.collapsed = this.value.map((v) => v._id).filter((v) => !ids.includes(v));
                 return;
             }
 
-            if (this.collapsed.includes(id)) {
-                var index = this.collapsed.indexOf(id);
-                this.collapsed.splice(index, 1);
-            }
+            this.collapsed = this.collapsed.filter((setId) => !ids.includes(setId));
         },
 
         collapseAll() {
@@ -372,6 +523,69 @@ export default {
 
             return this.errorsById.hasOwnProperty(id) && this.errorsById[id].length > 0;
         },
+
+        cardGroupMemberIds(id) {
+            const index = this.value.findIndex((set) => set._id === id);
+
+            if (index === -1) {
+                return [id];
+            }
+
+            return getCardGroupMemberIds({
+                index,
+                value: this.value,
+                layouts: this.cardLayouts,
+                multiColumn: this.cardMultiColumnLayout,
+                maxColumns: this.cardMaxColumns,
+            });
+        },
+
+        sortedValueFromDom(byId) {
+            const list = this.$refs.setList;
+
+            if (!list) {
+                return null;
+            }
+
+            const ordered = [...list.children]
+                .map((element) => byId.get(element.dataset.setId))
+                .filter(Boolean);
+
+            if (ordered.length !== this.value.length) {
+                return null;
+            }
+
+            return ordered;
+        },
+
+        observeCardLayoutContainer() {
+            this.cardLayoutObserver?.disconnect();
+            this.cardLayoutObserver = null;
+
+            const root = this.$refs.setList;
+            const panel = root?.closest('[data-ui-panel], [class*="container/panel"]');
+
+            if (!panel) {
+                this.cardMultiColumnLayout = false;
+                return;
+            }
+
+            this.cardLayoutObserver = new ResizeObserver(([entry]) => {
+                const width = entry.contentRect.width;
+
+                this.cardMultiColumnLayout = width > CARD_MULTI_COLUMN_MIN_WIDTH;
+                this.cardMaxColumns = width > CARD_THREE_COLUMN_MIN_WIDTH ? 3 : 2;
+            });
+            this.cardLayoutObserver.observe(panel);
+        },
+    },
+
+    mounted() {
+        this.$nextTick(() => this.observeCardLayoutContainer());
+    },
+
+    beforeUnmount() {
+        this.cardLayoutObserver?.disconnect();
     },
 
     watch: {
@@ -385,6 +599,10 @@ export default {
                     this.$emit('blur');
                 }
             }, 1);
+        },
+
+        fullScreenMode() {
+            this.$nextTick(() => this.observeCardLayoutContainer());
         },
 
         collapsed(collapsed) {

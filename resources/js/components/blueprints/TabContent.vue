@@ -8,6 +8,7 @@
             :add-section-text="addSectionText"
             :edit-section-text="editSectionText"
             :show-section-handle-field="showSectionHandleField"
+            :show-section-card-field="showSectionCardField"
             :show-section-collapsible-field="showSectionCollapsibleField"
             :show-section-hide-field="showSectionHideField"
             :can-define-localizable="canDefineLocalizable"
@@ -34,6 +35,10 @@ export default {
             type: Object,
         },
         showSectionHandleField: {
+            type: Boolean,
+            default: false,
+        },
+        showSectionCardField: {
             type: Boolean,
             default: false,
         },

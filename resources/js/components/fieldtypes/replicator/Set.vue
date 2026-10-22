@@ -1,5 +1,6 @@
 <script setup>
 import { computed, inject, ref } from 'vue';
+import { DropdownMenuCheckboxItem } from 'reka-ui';
 import {
     Icon,
     Switch,
@@ -87,7 +88,7 @@ const fieldActions = computed(() => {
     return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
-const previewText = computed(() => {
+const previewItems = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
             if (!handle.endsWith('_')) return false;
@@ -109,8 +110,18 @@ const previewText = computed(() => {
 
             return escapeHtml(JSON.stringify(value));
         })
-        .filter((html) => html && html.trim() !== '')
-        .join(' <span class="text-gray-400 dark:text-gray-600">/</span> ');
+        .filter((html) => html && html.trim() !== '');
+});
+
+const previewText = computed(() => previewItems.value.join(' <span class="text-gray-400 dark:text-gray-600">/</span> '));
+
+const firstPreviewText = computed(() => {
+    if (!previewItems.value.length) return null;
+
+    const el = document.createElement('div');
+    el.innerHTML = previewItems.value[0];
+
+    return el.textContent.trim() || null;
 });
 
 function toggleEnabledState() {
@@ -213,6 +224,7 @@ function onSetDropdownClosed() {
                         </span>
                         {{ __(config.display) || config.handle }}
                     </Badge>
+                    <span v-if="firstPreviewText" class="sr-only">{{ firstPreviewText }}</span>
                     <Icon
                         v-if="config.instructions && !collapsed"
                         name="info-square"
@@ -221,6 +233,8 @@ function onSetDropdownClosed() {
                     />
                     <Subheading
                         v-show="collapsed"
+                        data-replicator-set-preview
+                        aria-hidden="true"
                         v-html="previewText"
                         class="overflow-hidden text-ellipsis whitespace-nowrap"
                     />
@@ -234,6 +248,7 @@ function onSetDropdownClosed() {
                         :aria-label="__('messages.keyboard_item_reorder_instructions')"
                     />
                     <Switch
+                        v-if="!config.card"
                         size="xs"
                         :model-value="enabled"
                         :label="__('Included in output')"
@@ -245,6 +260,16 @@ function onSetDropdownClosed() {
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
                         <DropdownMenu>
+                            <DropdownMenuCheckboxItem
+                                v-if="config.card"
+                                class="col-span-2 flex items-center justify-between gap-4 rounded-lg px-3 py-1.5 text-sm text-gray-700 outline-hidden cursor-pointer data-highlighted:bg-gray-100 dark:text-gray-300 dark:data-highlighted:bg-gray-800"
+                                :model-value="enabled"
+                                @update:model-value="toggleEnabledState"
+                            >
+                                <span>{{ __('Visible') }}</span>
+                                <Icon v-if="enabled" name="checkmark" class="size-3.5" aria-hidden="true" />
+                            </DropdownMenuCheckboxItem>
+                            <DropdownSeparator v-if="config.card" />
                             <DropdownItem
                                 v-if="fieldActions.length"
                                 v-for="action in fieldActions"
@@ -285,6 +310,7 @@ function onSetDropdownClosed() {
 
             <div
                 v-show="!collapsed && hasFields"
+                data-replicator-set-fields
                 :class="{ 'contain-paint': collapsed, 'isolate': !collapsed }"
                 class="border-t border-t-gray-300! dark:border-t-white/10!"
             >
