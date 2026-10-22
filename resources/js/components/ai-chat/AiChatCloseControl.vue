@@ -19,7 +19,7 @@ function dismiss() {
         size="sm"
         icon-append="x"
         :text="__('Close')"
-        class="absolute end-2 top-2 z-10 opacity-0 shadow-none! transition-opacity focus-visible:opacity-100 group-hover/chat:opacity-100 pointer-coarse:opacity-100 [&_svg]:size-3.5! [&>div]:-translate-y-px"
+        class="absolute end-2 top-2 z-(--z-index-above) opacity-0 shadow-none! transition-opacity focus-visible:opacity-100 group-hover/chat:opacity-100 pointer-coarse:opacity-100 [&_svg]:size-3.5! [&>div]:-translate-y-px"
         @click="dismiss"
     />
 </template>

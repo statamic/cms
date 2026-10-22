@@ -67,7 +67,7 @@ const icon = computed(() => (floating.value ? 'bar-sidebar-left-panel-open' : 'b
         v-tooltip="label"
         :class="[
             // The same look in both layouts: a small button on the edge of the chat, level with the input's divider, so it stays put as messages make the chat grow
-            'z-10 flex size-7 cursor-pointer items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 opacity-0 shadow-md transition-opacity hover:text-gray-900 focus-visible:opacity-100 focus-visible:focus-outline group-hover/chat:opacity-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-white',
+            'z-(--z-index-above) flex size-7 cursor-pointer items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 opacity-0 shadow-md transition-opacity hover:text-gray-900 focus-visible:opacity-100 focus-visible:focus-outline group-hover/chat:opacity-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-white',
             // Floating it straddles the card's right edge. Docked it's fixed in place (see above).
             floating ? 'absolute -end-3.5 bottom-[37.5px]' : 'fixed',
         ]"

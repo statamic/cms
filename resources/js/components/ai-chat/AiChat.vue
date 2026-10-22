@@ -198,7 +198,7 @@ function scrollToBottom() {
                 <div
                     v-if="showHelp"
                     :class="floating ? (messages.length ? 'start-[7px] w-[calc(100%-14px)]' : '-start-2.75 w-[calc(100%+11px)]') : 'start-0.25 end-2.5'"
-                    class="absolute bottom-full z-20 mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-lg dark:border-gray-700 dark:bg-gray-900"
+                    class="absolute bottom-full z-(--z-index-portal) mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-lg dark:border-gray-700 dark:bg-gray-900"
                 >
                     <!-- Docked, the examples are already above the input until the first message -->
                     <AiChatExamples v-if="floating && !messages.length" ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
@@ -208,7 +208,7 @@ function scrollToBottom() {
             <!-- Like the command palette's search row, an icon in front of the text -->
             <Icon
                 name="ai-chat"
-                :class="['pointer-events-none absolute z-10 size-4 text-gray-400', floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
+                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
             />
             <Textarea
                 v-model="prompt"

@@ -253,7 +253,7 @@ function follow(text) {
                             v-for="suggestion in result.suggestions"
                             :key="suggestion.text"
                             type="button"
-                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:-top-[5px] last:after:-bottom-[5px] after:-z-10 after:rounded-lg hover:z-10 hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-20 focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
+                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:-top-[5px] last:after:-bottom-[5px] after:z-(--z-index-below) after:rounded-lg hover:z-(--z-index-above) hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-[calc(var(--z-index-above)+1)] focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
                             :aria-label="suggestion.label ? `${__(suggestion.label)}: ${suggestion.text}` : suggestion.text"
                             @click="apply(suggestion.text)"
                             @mouseenter="showPreview(suggestion.text)"
@@ -322,6 +322,6 @@ function follow(text) {
         readonly
         :value="preview"
         :style="overlayStyle"
-        class="pointer-events-none absolute inset-0 z-[5] size-full resize-none appearance-none overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
+        class="pointer-events-none absolute inset-0 z-(--z-index-above) size-full resize-none appearance-none overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
     />
 </template>
