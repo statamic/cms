@@ -1,10 +1,12 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import { ref } from 'vue';
 import { Editor } from '@tiptap/vue-3';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
 import Provider from '@/components/portals/Provider.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
+import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants.js';
 
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
 window.cp_url = (url) => url;
@@ -21,7 +23,11 @@ function set(id, label) {
     return { type: 'set', attrs: { id, enabled: true, values: { type: 'card', label } } };
 }
 
-async function mountField(config = {}, initialValue = value) {
+function listItem(text) {
+    return { type: 'listItem', content: [{ type: 'paragraph', ...(text && { content: [{ type: 'text', text }] }) }] };
+}
+
+async function mountField(config = {}, initialValue = value, container = {}) {
     const wrapper = mount(BardFieldtype, {
         props: {
             value: initialValue,
@@ -51,6 +57,7 @@ async function mountField(config = {}, initialValue = value) {
                     errors: { value: {} },
                     setFieldValue: vi.fn(),
                     setFieldMeta: vi.fn(),
+                    ...container,
                 },
             },
         },
@@ -60,6 +67,20 @@ async function mountField(config = {}, initialValue = value) {
     await wrapper.vm.$nextTick();
 
     return wrapper;
+}
+
+async function mountFieldInContainer(config, initialValue) {
+    const values = ref({ content: initialValue });
+    const wrapper = await mountField(config, initialValue, { values });
+
+    await wrapper.setProps({
+        'onUpdate:value': (value) => {
+            data_set(values.value, 'content', value);
+            wrapper.setProps({ value });
+        },
+    });
+
+    return { wrapper, values };
 }
 
 async function type(wrapper, text) {
@@ -170,4 +191,41 @@ test('the editor is rebuilt when the value changes while the editor is not focus
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
     expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+});
+
+test('sets keep their values when an edit moves them without changing the node count', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets, buttons: ['unorderedlist'] }, [
+        { type: 'bulletList', content: [listItem('One'), listItem(), listItem('Two')] },
+        set('set-a', 'A'),
+        { type: 'paragraph', content: [{ type: 'text', text: 'Between' }] },
+        set('set-b', 'B'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'paragraph' && node.childCount === 0) editor.commands.setTextSelection(pos + 1);
+    });
+    editor.commands.keyboardShortcut('Enter');
+    await new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
+
+    const labels = (nodes) => nodes.filter((node) => node.type === 'set').map((node) => node.attrs.values.label);
+    expect(editor.getJSON().content.map((node) => node.type)).toEqual(['bulletList', 'paragraph', 'bulletList', 'set', 'paragraph', 'set']);
+    expect(labels(editor.getJSON().content)).toEqual(['A', 'B']);
+    expect(labels(values.value.content)).toEqual(['A', 'B']);
+});
+
+test('typing is still debounced when it does not move any sets', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    wrapper.vm.editor.commands.insertContentAt(4, ' two');
+    await wrapper.vm.$nextTick();
+
+    expect(values.value.content[0].content[0].text).toBe('One');
+
+    await new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
+
+    expect(values.value.content[0].content[0].text).toBe('One two');
 });
