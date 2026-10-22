@@ -270,8 +270,8 @@ function follow(text) {
             </div>
 
             <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. -->
-                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="focusClicked($event); !loading && generate()" />
+                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it works. -->
+                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': loading }" @click="focusClicked($event); !loading && generate()" />
             </div>
         </div>
     </Popover>
