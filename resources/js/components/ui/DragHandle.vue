@@ -125,6 +125,6 @@ onBeforeUnmount(() => {
         @keydown="onKeydown"
         @pointerdown="onPointerDown"
     >
-        <DragDots class="w-[7px] h-[17px]" />
+        <DragDots class="w-[7px] h-[17px] [&_g]:fill-current!" />
     </button>
 </template>

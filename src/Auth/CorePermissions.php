@@ -23,7 +23,6 @@ class CorePermissions
             $this->register('access cp');
             $this->register('configure sites');
             $this->register('configure fields');
-            $this->register('configure form fields');
             $this->register('manage preferences');
         });
 
@@ -209,9 +208,32 @@ class CorePermissions
     {
         $this->register('configure forms');
 
-        $this->register('view {form} form submissions', function ($permission) {
+        $this->register('edit forms', function ($permission) {
             $this->permission($permission)->hiddenBy('configure forms')->children([
+                $this->permission('create forms'),
+                $this->permission('delete forms'),
+            ]);
+        });
+
+        $this->register('view form submissions', function ($permission) {
+            $this->permission($permission)->hiddenBy('configure forms')->children([
+                $this->permission('delete form submissions'),
+                $this->permission('manage form spam'),
+            ]);
+        });
+
+        $this->register('edit {form} form', function ($permission) {
+            $this->permission($permission)->hiddenBy(['configure forms', 'edit forms'])->replacements('form', function () {
+                return Form::all()->map(function ($form) {
+                    return ['value' => $form->handle(), 'label' => __($form->title())];
+                });
+            });
+        });
+
+        $this->register('view {form} form submissions', function ($permission) {
+            $this->permission($permission)->hiddenBy(['configure forms', 'view form submissions'])->children([
                 $this->permission('delete {form} form submissions'),
+                $this->permission('manage {form} form spam'),
             ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
                     return ['value' => $form->handle(), 'label' => __($form->title())];

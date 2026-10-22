@@ -55,6 +55,18 @@ it('normalizes input options with array of objects with key value keys', () => {
     ]);
 });
 
+it('normalizes input options with array of objects with key label keys', () => {
+    expect(
+        normalizeInputOptions([
+            { key: 'one', label: 'One', image: 'one.jpg' },
+            { key: 'two', label: 'Two', image: 'two.jpg' },
+        ]),
+    ).toEqual([
+        { value: 'one', label: 'Uno' },
+        { value: 'two', label: 'Two' },
+    ]);
+});
+
 it('preserves icon when normalizing object options with value label keys', () => {
     expect(
         normalizeInputOptions([
