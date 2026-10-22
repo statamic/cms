@@ -24,6 +24,10 @@ function set(id, label) {
     return { type: 'set', attrs: { id, enabled: true, values: { type: 'card', label } } };
 }
 
+function listItem(text) {
+    return { type: 'listItem', content: [{ type: 'paragraph', ...(text && { content: [{ type: 'text', text }] }) }] };
+}
+
 async function mountField(config = {}, initialValue = value, container = {}) {
     const wrapper = mount(BardFieldtype, {
         props: {
@@ -179,11 +183,34 @@ test('the editor is rebuilt when the value loses nodes while the editor is focus
 test('the editor is left alone when only set values change while the editor is focused', async () => {
     const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
     focusEditor(wrapper);
-    const setContent = vi.spyOn(wrapper.vm.editor.commands, 'setContent');
+    const doc = wrapper.vm.editor.state.doc;
 
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
-    expect(setContent).not.toHaveBeenCalled();
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
+});
+
+test('the editor is left alone when only set values change and the value omits attribute defaults', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+    focusEditor(wrapper);
+    const doc = wrapper.vm.editor.state.doc;
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'Changed' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
+});
+
+test('the editor is left alone when the value only differs by omitted attribute defaults', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+    const doc = wrapper.vm.editor.state.doc;
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'A' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
 });
 
 test('the editor is rebuilt when the value changes while the editor is not focused', async () => {
@@ -231,4 +258,59 @@ test('each set field edit can be undone', async () => {
 
     expect(editor.getJSON().content[1].attrs.values.label).toBe('ABC');
     expect(values.value.content[1].attrs.values.label).toBe('ABC');
+});
+
+test('the editor is rebuilt when the value omits attribute defaults but changes content', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'Changed' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+});
+
+test('the editor is cleared when an empty value arrives', async () => {
+    const wrapper = await mountField({ sets }, [{ type: 'paragraph' }, { type: 'paragraph' }]);
+
+    await wrapper.setProps({ value: [] });
+
+    expect(wrapper.vm.editor.getJSON().content).toEqual([{ type: 'paragraph' }]);
+});
+
+test('sets keep their values when an edit moves them without changing the node count', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets, buttons: ['unorderedlist'] }, [
+        { type: 'bulletList', content: [listItem('One'), listItem(), listItem('Two')] },
+        set('set-a', 'A'),
+        { type: 'paragraph', content: [{ type: 'text', text: 'Between' }] },
+        set('set-b', 'B'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'paragraph' && node.childCount === 0) editor.commands.setTextSelection(pos + 1);
+    });
+    editor.commands.keyboardShortcut('Enter');
+    await new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
+
+    const labels = (nodes) => nodes.filter((node) => node.type === 'set').map((node) => node.attrs.values.label);
+    expect(editor.getJSON().content.map((node) => node.type)).toEqual(['bulletList', 'paragraph', 'bulletList', 'set', 'paragraph', 'set']);
+    expect(labels(editor.getJSON().content)).toEqual(['A', 'B']);
+    expect(labels(values.value.content)).toEqual(['A', 'B']);
+});
+
+test('typing is still debounced when it does not move any sets', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    wrapper.vm.editor.commands.insertContentAt(4, ' two');
+    await wrapper.vm.$nextTick();
+
+    expect(values.value.content[0].content[0].text).toBe('One');
+
+    await new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
+
+    expect(values.value.content[0].content[0].text).toBe('One two');
 });

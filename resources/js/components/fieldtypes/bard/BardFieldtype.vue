@@ -453,17 +453,16 @@ export default {
         value(value) {
             if (!this.editor) return;
 
-            const oldContent = this.editor.getJSON();
-            const content = this.valueToContent(value);
+            if (this.valueMatchesEditor(value)) return;
 
-            if (JSON.stringify(content) === JSON.stringify(oldContent)) return;
+            const oldContent = this.editor.getJSON();
 
             // Sets sync their own values into the editor, so while it's focused those changes
             // don't need a rebuild, which would destroy the field being typed in.
             if (this.editorIsFocused() && this.onlySetValuesDiffer(value, oldContent.content ?? [])) return;
 
             this.editor.commands.clearContent(false);
-            this.editor.commands.setContent(content, true);
+            this.editor.commands.setContent(this.valueToContent(value), true);
         },
 
         readOnly(readOnly) {
@@ -896,7 +895,12 @@ export default {
                         return count;
                     };
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Sets look up their values by index, so moving them can't wait for the debounce.
+                    const setPositions = (nodes) => (nodes ?? []).map((node) => (node.type === 'set' ? node.attrs.id : '')).join();
+
+                    if (countNodes(oldJson) !== countNodes(newJson) || setPositions(oldJson) !== setPositions(newJson)) {
+                        this.debounceNextUpdate = false;
+                    }
 
                     this.json = newJson;
 
@@ -955,12 +959,38 @@ export default {
             return value.length ? { type: 'doc', content: value } : null;
         },
 
+        // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
+        valueMatchesEditor(value) {
+            const content = this.valueToContent(value);
+            const current = this.editor.getJSON();
+
+            if (JSON.stringify(content) === JSON.stringify(current)) return true;
+
+            const node = this.contentToNode(content);
+
+            return node !== null && node.eq(this.editor.state.doc);
+        },
+
+        contentToNode(content) {
+            try {
+                return this.editor.schema.nodeFromJSON(
+                    content ?? { type: 'doc', content: [{ type: 'paragraph' }] },
+                );
+            } catch (error) {
+                return null;
+            }
+        },
+
         editorIsFocused() {
             return this.editor.view.dom.contains(document.activeElement);
         },
 
-        onlySetValuesDiffer(nodes, oldNodes) {
-            return JSON.stringify(this.withoutSetValues(nodes)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        onlySetValuesDiffer(value, oldNodes) {
+            const node = this.contentToNode(this.valueToContent(value));
+
+            if (node === null) return false;
+
+            return JSON.stringify(this.withoutSetValues(node.toJSON().content)) === JSON.stringify(this.withoutSetValues(oldNodes));
         },
 
         withoutSetValues(nodes) {
