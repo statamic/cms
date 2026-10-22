@@ -137,7 +137,8 @@ function hidePreview() {
 
 watch(open, (isOpen) => isOpen || (preview.value = null));
 
-// Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through.
+// Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
+// Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
 // A word-level diff, from the longest run of words the two have in common.
 function diffWords(from, to) {
     const a = from.split(/\s+/).filter(Boolean);
@@ -230,6 +231,7 @@ function follow(text) {
                             :key="suggestion.text"
                             type="button"
                             class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:-top-[5px] last:after:-bottom-[5px] after:-z-10 after:rounded-lg hover:z-10 hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-20 focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
+                            :aria-label="suggestion.label ? `${__(suggestion.label)}: ${suggestion.text}` : suggestion.text"
                             @click="apply(suggestion.text)"
                             @mouseenter="showPreview(suggestion.text)"
                             @mouseleave="hidePreview"
@@ -242,7 +244,7 @@ function follow(text) {
                                     <span
                                         :class="{
                                             'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
-                                            'text-gray-500 line-through group-hover:text-gray-600 dark:text-gray-400': part.type === 'removed',
+                                            'rounded-sm bg-red-50 text-red-700 line-through dark:bg-red-400/15 dark:text-red-300': part.type === 'removed',
                                         }"
                                         >{{ part.text }}</span
                                     >{{ ' ' }}
