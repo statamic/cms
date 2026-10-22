@@ -235,7 +235,7 @@ function scrollToBottom() {
                 v-show="!prompt"
                 type="button"
                 :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
-                class="absolute flex h-6.5 cursor-pointer items-center px-1.5 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
+                class="absolute flex h-6.5 cursor-pointer items-center rounded-md px-1.5 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
                 @click="newChat"
             >
                 {{ __('Clear') }}
