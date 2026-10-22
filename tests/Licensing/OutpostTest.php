@@ -12,6 +12,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Addons\Addon as AddonInstance;
 use Statamic\Addons\Manifest;
@@ -302,6 +303,33 @@ class OutpostTest extends TestCase
         ], $response);
         $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
         $this->assertCachedUntilExpiry($response);
+    }
+
+    #[Test]
+    #[DataProvider('invalidResponseBodyProvider')]
+    public function it_caches_an_invalid_response_body_as_an_error_for_5_to_10_minutes($body)
+    {
+        $outpost = $this->outpostWithResponse(new Response(200, [], $body));
+
+        $response = $outpost->response();
+
+        $this->assertEquals([
+            'error' => 500,
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
+        $this->assertCachedUntilExpiry($response);
+    }
+
+    public static function invalidResponseBodyProvider()
+    {
+        return [
+            'string' => ['ok'],
+            'empty' => [''],
+            'json string' => ['"ok"'],
+            'html' => ['<html></html>'],
+        ];
     }
 
     #[Test]

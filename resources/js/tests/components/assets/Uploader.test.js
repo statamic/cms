@@ -1,33 +1,99 @@
+import { expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { expect, test } from 'vitest';
 import Uploader from '@/components/assets/Uploader.vue';
 
-const uploader = () =>
-    mount(Uploader, {
-        props: { enabled: true, container: 'assets', path: '/', url: '/cp/assets' },
-        slots: { default: `<template #default="{ dragging }"><span>{{ dragging ? 'dragging' : 'idle' }}</span></template>` },
+function mountUploader(methods = {}) {
+    return mount(
+        { ...Uploader, methods: { ...Uploader.methods, ...methods } },
+        {
+            props: { url: '/cp/assets' },
+            slots: { default: '<div class="content" />' },
+        },
+    );
+}
+
+function dragEvent(type, types, files = []) {
+    const event = new Event(type, { bubbles: true, cancelable: true });
+
+    Object.defineProperty(event, 'dataTransfer', {
+        value: { types, files, items: [] },
     });
 
-const dragenter = (wrapper, types) => {
-    const event = new Event('dragenter', { bubbles: true, cancelable: true });
-    event.dataTransfer = { types };
+    return event;
+}
+
+test.each([['dragenter'], ['dragover']])('a file %s is handled', async (type) => {
+    const wrapper = mountUploader();
+    const event = dragEvent(type, ['Files']);
+
     wrapper.element.dispatchEvent(event);
-};
-
-test('dragging files shows the upload state', async () => {
-    const wrapper = uploader();
-
-    dragenter(wrapper, ['Files']);
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.text()).toBe('dragging');
+    expect(event.defaultPrevented).toBe(true);
 });
 
-test('dragging things from within the page is ignored', async () => {
-    const wrapper = uploader();
+test('a file dragenter sets dragging', async () => {
+    const wrapper = mountUploader();
 
-    dragenter(wrapper, ['text/plain']);
-    await wrapper.vm.$nextTick();
+    wrapper.element.dispatchEvent(dragEvent('dragenter', ['Files']));
 
-    expect(wrapper.text()).toBe('idle');
+    expect(wrapper.vm.dragging).toBe(true);
+});
+
+test.each([['dragenter'], ['dragover'], ['drop']])('a non-file %s is ignored', (type) => {
+    const wrapper = mountUploader();
+    const event = dragEvent(type, ['text/plain']);
+
+    wrapper.element.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(wrapper.vm.dragging).toBe(false);
+});
+
+test('a non-file drag reaches listeners further up', () => {
+    const wrapper = mountUploader();
+    const parent = document.createElement('div');
+    parent.appendChild(wrapper.element);
+
+    let received = false;
+    parent.addEventListener('drop', () => (received = true));
+
+    wrapper.element.querySelector('.content').dispatchEvent(dragEvent('drop', ['text/plain']));
+
+    expect(received).toBe(true);
+});
+
+test('a file drop adds uploads', () => {
+    const addFile = vi.fn();
+    const wrapper = mountUploader({ addFile });
+    const file = new File(['x'], 'test.txt');
+
+    wrapper.element.dispatchEvent(dragEvent('drop', ['Files'], [file]));
+
+    expect(addFile).toHaveBeenCalledWith(file);
+});
+
+test('a non-file drop does not add uploads', () => {
+    const addFile = vi.fn();
+    const wrapper = mountUploader({ addFile });
+    const file = new File(['x'], 'test.txt');
+
+    wrapper.element.dispatchEvent(dragEvent('drop', ['text/plain'], [file]));
+
+    expect(addFile).not.toHaveBeenCalled();
+});
+
+test('types given as a DOMStringList are supported', () => {
+    const wrapper = mountUploader();
+    const types = {
+        0: 'Files',
+        length: 1,
+        contains: (type) => type === 'Files',
+    };
+    const event = dragEvent('dragenter', types);
+
+    wrapper.element.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(wrapper.vm.dragging).toBe(true);
 });

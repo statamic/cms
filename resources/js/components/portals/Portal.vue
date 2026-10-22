@@ -43,6 +43,13 @@ export default {
 
     created() {
         this.portal = this.$portals.create(this.name);
+        this.portal.setDisabled(this.disabled);
+    },
+
+    watch: {
+        disabled(disabled) {
+            this.portal.setDisabled(disabled);
+        },
     },
 
     mounted() {

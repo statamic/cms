@@ -94,13 +94,12 @@ export default {
             }
         },
 
-        isDraggingFiles(e) {
-            // Ignore drags that start in the page, like moving assets between folders.
-            return e.dataTransfer?.types.includes('Files');
+        isFileDrag(e) {
+            return Array.from(e.dataTransfer?.types ?? []).includes('Files');
         },
 
         dragenter(e) {
-            if (!this.isDraggingFiles(e)) return;
+            if (!this.isFileDrag(e)) return;
 
             e.stopPropagation();
             e.preventDefault();
@@ -108,7 +107,7 @@ export default {
         },
 
         dragover(e) {
-            if (!this.isDraggingFiles(e)) return;
+            if (!this.isFileDrag(e)) return;
 
             e.stopPropagation();
             e.preventDefault();
@@ -122,7 +121,7 @@ export default {
         },
 
         drop(e) {
-            if (!this.isDraggingFiles(e)) return;
+            if (!this.isFileDrag(e)) return;
 
             e.stopPropagation();
             e.preventDefault();
