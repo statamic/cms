@@ -178,11 +178,34 @@ test('the editor is rebuilt when the value loses nodes while the editor is focus
 test('the editor is left alone when only set values change while the editor is focused', async () => {
     const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
     focusEditor(wrapper);
-    const setContent = vi.spyOn(wrapper.vm.editor.commands, 'setContent');
+    const doc = wrapper.vm.editor.state.doc;
 
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
-    expect(setContent).not.toHaveBeenCalled();
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
+});
+
+test('the editor is left alone when only set values change and the value omits attribute defaults', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+    focusEditor(wrapper);
+    const doc = wrapper.vm.editor.state.doc;
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'Changed' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
+});
+
+test('the editor is left alone when the value only differs by omitted attribute defaults', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+    const doc = wrapper.vm.editor.state.doc;
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'A' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.state.doc).toBe(doc);
 });
 
 test('the editor is rebuilt when the value changes while the editor is not focused', async () => {
@@ -191,6 +214,24 @@ test('the editor is rebuilt when the value changes while the editor is not focus
     await wrapper.setProps({ value: [set('set-a', 'Changed'), { type: 'paragraph' }] });
 
     expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+});
+
+test('the editor is rebuilt when the value omits attribute defaults but changes content', async () => {
+    const wrapper = await mountField({ sets }, [set('set-a', 'A'), { type: 'paragraph' }]);
+
+    await wrapper.setProps({
+        value: [{ type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'Changed' } } }, { type: 'paragraph' }],
+    });
+
+    expect(wrapper.vm.editor.getJSON().content).toEqual([set('set-a', 'Changed'), { type: 'paragraph' }]);
+});
+
+test('the editor is cleared when an empty value arrives', async () => {
+    const wrapper = await mountField({ sets }, [{ type: 'paragraph' }, { type: 'paragraph' }]);
+
+    await wrapper.setProps({ value: [] });
+
+    expect(wrapper.vm.editor.getJSON().content).toEqual([{ type: 'paragraph' }]);
 });
 
 test('sets keep their values when an edit moves them without changing the node count', async () => {
