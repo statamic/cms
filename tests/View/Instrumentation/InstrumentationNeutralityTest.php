@@ -141,6 +141,18 @@ class InstrumentationNeutralityTest extends ParserTestCase
         $this->assertStringContainsString('<p><!-- antlers:start ', (string) Antlers::parse($template, ['title' => 'Hello'], true));
     }
 
+    public function test_parsing_without_instrumentation_suppresses_nested_renders_too()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('inner', '<em>{{ title }}</em>');
+        Runtime::register(HtmlInstrumentation::make());
+        $template = '<p>{{ partial:inner }}</p>';
+        $data = ['title' => 'Hello'];
+
+        $this->assertStringContainsString('<em><!-- antlers:start ', (string) Antlers::parse($template, $data, true));
+        $this->assertSame('<p><em>Hello</em></p>', (string) Antlers::parseWithoutInstrumentation($template, $data, true));
+    }
+
     private function renderWithAndWithoutInstrumentation(array $views): array
     {
         $this->withFakeViews();
