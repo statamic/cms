@@ -68,6 +68,14 @@ test('it previews a cloudflare iframe url', async () => {
     expect((await preview(`${cloudflare}/iframe`)).attributes('src')).toBe(`${cloudflare}/iframe`);
 });
 
+test('it keeps the player options of a cloudflare iframe url', async () => {
+    expect((await preview(`${cloudflare}/iframe?autoplay=true&muted=true`)).attributes('src')).toBe(`${cloudflare}/iframe?autoplay=true&muted=true`);
+});
+
+test('it drops the query string of a cloudflare watch url', async () => {
+    expect((await preview(`${cloudflare}/watch?autoplay=true`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+});
+
 test('it previews a cloudflare watch url as its iframe', async () => {
     expect((await preview(`${cloudflare}/watch`)).attributes('src')).toBe(`${cloudflare}/iframe`);
 });

@@ -29,7 +29,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
-const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(?:\/|\/iframe\/?|\/watch\/?)?(?:[?#]\S*)?$/i;
+const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(\/|\/iframe\/?|\/watch\/?)?(?:\?([^\s#]*))?(?:#\S*)?$/i;
 
 export default {
     mixins: [Fieldtype],
@@ -49,11 +49,19 @@ export default {
         cloudflare() {
             const match = CLOUDFLARE_URL_PATTERN.exec(this.value || '');
 
-            return match ? { host: match[1], id: match[2] } : null;
+            if (!match) return null;
+
+            const isWatch = (match[3] || '').toLowerCase().startsWith('/watch');
+
+            return { host: match[1], id: match[2], query: isWatch ? '' : new URLSearchParams(match[4] || '').toString() };
         },
 
         embedUrl() {
-            if (this.cloudflare) return `https://${this.cloudflare.host}/${this.cloudflare.id}/iframe`;
+            if (this.cloudflare) {
+                const { host, id, query } = this.cloudflare;
+
+                return `https://${host}/${id}/iframe${query ? `?${query}` : ''}`;
+            }
 
             let embed_url = this.value || '';
 

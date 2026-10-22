@@ -14,7 +14,7 @@ class Embed extends ArrayableString
     const VIMEO = 'vimeo';
     const YOUTUBE = 'youtube';
 
-    private const CLOUDFLARE_URL_PATTERN = '#^https?://(customer-[a-z0-9]+\.cloudflarestream\.com)/([a-z0-9]+)(?:/|/iframe/?|/watch/?)?(?:[?\#]\S*)?\z#i';
+    private const CLOUDFLARE_URL_PATTERN = '#^https?://(customer-[a-z0-9]+\.cloudflarestream\.com)/([a-z0-9]+)(/|/iframe/?|/watch/?)?(?:\?([^\s\#]*))?(?:\#\S*)?\z#i';
     private const VIMEO_PRIVACY_HASH_PATTERN = '/^[a-zA-Z0-9]+$/';
     private const YOUTUBE_ID_PATTERN = '/^[a-zA-Z0-9_-]+$/';
 
@@ -211,14 +211,25 @@ class Embed extends ArrayableString
         return filled($url) && (Str::contains($url, ['youtu.be', 'youtube', self::VIMEO]) || self::cloudflareParts($url) !== null);
     }
 
-    private static function cloudflareEmbedUrl(string $host, string $id): string
+    private static function cloudflareEmbedUrl(string $host, string $id, string $query): string
     {
-        return "https://{$host}/{$id}/iframe";
+        parse_str($query, $params);
+
+        $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+
+        return "https://{$host}/{$id}/iframe".($query ? "?{$query}" : '');
     }
 
     private static function cloudflareParts(?string $url): ?array
     {
-        return preg_match(self::CLOUDFLARE_URL_PATTERN, $url ?? '', $matches) ? [$matches[1], $matches[2]] : null;
+        if (! preg_match(self::CLOUDFLARE_URL_PATTERN, $url ?? '', $matches)) {
+            return null;
+        }
+
+        // Player options only apply to the iframe, so a watch page's query string is dropped.
+        $query = Str::startsWith(strtolower($matches[3] ?? ''), '/watch') ? '' : ($matches[4] ?? '');
+
+        return [$matches[1], $matches[2], $query];
     }
 
     private static function isVideoFile(string $url): bool
