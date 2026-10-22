@@ -1,5 +1,12 @@
 # Release Notes
 
+## 5.74.7 (2026-10-22)
+
+### What's fixed
+- Harden glide query param logic [#15693](https://github.com/statamic/cms/issues/15693) by @jasonvarga
+
+
+
 ## 5.74.6 (2026-10-08)
 
 ### What's fixed
