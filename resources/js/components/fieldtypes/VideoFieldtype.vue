@@ -29,7 +29,7 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
-const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(?:[/?#]|$)/i;
+const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(?:\/|\/iframe\/?|\/watch\/?|\/manifest\/video\.(?:m3u8|mpd))?(?:[?#]\S*)?$/i;
 
 export default {
     mixins: [Fieldtype],

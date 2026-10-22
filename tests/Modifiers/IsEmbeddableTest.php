@@ -17,6 +17,7 @@ class IsEmbeddableTest extends TestCase
             'vimeo' => [true, 'https://vimeo.com/22439234'],
             'cloudflare' => [true, 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/manifest/video.m3u8'],
             'cloudflare without an id' => [false, 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/'],
+            'cloudflare download' => [false, 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b/downloads/default.mp4'],
             'other' => [false, 'http://video-home-system.com/video.mp4'],
         ];
     }

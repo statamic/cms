@@ -68,7 +68,19 @@ test('it previews a cloudflare iframe url', async () => {
     expect((await preview(`${cloudflare}/iframe`)).attributes('src')).toBe(`${cloudflare}/iframe`);
 });
 
+test('it previews a cloudflare watch url as its iframe', async () => {
+    expect((await preview(`${cloudflare}/watch`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+});
+
+test('it previews a cloudflare download as a video file', async () => {
+    expect((await preview(`${cloudflare}/downloads/default.mp4`)).attributes('src')).toBe(`${cloudflare}/downloads/default.mp4`);
+});
+
 test('it does not preview a cloudflare url with a malformed id', async () => {
+    expect((await preview('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/abc-123/iframe')).exists()).toBe(false);
+});
+
+test('it does not preview a cloudflare url with html in it', async () => {
     expect((await preview('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/1234"><script>alert(1)</script>')).exists()).toBe(false);
 });
 
