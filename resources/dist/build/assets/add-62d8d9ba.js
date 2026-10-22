@@ -1,0 +1,1 @@
+var e=function(){var t=this,r=t._self._c;return r("svg",{attrs:{xmlns:"http://www.w3.org/2000/svg",fill:"none",viewBox:"0 0 14 14"}},[r("path",{attrs:{stroke:"currentColor","stroke-linecap":"round","stroke-width":"1.5",d:"M7 1v12m6-6H1"}})])};const o={render:e};export{o as default};
