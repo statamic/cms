@@ -151,7 +151,7 @@ function scrollToBottom() {
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
         <!-- While the help is open it dims, so the help stands out in front of it -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2.5 pt-3.5 pb-2 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp ? 'opacity-40' : '']">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2 pt-3.5 pb-2 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp ? 'opacity-40' : '']">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
