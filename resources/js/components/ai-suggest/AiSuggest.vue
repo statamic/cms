@@ -17,6 +17,8 @@ const emit = defineEmits(['apply']);
 
 const open = ref(false);
 const loading = ref(false);
+// Whether this round came from Try again, which spins its icon. The first round, and reworks from the "Make it…" box, don't.
+const retrying = ref(false);
 const result = ref(null);
 // What was in the field when the suggestions were made, to show what changed
 const original = ref('');
@@ -31,7 +33,14 @@ function generate(rework = null) {
         const fresh = suggestFor(props.config, props.value, props.values);
         result.value = rework ? rework(fresh) : fresh;
         loading.value = false;
+        retrying.value = false;
     }, rework ? 700 : 900);
+}
+
+function retry() {
+    if (loading.value) return;
+    retrying.value = true;
+    generate();
 }
 
 function toggled(isOpen) {
@@ -270,8 +279,8 @@ function follow(text) {
             </div>
 
             <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it works. -->
-                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': loading }" @click="focusClicked($event); !loading && generate()" />
+                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it tries again. -->
+                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': retrying }" @click="focusClicked($event); retry()" />
             </div>
         </div>
     </Popover>
