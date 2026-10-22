@@ -66,6 +66,57 @@ test('dragging a selected asset moves the rest of the movable selection with it'
     expect(wrapper.emitted('move-items')[0][0].items).toEqual(['assets::a.jpg', 'assets::b.jpg']);
 });
 
+test('selected assets still moving from an earlier drop are left behind', () => {
+    const wrapper = browser({
+        assets: ['a.jpg', 'b.jpg', 'c.jpg', 'd.jpg', 'e.jpg'].map((path) => asset(path)),
+        selectedAssets: ['assets::a.jpg', 'assets::b.jpg', 'assets::c.jpg', 'assets::d.jpg', 'assets::e.jpg'],
+        moving: ['assets::a.jpg'],
+        moved: ['assets::b.jpg'],
+        removed: ['assets::c.jpg'],
+    });
+
+    wrapper.vm.draggingAsset = 'assets::e.jpg';
+
+    expect(wrapper.vm.draggedAssetIds).toEqual(['assets::d.jpg', 'assets::e.jpg']);
+});
+
+test('a drag is not movable once the dragged asset has gone', () => {
+    const wrapper = browser({ assets: [asset('a.jpg')] });
+
+    wrapper.vm.draggingAsset = 'assets::gone.jpg';
+
+    expect(wrapper.vm.draggingMovable).toBe(false);
+});
+
+test('dragging several assets shows a count badge that follows the cursor', () => {
+    const wrapper = browser({
+        assets: [asset('a.jpg'), asset('b.jpg'), asset('c.jpg')],
+        selectedAssets: ['assets::a.jpg', 'assets::b.jpg', 'assets::c.jpg'],
+    });
+    const event = { clientX: 100, clientY: 50, dataTransfer: { setDragImage: vi.fn() } };
+
+    wrapper.vm.assetDragStarted(event, asset('a.jpg'));
+
+    const badge = document.body.lastElementChild;
+    expect(badge.textContent).toBe('3');
+    expect(badge.style.transform).toBe('translate(118px, 70px)');
+    expect(event.dataTransfer.setDragImage).toHaveBeenCalled();
+
+    document.dispatchEvent(new Event('dragend'));
+
+    expect(badge.isConnected).toBe(false);
+});
+
+test('dragging a single asset keeps the native drag image', () => {
+    const wrapper = browser({ assets: [asset('a.jpg'), asset('b.jpg')] });
+    const event = { clientX: 0, clientY: 0, dataTransfer: { setDragImage: vi.fn() } };
+
+    wrapper.vm.assetDragStarted(event, asset('a.jpg'));
+
+    expect(wrapper.vm.draggingAsset).toBe('assets::a.jpg');
+    expect(event.dataTransfer.setDragImage).not.toHaveBeenCalled();
+});
+
 test('assets that are already in the destination are skipped', () => {
     const wrapper = browser({
         assets: [asset('photos/a.jpg'), asset('b.jpg')],

@@ -122,7 +122,7 @@
                     ]"
                     :draggable="true"
                     @dragover.prevent
-                    @dragstart="draggingAsset = asset.id"
+                    @dragstart="assetDragStarted($event, asset)"
                     @dragend="draggingAsset = null"
                     :data-moving="isMoving(asset.id) || null"
                     :data-moved="isMoved(asset.id) || null"

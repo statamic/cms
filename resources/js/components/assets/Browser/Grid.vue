@@ -140,7 +140,7 @@
                                     class="size-full"
                                     :draggable="true"
                                     @dragover.prevent
-                                    @dragstart="draggingAsset = asset.id"
+                                    @dragstart="assetDragStarted($event, asset)"
                                     @dragend="draggingAsset = null"
                                     @click.stop="selectionClicked(assets.indexOf(asset), $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
