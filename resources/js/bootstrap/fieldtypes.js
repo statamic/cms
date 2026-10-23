@@ -36,6 +36,7 @@ import HiddenFieldtype from '../components/fieldtypes/HiddenFieldtype.vue';
 import HtmlFieldtype from '../components/fieldtypes/HtmlFieldtype.vue';
 import IconFieldtype from '../components/fieldtypes/IconFieldtype.vue';
 import InfoFieldtype from '../components/fieldtypes/InfoFieldtype.vue';
+import AiStatusFieldtype from '../components/fieldtypes/AiStatusFieldtype.vue';
 import IntegerFieldtype from '../components/fieldtypes/IntegerFieldtype.vue';
 import LinkFieldtype from '../components/fieldtypes/LinkFieldtype.vue';
 import LinkIndexFieldtype from '../components/fieldtypes/LinkIndexFieldtype.vue';
@@ -112,6 +113,8 @@ export default function registerFieldtypes(app) {
     app.component('html-fieldtype', HtmlFieldtype);
     app.component('icon-fieldtype', IconFieldtype);
     app.component('info-fieldtype', InfoFieldtype);
+    // Prototype: Settings → AI
+    app.component('ai_status-fieldtype', AiStatusFieldtype);
     app.component('integer-fieldtype', IntegerFieldtype);
     app.component('link-fieldtype', LinkFieldtype);
     app.component('link-fieldtype-index', LinkIndexFieldtype);

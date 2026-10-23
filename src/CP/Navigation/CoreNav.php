@@ -340,6 +340,13 @@ class CoreNav
             ->icon('site')
             ->can('configure sites');
 
+        // Prototype: Settings → AI (a mock, see AiSettingsController). Super users only for now.
+        if (User::current()?->isSuper()) {
+            Nav::settings('AI')
+                ->route('ai.edit')
+                ->icon('ai-chat');
+        }
+
         Nav::settings('Preferences')
             ->route('preferences.index')
             ->icon('preferences')

@@ -6,6 +6,7 @@ use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
 use Statamic\Http\Controllers\CP\Addons\AddonSettingsController;
+use Statamic\Http\Controllers\CP\Ai\AiSettingsController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController as AssetActionController;
 use Statamic\Http\Controllers\CP\Assets\AssetContainerBlueprintController;
@@ -272,6 +273,10 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('sites', [SitesController::class, 'edit'])->name('sites.edit');
     Route::patch('sites', [SitesController::class, 'update'])->name('sites.update');
+
+    // Prototype: Settings → AI (a mock, see AiSettingsController)
+    Route::get('ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
+    Route::patch('ai', [AiSettingsController::class, 'update'])->name('ai.update');
 
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');

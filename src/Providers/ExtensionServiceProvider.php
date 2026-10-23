@@ -62,6 +62,7 @@ class ExtensionServiceProvider extends ServiceProvider
     ];
 
     protected $fieldtypes = [
+        'ai_status' => Fieldtypes\AiStatus::class, // Prototype: Settings → AI
         'array' => Fieldtypes\Arr::class,
         'asset_container' => Fieldtypes\AssetContainer::class,
         'asset_folder' => Fieldtypes\AssetFolder::class,
