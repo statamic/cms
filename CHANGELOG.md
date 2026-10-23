@@ -1,5 +1,30 @@
 # Release Notes
 
+## 6.38.0 (2026-10-23)
+
+### What's new
+- Drag assets and folders onto breadcrumbs [#15677](https://github.com/statamic/cms/issues/15677) by @jaygeorge
+- Drag a whole selection of assets at once [#15678](https://github.com/statamic/cms/issues/15678) by @jaygeorge
+- Add Cloudflare Stream support to the video fieldtype [#15459](https://github.com/statamic/cms/issues/15459) by @edalzell
+- Allow Live Preview while creating entries [#15648](https://github.com/statamic/cms/issues/15648) by @matsantosz
+
+### What's fixed
+- Fix dragging assets onto folders in list view [#15676](https://github.com/statamic/cms/issues/15676) by @jaygeorge
+- Don't rebuild Bard editors when the content hasn't changed [#15700](https://github.com/statamic/cms/issues/15700) by @o1y
+- Fix Bard sets picking up wrong values when splitting a list [#15701](https://github.com/statamic/cms/issues/15701) by @o1y
+- Fix Bard set fields losing characters when typing fast [#15702](https://github.com/statamic/cms/issues/15702) by @o1y
+- Keep Bard set node views alive across saves [#15689](https://github.com/statamic/cms/issues/15689) by @edalzell
+- Fix spacing between wrapped combobox chips [#15708](https://github.com/statamic/cms/issues/15708) by @jaygeorge
+- Optically centre badge text [#15710](https://github.com/statamic/cms/issues/15710) by @jaygeorge
+- Optically centre chip text [#15711](https://github.com/statamic/cms/issues/15711) by @jaygeorge
+- Fix Bard set dropdowns closing right after opening [#15709](https://github.com/statamic/cms/issues/15709) by @o1y
+- Persist Replicator set collapse state to meta [#15688](https://github.com/statamic/cms/issues/15688) by @edalzell
+- Stop deep-watching publish container meta [#15713](https://github.com/statamic/cms/issues/15713) by @o1y
+- German translations [#15707](https://github.com/statamic/cms/issues/15707) by @helloDanuk
+- French translations [#15706](https://github.com/statamic/cms/issues/15706) by @ebeauchamps
+
+
+
 ## 6.37.0 (2026-10-22)
 
 ### What's new
