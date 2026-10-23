@@ -1,8 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
 import { Editor } from '@tiptap/vue-3';
 import { closeHistory } from '@tiptap/pm/history';
+import { hideOthers } from 'aria-hidden';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
 import Provider from '@/components/portals/Provider.vue';
@@ -351,4 +352,28 @@ test('typing is still debounced when it does not move any sets', async () => {
     await new Promise((resolve) => setTimeout(resolve, UPDATE_DEBOUNCE_MS + 50));
 
     expect(values.value.content[0].content[0].text).toBe('One two');
+});
+
+test('sets are left alone when a modal overlay hides the page around a live region inside one', async () => {
+    const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
+    const wrapper = await mountField({ sets }, [text, set('set-a', 'A'), text]);
+    let root = wrapper.vm.editor.view.dom;
+    while (root.parentElement) root = root.parentElement;
+    document.body.append(root);
+    const setElement = wrapper.find('[data-type="card"]').element;
+    setElement.insertAdjacentHTML('beforeend', '<div aria-live="polite"></div>');
+    const overlay = document.body.appendChild(document.createElement('div'));
+
+    const reveal = hideOthers(overlay);
+    await flushPromises();
+
+    expect(wrapper.vm.editor.view.dom.firstElementChild.getAttribute('aria-hidden')).toBe('true');
+
+    reveal();
+    await flushPromises();
+
+    expect(wrapper.find('[data-type="card"]').element).toBe(setElement);
+
+    root.remove();
+    overlay.remove();
 });

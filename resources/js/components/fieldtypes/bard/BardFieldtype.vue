@@ -166,6 +166,7 @@ import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
+import { IgnoreAriaHidden } from './IgnoreAriaHidden';
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
@@ -1111,6 +1112,7 @@ export default {
                 Dropcursor,
                 Gapcursor,
                 History,
+                IgnoreAriaHidden,
                 Paragraph,
                 Set.configure({ bard: this, foo: 'bar' }),
                 Text,
