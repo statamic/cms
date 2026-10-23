@@ -20,6 +20,8 @@ export default function registerGlobalCommandPalette() {
         icon: 'ai-chat',
         keys: 'mod+/',
         persist: true,
+        // Only for roles that can use AI (the "Use AI" permission)
+        when: () => Statamic.$permissions.has('use ai'),
         // The palette hands focus back to the page after it has closed, so wait for that before moving focus into the chat
         action: () => setTimeout(focus, 450),
     });

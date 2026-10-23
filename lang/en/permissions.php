@@ -14,6 +14,8 @@ return [
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
     'manage_preferences' => 'Manage Preferences',
     'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
+    'use_ai' => 'Use AI',
+    'use_ai_desc' => 'Ability to use the AI assistant and field suggestions, limited to this role\'s permissions.',
 
     'group_sites' => 'Sites',
     'access_{site}_site' => 'Access :site site',

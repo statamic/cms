@@ -13,6 +13,7 @@ import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
 import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
+import { permissions } from '@api';
 
 const props = defineProps({
     config: {
@@ -202,7 +203,8 @@ const shouldShowFieldPreviews = computed(() => {
 const isLocalizable = computed(() => props.config.localizable);
 
 // Prototype: fields with AI suggestions switched on in the blueprint get a suggest button, floating in the field's top right corner
-const canSuggest = computed(() => props.config.ai_suggestions && suggestableTypes.includes(props.config.type) && !isReadOnly.value);
+// Only for roles that can use AI (the "Use AI" permission)
+const canSuggest = computed(() => props.config.ai_suggestions && suggestableTypes.includes(props.config.type) && !isReadOnly.value && permissions.has('use ai'));
 // The suggest button floats over the field's text. A multi-line field makes room for it on the right, so the text wraps before it.
 // A single-line field gives the button a backing in the field's colour instead, so long text slips behind it.
 const isSuggestMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));

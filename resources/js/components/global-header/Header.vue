@@ -8,6 +8,7 @@ import SupportButton from "@/components/global-header/SupportButton.vue";
 import MaxWidthButton from "@/components/global-header/MaxWidthButton.vue";
 import ViewSiteButton from './ViewSiteButton.vue';
 import UserDropdown from './UserDropdown.vue';
+import { permissions } from '@api';
 </script>
 
 <template>
@@ -30,7 +31,8 @@ import UserDropdown from './UserDropdown.vue';
             <div class="flex items-center">
                 <Search />
             </div>
-            <AiChatButton />
+            <!-- Only for roles that can use AI. The button also owns the keyboard shortcut, so that goes with it. -->
+            <AiChatButton v-if="permissions.has('use ai')" />
 	        <SupportButton />
 	        <MaxWidthButton />
             <ViewSiteButton />
