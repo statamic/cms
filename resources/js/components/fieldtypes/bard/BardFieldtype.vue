@@ -452,10 +452,13 @@ export default {
             }
         },
 
-        value(value) {
+        value(value, oldValue) {
             if (!this.editor) return;
 
             if (this.valueMatchesEditor(value)) return;
+
+            // A repeat of the old value would undo typing that's still debounced.
+            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
 
             const oldContent = this.editor.getJSON();
 

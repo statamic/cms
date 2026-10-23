@@ -213,6 +213,17 @@ test('the editor is left alone when the value only differs by omitted attribute 
     expect(wrapper.vm.editor.state.doc).toBe(doc);
 });
 
+test('typing still waiting for the debounced update is kept when the same value arrives again', async () => {
+    const wrapper = await mountField();
+
+    await type(wrapper, 'Zero. ');
+    await wrapper.setProps({ value: clone(value) });
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getText()).toBe('Zero. One two three four five.');
+    expect(wrapper.emitted('update:value')?.at(-1)).toEqual([wrapper.vm.editor.getJSON().content]);
+});
+
 // With remove_empty_nodes, a save strips empty nodes. Deleting them in place keeps the set fields alive.
 test('empty nodes the value no longer has are deleted in place', async () => {
     const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
