@@ -99,6 +99,13 @@
 @utility st-text-trim-ex-alphabetic {
     text-box: ex alphabetic;
 }
+@utility st-text-trim-optical-cap {
+    /* =Jay. Trim to x-height, then nudge the text down so it sits between x-height and cap height, a touch nearer cap height. Lowercase and Capitalised labels both look centred in small, tight boxes like badges */
+    @supports (text-box: ex alphabetic) {
+        text-box: ex alphabetic;
+        padding-top: calc((1cap - 1ex) * 3 / 4);
+    }
+}
 
 @utility placeholder-xs {
     /* =Jay. The default of 1em on field inputs feels a bit clumsy/big */
