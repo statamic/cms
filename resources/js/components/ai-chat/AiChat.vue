@@ -48,12 +48,12 @@ const suggestions = [
 
 watch(prompt, (value) => value && (showHelp.value = false));
 
-// Saved prompts, set up on Settings → AI and run with /their-name. The server only sends the ones for this user's role. Ones for particular collections are only offered on those collections' pages.
+// Saved prompts, set up on Settings → AI and run with /their-name. The server only sends the ones for this user's role. Ones for particular collections are only offered on those collections' pages. Field prompts belong in the suggestions menu on fields, not here.
 const page = usePage();
 const savedPrompts = computed(() => {
     const collection = page.url.match(/\/collections\/([^/?]+)/)?.[1];
 
-    return (page.props._statamic?.aiPrompts ?? []).filter((saved) => !saved.collections.length || saved.collections.includes(collection));
+    return (page.props._statamic?.aiPrompts ?? []).filter((saved) => saved.use_on !== 'fields' && (!saved.collections.length || saved.collections.includes(collection)));
 });
 
 // Typing / and then a letter (the / itself opens the help) turns the input into a command, with a menu of the matching saved prompts. Enter runs the highlighted one.

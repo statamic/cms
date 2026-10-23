@@ -33,7 +33,7 @@ class AiSettingsController extends CpController
         $values = array_merge($this->defaults(), Cache::get(self::CACHE_KEY, []));
 
         // The prompts are a Replicator, whose rows need to say which set they are
-        $values['prompts'] = collect($values['prompts'] ?? [])->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->all();
+        $values['prompts'] = collect(self::savedPrompts())->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->all();
 
         return PublishForm::make($this->blueprint())
             ->asConfig()
@@ -55,8 +55,9 @@ class AiSettingsController extends CpController
     }
 
     /**
-     * The saved prompts the current user can run from the AI chat, shared with every CP page (see HandleInertiaRequests).
-     * Each one's command is its name as a slug, so "Legal check" is run with /legal-check.
+     * The saved prompts the current user can run, shared with every CP page (see HandleInertiaRequests).
+     * Page prompts run from the AI chat, where each one's command is its name as a slug, so "Legal check" is run with /legal-check.
+     * Field prompts show in the suggestions menu on fields, and rewrite just that field.
      */
     public static function prompts(): array
     {
@@ -66,9 +67,7 @@ class AiSettingsController extends CpController
             return [];
         }
 
-        $prompts = Cache::get(self::CACHE_KEY, [])['prompts'] ?? app(static::class)->defaults()['prompts'];
-
-        return collect($prompts)
+        return collect(self::savedPrompts())
             // Named, and not switched off
             ->filter(fn ($prompt) => filled($prompt['name'] ?? null) && ($prompt['enabled'] ?? true))
             // Limited to some roles: super users still see them all, as they can see everything else
@@ -78,9 +77,30 @@ class AiSettingsController extends CpController
                 'command' => Str::slug($prompt['name']),
                 'instructions' => $prompt['instructions'] ?? '',
                 'collections' => $prompt['collections'] ?? [],
+                'use_on' => $prompt['use_on'] ?? 'page',
             ])
             ->values()
             ->all();
+    }
+
+    // Prototype: the saved prompts, or the examples if none have been saved. Prompts saved before "Use on" existed are all page prompts, so the example field prompts are added to them.
+    private static function savedPrompts(): array
+    {
+        $defaults = app(static::class)->defaults()['prompts'];
+        $saved = Cache::get(self::CACHE_KEY, [])['prompts'] ?? null;
+
+        if ($saved === null) {
+            return $defaults;
+        }
+
+        if (collect($saved)->contains(fn ($prompt) => isset($prompt['use_on']))) {
+            return $saved;
+        }
+
+        return [
+            ...collect($saved)->map(fn ($prompt) => [...$prompt, 'use_on' => 'page'])->all(),
+            ...collect($defaults)->where('use_on', 'fields')->values()->all(),
+        ];
     }
 
     // Only super users, until there's a permission for it
@@ -111,32 +131,61 @@ class AiSettingsController extends CpController
                 'ip', 'ip_address',
             ],
             'excluded_other' => ['users', 'form_submissions'],
-            // A few to show what they're for. Each gets a /command in the AI chat.
+            // A few to show what they're for. Page prompts get a /command in the AI chat, and field prompts show in the suggestions menu on fields.
             'prompts' => [
                 [
                     'name' => 'Legal check',
+                    'use_on' => 'page',
                     'instructions' => "Read this page as our legal team would. List any claim we can't back up (prices, guarantees, \"best\" or \"only\", health claims) and anything that needs terms and conditions, quoting the sentence it's in. Don't change anything.",
                 ],
                 [
                     'name' => 'Alt text',
+                    'use_on' => 'page',
                     'instructions' => "Write alt text for every image on this page that hasn't got any. One short sentence saying what's in the image, not what it's for. Leave decorative images empty.",
                 ],
                 [
                     'name' => 'SEO check',
+                    'use_on' => 'page',
                     'instructions' => 'Check the meta title (under 60 characters) and meta description (under 155). Draft any that are missing or too long, and suggest them rather than saving them.',
+                ],
+                // The suggestions menu's chips. Sites can change them, switch them off or add their own.
+                [
+                    'name' => 'Shorter',
+                    'use_on' => 'fields',
+                    'instructions' => 'Make it shorter, keeping what it says.',
+                ],
+                [
+                    'name' => 'More formal',
+                    'use_on' => 'fields',
+                    'instructions' => 'Make it more formal and professional, without contractions.',
+                ],
+                [
+                    'name' => 'Friendlier',
+                    'use_on' => 'fields',
+                    'instructions' => 'Make it warmer and friendlier, as if talking to a customer.',
+                ],
+                [
+                    'name' => 'On-brand',
+                    'use_on' => 'fields',
+                    'instructions' => 'Rewrite it in our voice: warm and plain, British English, no exclamation marks, and say "customers", never "users".',
+                ],
+                [
+                    'name' => 'Fit for Google',
+                    'use_on' => 'fields',
+                    'instructions' => 'Make it fit search results: under 60 characters for a title, 155 for a description, with the main keyword near the start.',
                 ],
             ],
         ];
     }
 
-    // Each saved prompt collapses to a row: its name in the badge, then the start of its instructions. Opened, the name and who sees it share a row, with the instructions under them.
+    // Each saved prompt collapses to a row: its name in the badge, then the start of its instructions. Opened, it has its name and where it's used, then where and for whom it's offered, then the instructions.
     private function promptsField(): array
     {
         return ['handle' => 'prompts', 'field' => [
             'type' => 'replicator',
             'display' => __('Prompts'),
             // The help for each prompt's fields lives here, so it isn't repeated in every one
-            'instructions' => __('Run one in the AI chat by typing / and its name, like `/legal-check`. It works on whatever page is open. Leave *Collections* and *Roles* empty to offer it everywhere, to everyone who can use AI.'),
+            'instructions' => __('Page prompts run in the AI chat, on whatever page is open, by typing / and their name, like `/legal-check`. Field prompts show in the suggestions menu on fields, and rewrite just that field. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
             'full_width_setting' => true,
             'collapse' => true,
             'previews' => true,
@@ -144,10 +193,11 @@ class AiSettingsController extends CpController
             'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
                 // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out
                 'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'fields' => [
-                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'width' => 33, 'replicator_preview' => false]],
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'width' => 50, 'replicator_preview' => false]],
+                    ['handle' => 'use_on', 'field' => ['type' => 'button_group', 'display' => __('Use On'), 'options' => ['page' => __('The page'), 'fields' => __('Fields')], 'default' => 'page', 'replicator_preview' => false, 'width' => 50]],
                     // Plain multi-selects rather than the relationship fieldtypes, whose choices stack up below them as draggable rows and leave a gap beside the name. These show them as chips.
-                    ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 33]],
-                    ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 33]],
+                    ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 50]],
+                    ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 50]],
                     ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What the AI should do, as you would ask a colleague.')]],
                 ]],
             ]]],

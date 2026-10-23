@@ -177,6 +177,9 @@ export function steer(result, instruction) {
         if (/short|concise|brief/.test(how)) return finish(punchier(text, result.long));
         if (/formal|professional/.test(how)) return finish(formal(text));
         if (/friend|warm|casual/.test(how)) return finish(/^(Enjoy|Discover|Good news)/.test(text) ? text : warmer(text, result.long));
+        // The example saved field prompts: a house voice, and fitting search results
+        if (/brand|voice/.test(how)) return finish(/^(Enjoy|Discover|Good news)/.test(text) ? text : warmer(text, result.long));
+        if (/google|search|seo/.test(how)) return finish(punchier(text, result.long));
         return finish(tighten(text));
     };
 

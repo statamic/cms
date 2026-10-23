@@ -1,5 +1,6 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { Button, Icon, Popover } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
 import { icon } from './use-ai-suggest.js';
@@ -194,7 +195,14 @@ const showDiff = computed(() => result.value?.mode === 'improve' && original.val
 
 // The "Make it…" box: type an instruction or pick a chip, and the suggestions are reworked to follow it
 const instruction = ref('');
-const chips = ['Shorter', 'More formal', 'Friendlier'];
+
+// The chips are the site's saved field prompts, from Settings → AI (only the ones for this user's role, and for this collection if they're limited to some). Sites start with Shorter, More formal and Friendlier, and can change them or add their own.
+const page = usePage();
+const fieldPrompts = computed(() => {
+    const collection = page.url.match(/\/collections\/([^/?]+)/)?.[1];
+
+    return (page.props._statamic?.aiPrompts ?? []).filter((saved) => saved.use_on === 'fields' && (!saved.collections.length || saved.collections.includes(collection)));
+});
 
 // Safari and Firefox on macOS don't focus a button when it's clicked, as Chrome does. Focusing it ourselves means you can press Enter to go again after clicking.
 function focusClicked(event) {
@@ -290,16 +298,18 @@ function follow(text) {
                         class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
                     />
                 </form>
-                <div class="flex flex-wrap gap-1.5">
+                <!-- Hovering one shows its instructions -->
+                <div v-if="fieldPrompts.length" class="flex flex-wrap gap-1.5">
                     <button
-                        v-for="chip in chips"
-                        :key="chip"
+                        v-for="saved in fieldPrompts"
+                        :key="saved.command"
                         type="button"
                         class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
                         :aria-disabled="loading"
-                        @click="focusClicked($event); !loading && follow(chip)"
+                        v-tooltip="saved.instructions"
+                        @click="focusClicked($event); !loading && follow(saved.name)"
                     >
-                        {{ __(chip) }}
+                        {{ saved.name }}
                     </button>
                 </div>
             </div>
