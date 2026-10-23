@@ -60,6 +60,10 @@ const savedPrompts = computed(() => {
     return (page.props._statamic?.aiPrompts ?? []).filter((saved) => saved.use_on !== 'fields' && (!saved.collections.length || saved.collections.includes(collection)));
 });
 
+// Up to three show as pills above the floating chat. With more, only the first two do (in the order they're in on Settings → AI), then a pill that opens the help, which lists them all. That way lots of them don't pile up over the page, they stay on one row, and there's never a "1 more".
+const promptPills = computed(() => (savedPrompts.value.length <= 3 ? savedPrompts.value : savedPrompts.value.slice(0, 2)));
+const morePrompts = computed(() => savedPrompts.value.length - promptPills.value.length);
+
 // Typing / and then a letter (the / itself opens the help) turns the input into a command, with a menu of the matching saved prompts. Enter runs the highlighted one.
 const commandQuery = computed(() => prompt.value.match(/^\/([\w-]*)$/)?.[1]?.toLowerCase() ?? null);
 const commandMenuOpen = computed(() => commandQuery.value !== null);
@@ -287,6 +291,32 @@ function scrollToBottom() {
             @keydown.enter.exact="onEnter"
             @keydown="onKeydown"
         >
+            <!-- The saved prompts as pills above the input, while you're in the chat and until it starts. They sit over the page just above the floating card, lined up with its right edge. Picking one runs it. mousedown.prevent keeps focus in the input, so they stay put. -->
+            <div
+                v-if="floating && savedPrompts.length && !messages.length && !prompt && !showHelp"
+                class="pointer-events-none absolute -end-px bottom-full mb-3 flex max-w-full justify-end gap-1.5 opacity-0 transition-opacity group-focus-within/chat:pointer-events-auto group-focus-within/chat:opacity-100"
+            >
+                <button
+                    v-for="saved in promptPills"
+                    :key="saved.command"
+                    type="button"
+                    class="max-w-36 cursor-pointer truncate rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800"
+                    v-tooltip="'/' + saved.command"
+                    @mousedown.prevent
+                    @click="runPrompt(saved)"
+                >
+                    {{ saved.name }}
+                </button>
+                <button
+                    v-if="morePrompts"
+                    type="button"
+                    class="shrink-0 cursor-pointer rounded-full bg-white px-2.5 py-1 text-xs text-gray-500 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-400 dark:ring-gray-700/80 dark:hover:bg-gray-800 dark:hover:text-white"
+                    @mousedown.prevent
+                    @click="showHelp = true"
+                >
+                    {{ __(':count more', { count: morePrompts }) }}
+                </button>
+            </div>
             <!-- Help (the examples, until there's a conversation, and the saved prompts), opened by pressing / in the empty box, or the keyboard shortcuts, opened with ? -->
             <!-- The same fade up as the chat itself, in and out, a touch quicker -->
             <Transition
