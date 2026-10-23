@@ -740,10 +740,7 @@ export default {
         },
 
         existingUploadSelected(upload) {
-            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.id}::${path}`;
-
-            this.selectedAssets.push(id);
+            this.selectedAssets.push(upload.existingId);
             this.$emit('selections-updated', this.selectedAssets);
         },
 
