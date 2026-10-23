@@ -273,7 +273,7 @@ function scrollToBottom() {
                     >
                         {{ message.text }}
                         <!-- A saved prompt also shows its command, so you learn to type it -->
-                        <span v-if="message.command" class="ms-1 font-mono text-xs text-gray-500 dark:text-gray-400">/{{ message.command }}</span>
+                        <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
                     </div>
                 </template>
             </div>
