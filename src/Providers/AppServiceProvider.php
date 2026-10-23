@@ -151,7 +151,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerElevatedSessionMacros();
 
         if (config('statamic.system.handle_scheduled_entries')) {
-            $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+            $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)
+                ->cron(config('statamic.system.scheduled_entries_frequency', '* * * * *'));
         }
 
         $this->app->make(Schedule::class)
