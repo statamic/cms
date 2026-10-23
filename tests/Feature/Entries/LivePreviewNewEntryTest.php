@@ -122,10 +122,10 @@ class LivePreviewNewEntryTest extends TestCase
 
     private function previewUrl(string $collection, array $values, ?string $parent = null, ?string $blueprint = null): string
     {
-        $uri = "/cp/collections/{$collection}/entries/create/en/preview";
+        $uri = "/cp/collections/{$collection}/entries/create/en/preview".($parent ? "?parent={$parent}" : '');
 
         return $this->actingAs($this->user())
-            ->postJson($uri, ['preview' => $values, 'parent' => $parent, 'blueprint' => $blueprint])
+            ->postJson($uri, ['preview' => $values, 'blueprint' => $blueprint])
             ->assertOk()
             ->json('url');
     }
