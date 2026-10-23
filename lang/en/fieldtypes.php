@@ -32,7 +32,6 @@ return [
     'autocomplete_editor.config.placeholder' => 'Text to display when the field is empty.',
     'autocomplete_editor.config.trigger' => 'The character that triggers the autocomplete suggestions.',
     'autocomplete_editor.title' => 'Autocomplete Editor',
-    'bard.config.allow_source' => 'Enable to view the HTML source code while writing.',
     'bard.config.always_show_set_button' => 'Enable to always show the "Add Set" button.',
     'bard.config.buttons' => 'Choose which buttons to show in the toolbar.',
     'bard.config.container' => 'Choose which asset container to use for this field.',

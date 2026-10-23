@@ -608,13 +608,13 @@ defineExpose({
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2" :class="{ 'mt-2.5': selectedOptions.length }">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item mt-2 cursor-grab active:cursor-grabbing"
+                        class="sortable-item cursor-grab active:cursor-grabbing"
                     >
-                        <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
+                        <Badge pill size="lg" class="[&>*:not(svg)]:st-text-trim-optical">
                             <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
@@ -639,10 +639,3 @@ defineExpose({
     </div>
 </template>
 
-<style scoped>
-    @supports(text-box: ex alphabetic) {
-        [data-ui-badge] {
-            padding-block: 0.65rem;
-        }
-    }
-</style>

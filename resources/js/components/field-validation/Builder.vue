@@ -68,14 +68,14 @@
                 :mirror="false"
                 v-model="rules"
             >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2" :class="{ 'mt-2.5': rules.length }">
                     <div
                         v-for="rule in rules"
                         :key="rule"
-                        class="sortable-item mt-2"
+                        class="sortable-item"
                     >
-                        <Badge pill size="lg">
-                            {{ rule }}
+                        <Badge pill size="lg" class="*:st-text-trim-optical">
+                            <span>{{ rule }}</span>
 
                             <button
                                 type="button"

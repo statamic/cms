@@ -1,5 +1,36 @@
 # Release Notes
 
+## 6.37.0 (2026-10-22)
+
+### What's new
+- Add --no-cache-clear option to statamic:install [#15664](https://github.com/statamic/cms/issues/15664) by @edalzell
+- Expose expanded sections on tabs [#15694](https://github.com/statamic/cms/issues/15694) by @jasonvarga
+
+### What's fixed
+- Make read-only fields easier to spot [#15663](https://github.com/statamic/cms/issues/15663) by @jaygeorge
+- Fix cache misses for namespaced and subfolder fieldsets [#15666](https://github.com/statamic/cms/issues/15666) by @daun
+- Skip driver check for universally supported image formats [#15665](https://github.com/statamic/cms/issues/15665) by @daun
+- Only check the selected site when building the navigation sidebar items [#15668](https://github.com/statamic/cms/issues/15668) by @lazerg
+- Remove architectural lines when leaving a navigation page [#15681](https://github.com/statamic/cms/issues/15681) by @jaygeorge
+- Speed up Stache entry queries by id and by value [#15669](https://github.com/statamic/cms/issues/15669) by @porstendorfer
+- Refetch bulk actions when selections are replaced [#15674](https://github.com/statamic/cms/issues/15674) by @jaygeorge
+- Resolve validation placeholders for fields inside a Group [#15670](https://github.com/statamic/cms/issues/15670) by @mynetx
+- Keep elastic textareas sized to their content [#15683](https://github.com/statamic/cms/issues/15683) by @o1y
+- Speed up the control panel on large entries [#15679](https://github.com/statamic/cms/issues/15679) by @o1y
+- Make field ids unique across publish containers [#15682](https://github.com/statamic/cms/issues/15682) by @mynetx
+- Fix assignments leaking from Antlers includes rendered inside loops [#15671](https://github.com/statamic/cms/issues/15671) by @daun
+- Keep keyboard focus inside the licensing alert [#15673](https://github.com/statamic/cms/issues/15673) by @jaygeorge
+- Make Stack and Modal close buttons respect beforeClose [#15685](https://github.com/statamic/cms/issues/15685) by @jasonvarga
+- Handle invalid outpost responses [#15691](https://github.com/statamic/cms/issues/15691) by @jasonvarga
+- Harden glide query param logic [#15693](https://github.com/statamic/cms/issues/15693) by @jasonvarga
+- Fix dragging assets onto folders in the asset selector [#15695](https://github.com/statamic/cms/issues/15695) by @jasonvarga
+- Fix CP downloads for Inertia requests on inertia-laravel 3.5.2 [#15697](https://github.com/statamic/cms/issues/15697) by @jasonvarga
+- Bump the github-actions group with 3 updates [#15672](https://github.com/statamic/cms/issues/15672) by @dependabot
+- Bump follow-redirects from 1.16.0 to 1.16.1 [#15686](https://github.com/statamic/cms/issues/15686) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 2 updates [#15696](https://github.com/statamic/cms/issues/15696) by @dependabot
+
+
+
 ## 6.36.0 (2026-10-16)
 
 ### What's new

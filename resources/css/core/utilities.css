@@ -96,8 +96,19 @@
     /* =Jay. Sometimes this is handy e.g. the text inside the command palette searchbox */
     text-box: cap alphabetic;
 }
-@utility st-text-trim-ex-alphabetic {
-    text-box: ex alphabetic;
+@utility st-text-trim-optical {
+    /* =Jay. Trim to x-height, then nudge the text down so it's centred halfway between x-height and cap height. Lowercase and Capitalised labels both look centred */
+    @supports (text-box: ex alphabetic) {
+        text-box: ex alphabetic;
+        padding-top: calc((1cap - 1ex) / 2);
+    }
+}
+@utility st-text-trim-optical-cap {
+    /* =Jay. Like st-text-trim-optical, but a touch nearer cap height, which suits smaller, tighter boxes like badges */
+    @supports (text-box: ex alphabetic) {
+        text-box: ex alphabetic;
+        padding-top: calc((1cap - 1ex) * 3 / 4);
+    }
 }
 
 @utility placeholder-xs {
