@@ -147,6 +147,7 @@
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
                             <time
+                                class="st-text-trim-optical-cap"
                                 :datetime="asset.lastModified"
                                 v-tooltip="$date.format(asset.lastModified)"
                                 v-text="asset.lastModifiedRelative" />

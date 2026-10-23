@@ -32,10 +32,10 @@
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
-                            {{ __(setGroup.display) }}
-                            <Icon name="chevron-right" class="relative top-px size-3" />
+                            <span class="st-text-trim-optical-cap">{{ __(setGroup.display) }}</span>
+                            <Icon name="chevron-right" class="size-3" />
                         </span>
-                        {{ __(config.display) || config.handle }}
+                        <span class="st-text-trim-optical-cap">{{ __(config.display) || config.handle }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
