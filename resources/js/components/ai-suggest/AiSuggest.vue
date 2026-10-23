@@ -11,8 +11,6 @@ const props = defineProps({
     values: { type: Object, default: () => ({}) },
     // Where the button sits, as classes for the button itself
     buttonClass: { type: [String, Array, Object], default: null },
-    // Where the Undo badge sits after picking a suggestion, just before the button
-    undoClass: { type: [String, Array, Object], default: null },
 });
 
 const emit = defineEmits(['apply']);
@@ -90,15 +88,7 @@ function onArrowKey(event) {
     stops[(index + (event.key === 'ArrowDown' ? 1 : -1) + stops.length) % stops.length].focus();
 }
 
-// Picking one replaces what was in the field. It's set from code, so ⌘Z can't bring the old text back. Instead a little Undo badge shows next to the suggest button, and puts the old text back.
-// It stays while you're still in the field (or on the badge or the suggest button), and goes once it's used, when focus leaves them, or as soon as the field changes some other way (like typing), as undoing would then throw that away.
-const undoable = ref(null); // { previous, applied }
-const undoAnnouncement = ref('');
-
 function apply(text) {
-    undoable.value = { previous: props.value ?? '', applied: text };
-    undoAnnouncement.value = __('Suggestion used. Undo is next to the suggest button.');
-
     emit('apply', text);
     open.value = false;
     preview.value = null;
@@ -117,38 +107,6 @@ function focusField() {
         }),
     );
 }
-
-function undo() {
-    if (!undoable.value) return;
-    emit('apply', undoable.value.previous);
-    forgetUndo();
-    undoAnnouncement.value = __('Suggestion undone');
-    // The badge goes as it's clicked, so put focus back in the field rather than losing it
-    focusField();
-}
-
-function forgetUndo() {
-    undoable.value = null;
-}
-
-watch(
-    () => props.value,
-    (value) => undoable.value && value !== undoable.value.applied && forgetUndo(),
-);
-watch(open, (isOpen) => isOpen && forgetUndo());
-
-// Focus leaving the field, the badge and the suggest button (they share the field's wrapper) puts the badge away.
-// Picking a suggestion moves focus from the dropdown into the field, which doesn't count, as the dropdown isn't in the wrapper.
-function onWrapperFocusOut(event) {
-    if (!event.currentTarget.contains(event.relatedTarget)) forgetUndo();
-}
-
-watch(undoable, (now, before) => {
-    const wrapper = overlay.value?.parentElement;
-    if (now && !before) wrapper?.addEventListener('focusout', onWrapperFocusOut);
-    if (!now && before) wrapper?.removeEventListener('focusout', onWrapperFocusOut);
-});
-onBeforeUnmount(() => overlay.value?.parentElement?.removeEventListener('focusout', onWrapperFocusOut));
 
 // Hovering or focusing a suggestion previews it in the field, in grey (gray-500, the lightest that passes AA). It's laid over the field, matching its padding and font, until you move off it.
 // The preview is an input or textarea like the field, so the browser places the text exactly where the field will. A div with the same styles sits half a pixel higher than an input's text.
@@ -251,26 +209,6 @@ function follow(text) {
 </script>
 
 <template>
-    <!-- Puts the old text back after picking a suggestion. A small grey pill, fading in and out, just before the suggest button. -->
-    <!-- It comes before the suggest button in the page too, so Tab from the field goes straight to it. Pressing it doesn't take focus from the field, so the field doesn't lose focus (and put the badge away) before the click lands. -->
-    <Transition
-        enter-active-class="transition-opacity duration-150 motion-reduce:transition-none"
-        enter-from-class="opacity-0"
-        leave-active-class="transition-opacity duration-150 motion-reduce:transition-none"
-        leave-to-class="opacity-0"
-    >
-        <button
-            v-if="undoable"
-            type="button"
-            :class="undoClass"
-            class="flex h-5 cursor-pointer items-center rounded-full bg-gray-100 px-2 text-2xs font-medium text-gray-700 hover:bg-gray-200 hover:text-gray-900 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/15 dark:hover:text-white"
-            @mousedown.prevent
-            @click="undo"
-        >
-            <span class="-translate-y-px">{{ __('Undo') }}</span>
-        </button>
-    </Transition>
-
     <!-- Opens below the button, with its right edge lined up with the field's (the button sits 6px in from it) -->
     <Popover :open="open" @update:open="toggled" align="end" :align-offset="-6" :offset="dropdownOffset" inset class="w-80!">
         <template #trigger>
@@ -373,9 +311,6 @@ function follow(text) {
         </div>
     </Popover>
 
-
-    <!-- Tells screen readers a suggestion went in, and where to undo it -->
-    <p class="sr-only" role="status">{{ undoAnnouncement }}</p>
 
     <!-- The previewed suggestion, laid over the field -->
     <component

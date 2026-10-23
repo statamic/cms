@@ -342,11 +342,10 @@ const fieldtypeComponentEvents = computed(() => ({
                     v-bind="fieldtypeComponentProps"
                     v-on="fieldtypeComponentEvents"
                 />
-                <!-- Prototype: the suggest button floats in the field's top right corner, with an Undo badge just before it after picking a suggestion -->
+                <!-- Prototype: the suggest button floats in the field's top right corner -->
                 <AiSuggest
                     v-if="canSuggest"
                     :button-class="['absolute! end-1.5 top-[7px] z-[calc(var(--z-index-above)+1)]', !isSuggestMultiline && 'bg-white! shadow-[-6px_0_6px_white]! dark:bg-gray-900! dark:shadow-[-6px_0_6px_var(--color-gray-900)]!']"
-                    :undo-class="['absolute end-9 top-2.5 z-[calc(var(--z-index-above)+2)]', !isSuggestMultiline && 'shadow-[-6px_0_6px_white] dark:shadow-[-6px_0_6px_var(--color-gray-900)]']"
                     :config="config"
                     :value="value"
                     :values="values"
