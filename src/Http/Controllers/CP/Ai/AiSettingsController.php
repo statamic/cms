@@ -4,7 +4,10 @@ namespace Statamic\Http\Controllers\CP\Ai;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\CP\PublishForm;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Role;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
@@ -27,11 +30,16 @@ class AiSettingsController extends CpController
     {
         $this->onlySuperUsers();
 
+        $values = array_merge($this->defaults(), Cache::get(self::CACHE_KEY, []));
+
+        // The prompts are a Replicator, whose rows need to say which set they are
+        $values['prompts'] = collect($values['prompts'] ?? [])->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->all();
+
         return PublishForm::make($this->blueprint())
             ->asConfig()
             ->icon('ai-chat')
             ->title(__('AI'))
-            ->values(array_merge($this->defaults(), Cache::get(self::CACHE_KEY, [])))
+            ->values($values)
             ->submittingTo(cp_route('ai.update'));
     }
 
@@ -44,6 +52,35 @@ class AiSettingsController extends CpController
         Cache::forever(self::CACHE_KEY, $values);
 
         return ['saved' => true];
+    }
+
+    /**
+     * The saved prompts the current user can run from the AI chat, shared with every CP page (see HandleInertiaRequests).
+     * Each one's command is its name as a slug, so "Legal check" is run with /legal-check.
+     */
+    public static function prompts(): array
+    {
+        $user = User::current();
+
+        if (! $user || (! $user->isSuper() && ! $user->hasPermission('use ai'))) {
+            return [];
+        }
+
+        $prompts = Cache::get(self::CACHE_KEY, [])['prompts'] ?? app(static::class)->defaults()['prompts'];
+
+        return collect($prompts)
+            // Named, and not switched off
+            ->filter(fn ($prompt) => filled($prompt['name'] ?? null) && ($prompt['enabled'] ?? true))
+            // Limited to some roles: super users still see them all, as they can see everything else
+            ->filter(fn ($prompt) => empty($prompt['roles']) || $user->isSuper() || collect($prompt['roles'])->contains(fn ($role) => $user->hasRole($role)))
+            ->map(fn ($prompt) => [
+                'name' => $prompt['name'],
+                'command' => Str::slug($prompt['name']),
+                'instructions' => $prompt['instructions'] ?? '',
+                'collections' => $prompt['collections'] ?? [],
+            ])
+            ->values()
+            ->all();
     }
 
     // Only super users, until there's a permission for it
@@ -74,7 +111,47 @@ class AiSettingsController extends CpController
                 'ip', 'ip_address',
             ],
             'excluded_other' => ['users', 'form_submissions'],
+            // A few to show what they're for. Each gets a /command in the AI chat.
+            'prompts' => [
+                [
+                    'name' => 'Legal check',
+                    'instructions' => "Read this page as our legal team would. List any claim we can't back up (prices, guarantees, \"best\" or \"only\", health claims) and anything that needs terms and conditions, quoting the sentence it's in. Don't change anything.",
+                ],
+                [
+                    'name' => 'Alt text',
+                    'instructions' => "Write alt text for every image on this page that hasn't got any. One short sentence saying what's in the image, not what it's for. Leave decorative images empty.",
+                ],
+                [
+                    'name' => 'SEO check',
+                    'instructions' => 'Check the meta title (under 60 characters) and meta description (under 155). Draft any that are missing or too long, and suggest them rather than saving them.',
+                ],
+            ],
         ];
+    }
+
+    // Each saved prompt collapses to a row: its name in the badge, then the start of its instructions. Opened, the name and who sees it share a row, with the instructions under them.
+    private function promptsField(): array
+    {
+        return ['handle' => 'prompts', 'field' => [
+            'type' => 'replicator',
+            'display' => __('Prompts'),
+            // The help for each prompt's fields lives here, so it isn't repeated in every one
+            'instructions' => __('Run one in the AI chat by typing / and its name, like `/legal-check`. It works on whatever page is open. Leave *Collections* and *Roles* empty to offer it everywhere, to everyone who can use AI.'),
+            'full_width_setting' => true,
+            'collapse' => true,
+            'previews' => true,
+            'button_label' => __('Add Prompt'),
+            'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
+                // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out
+                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'width' => 33, 'replicator_preview' => false]],
+                    // Plain multi-selects rather than the relationship fieldtypes, whose choices stack up below them as draggable rows and leave a gap beside the name. These show them as chips.
+                    ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 33]],
+                    ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 33]],
+                    ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What the AI should do, as you would ask a colleague.')]],
+                ]],
+            ]]],
+        ]];
     }
 
     private function blueprint(): Blueprint
@@ -247,6 +324,13 @@ class AiSettingsController extends CpController
                                         ],
                                     ],
                                 ]] : []),
+                            ],
+                        ],
+                        [
+                            'display' => __('Saved Prompts'),
+                            'instructions' => __('Jobs your team does often, written once so anyone can run them the same way.'),
+                            'fields' => [
+                                $this->promptsField(),
                             ],
                         ],
                         [

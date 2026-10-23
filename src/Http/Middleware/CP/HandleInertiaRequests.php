@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Middleware;
 use Inertia\Support\Header;
 use Statamic\CP\Toasts\Manager;
+use Statamic\Http\Controllers\CP\Ai\AiSettingsController;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +40,8 @@ class HandleInertiaRequests extends Middleware
                 'cmsName' => __(Statamic::pro() ? config('statamic.cp.custom_cms_name', 'Statamic') : 'Statamic'),
                 'logos' => $this->logos(),
                 'isCpRoute' => Statamic::isCpRoute(),
+                // Prototype: the AI chat's saved prompts (see AiSettingsController)
+                'aiPrompts' => AiSettingsController::prompts(),
             ],
             '_toasts' => $this->toasts($request),
         ]);
