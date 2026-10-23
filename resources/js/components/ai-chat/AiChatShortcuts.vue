@@ -16,6 +16,7 @@ const shortcuts = [
     { keys: ['Shift', 'Enter'], text: 'New line' },
     { keys: ['↑'], text: 'Pick an example', or: ['↓'], needsExamples: true },
     { keys: ['Esc'], text: 'Back to the page' },
+    { keys: ['/name'], text: 'Run a saved prompt' },
     { keys: ['/clear'], text: 'Start a new chat' },
 ];
 

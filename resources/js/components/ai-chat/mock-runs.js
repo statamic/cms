@@ -101,6 +101,65 @@ export function planRun(text) {
     });
 }
 
+// The page the chat was asked about, from the browser tab's title ("Our summer sale ‹ Statamic")
+const currentPage = () => document.title.split(/ [‹›] /)[0] || 'this page';
+
+// What each of the example saved prompts (see AiSettingsController) pretends to do. Any others follow their instructions, vaguely.
+const promptScenarios = {
+    'legal-check': (page) => ({
+        permission: 'view entries',
+        steps: [
+            { tool: 'statamic.get_entry', args: `entry: "${page}"`, result: 'Loaded · 1,180 words', ms: 1000 },
+            { tool: 'statamic.get_blueprint', args: 'fields: content, terms', result: 'No terms field', ms: 700 },
+        ],
+        done: {
+            text: '3 things to check before this goes live',
+            items: [
+                '“The lowest prices anywhere” needs evidence, or could say “low prices”.',
+                '“Free returns” should link to the returns policy.',
+                '“Ends Sunday” needs a date and time.',
+            ],
+            note: 'Nothing was changed.',
+        },
+    }),
+    'alt-text': (page) => ({
+        permission: 'edit assets',
+        steps: [
+            { tool: 'statamic.get_entry', args: `entry: "${page}" · fields: assets`, result: '9 images used', ms: 900 },
+            { tool: 'statamic.update_asset', args: 'assets: 6 without alt · field: alt', result: 'Alt text written for 6 images', ms: 1600 },
+        ],
+        done: { text: 'Alt text added to 6 images', note: '3 already had some, and were left alone.' },
+    }),
+    'seo-check': (page) => ({
+        permission: 'view entries',
+        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}" · fields: seo`, result: 'Loaded', ms: 1000 }],
+        done: {
+            text: '2 fixes suggested',
+            items: ['The meta title is 72 characters. Search results cut it at about 60.', 'There’s no meta description. Try: “Everything in the summer sale, up to half off until Sunday.”'],
+            note: 'Nothing was changed.',
+        },
+    }),
+};
+
+// A saved prompt, run on the page that's open. The run is titled with its name, so it's clear which one ran.
+export function planPromptRun(prompt) {
+    const page = currentPage();
+    const scenario = promptScenarios[prompt.command] ?? (() => ({
+        permission: 'view entries',
+        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}"`, result: 'Loaded', ms: 1000 }],
+        done: { text: `Done, following the “${prompt.name}” instructions` },
+    }));
+    const plan = scenario(page);
+
+    return reactive({
+        ...plan,
+        title: prompt.name,
+        who: whoIsAsking(),
+        status: 'working',
+        steps: plan.steps.map((step) => ({ ...step, state: 'pending' })),
+    });
+}
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Plays the run: each step goes running, waits, then done. onChange lets the thread keep itself scrolled to the bottom.

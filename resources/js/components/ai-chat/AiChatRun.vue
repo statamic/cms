@@ -46,7 +46,14 @@ defineProps({
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
                 <AiChatDoneIcon />
             </div>
-            <p class="min-w-0 flex-1 text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
+            <div class="min-w-0 flex-1 space-y-1.5">
+                <p class="text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
+                <!-- What it found, for jobs that check rather than change, like a saved legal check -->
+                <ul v-if="run.done.items" class="list-disc space-y-1 ps-4 text-xs/5 text-gray-700 dark:text-gray-300">
+                    <li v-for="item in run.done.items" :key="item">{{ item }}</li>
+                </ul>
+                <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
+            </div>
         </div>
 
         <p class="px-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
