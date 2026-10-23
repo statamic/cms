@@ -1,0 +1,8 @@
+
+@supports(text-box: cap alphabetic) {
+        /* =Jay. Counts are only ever digits, so they sit best centred on cap height rather than the usual badge trim */
+[data-ui-panel-footer] [data-ui-badge][data-v-45f1e3ea] {
+            min-height: auto;
+            padding-block: calc(var(--spacing) * 1.5);
+}
+}
