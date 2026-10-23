@@ -33,22 +33,13 @@ const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), pro
     });
 };
 
-test('selecting the existing file references it by the container id', () => {
-    const post = vi.fn(() => Promise.resolve({ data: [] }));
-    const field = makeField({ axiosPost: post });
-
-    field.vm.uploadSelected({ basename: 'user.png' });
-
-    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::user.png'] });
-});
-
-test('the existing file id includes the configured folder', () => {
+test('selecting the existing file references the asset the server reported', () => {
     const post = vi.fn(() => Promise.resolve({ data: [] }));
     const field = makeField({ axiosPost: post, props: { config: { folder: 'sub' } } });
 
-    field.vm.uploadSelected({ basename: 'user.png' });
+    field.vm.uploadSelected({ basename: 'My File.PNG', existingId: 'main::sub/my-file.png' });
 
-    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::sub/user.png'] });
+    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::sub/my-file.png'] });
 });
 
 test('loading assets for a new value does not emit an update when the ids are unchanged', async () => {
