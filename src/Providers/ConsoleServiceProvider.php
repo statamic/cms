@@ -19,6 +19,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\Install::class,
         Commands\InstallCollaboration::class,
         Commands\InstallEloquentDriver::class,
+        Commands\InstallSearch::class,
         Commands\InstallSsg::class,
         Commands\FlatCamp::class,
         Commands\LicenseSet::class,
