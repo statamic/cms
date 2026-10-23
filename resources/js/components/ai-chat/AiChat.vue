@@ -19,13 +19,17 @@ const inputClasses = computed(() =>
 );
 const prompt = ref('');
 
-// Floating, the help (the examples, then the keyboard shortcuts) is hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, they show above the input.
+// Floating, the help (the examples, then the saved prompts) is hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, the examples show above the input.
 const showHelp = ref(false);
+// The help shows either the examples and saved prompts (opened with /), or the keyboard shortcuts on their own (opened with ?)
+const helpView = ref('main');
+watch(showHelp, (open) => open || (helpView.value = 'main'));
+
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
 const examples = useTemplateRef('examples');
 // Floating, the examples are only there once opened. Docked, they're there until the first message.
-const examplesVisible = computed(() => !messages.value.length && (floating.value ? showHelp.value : true));
+const examplesVisible = computed(() => !messages.value.length && (floating.value ? showHelp.value && helpView.value === 'main' : true));
 
 // Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
@@ -139,6 +143,15 @@ function onKeydown(event) {
         return;
     }
 
+    // ? in the empty box opens the keyboard shortcuts on their own, or puts them away again. (Open help was put away above, as for any key.)
+    if (event.key === '?' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        const wereOpen = helpView.value === 'shortcuts';
+        helpView.value = 'shortcuts';
+        showHelp.value = !wereOpen;
+        return;
+    }
+
     if (event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault();
         showHelp.value = true;
@@ -199,6 +212,9 @@ function send(text = prompt.value) {
         playRun(run, scrollToBottom);
     }, 500);
 }
+
+// From the help or the command menu: a saved prompt runs, and /clear starts a new chat
+const runCommand = (command) => (command.builtIn ? send('/clear') : runPrompt(command));
 
 // Run a saved prompt on the page that's open. Your message shows its name, and the answer is the job it does.
 function runPrompt(saved) {
@@ -271,7 +287,7 @@ function scrollToBottom() {
             @keydown.enter.exact="onEnter"
             @keydown="onKeydown"
         >
-            <!-- Help (the examples, until there's a conversation, and the keyboard shortcuts), opened by pressing / in the empty box -->
+            <!-- Help (the examples, until there's a conversation, and the saved prompts), opened by pressing / in the empty box, or the keyboard shortcuts, opened with ? -->
             <!-- The same fade up as the chat itself, in and out, a touch quicker -->
             <Transition
                 enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
@@ -282,18 +298,30 @@ function scrollToBottom() {
                 <div
                     v-if="showHelp || commandMenuOpen"
                     :class="floating ? (messages.length ? 'start-[7px] w-[calc(100%-14px)]' : '-start-2.75 w-[calc(100%+11px)]') : 'start-0.25 end-2.5'"
-                    class="absolute bottom-full z-(--z-index-portal) mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-lg dark:border-gray-700 dark:bg-gray-900"
+                    class="absolute bottom-full z-(--z-index-portal) mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-xl dark:border-gray-700 dark:bg-gray-900"
                 >
                     <!-- While typing a command, only the commands that match -->
                     <template v-if="commandMenuOpen">
-                        <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" @pick="(command) => (command.builtIn ? send('/clear') : runPrompt(command))" />
+                        <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" @pick="runCommand" />
                         <p v-else class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
                     </template>
+                    <!-- The keyboard shortcuts on their own. Esc or ? puts them away. -->
+                    <AiChatShortcuts v-else-if="helpView === 'shortcuts'" :has-examples="false" />
                     <template v-else>
                         <!-- Docked, the examples are already above the input until the first message -->
                         <AiChatExamples v-if="floating && !messages.length" ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
                         <AiChatPrompts v-if="savedPrompts.length" :prompts="savedPrompts" :after-list="floating && !messages.length" @pick="runPrompt" />
-                        <AiChatShortcuts :after-examples="(floating && !messages.length) || !!savedPrompts.length" :has-examples="!messages.length" />
+                        <!-- A hint along the foot, which also works as a button. mousedown.prevent keeps focus in the input. -->
+                        <button
+                            type="button"
+                            class="flex w-full cursor-pointer items-center gap-1.5 px-3 pt-1.5 pb-3 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                            @mousedown.prevent
+                            @click="helpView = 'shortcuts'"
+                        >
+                            {{ __('Press') }}
+                            <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">?</kbd>
+                            {{ __('for keyboard shortcuts') }}
+                        </button>
                     </template>
                 </div>
             </Transition>
