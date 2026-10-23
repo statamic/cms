@@ -4,6 +4,7 @@ namespace Statamic\Search;
 
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -30,7 +31,8 @@ class Tags extends BaseTags
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($supplementData);
+            ->withData($supplementData)
+            ->naturalLanguage($this->params->bool('natural_language'));
 
         $this->querySite($builder);
         $this->queryStatus($builder);
@@ -39,8 +41,47 @@ class Tags extends BaseTags
         $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
+        $naturalLanguage = $builder->naturalLanguageParams();
 
-        return $this->output($results);
+        if ($naturalLanguage) {
+            $collection = $results instanceof \Illuminate\Contracts\Pagination\Paginator
+                ? $results->getCollection()
+                : $results;
+
+            if (method_exists($collection, 'supplement')) {
+                $collection->supplement('natural_language', $naturalLanguage);
+            }
+        }
+
+        $output = $this->output($results);
+
+        if ($naturalLanguage && is_array($output)) {
+            $output['natural_language'] = $naturalLanguage;
+        }
+
+        return $output;
+    }
+
+    public function scopedKey()
+    {
+        $index = Search::index($this->params->get('index'));
+
+        if (! method_exists($index, 'scopedSearchKey')) {
+            throw new \LogicException(
+                "Search index [{$index->name()}] does not support scoped search keys."
+            );
+        }
+
+        $parameters = Arr::except($this->params->all(), [
+            'index',
+            'expires',
+            'expires_at',
+        ]);
+
+        return $index->scopedSearchKey(
+            $parameters,
+            $this->params->int('expires', 3600),
+        );
     }
 
     protected function queryStatus($query)
