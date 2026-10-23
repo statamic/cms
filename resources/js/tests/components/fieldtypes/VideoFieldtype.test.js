@@ -64,6 +64,18 @@ test('it does not preview a cloudflare manifest url', async () => {
     expect((await preview(`${cloudflare}/manifest/video.m3u8`)).exists()).toBe(false);
 });
 
+test.each(['manifest/video.m3u8', 'manifest/video.mpd'])('it hints to use the video link for a cloudflare %s url', (path) => {
+    const wrapper = mountVideoField({ value: `${cloudflare}/${path}` });
+
+    expect(wrapper.find('p').text()).toBe('statamic::messages.video_fieldtype_cloudflare_manifest');
+});
+
+test.each(['watch', 'iframe'])('it does not hint for a cloudflare %s url', (path) => {
+    const wrapper = mountVideoField({ value: `${cloudflare}/${path}` });
+
+    expect(wrapper.find('p').exists()).toBe(false);
+});
+
 test('it previews a cloudflare iframe url', async () => {
     expect((await preview(`${cloudflare}/iframe`)).attributes('src')).toBe(`${cloudflare}/iframe`);
 });

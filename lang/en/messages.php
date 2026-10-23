@@ -305,5 +305,6 @@ return [
     'user_wizard_invitation_subject' => 'Activate your new Statamic account on :site',
     'user_wizard_roles_groups_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
     'user_wizard_super_admin_instructions' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
+    'video_fieldtype_cloudflare_manifest' => 'Cloudflare Stream manifest URLs can\'t be embedded. Use the URL from the "Video Link" button in Cloudflare instead.',
     'width_x_height' => ':width × :height',
 ];

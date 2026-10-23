@@ -14,6 +14,7 @@
             />
         </ui-input-group>
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isCloudflareManifest">{{ __('statamic::messages.video_fieldtype_cloudflare_manifest') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             ref="iframe"
@@ -30,6 +31,7 @@
 import Fieldtype from './Fieldtype.vue';
 
 const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(\/|\/iframe\/?|\/watch\/?)?(?:\?([^\s#]*))?(?:#\S*)?$/i;
+const CLOUDFLARE_MANIFEST_PATTERN = /^https?:\/\/customer-[a-z0-9]+\.cloudflarestream\.com\/[a-z0-9]+\/manifest\//i;
 
 export default {
     mixins: [Fieldtype],
@@ -54,6 +56,10 @@ export default {
             const isWatch = (match[3] || '').toLowerCase().startsWith('/watch');
 
             return { host: match[1], id: match[2], query: isWatch ? '' : new URLSearchParams(match[4] || '').toString() };
+        },
+
+        isCloudflareManifest() {
+            return CLOUDFLARE_MANIFEST_PATTERN.test(this.value || '');
         },
 
         embedUrl() {
