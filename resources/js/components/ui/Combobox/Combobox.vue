@@ -614,7 +614,7 @@ defineExpose({
                         :key="getOptionValue(option)"
                         class="sortable-item cursor-grab active:cursor-grabbing"
                     >
-                        <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
+                        <Badge pill size="lg" class="[&>*:not(svg)]:st-text-trim-optical">
                             <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
@@ -639,10 +639,3 @@ defineExpose({
     </div>
 </template>
 
-<style scoped>
-    @supports(text-box: ex alphabetic) {
-        [data-ui-badge] {
-            padding-block: 0.65rem;
-        }
-    }
-</style>

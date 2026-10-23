@@ -74,8 +74,8 @@
                         :key="rule"
                         class="sortable-item"
                     >
-                        <Badge pill size="lg">
-                            {{ rule }}
+                        <Badge pill size="lg" class="*:st-text-trim-optical">
+                            <span>{{ rule }}</span>
 
                             <button
                                 type="button"
