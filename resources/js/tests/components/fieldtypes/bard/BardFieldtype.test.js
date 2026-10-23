@@ -277,6 +277,52 @@ test('set field edits made while an update is debounced are kept', async () => {
     expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('ABC');
 });
 
+test('set field edits are not emitted back into the container', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        // As saved, without attribute defaults.
+        { type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'A' } } },
+    ]);
+
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('AB');
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+});
+
+test('set attributes changed in the editor are still emitted', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    editor.view.dispatch(editor.state.tr.setNodeAttribute(editor.state.doc.child(0).nodeSize, 'enabled', false));
+    await waitForDebounce();
+
+    expect(values.value.content[1].attrs.enabled).toBe(false);
+});
+
+test('set field edits made after the editor was rebuilt are kept', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    data_set(values.value, 'content', [{ type: 'paragraph', content: [{ type: 'text', text: 'Two' }] }, set('set-a', 'A')]);
+    await wrapper.setProps({ value: values.value.content });
+    await waitForDebounce();
+
+    wrapper.vm.editor.commands.insertContentAt(1, 'Then ');
+    await nextTick();
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(values.value.content[0].content[0].text).toBe('Then Two');
+    expect(values.value.content[1].attrs.values.label).toBe('AB');
+});
+
 test('each set field edit can be undone', async () => {
     const { wrapper, values } = await mountFieldInContainer({ sets }, [
         { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },

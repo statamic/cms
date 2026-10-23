@@ -472,7 +472,7 @@ export default {
             }
 
             this.editor.commands.clearContent(false);
-            this.editor.commands.setContent(this.valueToContent(value), true);
+            this.editor.commands.setContent(this.valueToContent(clone(value)), true);
         },
 
         readOnly(readOnly) {
@@ -1002,6 +1002,13 @@ export default {
             tr.setSelection(TextSelection.between(tr.selection.$from, tr.selection.$from, -1));
 
             this.editor.view.dispatch(tr);
+        },
+
+        // Set field edits are already in the container. Emitting them back would hand each field a copy of its own value.
+        update(value) {
+            if (this.editor && this.valueMatchesEditor(this.value) && this.valueMatchesEditor(value)) return;
+
+            this.$emit('update:value', value);
         },
 
         // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
