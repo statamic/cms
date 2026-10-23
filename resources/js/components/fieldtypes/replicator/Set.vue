@@ -87,6 +87,9 @@ const fieldActions = computed(() => {
     return toFieldActions('replicator-fieldtype-set', fieldActionPayload.value);
 });
 
+// Prototype: a set can name a field whose value labels its badge instead of the set's name, e.g. each saved prompt on Settings → AI shows its own name. Until it's filled in, the set's name shows.
+const badgeText = computed(() => (props.config.title_field && props.values?.[props.config.title_field]) || __(props.config.display) || props.config.handle);
+
 const previewText = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
@@ -211,7 +214,7 @@ function onSetDropdownClosed() {
                             <span class="st-text-trim-optical-cap">{{ __(setGroup.display) }}</span>
                             <Icon name="chevron-right" class="size-3" />
                         </span>
-                        <span class="st-text-trim-optical-cap">{{ __(config.display) || config.handle }}</span>
+                        <span class="st-text-trim-optical-cap">{{ badgeText }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
