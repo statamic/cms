@@ -5,13 +5,16 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Facades\Stache;
 
+/**
+ * @internal
+ */
 trait ResolvesEntryUri
 {
     /**
      * The URI an entry will have once it's saved. A structured entry that
      * isn't in the tree yet goes under the given parent page.
      */
-    protected function entryUri($entry, $tree, $parent)
+    private function entryUri($entry, $tree, $parent)
     {
         if (! $entry->route()) {
             return null;
