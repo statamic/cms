@@ -15,7 +15,7 @@ return [
     'manage_preferences' => 'Manage Preferences',
     'manage_preferences_desc' => 'Ability to customize global and role-specific preferences.',
     'use_ai' => 'Use AI',
-    'use_ai_desc' => 'Ability to use the AI assistant and field suggestions, limited to this role\'s permissions.',
+    'use_ai_desc' => 'Ability to use the AI chat and field suggestions, limited to this role\'s permissions.',
 
     'group_sites' => 'Sites',
     'access_{site}_site' => 'Access :site site',

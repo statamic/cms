@@ -25,7 +25,7 @@ class CorePermissions
             $this->register('configure fields');
             $this->register('configure form fields');
             $this->register('manage preferences');
-            // Prototype: whether a role can use AI at all (the Ask chat and field suggestions). It's here rather than per content type because the AI acts as the user, so their other permissions already decide what it can see and do. This only decides whether their content may be sent to the AI provider.
+            // Prototype: whether a role can use AI at all (the AI chat and field suggestions). It's here rather than per content type because the AI acts as the user, so their other permissions already decide what it can see and do. This only decides whether their content may be sent to the AI provider.
             $this->register('use ai');
         });
 
