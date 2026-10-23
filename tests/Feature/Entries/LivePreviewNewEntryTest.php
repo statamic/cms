@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -85,6 +87,26 @@ class LivePreviewNewEntryTest extends TestCase
         $this->get($url)->assertOk()->assertSee('<h1>Sibling page</h1>', false);
     }
 
+    #[Test]
+    public function it_previews_a_new_entry_using_the_selected_blueprint()
+    {
+        Collection::make('news')->routes('/news/{slug}')->template('@blueprint')->save();
+        $this->viewShouldReturnRaw('news.first', 'First blueprint');
+        $this->viewShouldReturnRaw('news.second', 'Second blueprint');
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')
+            ->with('collections/news')
+            ->andReturn(collect([
+                'first' => Blueprint::makeFromFields(['title' => ['type' => 'text']])->setHandle('first'),
+                'second' => Blueprint::makeFromFields(['title' => ['type' => 'text']])->setHandle('second'),
+            ]));
+
+        $url = $this->previewUrl('news', ['title' => 'News', 'slug' => 'news'], blueprint: 'second');
+
+        $this->get($url)->assertOk()->assertSee('Second blueprint')->assertDontSee('First blueprint');
+    }
+
     private function structuredCollection(): void
     {
         $collection = tap(Collection::make('pages')->routes('{parent_uri}/{slug}')->template('entry')->structureContents(['root' => true]))->save();
@@ -98,16 +120,19 @@ class LivePreviewNewEntryTest extends TestCase
         ])->save();
     }
 
-    private function previewUrl(string $collection, array $values, ?string $parent = null): string
+    private function previewUrl(string $collection, array $values, ?string $parent = null, ?string $blueprint = null): string
     {
-        $uri = "/cp/collections/{$collection}/entries/create/en/preview".($parent ? "?parent={$parent}" : '');
+        $uri = "/cp/collections/{$collection}/entries/create/en/preview";
 
-        return $this->actingAs($this->user())->postJson($uri, ['preview' => $values])->assertOk()->json('url');
+        return $this->actingAs($this->user())
+            ->postJson($uri, ['preview' => $values, 'parent' => $parent, 'blueprint' => $blueprint])
+            ->assertOk()
+            ->json('url');
     }
 
     private function user()
     {
-        $this->setTestRoles(['test' => ['access cp', 'create blog entries', 'create pages entries']]);
+        $this->setTestRoles(['test' => ['access cp', 'create blog entries', 'create pages entries', 'create news entries']]);
 
         return User::make()->assignRole('test')->save();
     }

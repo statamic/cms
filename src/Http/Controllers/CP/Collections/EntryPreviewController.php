@@ -27,6 +27,7 @@ class EntryPreviewController extends PreviewController
         $entry = Entry::make()
             ->slug($preview['slug'] ?? 'slug')
             ->collection($collection)
+            ->blueprint($request->blueprint)
             ->locale($site->handle());
 
         if ($collection->dated()) {
