@@ -76,12 +76,21 @@ class UserTags extends Tags
 
         // No user found? Get the current one.
         if (! $user) {
-            if (! $user = User::current()) {
+            if (! $user = $this->currentUser()) {
                 return $this->parseNoResults();
             }
         }
 
         return $this->aliasedResult($user);
+    }
+
+    private function currentUser()
+    {
+        if (! $guard = $this->params->get('guard')) {
+            return User::current();
+        }
+
+        return User::fromUser(auth($guard)->user());
     }
 
     /**
@@ -420,6 +429,10 @@ class UserTags extends Tags
             $queryParams['redirect'] = $redirect;
         }
 
+        if ($guard = $this->params->get('guard')) {
+            $queryParams['guard'] = $guard;
+        }
+
         return route('statamic.logout', $queryParams);
     }
 
@@ -430,7 +443,7 @@ class UserTags extends Tags
      */
     public function logout()
     {
-        auth()->logout();
+        auth($this->params->get('guard'))->logout();
 
         abort(redirect($this->params->get('redirect', '/'), $this->params->get('response', 302)));
     }
@@ -575,12 +588,12 @@ class UserTags extends Tags
      */
     public function can()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? null : false;
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
-        $arguments = $this->params->except(['permission', 'do'])->all();
+        $arguments = $this->params->except(['permission', 'do', 'guard'])->all();
 
         foreach ($permissions as $permission) {
             if ($user->can($permission, $arguments)) {
@@ -600,12 +613,12 @@ class UserTags extends Tags
      */
     public function cant()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? $this->parse() : true;
         }
 
         $permissions = Arr::wrap($this->params->explode(['permission', 'do']));
-        $arguments = $this->params->except(['permission', 'do'])->all();
+        $arguments = $this->params->except(['permission', 'do', 'guard'])->all();
 
         $can = false;
 
@@ -632,7 +645,7 @@ class UserTags extends Tags
      */
     public function is()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? null : false;
         }
 
@@ -660,7 +673,7 @@ class UserTags extends Tags
      */
     public function isnt()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? $this->parse() : true;
         }
 
@@ -695,7 +708,7 @@ class UserTags extends Tags
      */
     public function in()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? null : false;
         }
 
@@ -719,7 +732,7 @@ class UserTags extends Tags
      */
     public function notIn()
     {
-        if (! $user = User::current()) {
+        if (! $user = $this->currentUser()) {
             return $this->parser ? $this->parse() : true;
         }
 

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\User;
 
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -108,7 +109,7 @@ class LoginController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        Auth::guard($this->requestedGuard())->logout();
 
         $redirect = request()->get('redirect');
 
@@ -117,6 +118,25 @@ class LoginController extends Controller
             : route('statamic.site');
 
         return redirect($url);
+    }
+
+    private function requestedGuard(): ?string
+    {
+        $guard = request()->query('guard');
+
+        if (! $guard) {
+            return null;
+        }
+
+        abort_unless(is_string($guard) && $this->isStatefulGuard($guard), 404);
+
+        return $guard;
+    }
+
+    private function isStatefulGuard(string $guard): bool
+    {
+        return array_key_exists($guard, config('auth.guards'))
+            && Auth::guard($guard) instanceof StatefulGuard;
     }
 
     protected function username()
