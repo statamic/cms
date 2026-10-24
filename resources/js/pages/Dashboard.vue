@@ -1,18 +1,25 @@
 <script setup>
+import { ref } from 'vue';
 import Head from '@/pages/layout/Head.vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
+import EnableProModal from '@/components/modals/EnableProModal.vue';
 import { Icon, EmptyStateMenu, EmptyStateItem, DocsCallout } from '@ui';
 import useArchitecturalBackground from '@/pages/layout/architectural-background.js';
 
 const props = defineProps({
     widgets: Array,
     pro: Boolean,
+    canEnablePro: Boolean,
+    hasLicenseKey: Boolean,
+    enableProUrl: String,
     blueprintsUrl: String,
     collectionsCreateUrl: String,
     navigationCreateUrl: String,
 });
 
 if (props.widgets.length === 0) useArchitecturalBackground();
+
+const confirmingEnablePro = ref(false);
 
 function classes(widget) {
     return `${widget.classes} ${tailwindWidthClass(widget.width)}`;
@@ -79,11 +86,11 @@ function tailwindWidthClass(width) {
                 :description="__('statamic::messages.getting_started_widget_docs')"
             />
             <EmptyStateItem
-                v-if="!pro"
-                href="https://statamic.dev/licensing"
+                v-if="!pro && canEnablePro"
                 icon="pro-ribbon"
                 :heading="__('Enable Pro Mode')"
                 :description="__('statamic::messages.getting_started_widget_pro')"
+                @click="confirmingEnablePro = true"
             />
             <EmptyStateItem
                 :href="blueprintsUrl"
@@ -104,6 +111,12 @@ function tailwindWidthClass(width) {
                 :description="__('statamic::messages.getting_started_widget_navigation')"
             />
         </EmptyStateMenu>
+
+        <EnableProModal
+            v-model:open="confirmingEnablePro"
+            :url="enableProUrl"
+            :has-license-key="hasLicenseKey"
+        />
     </template>
 
     <DocsCallout :topic="__('Widgets')" url="widgets" />
