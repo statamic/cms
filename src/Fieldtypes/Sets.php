@@ -6,7 +6,7 @@ use Statamic\Exceptions\ReplicatorIconSetNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Icon;
-use Statamic\Fields\Fieldset;
+use Statamic\Fields\ConfigFields;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Fields\Fieldtype;
 use Statamic\Statamic;
@@ -17,6 +17,108 @@ use function Statamic\trans as __;
 class Sets extends Fieldtype
 {
     protected $selectable = false;
+
+    protected static $setConfigFields = [];
+
+    private const SET_KEYS = ['_id', 'handle', 'display', 'instructions', 'icon', 'image', 'hide', 'fields', 'extraConfig'];
+
+    public static function appendSetConfigFields(array $fields): void
+    {
+        foreach ($fields as $handle => $config) {
+            if (! is_string($handle) || in_array($handle, self::SET_KEYS)) {
+                throw new \InvalidArgumentException("Cannot append set config field [{$handle}]. Use a unique field handle.");
+            }
+        }
+
+        static::$setConfigFields = array_merge(static::$setConfigFields, $fields);
+    }
+
+    public static function appendSetConfigField(string $handle, array $config): void
+    {
+        static::appendSetConfigFields([$handle => $config]);
+    }
+
+    private function setConfigFields(): ConfigFields
+    {
+        return new ConfigFields(collect(static::$setConfigFields)->map(fn ($field, $handle) => compact('handle', 'field')));
+    }
+
+    private function preProcessSetConfig(array $set): array
+    {
+        $values = Arr::except($set, self::SET_KEYS);
+        $fields = $this->setConfigFields()->addValues($values)->preProcess();
+
+        if (! $values && $fields->all()->isEmpty()) {
+            return [];
+        }
+
+        return ['extraConfig' => [
+            'values' => array_merge($values, $fields->values()->all()),
+            'meta' => $fields->meta()->all(),
+        ]];
+    }
+
+    private function processSetConfig(array $section): array
+    {
+        $values = Arr::except($section['extraConfig']['values'] ?? [], self::SET_KEYS);
+
+        return array_merge($values, $this->setConfigFields()->addValues($values)->process()->values()->all());
+    }
+
+    public function preload()
+    {
+        $fields = $this->setConfigFields()->preProcess();
+
+        return ['setConfig' => [
+            'fields' => $fields->toPublishArray(),
+            'defaults' => [
+                'values' => $fields->values()->all(),
+                'meta' => $fields->meta()->all(),
+            ],
+        ]];
+    }
+
+    public function extraRules(): array
+    {
+        return $this->setConfigValidation('rules');
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        return $this->setConfigValidation('attributes');
+    }
+
+    private function setConfigValidation(string $method): array
+    {
+        return collect($this->field->value())->flatMap(function ($tab, $tabIndex) use ($method) {
+            return collect($tab['sections'] ?? [])->flatMap(function ($section, $sectionIndex) use ($tabIndex, $method) {
+                $prefix = "{$this->field->handle()}.{$tabIndex}.sections.{$sectionIndex}.extraConfig.values.";
+                $validator = $this->setConfigFields()
+                    ->addValues($section['extraConfig']['values'] ?? [])
+                    ->validator()
+                    ->withContext(['prefix' => $this->field->validationContext('prefix').$prefix]);
+
+                return collect($validator->{$method}())->mapWithKeys(fn ($value, $handle) => [$prefix.$handle => $value]);
+            });
+        })->all();
+    }
+
+    public function preProcessValidatable($value)
+    {
+        return collect($value)->map(function ($tab) {
+            $tab['sections'] = collect($tab['sections'] ?? [])->map(function ($section) {
+                if (static::$setConfigFields) {
+                    $values = $section['extraConfig']['values'] ?? [];
+                    $section['extraConfig']['values'] = array_merge($values, $this->setConfigFields()
+                        ->addValues($values)->preProcessValidatables()->values()->all());
+                }
+
+                return $section;
+            })->all();
+
+            return $tab;
+        })->all();
+    }
 
     /**
      * Converts the "sets" array of a Replicator (or Bard) field into what the
@@ -50,7 +152,7 @@ class Sets extends Fieldtype
                 'instructions' => $group['instructions'] ?? null,
                 'icon' => $group['icon'] ?? null,
                 'sections' => collect($group['sets'] ?? [])->map(function ($set, $setHandle) use ($groupId) {
-                    return [
+                    return array_merge($this->preProcessSetConfig($set), [
                         '_id' => $setId = $groupId.'-section-'.$setHandle,
                         'handle' => $setHandle,
                         'display' => $set['display'] ?? null,
@@ -61,7 +163,7 @@ class Sets extends Fieldtype
                         'fields' => collect($set['fields'] ?? [])->map(function ($field, $i) use ($setId) {
                             return array_merge(FieldTransformer::toVue($field), ['_id' => $setId.'-'.$i]);
                         })->all(),
-                    ];
+                    ]);
                 })->values()->all(),
             ];
         })->values()->all();
@@ -122,7 +224,7 @@ class Sets extends Fieldtype
                     'icon' => $tab['icon'] ?? null,
                     'sets' => collect($tab['sections'])->mapWithKeys(function ($section) {
                         return [
-                            $section['handle'] => [
+                            $section['handle'] => array_merge($this->processSetConfig($section), [
                                 'display' => $section['display'],
                                 'instructions' => $section['instructions'] ?? null,
                                 'icon' => $section['icon'] ?? null,
@@ -131,7 +233,7 @@ class Sets extends Fieldtype
                                 'fields' => collect($section['fields'])->map(function ($field) {
                                     return FieldTransformer::fromVue($field);
                                 })->all(),
-                            ],
+                            ]),
                         ];
                     })->all(),
                 ],
