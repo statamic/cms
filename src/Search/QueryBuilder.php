@@ -16,10 +16,16 @@ abstract class QueryBuilder extends BaseQueryBuilder
     protected $query;
     protected $index;
     protected $withData = true;
+    protected $arguments = [];
 
     public function __construct(Index $index)
     {
         $this->index = $index;
+    }
+
+    public function arguments(): array
+    {
+        return $this->arguments;
     }
 
     public function query($query)
@@ -39,6 +45,13 @@ abstract class QueryBuilder extends BaseQueryBuilder
     public function withoutData()
     {
         $this->withData = false;
+
+        return $this;
+    }
+
+    public function withArguments(array $arguments)
+    {
+        $this->arguments = $arguments;
 
         return $this;
     }
