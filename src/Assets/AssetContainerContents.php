@@ -37,6 +37,7 @@ class AssetContainerContents
         return $this->files = $this->cacheStore()->remember($this->key(), $this->ttl(), function () {
             return collect($this->getRawFlysystemDirectoryListing())
                 ->keyBy('path')
+                ->reject(fn ($file, $path) => $this->isMetaPath($path))
                 ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
                 ->pipe(fn ($files) => $this->ensureMissingDirectoriesExist($files))
                 ->sortKeys();
@@ -182,26 +183,14 @@ class AssetContainerContents
             return $this->metaFiles[$key];
         }
 
-        $files = $this->files();
+        $path = $recursive ? $folder : trim($folder, '/').'/.meta';
 
-        $files = $files->filter(function ($file, $path) {
-            return Str::startsWith($path, '.meta/')
-                || Str::contains($path, '/.meta/');
-        });
-
-        // Filter by folder and recursiveness. But don't bother if we're
-        // requesting the root recursively as it's already that way.
-        if ($folder === '/' && $recursive) {
-            //
-        } else {
-            $files = $files->filter(function ($file) use ($folder, $recursive) {
-                $dir = $file['dirname'];
-                $dir = substr($dir, 0, -6); // remove .meta/ from the end
-                $dir = $dir ?: '/';
-
-                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
-            });
-        }
+        $files = collect($this->filesystem()->listContents($path, $recursive))
+            ->filter(fn ($attributes) => $attributes->isFile())
+            ->keyBy('path')
+            ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
+            ->filter(fn ($file, $path) => $this->isMetaPath($path))
+            ->sortKeys();
 
         return $this->metaFiles[$key] = $files;
     }
@@ -266,6 +255,11 @@ class AssetContainerContents
     private function filesystem()
     {
         return $this->container->disk()->filesystem()->getDriver();
+    }
+
+    private function isMetaPath($path): bool
+    {
+        return (bool) preg_match('#(^|/)\.meta(/|$)#', $path);
     }
 
     public function save()
