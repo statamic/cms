@@ -20,6 +20,7 @@ class NavBuilder
     protected $itemsKeyedById = null;
     protected $withHidden = false;
     protected $itemsWithChildrenClosures = [];
+    protected $itemsRemovedFromChildren = [];
     protected $sections = [];
     protected $sectionsEmptiedByAuthorization = [];
     protected $sectionsOriginalItemIds = [];
@@ -736,6 +737,7 @@ class NavBuilder
     protected function userModifyItemChildren($item, $childrenOverrides, $section, $reorder)
     {
         $itemChildren = collect($item->original()->resolveChildren()->children())
+            ->reject(fn ($child) => in_array($child->id(), $this->itemsRemovedFromChildren))
             ->each(fn ($item, $index) => $item->order($index + 1000))
             ->keyBy
             ->id();
@@ -883,6 +885,8 @@ class NavBuilder
         if (! $parent) {
             return;
         }
+
+        $this->itemsRemovedFromChildren[] = $item->id();
 
         if ($this->urlsUnresolvedChildren->has($parent->id())) {
             $this->urlsUnresolvedChildren[$parent->id()] = collect($this->urlsUnresolvedChildren[$parent->id()])
