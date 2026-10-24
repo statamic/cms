@@ -48,4 +48,16 @@ class LogoutTest extends TestCase
     {
         return tap(User::make()->id('test-user')->email('test@example.com')->password('secret'))->save();
     }
+
+    #[Test]
+    public function disabled_frontend_authentication_does_not_log_out_authenticated_users(): void
+    {
+        $user = User::make()->email('test@example.com')->save();
+
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->actingAs($user)->get('/!/auth/logout')->assertNotFound();
+
+        $this->assertAuthenticatedAs($user);
+    }
 }
