@@ -14,6 +14,8 @@ use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
+    protected $pending;
+
     public function search($query)
     {
         return (new Query($this))->query($query);
@@ -107,6 +109,12 @@ class Index extends BaseIndex
 
     public function insertDocuments(Documents $documents)
     {
+        if (! is_null($this->pending)) {
+            $this->pending = $documents->union($this->pending);
+
+            return;
+        }
+
         try {
             $data = $this->data();
         } catch (IndexNotFoundException $e) {
@@ -114,6 +122,23 @@ class Index extends BaseIndex
         }
 
         $this->save($documents->union($data));
+    }
+
+    public function update()
+    {
+        $this->pending = collect();
+
+        try {
+            parent::update();
+        } finally {
+            [$pending, $this->pending] = [$this->pending, null];
+        }
+
+        if ($pending->isNotEmpty()) {
+            $this->save($pending);
+        }
+
+        return $this;
     }
 
     public function deleteIndex()
