@@ -312,6 +312,38 @@ EOT;
     }
 
     #[Test]
+    #[DataProvider('regexMetacharactersProvider')]
+    public function it_treats_regex_metacharacters_in_boolean_words_literally($term, $expected)
+    {
+        $comb = new Comb([
+            ['title' => 'node.js guide'],
+            ['title' => 'nodeXjs guide'],
+            ['title' => 'c++ guide'],
+            ['title' => 'c guide'],
+        ]);
+
+        try {
+            $results = $comb->lookUp($term);
+        } catch (NoResultsFound $e) {
+            $results = [];
+        }
+
+        $this->assertEquals($expected, collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    public static function regexMetacharactersProvider()
+    {
+        return [
+            'required word with a dot' => ['+node.js', ['node.js guide']],
+            'disallowed word with a dot' => ['guide -node.js', ['nodeXjs guide', 'c++ guide', 'c guide']],
+            'required word with plus signs' => ['+c++', ['c++ guide']],
+            'disallowed word with plus signs' => ['guide -c++', ['node.js guide', 'nodeXjs guide', 'c guide']],
+            'required word with a trailing backslash' => ['+foo\\', []],
+            'disallowed word with a trailing backslash' => ['guide -foo\\', ['node.js guide', 'nodeXjs guide', 'c++ guide', 'c guide']],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('requiredWordsProvider')]
     public function it_filters_out_results_without_required_words($term, $expected)
     {
