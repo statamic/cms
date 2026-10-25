@@ -6,7 +6,10 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
+use Statamic\Facades\Stache;
 use Statamic\Search\Comb\Index;
+use Statamic\Search\Documents;
+use Symfony\Component\Lock\LockInterface;
 use Tests\TestCase;
 
 class CombIndexTest extends TestCase
@@ -112,6 +115,81 @@ class CombIndexTest extends TestCase
             ['entry::b' => ['title' => 'Bar']],
             json_decode(file_get_contents($path), true)
         );
+    }
+
+    #[Test]
+    public function inserting_holds_the_index_lock_across_the_read_and_the_write()
+    {
+        $path = $this->createIndexFile(['entry::a' => ['title' => 'Foo']]);
+        $lock = $this->expectIndexLock(
+            acquired: fn () => $this->assertSame(['entry::a' => ['title' => 'Foo']], json_decode(file_get_contents($path), true)),
+            released: fn () => $this->assertSame(['entry::b' => ['title' => 'Bar'], 'entry::a' => ['title' => 'Foo']], json_decode(file_get_contents($path), true)),
+        );
+
+        $index = $this->getIndex('test', ['path' => $this->tmpDir], null);
+
+        $index->insertDocuments(new Documents(['entry::b' => ['title' => 'Bar']]));
+
+        $lock->shouldHaveReceived('release')->once();
+    }
+
+    #[Test]
+    public function deleting_holds_the_index_lock_across_the_read_and_the_write()
+    {
+        $path = $this->createIndexFile(['entry::a' => ['title' => 'Foo'], 'entry::b' => ['title' => 'Bar']]);
+        $lock = $this->expectIndexLock(
+            acquired: fn () => $this->assertCount(2, json_decode(file_get_contents($path), true)),
+            released: fn () => $this->assertSame(['entry::b' => ['title' => 'Bar']], json_decode(file_get_contents($path), true)),
+        );
+
+        $index = $this->getIndex('test', ['path' => $this->tmpDir], null);
+
+        $document = Mockery::mock(Searchable::class);
+        $document->shouldReceive('getSearchReference')->andReturn('entry::a');
+
+        $index->delete($document);
+
+        $lock->shouldHaveReceived('release')->once();
+    }
+
+    #[Test]
+    public function the_index_lock_is_released_when_the_write_fails()
+    {
+        $this->createIndexFile([]);
+        file_put_contents($this->tmpDir.'/test.json', '{not json');
+        $lock = $this->expectIndexLock();
+
+        $index = $this->getIndex('test', ['path' => $this->tmpDir], null);
+
+        try {
+            $index->insertDocuments(new Documents(['entry::b' => ['title' => 'Bar']]));
+            $this->fail('Expected the invalid index file to throw.');
+        } catch (\JsonException $e) {
+            //
+        }
+
+        $lock->shouldHaveReceived('release')->once();
+    }
+
+    private function expectIndexLock(?\Closure $acquired = null, ?\Closure $released = null)
+    {
+        $lock = Mockery::spy(LockInterface::class);
+        $lock->shouldReceive('acquire')->with(true)->once()->andReturnUsing(function () use ($acquired) {
+            if ($acquired) {
+                $acquired();
+            }
+
+            return true;
+        });
+        $lock->shouldReceive('release')->andReturnUsing(function () use ($released) {
+            if ($released) {
+                $released();
+            }
+        });
+
+        Stache::partialMock()->shouldReceive('lock')->with('search-index-test')->andReturn($lock);
+
+        return $lock;
     }
 
     private function createIndexFile(array $data): string
