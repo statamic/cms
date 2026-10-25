@@ -710,7 +710,7 @@ class Comb
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#'.implode('|', array_map(fn ($word) => preg_quote($word, '#'), $params['disallowed'])).'#iu';
+        $disallowed = $this->pattern($params['disallowed']);
         $new_data = [];
 
         // this only applies to boolean mode
@@ -740,7 +740,7 @@ class Comb
 
                 // check for required, one word at a time so each is a single linear scan
                 foreach ($params['required'] as $word) {
-                    if (! preg_match('#'.preg_quote($word, '#').'#iu', $record)) {
+                    if (! preg_match($this->pattern([$word]), $record)) {
                         // a required word is missing, we don't want this
                         throw new CombException('');
                     }
@@ -753,6 +753,11 @@ class Comb
         }
 
         return $new_data;
+    }
+
+    private function pattern(array $words): string
+    {
+        return '#'.implode('|', array_map(fn ($word) => preg_quote($word, '#'), $words)).'#iu';
     }
 
     /**
