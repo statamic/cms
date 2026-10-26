@@ -2,6 +2,7 @@
 
 namespace Statamic\Search\Comb;
 
+use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
@@ -14,7 +15,7 @@ use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
-    protected $pending;
+    protected ?Collection $pending = null;
 
     public function search($query)
     {
