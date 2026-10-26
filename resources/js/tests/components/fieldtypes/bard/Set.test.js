@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { afterEach, expect, test, vi } from 'vitest';
 import * as Globals from '@/bootstrap/globals';
 import Set from '@/components/fieldtypes/bard/Set.vue';
+import { Set as SetNode } from '@/components/fieldtypes/bard/Set.js';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 
 Object.keys(Globals).forEach((fn) => (window[fn] = Globals[fn]));
@@ -107,4 +108,15 @@ test('clicking a custom select field does not bubble its mousedown to ProseMirro
     selectedOption.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
 
     expect(mousedown).not.toHaveBeenCalled();
+});
+
+test('pasting a copied set keeps html characters in its values', () => {
+    const attrs = { id: 'set-1', enabled: true, values: { type: 'my_set', code: '<b>bold</b> & co' } };
+
+    // A copied set is rendered with the JSON as text, so the clipboard html has it entity-encoded.
+    const [tag, , json] = SetNode.config.renderHTML({ HTMLAttributes: attrs });
+    const element = document.createElement(tag);
+    element.textContent = json;
+
+    expect(SetNode.config.parseHTML()[0].getAttrs(element)).toEqual(attrs);
 });

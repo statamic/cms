@@ -213,6 +213,17 @@ test('the editor is left alone when the value only differs by omitted attribute 
     expect(wrapper.vm.editor.state.doc).toBe(doc);
 });
 
+test('typing still waiting for the debounced update is kept when the same value arrives again', async () => {
+    const wrapper = await mountField();
+
+    await type(wrapper, 'Zero. ');
+    await wrapper.setProps({ value: clone(value) });
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getText()).toBe('Zero. One two three four five.');
+    expect(wrapper.emitted('update:value')?.at(-1)).toEqual([wrapper.vm.editor.getJSON().content]);
+});
+
 // With remove_empty_nodes, a save strips empty nodes. Deleting them in place keeps the set fields alive.
 test('empty nodes the value no longer has are deleted in place', async () => {
     const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
@@ -275,6 +286,52 @@ test('set field edits made while an update is debounced are kept', async () => {
 
     expect(values.value.content[1].attrs.values.label).toBe('ABC');
     expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('ABC');
+});
+
+test('set field edits are not emitted back into the container', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        // As saved, without attribute defaults.
+        { type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'A' } } },
+    ]);
+
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('AB');
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+});
+
+test('set attributes changed in the editor are still emitted', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    editor.view.dispatch(editor.state.tr.setNodeAttribute(editor.state.doc.child(0).nodeSize, 'enabled', false));
+    await waitForDebounce();
+
+    expect(values.value.content[1].attrs.enabled).toBe(false);
+});
+
+test('set field edits made after the editor was rebuilt are kept', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    data_set(values.value, 'content', [{ type: 'paragraph', content: [{ type: 'text', text: 'Two' }] }, set('set-a', 'A')]);
+    await wrapper.setProps({ value: values.value.content });
+    await waitForDebounce();
+
+    wrapper.vm.editor.commands.insertContentAt(1, 'Then ');
+    await nextTick();
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(values.value.content[0].content[0].text).toBe('Then Two');
+    expect(values.value.content[1].attrs.values.label).toBe('AB');
 });
 
 test('each set field edit can be undone', async () => {
