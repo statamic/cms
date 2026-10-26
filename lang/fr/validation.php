@@ -178,6 +178,7 @@ return [
     'invalid_two_factor_code' => 'Le code d’authentification à deux facteurs fourni n’est pas valide.',
     'invalid_two_factor_recovery_code' => 'Le code de récupération à deux facteurs fourni n’est pas valide.',
     'bard_container_required_by_button' => 'Ce champ est requis par un bouton de la barre d’outils.',
+    'users_fieldtype_default_max_items' => 'Le nombre d’utilisateurs par défaut ne peut pas être supérieur au nombre maximal d’éléments du champ (:max).',
     'custom.attribute-name.rule-name' => 'message personnalisé',
     'attributes' => [],
 ];

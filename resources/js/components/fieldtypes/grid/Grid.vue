@@ -15,7 +15,16 @@
                     <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
                     <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
+                    <div
+                        v-if="isReadOnly && (!value || value.length === 0)"
+                        class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400"
+                        data-grid-readonly-empty
+                    >
+                        {{ __('None') }}
+                    </div>
+
                     <component
+                        v-if="(value && value.length > 0) || !isReadOnly"
                         :is="component"
                         :fields="fields"
                         :rows="value"

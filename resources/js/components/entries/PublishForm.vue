@@ -49,6 +49,7 @@
                         :variant="!revisionsEnabled ? 'primary' : 'default'"
                         @click.prevent="save"
                         v-text="saveText"
+                        v-tooltip="saveAndCloseTooltip"
                     />
                 </save-button-options>
 
@@ -287,6 +288,7 @@ import {
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
 import debounce from '@/util/debounce.js';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import { router } from '@inertiajs/vue3';
@@ -397,7 +399,9 @@ export default {
 
             saveKeyBinding: null,
             quickSaveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
             quickSave: false,
+            closeAfterSave: false,
             isAutosave: false,
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
@@ -445,6 +449,12 @@ export default {
             return !this.readOnly && !this.somethingIsLoading;
         },
 
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
         canPublish() {
             if (!this.revisionsEnabled) return false;
 
@@ -466,7 +476,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
@@ -593,7 +603,7 @@ export default {
                         this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
                         this.extraValues = response.data.data.extraValues;
                         this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.emitSaved(response);
                         return;
                     }
 
@@ -619,13 +629,15 @@ export default {
                         this.initialPublished = response.data.data.published;
                         this.activeLocalization.published = response.data.data.published;
                         this.activeLocalization.status = response.data.data.status;
-                        this.$nextTick(() => this.$emit('saved', response));
+                        this.emitSaved(response);
                     }
 
                     this.quickSave = false;
                     this.isAutosave = false;
                 })
                 .catch((e) => {
+                    this.closeAfterSave = false;
+
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
                         console.error(e);
@@ -829,7 +841,7 @@ export default {
                 this.activeLocalization.published = response.data.data.published;
                 this.activeLocalization.status = response.data.data.status;
                 this.permalink = response.data.data.permalink;
-                this.$nextTick(() => this.$emit('saved', response));
+                this.emitSaved(response);
             }
         },
 
@@ -897,7 +909,15 @@ export default {
 
         redirectTo(location) {
             router.get(location);
-        }
+        },
+
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
     },
 
     mounted() {
@@ -913,6 +933,16 @@ export default {
             this.quickSave = true;
             this.save();
         });
+
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                if (this.confirmingPublish || !this.canSave) return;
+                this.quickSave = true;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
 
         if (typeof this.autosaveInterval === 'number') {
             this.setAutosaveInterval();
@@ -940,6 +970,7 @@ export default {
 	    clearTimeout(this.trackDirtyStateTimeout);
 	    this.saveKeyBinding.destroy();
 	    this.quickSaveKeyBinding.destroy();
+	    this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>

@@ -1,19 +1,27 @@
 <template>
-    <div class="flex flex-col space-y-3 p-1.5 bg-gray-100 border border-gray-300 dark:bg-gray-900 dark:border-gray-700 rounded-xl">
+    <div
+        class="
+            flex flex-col space-y-3 rounded-xl border border-gray-300 bg-gray-100 p-1.5 dark:border-gray-700 dark:bg-gray-900
+            data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100
+            data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+        "
+        :data-readonly="isReadOnly ? true : undefined"
+    >
         <ui-input-group>
             <ui-input-group-prepend :text="__('URL')" />
             <ui-input
                 :model-value="value"
-                :isReadOnly="isReadOnly"
+                :read-only="isReadOnly"
                 :placeholder="__(config.placeholder) || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'"
                 :aria-label="__('Video URL')"
-                @update:model-value="updateDebounced"
+                @update:model-value="onInputUpdate"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
-                input-class="border-s-0"
+                input-class="border-s-0 read-only:border-solid"
             />
         </ui-input-group>
         <ui-description v-if="isInvalid" class="text-red-600">{{ __('statamic::validation.url') }}</ui-description>
+        <ui-description v-if="isCloudflareManifest">{{ __('statamic::messages.video_fieldtype_cloudflare_manifest') }}</ui-description>
         <iframe
             v-if="shouldShowPreview"
             ref="iframe"
@@ -29,8 +37,18 @@
 <script>
 import Fieldtype from './Fieldtype.vue';
 
+const CLOUDFLARE_URL_PATTERN = /^https?:\/\/(customer-[a-z0-9]+\.cloudflarestream\.com)\/([a-z0-9]+)(\/|\/iframe\/?|\/watch\/?)?(?:\?([^\s#]*))?(?:#\S*)?$/i;
+const CLOUDFLARE_MANIFEST_PATTERN = /^https?:\/\/customer-[a-z0-9]+\.cloudflarestream\.com\/[a-z0-9]+\/manifest\//i;
+
 export default {
     mixins: [Fieldtype],
+
+    methods: {
+        onInputUpdate(value) {
+            if (this.isReadOnly) return;
+            this.updateDebounced(value);
+        },
+    },
 
     data() {
         return {
@@ -44,7 +62,27 @@ export default {
             return !this.isInvalid && (this.isEmbeddable || this.isVideo);
         },
 
+        cloudflare() {
+            const match = CLOUDFLARE_URL_PATTERN.exec(this.value || '');
+
+            if (!match) return null;
+
+            const isWatch = (match[3] || '').toLowerCase().startsWith('/watch');
+
+            return { host: match[1], id: match[2], query: isWatch ? '' : new URLSearchParams(match[4] || '').toString() };
+        },
+
+        isCloudflareManifest() {
+            return CLOUDFLARE_MANIFEST_PATTERN.test(this.value || '');
+        },
+
         embedUrl() {
+            if (this.cloudflare) {
+                const { host, id, query } = this.cloudflare;
+
+                return `https://${host}/${id}/iframe${query ? `?${query}` : ''}`;
+            }
+
             let embed_url = this.value || '';
 
             if (embed_url.includes('youtube')) {
@@ -77,7 +115,7 @@ export default {
             const url = this.value || '';
             const isYoutube = url.includes('youtube') || url.includes('youtu.be');
             const isVimeo = url.includes('vimeo');
-            return isYoutube || isVimeo;
+            return isYoutube || isVimeo || !!this.cloudflare;
         },
 
         isInvalid() {

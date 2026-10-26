@@ -41,7 +41,10 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    {{ option.display }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
+                    <template v-else>
+                        {{ option.display }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                    </template>
                 </template>
 
                 <template #selected-options>
@@ -65,14 +68,14 @@
                 :mirror="false"
                 v-model="rules"
             >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2" :class="{ 'mt-2.5': rules.length }">
                     <div
                         v-for="rule in rules"
                         :key="rule"
-                        class="sortable-item mt-2"
+                        class="sortable-item"
                     >
-                        <Badge pill size="lg">
-                            {{ rule }}
+                        <Badge pill size="lg" class="*:st-text-trim-optical">
+                            <span>{{ rule }}</span>
 
                             <button
                                 type="button"
@@ -256,8 +259,9 @@ export default {
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
-            let rule = rulesSelect.searchQuery.value;
+            let rule = rulesSelect?.searchQuery;
 
+            if (!rule) return;
             if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
             this.add(rule);
@@ -272,7 +276,7 @@ export default {
         },
 
         searchNotFound(rulesSelect) {
-            return rulesSelect.searchQuery.value?.length === 0 || rulesSelect?.filteredOptions.length === 0;
+            return rulesSelect.filteredOptions.length === 0;
         },
 
         updated(rules) {

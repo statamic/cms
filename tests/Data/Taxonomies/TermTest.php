@@ -268,6 +268,25 @@ class TermTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_localization_using_a_site_instance()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+
+        $term = (new Term)->taxonomy('tags');
+        $term->in('fr')->set('title', 'Le Test');
+
+        $localized = $term->in(Facades\Site::get('fr'));
+
+        $this->assertSame('fr', $localized->locale());
+        $this->assertEquals('Le Test', $localized->get('title'));
+    }
+
+    #[Test]
     public function it_gets_preview_targets()
     {
         $this->setSites([

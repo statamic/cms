@@ -1,6 +1,13 @@
 <template>
     <div :class="{ 'w-full min-w-0': isCompact }">
-        <component :is="wrapperComponent" v-bind="wrapperBinds">
+        <div
+            v-if="showReadOnlyEmpty"
+            class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400"
+            data-array-readonly-empty
+        >
+            {{ __('None') }}
+        </div>
+        <component v-else :is="wrapperComponent" v-bind="wrapperBinds">
             <template v-if="isCompact" #trigger>
                 <ui-button
                     class="w-full min-w-0 shrink justify-between"
@@ -116,7 +123,7 @@
                 >
                     <ui-button @click="addValue()" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
                     <ui-button v-if="isCompact" class="ms-auto" :class="compactFooterButtonClass" size="sm" @click="setCompactOpen(false)">
-                        <span class="st-text-trim-cap">{{ __('Close') }}</span>
+                        <span class="st-text-trim-optical-cap">{{ __('Close') }}</span>
                         <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
                             Esc
                         </span>
@@ -278,6 +285,10 @@ export default {
                 .map(([key, value]) => `${key}: ${value}`)
                 .filter(Boolean)
                 .join(', ');
+        },
+
+        showReadOnlyEmpty() {
+            return this.isReadOnly && this.valueCount === 0 && !this.isSingle;
         },
     },
 

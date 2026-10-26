@@ -1187,12 +1187,14 @@ INFO;
         $shouldSwapData = GlobalRuntimeState::$isolateViewData;
         GlobalRuntimeState::$isolateViewData = false;
         $suspendedData = $shouldSwapData ? $this->nodeProcessor->getAllData() : null;
+        $suspendedAssignments = $shouldSwapData ? $this->nodeProcessor->getRuntimeAssignments() : null;
 
         try {
             return $this->renderViewContent($view, $text, $data, $instrument);
         } finally {
             if ($shouldSwapData) {
                 $this->nodeProcessor->swapData($suspendedData);
+                $this->nodeProcessor->setRuntimeAssignments($suspendedAssignments);
             }
             $this->view = $existingView;
             array_pop(GlobalRuntimeState::$templateFileStack);
