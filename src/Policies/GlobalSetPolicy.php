@@ -4,6 +4,7 @@ namespace Statamic\Policies;
 
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\User;
+use Statamic\Sites\Site;
 
 class GlobalSetPolicy
 {
@@ -18,7 +19,7 @@ class GlobalSetPolicy
         }
     }
 
-    public function index($user)
+    public function index($user, ?Site $site = null)
     {
         $user = User::fromUser($user);
 
@@ -26,9 +27,10 @@ class GlobalSetPolicy
             return true;
         }
 
-        return ! GlobalSet::all()->filter(function ($set) use ($user) {
-            return $this->view($user, $set);
-        })->isEmpty();
+        return GlobalSet::all()
+            ->filter(fn ($set) => $this->view($user, $set))
+            ->filter(fn ($set) => ! $site || $set->existsIn($site->handle()))
+            ->isNotEmpty();
     }
 
     public function create($user)
