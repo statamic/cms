@@ -20,9 +20,8 @@ import { Motion } from 'motion-v';
 
 const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
-const sections = tab.sections;
 const visibleSections = computed(() => {
-    return sections.filter((section) => {
+    return tab.value.sections.filter((section) => {
         return section.fields.some((field) => {
             return new ShowField(
                 visibleValues.value,

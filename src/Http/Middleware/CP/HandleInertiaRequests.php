@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Middleware\CP;
 
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Middleware;
+use Inertia\Support\Header;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -42,13 +44,22 @@ class HandleInertiaRequests extends Middleware
         ]);
     }
 
-    public function onEmptyResponse(Request $request, Response $response): Response
+    public function handle(Request $request, Closure $next)
     {
-        if ($response instanceof StreamedResponse || $response instanceof BinaryFileResponse) {
-            return Inertia::location($request->fullUrl());
-        }
+        return parent::handle($request, function ($request) use ($next) {
+            $response = $next($request);
 
-        return parent::onEmptyResponse($request, $response);
+            if ($request->header(Header::INERTIA) && $this->isDownload($response)) {
+                return Inertia::location($request->fullUrl());
+            }
+
+            return $response;
+        });
+    }
+
+    private function isDownload(Response $response): bool
+    {
+        return $response instanceof StreamedResponse || $response instanceof BinaryFileResponse;
     }
 
     private function logos()

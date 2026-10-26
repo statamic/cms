@@ -23,6 +23,7 @@ use Statamic\Facades\Token;
 use Statamic\Facades\User;
 use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
+use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
 use Statamic\Jobs\HandleRevisionSchedule;
 use Statamic\Licensing\Radio;
@@ -119,7 +120,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Request::macro('statamicToken', function () {
-            if ($token = $this->token ?? $this->header('X-Statamic-Token')) {
+            if (($token = $this->token ?? $this->header('X-Statamic-Token')) && is_string($token)) {
                 return Token::find($token);
             }
         });
@@ -160,7 +161,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->make(Schedule::class)
             ->call(fn () => app(Radio::class)->ping())
-            ->hourly()
+            ->hourlyAt(crc32(config('app.key') ?: base_path()) % 60)
             ->name('statamic-outpost')
             ->withoutOverlapping();
     }
@@ -172,6 +173,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Sites::class);
+
+        $this->app->singleton(IconManager::class);
 
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,

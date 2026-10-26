@@ -3,6 +3,7 @@
 namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
@@ -14,7 +15,7 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 
-class Site implements Augmentable
+class Site implements Augmentable, QueryableValue
 {
     use HasAugmentedData;
 
@@ -161,6 +162,11 @@ class Site implements Augmentable
     public function rawConfig()
     {
         return $this->rawConfig;
+    }
+
+    public function toQueryableValue()
+    {
+        return $this->handle();
     }
 
     public function __toString()

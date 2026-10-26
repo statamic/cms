@@ -14,7 +14,8 @@
             >
                 <template #no-options><div class="hidden" /></template>
                 <template #option="option">
-                    <div class="flex items-center">
+                    <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: option.value }) }}</span>
+                    <div v-else class="flex items-center">
                         <span class="flex-shrink-0 truncate" v-text="option.label" />
                         <span
                             v-text="option.value"
@@ -40,6 +41,7 @@
 
         <Switch
             v-if="showValueToggle"
+            :label="valueToggleLabel"
             :model-value="condition.value === 'true'"
             @update:model-value="valueUpdated"
         />
@@ -115,6 +117,12 @@ export default {
             );
         },
 
+        valueToggleLabel() {
+            const field = __(this.field?.config.display) || this.condition.field;
+
+            return field ? __('Value for :field', { field }) : __('Value');
+        },
+
         showValueDropdown() {
             return (
                 this.field &&
@@ -156,6 +164,7 @@ export default {
                 not: __('Not'),
                 contains: __('Contains'),
                 contains_any: __('Contains Any'),
+                includes_any: __('Includes Any'),
                 '===': '===',
                 '!==': '!==',
                 '>': '>',

@@ -41,7 +41,7 @@
                                     <DropdownItem v-if="collection.editable" :text="__('Configure')" icon="cog" :href="collection.edit_url" />
                                     <DropdownItem v-if="collection.blueprint_editable" :text="__('Edit Blueprints')" icon="blueprint-edit" :href="collection.blueprints_url" />
                                     <DropdownItem v-if="collection.editable" :text="__('Scaffold Views')" icon="scaffold" :href="collection.scaffold_url" />
-                                    <DropdownSeparator v-if="shouldShowSkeleton || actions.length" />
+                                    <DropdownSeparator v-if="(collection.available_in_selected_site || collection.editable || collection.blueprint_editable) && (shouldShowSkeleton || actions.length)" />
                                     <template v-if="shouldShowSkeleton">
                                         <div v-for="index in 3" :key="index" class="contents">
                                             <ui-skeleton class="m-1 size-5" />
@@ -122,15 +122,15 @@
 
                 <ui-panel-footer v-if="collection.available_in_selected_site" class="flex items-center gap-6 gap-y-1.5 text-sm text-gray-600 dark:text-gray-400">
                     <div class="flex items-center gap-1.5">
-                        <ui-badge :text="String(collection.published_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
+                        <ui-badge :text="String(collection.published_entries_count)" pill class="bg-white! dark:bg-gray-700! [&>span]:st-text-trim-cap [&>span]:pt-0" />
                         <span>{{ __('Published') }}</span>
                     </div>
                     <div class="flex items-center gap-1.5" v-if="collection.scheduled_entries_count > 0">
-                        <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
+                        <ui-badge :text="String(collection.scheduled_entries_count)" pill class="bg-white! dark:bg-gray-700! [&>span]:st-text-trim-cap [&>span]:pt-0" />
                         <span>{{ __('Scheduled') }}</span>
                     </div>
                     <div class="flex items-center gap-1.5" v-if="collection.draft_entries_count > 0">
-                        <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-white! dark:bg-gray-700! [&_span]:st-text-trim-cap" />
+                        <ui-badge :text="String(collection.draft_entries_count)" pill class="bg-white! dark:bg-gray-700! [&>span]:st-text-trim-cap [&>span]:pt-0" />
                         <span>{{ __('Drafts') }}</span>
                     </div>
                 </ui-panel-footer>
@@ -324,7 +324,9 @@ export default {
 
 <style scoped>
     @supports(text-box: cap alphabetic) {
+        /* =Jay. Counts are only ever digits, so they sit best centred on cap height rather than the usual badge trim */
         [data-ui-panel-footer] [data-ui-badge] {
+            min-height: auto;
             padding-block: calc(var(--spacing) * 1.5);
         }
     }

@@ -36,7 +36,7 @@
                 :label="__('Always Save')"
                 :instructions="__('messages.field_conditions_always_save_instructions')"
             >
-                <Switch v-model="alwaysSave" />
+                <Switch v-model="alwaysSave" :label="__('Always Save')" />
             </Field>
 
             <Field
@@ -44,7 +44,7 @@
                 :label="__('Reserve Space When Hidden')"
                 :instructions="__('messages.field_conditions_reserve_space_when_hidden_instructions')"
             >
-                <Switch v-model="reserveSpaceWhenHidden" />
+                <Switch v-model="reserveSpaceWhenHidden" :label="__('Reserve Space When Hidden')" />
             </Field>
         </div>
     </div>

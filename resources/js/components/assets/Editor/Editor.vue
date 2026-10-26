@@ -136,10 +136,6 @@
                         @update:model-value="updateValues"
                     >
                         <div class="h-1/2 w-full overflow-scroll sm:p-4 md:h-full md:w-1/3 md:grow md:pt-px">
-                            <div v-if="saving" class="loading">
-                                <Icon name="loading" />
-                            </div>
-
                             <PublishTabs />
                         </div>
                     </PublishContainer>
@@ -151,6 +147,7 @@
                         <ui-badge pill icon="memory" :text="asset.size" />
                         <ui-badge pill icon="fingerprint">
                             <time
+                                class="st-text-trim-optical-cap"
                                 :datetime="asset.lastModified"
                                 v-tooltip="$date.format(asset.lastModified)"
                                 v-text="asset.lastModifiedRelative" />
@@ -159,7 +156,7 @@
                     <div class="flex items-center space-x-3 rtl:space-x-reverse">
                         <ui-button v-if="showNavigation" icon="chevron-left" @click="navigateToPreviousAsset" v-tooltip="__('Previous Asset')" />
                         <ui-button v-if="showNavigation" icon="chevron-right" @click="navigateToNextAsset" v-tooltip="__('Next Asset')" />
-                        <ui-button variant="primary" icon="save" @click="saveAndClose" v-if="!readOnly" :text="__('Save')" />
+                        <ui-button variant="primary" :icon="saving ? null : 'save'" @click="saveAndClose" v-if="!readOnly" :loading="saving" :text="__('Save')" v-tooltip="saveAndCloseTooltip" />
                     </div>
                 </div>
             </template>
@@ -170,6 +167,7 @@
                 :image="asset.preview"
                 @selected="selectFocalPoint"
                 @closed="closeFocalPointEditor"
+                @save="saveFocalPoint"
             />
 
             <crop-editor
@@ -211,6 +209,7 @@ import {
     Stack,
 } from '@ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import useCheckerboard from '@/composables/checkerboard.js';
 
 export default {
@@ -280,6 +279,10 @@ export default {
             return !this.asset.isEditable;
         },
 
+        saveAndCloseTooltip() {
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
         isImage() {
             if (!this.asset) return false;
 
@@ -321,10 +324,24 @@ export default {
         this.load();
 
         window.addEventListener('keydown', this.keydown);
+
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
+            this.save().catch(() => {});
+        });
+
+        this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+            e.preventDefault();
+            if (this.readOnly || this.loading || this.saving) return;
+            this.saveAndClose();
+        });
     },
 
     beforeUnmount() {
         window.removeEventListener('keydown', this.keydown);
+        this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding.destroy();
     },
 
     events: {
@@ -407,19 +424,27 @@ export default {
         },
 
         navigateToPreviousAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('previous');
             }
 
-            this.$emit('previous');
+            this.save()
+                .then(() => this.$emit('previous'))
+                .catch(() => {});
         },
 
         navigateToNextAsset() {
-            if (this.$dirty.has(this.publishContainer)) {
-                this.save();
+            if (this.saving) return;
+
+            if (!this.$dirty.has(this.publishContainer)) {
+                return this.$emit('next');
             }
 
-            this.$emit('next');
+            this.save()
+                .then(() => this.$emit('next'))
+                .catch(() => {});
         },
 
         openFocalPointEditor() {
@@ -434,6 +459,14 @@ export default {
             point = point === '50-50-1' ? null : point;
             this.values['focus'] = point;
             this.$dirty.add(this.publishContainer);
+        },
+
+        saveFocalPoint({ close = false } = {}) {
+            this.$nextTick(() => {
+                this.save()
+                    .then(() => close && this.$emit('closed'))
+                    .catch(() => {});
+            });
         },
 
         openCropEditor() {
@@ -505,7 +538,9 @@ export default {
         },
 
         saveAndClose() {
-            this.save().then(() => this.$emit('closed'));
+            this.save()
+                .then(() => this.$emit('closed'))
+                .catch(() => {});
         },
 
         clearErrors() {
