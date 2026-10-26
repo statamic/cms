@@ -260,7 +260,7 @@ class EntriesController extends CpController
 
             // have to save in case there are non-revisable fields
             if ($saved) {
-                $this->saveNonRevisableFields($entry, $request->input('_localized'));
+                $this->saveNonRevisableFields($entry);
             }
 
             // catch any changes through RevisionSaving event
@@ -537,27 +537,22 @@ class EntriesController extends CpController
         }
     }
 
-    private function saveNonRevisableFields(EntryContract $entry, ?array $localized = null): void
+    private function saveNonRevisableFields(EntryContract $entry): void
     {
+        $fresh = $entry->fresh();
         $handles = collect($entry->nonRevisableFields());
-
         $values = $entry->data()->only($handles->all());
 
-        // On a localization, a non-revisable field that's no longer localized has been
-        // dropped from the data entirely, so remove it from the saved localization.
-        // Otherwise the stale value would keep shadowing the origin.
-        $removed = $entry->hasOrigin()
-            ? $handles->diff($localized ?? [])->filter(fn ($handle) => $entry->fresh()->has($handle))
-            : collect();
+        // A localization's data only holds the localized handles, so a non-revisable
+        // field missing from it has been synced back to the origin and must be removed.
+        $removed = $handles->diff($values->keys())->filter(fn ($handle) => $fresh->has($handle));
 
         if ($values->isEmpty() && $removed->isEmpty()) {
             return;
         }
 
-        $fresh = $entry->fresh()->merge($values);
-
         $removed->each(fn ($handle) => $fresh->remove($handle));
 
-        $fresh->updateLastModified(User::current())->save();
+        $fresh->merge($values)->updateLastModified(User::current())->save();
     }
 }
