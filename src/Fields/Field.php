@@ -299,7 +299,6 @@ class Field implements Arrayable
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
             'reserve_space_when_hidden' => $this->reserveSpaceWhenHidden(),
-            'revisable' => $this->isRevisable(),
         ]);
 
         unset($array['validate']);

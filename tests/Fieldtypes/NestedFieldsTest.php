@@ -23,7 +23,6 @@ class NestedFieldsTest extends TestCase
             ->andReturn(new class extends Fieldtype
             {
                 protected $component = 'assets';
-
                 protected $configFields = [
                     'max_files' => ['type' => 'integer'],
                     'container' => ['type' => 'plain'],
