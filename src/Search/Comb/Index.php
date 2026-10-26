@@ -3,8 +3,8 @@
 namespace Statamic\Search\Comb;
 
 use Closure;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
-use Statamic\Facades\Stache;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
@@ -136,13 +136,7 @@ class Index extends BaseIndex
 
     private function locked(Closure $callback)
     {
-        $lock = tap(Stache::lock('search-index-'.$this->name))->acquire(true);
-
-        try {
-            return $callback();
-        } finally {
-            $lock->release();
-        }
+        return Cache::lock('search-index-'.$this->name, 60)->block(30, $callback);
     }
 
     public function extraAugmentedResultData(Result $result)
