@@ -757,7 +757,7 @@ class Comb
 
     private function pattern(array $words): string
     {
-        return '#'.implode('|', array_map(fn ($word) => preg_quote($word, '#'), $words)).'#iu';
+        return '#'.implode('|', array_map(fn (string $word) => preg_quote($word, '#'), $words)).'#iu';
     }
 
     /**
