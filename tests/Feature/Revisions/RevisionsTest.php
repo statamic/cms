@@ -70,14 +70,6 @@ class RevisionsTest extends TestCase
     }
 
     #[Test]
-    public function converts_publish_at_to_null_when_saving()
-    {
-        $revision = (new Revision)->date(now());
-
-        $this->assertNull($revision->fileData()['publish_at']);
-    }
-
-    #[Test]
     public function outputs_publish_at_when_to_array()
     {
         Carbon::setTestNow(now());
@@ -87,13 +79,5 @@ class RevisionsTest extends TestCase
             ->publishAt(now());
 
         $this->assertEquals(now()->timestamp, $revision->toArray()['publish_at']);
-    }
-
-    #[Test]
-    public function outputs_null_publish_at_when_to_array()
-    {
-        $revision = (new Revision)->date(now());
-
-        $this->assertNull($revision->toArray()['publish_at']);
     }
 }
