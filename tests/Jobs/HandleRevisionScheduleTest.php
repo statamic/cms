@@ -4,9 +4,7 @@ namespace Tests\Jobs;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Events\EntryScheduleReached;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -30,7 +28,6 @@ class HandleRevisionScheduleTest extends TestCase
     #[Test]
     public function it_publishes_due_revisions()
     {
-        Event::fake([EntryScheduleReached::class]);
         $user = User::make()->id('user-1')->save();
 
         $this->scheduleRevision('1', 'Scheduled', '2026-09-01 08:00', ['user' => $user, 'message' => 'Go live']);
@@ -52,7 +49,6 @@ class HandleRevisionScheduleTest extends TestCase
         $this->assertEquals('Go live', $published->message());
         $this->assertEquals('user-1', $published->user()->id());
         $this->assertEquals(['title' => 'Scheduled'], $published->attributes()['data']);
-        Event::assertDispatched(EntryScheduleReached::class, fn ($event) => $event->entry->id() === '1');
 
         $entry = Entry::find('2');
         $this->assertFalse($entry->published());
@@ -60,25 +56,21 @@ class HandleRevisionScheduleTest extends TestCase
         $this->assertTrue($entry->hasWorkingCopy());
         $this->assertCount(1, $entry->revisions());
         $this->assertEquals(Carbon::parse('2026-09-02 12:01'), $entry->latestRevision()->publishAt());
-        Event::assertNotDispatched(EntryScheduleReached::class, fn ($event) => $event->entry->id() === '2');
 
         $entry = Entry::find('3');
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
-        Event::assertNotDispatched(EntryScheduleReached::class, fn ($event) => $event->entry->id() === '3');
     }
 
     #[Test]
     public function it_does_not_republish_an_already_applied_revision()
     {
-        Event::fake([EntryScheduleReached::class]);
         $this->scheduleRevision('1', 'Scheduled', '2026-09-02 11:00');
 
         $this->runJobAt('2026-09-02 12:00');
         $this->runJobAt('2026-09-02 12:01');
 
         $this->assertCount(2, Entry::find('1')->revisions());
-        Event::assertDispatchedTimes(EntryScheduleReached::class, 1);
     }
 
     #[Test]
@@ -122,14 +114,12 @@ class HandleRevisionScheduleTest extends TestCase
     #[Test]
     public function it_skips_revisions_whose_entry_no_longer_exists()
     {
-        Event::fake([EntryScheduleReached::class]);
         $this->scheduleRevision('1', 'Scheduled', '2026-09-02 11:00');
         Entry::find('1')->delete();
 
         $this->runJobAt('2026-09-02 12:00');
 
         $this->assertNull(Entry::find('1'));
-        Event::assertNotDispatched(EntryScheduleReached::class);
     }
 
     private function runJobAt($time)

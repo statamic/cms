@@ -194,10 +194,6 @@ trait Revisable
             $item->deleteWorkingCopy();
         }
 
-        if ($item instanceof Entry) {
-            $item->blueprint()->setParent($item);
-        }
-
         return $item;
     }
 
