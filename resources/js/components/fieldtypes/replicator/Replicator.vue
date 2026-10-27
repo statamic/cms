@@ -92,6 +92,18 @@
                             @added="addSet"
                         />
                     </section>
+
+                    <!-- Prototype: with header_actions, one expand/collapse toggle goes on the right of the section's header instead of the usual controls, like the rules on a form's Logic page -->
+                    <Teleport v-if="config.header_actions && value.length" defer :to="`#${config.header_actions}`">
+                        <Button
+                            size="xs"
+                            variant="ghost"
+                            :icon="collapsed.length === value.length ? 'expand' : 'collapse'"
+                            :aria-label="collapsed.length === value.length ? __('Expand all prompts') : __('Collapse all prompts')"
+                            v-tooltip="collapsed.length === value.length ? __('Expand all prompts') : __('Collapse all prompts')"
+                            @click="collapsed.length === value.length ? expandAll() : collapseAll()"
+                        />
+                    </Teleport>
                 </div>
             </div>
         </div>
@@ -106,6 +118,7 @@ import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
 import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
+import { Button } from '@/components/ui';
 
 export default {
     mixins: [Fieldtype, ManagesSetMeta],
@@ -114,6 +127,7 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+        Button,
     },
 
     setup() {

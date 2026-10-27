@@ -63,6 +63,8 @@ function toggleSection(section) {
                     <Heading :text="__(section.display)" />
                     <Subheading v-if="section.instructions" :text="renderInstructions(section.instructions)" />
                 </div>
+                <!-- Prototype: a field can put its own controls in its section's header, by teleporting them here (see Replicator's header_actions) -->
+                <div v-if="section.header_actions" :id="section.header_actions" class="shrink-0" />
                 <Button
                     @click="toggleSection(section)"
                     v-if="section.collapsible"

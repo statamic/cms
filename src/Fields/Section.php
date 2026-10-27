@@ -52,6 +52,8 @@ class Section
             'instructions' => $this->instructions(),
             'collapsible' => $this->collapsible() ?: null,
             'collapsed' => $this->collapsed() ?: null,
+            // Prototype: where a field can put controls in the section's header (see Sections.vue)
+            'header_actions' => $this->contents['header_actions'] ?? null,
         ]) + [
             'fields' => $this->fieldsToPublishArray(),
         ];
