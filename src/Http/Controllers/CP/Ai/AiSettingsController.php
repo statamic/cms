@@ -32,8 +32,11 @@ class AiSettingsController extends CpController
 
         $values = array_merge($this->defaults(), Cache::get(self::CACHE_KEY, []));
 
-        // The prompts are a Replicator, whose rows need to say which set they are
-        $values['prompts'] = collect(self::savedPrompts())->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->all();
+        // The prompts are kept in one list, each saying where it's used, but the form splits them into page prompts (a Replicator, whose rows need to say which set they are) and field prompts (a table)
+        $prompts = collect(self::savedPrompts());
+        $values['page_prompts'] = $prompts->where('use_on', '!=', 'fields')->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->values()->all();
+        $values['field_prompts'] = $prompts->where('use_on', 'fields')->map(fn ($prompt) => ['name' => $prompt['name'] ?? null, 'instructions' => $prompt['instructions'] ?? null])->values()->all();
+        unset($values['prompts']);
 
         return PublishForm::make($this->blueprint())
             ->asConfig()
@@ -48,6 +51,13 @@ class AiSettingsController extends CpController
         $this->onlySuperUsers();
 
         $values = PublishForm::make($this->blueprint())->submit($request->all());
+
+        // Back into the one list of prompts, each saying where it's used
+        $values['prompts'] = [
+            ...collect($values['page_prompts'] ?? [])->map(fn ($prompt) => [...$prompt, 'use_on' => 'page'])->all(),
+            ...collect($values['field_prompts'] ?? [])->map(fn ($prompt) => [...$prompt, 'use_on' => 'fields'])->all(),
+        ];
+        unset($values['page_prompts'], $values['field_prompts']);
 
         Cache::forever(self::CACHE_KEY, $values);
 
@@ -178,14 +188,13 @@ class AiSettingsController extends CpController
         ];
     }
 
-    // Each saved prompt collapses to a row: its name in the badge, then the start of its instructions. Opened, it has its name and where it's used, then where and for whom it's offered, then the instructions.
-    private function promptsField(): array
+    // Each page prompt collapses to a row: its name in the badge, then the start of its instructions. Opened, it has its name, then where and for whom it's offered, then the instructions.
+    private function pagePromptsField(): array
     {
-        return ['handle' => 'prompts', 'field' => [
+        return ['handle' => 'page_prompts', 'field' => [
             'type' => 'replicator',
-            'display' => __('Prompts'),
-            // The help for each prompt's fields lives here, so it isn't repeated in every one
-            'instructions' => __('Page prompts run in the AI chat, on whatever page is open, by typing / and their name, like `/legal-check`. Field prompts show in the suggestions menu on fields, and rewrite just that field. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
+            'display' => __('Page Prompts'),
+            'hide_display' => true,
             'full_width_setting' => true,
             'collapse' => true,
             'previews' => true,
@@ -193,26 +202,34 @@ class AiSettingsController extends CpController
             // Prototype: new prompts go on the end, rather than between others from a + that shows on hover
             'insert_between' => false,
             'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
-                // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out
-                // pill_field shows where each is used on its row (a prototype addition to Replicator, like title_field), and switch_labels says what its switch does
-                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name',
-                    'pill_field' => 'use_on',
-                    'pill_options' => [
-                        'page' => ['label' => __('Page'), 'icon' => 'entry'],
-                        'fields' => ['label' => __('Fields'), 'icon' => 'fieldtype-text'],
-                    ],
-                    'switch_labels' => [__('Offered'), __('Switched off')],
-                    'fields' => [
-                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'width' => 50, 'replicator_preview' => false]],
-                    ['handle' => 'use_on', 'field' => ['type' => 'button_group', 'display' => __('Use On'), 'options' => ['page' => __('The page'), 'fields' => __('Fields')], 'default' => 'page', 'replicator_preview' => false, 'width' => 50]],
+                // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out, and switch_labels says what its switch does
+                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'replicator_preview' => false]],
                     // Plain multi-selects rather than the relationship fieldtypes, whose choices stack up below them as draggable rows and leave a gap beside the name. These show them as chips.
                     ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 50]],
                     ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 50]],
                     ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What the AI should do, as you would ask a colleague.')]],
-                    // Runs the prompt as it's written now, unsaved, on an entry or some text, and shows what it would change without changing anything
+                    // Runs the prompt as it's written now, unsaved, on an entry, and shows what it would find or change without changing anything
                     ['handle' => 'try', 'field' => ['type' => 'ai_status', 'show' => 'prompt', 'display' => __('Try It'), 'hide_display' => true, 'replicator_preview' => false]],
                 ]],
             ]]],
+        ]];
+    }
+
+    // Field prompts are short, one-line instructions, so a plain table of names and instructions is enough
+    private function fieldPromptsField(): array
+    {
+        return ['handle' => 'field_prompts', 'field' => [
+            'type' => 'grid',
+            'display' => __('Field Prompts'),
+            'hide_display' => true,
+            'full_width_setting' => true,
+            'add_row' => __('Add Prompt'),
+            'fullscreen' => false,
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'width' => 33]],
+                ['handle' => 'instructions', 'field' => ['type' => 'text', 'display' => __('Instructions'), 'placeholder' => __('Make it shorter, keeping what it says.')]],
+            ],
         ]];
     }
 
@@ -389,11 +406,14 @@ class AiSettingsController extends CpController
                             ],
                         ],
                         [
-                            'display' => __('Saved Prompts'),
-                            'instructions' => __('Jobs your team does often, written once so anyone can run them the same way.'),
-                            'fields' => [
-                                $this->promptsField(),
-                            ],
+                            'display' => __('Page Prompts'),
+                            'instructions' => __('Jobs your team does often on a whole page, run in the AI chat by typing / and their name, like `/legal-check`. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
+                            'fields' => [$this->pagePromptsField()],
+                        ],
+                        [
+                            'display' => __('Field Prompts'),
+                            'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
+                            'fields' => [$this->fieldPromptsField()],
                         ],
                         [
                             'display' => __('Kept Out of AI'),

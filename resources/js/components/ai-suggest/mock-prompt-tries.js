@@ -1,6 +1,6 @@
 import { steer, suggestFor } from './mock-suggestions.js';
 
-// Prototype: what a saved prompt would do, for trying it out on Settings → AI. Nothing here is real, and nothing is saved.
+// Prototype: what a page prompt would do, for trying it out on Settings → AI. Nothing here is real, and nothing is saved.
 // A page prompt either reports back (findings, quoting the sentence each is in) or changes some fields (each shown as a diff).
 
 const sentences = (text) => text.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
@@ -89,15 +89,4 @@ export function tryPagePrompt(instructions, entry) {
     if (/alt text|images?\b/.test(how)) return altText(entry);
 
     return rewrite(instructions, entry);
-}
-
-// A field prompt rewrites one bit of text
-export function tryFieldPrompt(instructions, text, long = text.length > 80) {
-    const to = steer({ long, suggestions: [{ text }] }, instructions).suggestions[0].text;
-
-    return {
-        kind: 'changes',
-        summary: to === text ? __('Would leave it as it is.') : __('Would change it to:'),
-        items: to === text ? [] : [{ from: text, to }],
-    };
 }
