@@ -52,6 +52,21 @@ class LocalizeEntryTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_the_existing_localization_instead_of_creating_another()
+    {
+        $entry = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->id('en-test')->slug('test')->create();
+        $existing = EntryFactory::collection('blog')->id('fr-test')->locale('fr')->origin('en-test')->slug('test')->create();
+
+        $this
+            ->actingAs($this->user())
+            ->localize($entry, ['site' => 'fr'])
+            ->assertOk()
+            ->assertJson(['handle' => 'fr', 'url' => $existing->editUrl()]);
+
+        $this->assertCount(1, \Statamic\Facades\Entry::query()->where('origin', 'en-test')->where('site', 'fr')->get());
+    }
+
+    #[Test]
     public function site_is_required()
     {
         $entry = EntryFactory::collection('blog')->slug('test')->create();
