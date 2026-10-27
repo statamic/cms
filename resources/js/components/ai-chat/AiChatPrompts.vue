@@ -16,6 +16,13 @@ defineEmits(['pick']);
 // Hovering one shows its full instructions in a tooltip off to the side, as the row cuts them short. So does Tab, for the highlighted one, and then it follows the highlight until Tab puts it away.
 // Focus stays in the input, so it's shown from here rather than with v-tooltip.
 const hovered = ref(-1);
+
+// Only a pointer that actually moves counts as hovering. When the list opens (say with /) under a pointer that's sitting still, the row under it shouldn't pop up its tooltip until the pointer moves.
+function onRowMove(index, event) {
+    if (!event.movementX && !event.movementY) return;
+    hovered.value = index;
+}
+
 const { show, dismissFor, reposition, isVisible } = useTooltip();
 const list = useTemplateRef('list');
 let shownFor = null;
@@ -75,7 +82,7 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
                     index === active ? 'bg-gray-50 dark:bg-gray-800/60' : 'hover:bg-gray-50 dark:hover:bg-gray-800',
                 ]"
                 @mousedown.prevent
-                @mouseenter="hovered = index"
+                @mousemove="onRowMove(index, $event)"
                 @mouseleave="hovered = -1"
                 @click="$emit('pick', prompt)"
             >
