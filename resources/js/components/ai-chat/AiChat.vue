@@ -141,7 +141,7 @@ async function onKeydown(event) {
         }
     }
 
-    // While typing a command, up and down move through the menu, Tab fills in the highlighted one, and Escape gives up on it.
+    // While typing a command, up and down move through the menu, Tab shows what the highlighted one does, and Escape gives up on it.
     if (commandMenuOpen.value && event.target.tagName === 'TEXTAREA') {
         const count = commandMatches.value.length;
 
@@ -151,12 +151,10 @@ async function onKeydown(event) {
             return;
         }
 
-        // Tab fills it in and shows what it does. Once it's filled in, Tab shows and hides that.
+        // Tab shows and hides what the highlighted one does, as in the help. There's no need to fill it in, as Enter runs the highlighted one anyway.
         if (event.key === 'Tab' && !event.shiftKey && count) {
             event.preventDefault();
-            const filled = '/' + commandMatches.value[activeCommand.value].command;
-            explainPrompt.value = prompt.value === filled ? !explainPrompt.value : true;
-            prompt.value = filled;
+            explainPrompt.value = !explainPrompt.value;
             return;
         }
 
