@@ -3,6 +3,9 @@ import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 
 import { usePage } from '@inertiajs/vue3';
 import { Button, Icon, Popover } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
+// Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
+// Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
+import diffWords from './diff-words.js';
 import { icon } from './use-ai-suggest.js';
 
 const props = defineProps({
@@ -151,39 +154,6 @@ function hidePreview() {
 }
 
 watch(open, (isOpen) => isOpen || (preview.value = null));
-
-// Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
-// Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
-// A word-level diff, from the longest run of words the two have in common.
-function diffWords(from, to) {
-    const a = from.split(/\s+/).filter(Boolean);
-    const b = to.split(/\s+/).filter(Boolean);
-    const key = (word) => word.toLowerCase().replace(/[^\w'-]/g, '');
-    const common = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
-
-    for (let i = a.length - 1; i >= 0; i--) {
-        for (let j = b.length - 1; j >= 0; j--) {
-            common[i][j] = key(a[i]) === key(b[j]) ? common[i + 1][j + 1] + 1 : Math.max(common[i + 1][j], common[i][j + 1]);
-        }
-    }
-
-    const parts = [];
-    let i = 0;
-    let j = 0;
-
-    while (i < a.length || j < b.length) {
-        if (i < a.length && j < b.length && key(a[i]) === key(b[j])) {
-            parts.push({ text: b[j++], type: 'same' });
-            i++;
-        } else if (j < b.length && (i === a.length || common[i][j + 1] >= common[i + 1][j])) {
-            parts.push({ text: b[j++], type: 'added' });
-        } else {
-            parts.push({ text: a[i++], type: 'removed' });
-        }
-    }
-
-    return parts;
-}
 
 const status = computed(() => {
     if (loading.value) return __('Finding suggestions…');
