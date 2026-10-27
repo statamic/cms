@@ -3,6 +3,7 @@
 namespace Statamic\Search\Comb;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
@@ -16,6 +17,8 @@ use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
+    protected ?Collection $pending = null;
+
     public function search($query)
     {
         return (new Query($this))->query($query);
@@ -111,6 +114,12 @@ class Index extends BaseIndex
 
     public function insertDocuments(Documents $documents)
     {
+        if (! is_null($this->pending)) {
+            $this->pending = $documents->union($this->pending);
+
+            return;
+        }
+
         $this->locked(function () use ($documents) {
             try {
                 $data = $this->data();
@@ -120,6 +129,23 @@ class Index extends BaseIndex
 
             $this->save($documents->union($data));
         });
+    }
+
+    public function update()
+    {
+        $this->pending = collect();
+
+        try {
+            parent::update();
+        } finally {
+            [$pending, $this->pending] = [$this->pending, null];
+        }
+
+        if ($pending->isNotEmpty()) {
+            $this->locked(fn () => $this->save($pending));
+        }
+
+        return $this;
     }
 
     public function deleteIndex()
