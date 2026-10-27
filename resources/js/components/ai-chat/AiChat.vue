@@ -368,17 +368,20 @@ function scrollToBottom() {
                     {{ __(':count more', { count: morePrompts }) }}
                 </button>
             </div>
-            <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Just a hint, not a button. -->
-            <div
+            <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Clicking it opens the help too. It's left out of the Tab order (/ does the same from the keyboard), and mousedown.prevent keeps focus in the input. -->
+            <button
                 v-show="!prompt && !showHelp && !messages.length"
-                aria-hidden="true"
+                type="button"
+                tabindex="-1"
                 :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
-                class="pointer-events-none absolute flex h-6.5 items-center gap-1.5 px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:opacity-100 dark:text-gray-400"
+                class="pointer-events-none absolute flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:pointer-events-auto group-focus-within/chat:opacity-100 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                @mousedown.prevent
+                @click="showHelp = true"
             >
                 <!-- The key sits a little above the middle of the send button, while the word is level with it, so nudge only the key down -->
                 <kbd class="translate-y-[0.5px] rounded-md bg-gray-950/5 px-[0.3125rem] py-[0.0625rem] font-sans text-[0.625rem]/4 font-medium ring-1 ring-gray-950/10 dark:bg-white/5 dark:ring-white/10"><span class="inline-block -translate-y-[0.75px]">/</span></kbd>
                 {{ __('help') }}
-            </div>
+            </button>
             <!-- Once a chat has started, a small link to clear it takes the / hint's place, while nothing has been typed. (Typing /clear does the same.) -->
             <button
                 v-if="messages.length"
