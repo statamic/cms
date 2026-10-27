@@ -2,6 +2,7 @@
 import Fieldtype from '@/components/fieldtypes/fieldtype.js';
 import { Button, Icon, injectPublishContext } from '@ui';
 import { computed, ref, watch } from 'vue';
+import AiPromptTry from './AiPromptTry.vue';
 
 // Prototype: the read-only parts of Settings → AI (see the AiStatus fieldtype). Everything here is made up.
 const emit = defineEmits(Fieldtype.emits);
@@ -82,6 +83,8 @@ const usageText = computed(() =>
             </template>
         </p>
     </div>
+
+    <AiPromptTry v-else-if="config.show === 'prompt'" :field-path-prefix="fieldPathPrefix" :meta="meta" />
 
     <div v-else-if="config.show === 'usage'" class="space-y-2">
         <p class="text-sm text-gray-700 dark:text-gray-300">

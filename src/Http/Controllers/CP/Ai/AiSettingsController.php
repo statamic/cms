@@ -199,6 +199,8 @@ class AiSettingsController extends CpController
                     ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 50]],
                     ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 50]],
                     ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What the AI should do, as you would ask a colleague.')]],
+                    // Runs the prompt as it's written now, unsaved, on an entry or some text, and shows what it would change without changing anything
+                    ['handle' => 'try', 'field' => ['type' => 'ai_status', 'show' => 'prompt', 'display' => __('Try It'), 'hide_display' => true, 'replicator_preview' => false]],
                 ]],
             ]]],
         ]];
