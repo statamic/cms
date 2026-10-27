@@ -90,6 +90,11 @@ const fieldActions = computed(() => {
 // Prototype: a set can name a field whose value labels its badge instead of the set's name, e.g. each saved prompt on Settings → AI shows its own name. Until it's filled in, the set's name shows.
 const badgeText = computed(() => (props.config.title_field && props.values?.[props.config.title_field]) || __(props.config.display) || props.config.handle);
 
+// Prototype: a set can say which of its fields to show as a label on its row, with a label and icon for each value, e.g. whether a saved prompt is used on the page or on fields
+const pill = computed(() => (props.config.pill_field ? props.config.pill_options?.[props.values?.[props.config.pill_field]] : null));
+// Prototype: the switch's tooltips, for sets where "Included in output" doesn't fit
+const switchLabels = computed(() => props.config.switch_labels ?? [__('Included in output'), __('Hidden from output')]);
+
 const previewText = computed(() => {
     return Object.entries(data_get(previews.value, fieldPathPrefix.value) || {})
         .filter(([handle, value]) => {
@@ -229,6 +234,11 @@ function onSetDropdownClosed() {
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
+                    <!-- A quiet label at the end, before the switch -->
+                    <span v-if="pill" class="me-1 flex shrink-0 items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <Icon :name="pill.icon" class="size-3.5" aria-hidden="true" />
+                        {{ pill.label }}
+                    </span>
                     <button
                         ref="reorderFocusEl"
                         type="button"
@@ -239,9 +249,9 @@ function onSetDropdownClosed() {
                     <Switch
                         size="xs"
                         :model-value="enabled"
-                        :label="__('Included in output')"
+                        :label="switchLabels[0]"
                         @update:model-value="toggleEnabledState"
-                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                        v-tooltip="enabled ? switchLabels[0] : switchLabels[1]"
                     />
                     <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
