@@ -190,6 +190,8 @@ class AiSettingsController extends CpController
             'collapse' => true,
             'previews' => true,
             'button_label' => __('Add Prompt'),
+            // Prototype: new prompts go on the end, rather than between others from a + that shows on hover
+            'insert_between' => false,
             'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
                 // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out
                 'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'fields' => [
