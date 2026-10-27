@@ -86,8 +86,8 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
                 @mouseleave="hovered = -1"
                 @click="$emit('pick', prompt)"
             >
-                <!-- The highlighted one (the one Enter runs) gets a purple pill just outside the card, nearly as tall as the row, in the gap between it and the panel's edge. Being outside, it never moves the text. -->
-                <span v-if="index === active" aria-hidden="true" class="absolute inset-y-1 -start-1 w-1 -translate-x-1/2 rounded-full bg-primary rtl:translate-x-1/2" />
+                <!-- The highlighted one (the one Enter runs) gets a purple-to-blue pill (the colours of the chat input's focus edge) just outside the card, nearly as tall as the row, against the panel's edge. Being outside, it never moves the text. -->
+                <span v-if="index === active" aria-hidden="true" class="absolute inset-y-1 -start-2 w-1 rounded-full bg-linear-to-b from-primary to-[#60a5fa]" />
                 <span class="min-w-0 flex-1">
                     <span class="block text-sm/5 text-gray-900 dark:text-gray-200">{{ prompt.name }}</span>
                     <span v-if="prompt.instructions" class="block truncate text-xs/5 text-gray-500 dark:text-gray-400">{{ prompt.instructions }}</span>
