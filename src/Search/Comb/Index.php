@@ -2,7 +2,9 @@
 
 namespace Statamic\Search\Comb;
 
+use Closure;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
@@ -91,21 +93,23 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        try {
-            $data = $this->data();
-        } catch (IndexNotFoundException $e) {
-            return;
-        }
+        $this->locked(function () use ($document) {
+            try {
+                $data = $this->data();
+            } catch (IndexNotFoundException $e) {
+                return;
+            }
 
-        $ref = $document->getSearchReference();
+            $ref = $document->getSearchReference();
 
-        if (! $data->has($ref)) {
-            return;
-        }
+            if (! $data->has($ref)) {
+                return;
+            }
 
-        $data->forget($ref);
+            $data->forget($ref);
 
-        $this->save($data);
+            $this->save($data);
+        });
     }
 
     public function insertDocuments(Documents $documents)
@@ -116,13 +120,15 @@ class Index extends BaseIndex
             return;
         }
 
-        try {
-            $data = $this->data();
-        } catch (IndexNotFoundException $e) {
-            $data = collect();
-        }
+        $this->locked(function () use ($documents) {
+            try {
+                $data = $this->data();
+            } catch (IndexNotFoundException $e) {
+                $data = collect();
+            }
 
-        $this->save($documents->union($data));
+            $this->save($documents->union($data));
+        });
     }
 
     public function update()
@@ -136,7 +142,7 @@ class Index extends BaseIndex
         }
 
         if ($pending->isNotEmpty()) {
-            $this->save($pending);
+            $this->locked(fn () => $this->save($pending));
         }
 
         return $this;
@@ -152,6 +158,11 @@ class Index extends BaseIndex
         app('files')->ensureDirectoryExists(pathinfo($this->path())['dirname']);
 
         app('files')->put($this->path(), $documents->toJson(), lock: true);
+    }
+
+    private function locked(Closure $callback)
+    {
+        return Cache::lock('search-index-'.$this->name, 60)->block(30, $callback);
     }
 
     public function extraAugmentedResultData(Result $result)

@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Encryption\Encrypter;
@@ -73,6 +75,18 @@ class OutpostTest extends TestCase
         ], $response);
         $this->assertExpiresBetween(now()->addMinutes(50), now()->addMinutes(59), $response);
         $this->assertCachedUntilExpiry($response);
+    }
+
+    #[Test]
+    public function it_sends_the_statamic_user_agent()
+    {
+        $history = [];
+        $handler = HandlerStack::create(new MockHandler([new Response(200, [], '{}')]));
+        $handler->push(Middleware::history($history));
+
+        $this->outpost(new Client(['handler' => $handler]))->response();
+
+        $this->assertEquals('Statamic/3.0.0-testing', $history[0]['request']->getHeaderLine('User-Agent'));
     }
 
     #[Test]

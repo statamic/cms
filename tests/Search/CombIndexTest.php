@@ -3,9 +3,11 @@
 namespace Tests\Search;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\Filesystem as Files;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
@@ -177,6 +179,59 @@ class CombIndexTest extends TestCase
         $this->instance('files', $files);
 
         return $files;
+    }
+
+    #[Test]
+    public function inserting_holds_the_index_lock_across_the_read_and_the_write()
+    {
+        $path = $this->createIndexFile(['entry::a' => ['title' => 'Foo']]);
+        $this->expectIndexLock(
+            acquired: fn () => $this->assertSame(['entry::a' => ['title' => 'Foo']], json_decode(file_get_contents($path), true)),
+            released: fn () => $this->assertSame(['entry::b' => ['title' => 'Bar'], 'entry::a' => ['title' => 'Foo']], json_decode(file_get_contents($path), true)),
+        );
+
+        $index = $this->getIndex('test', ['path' => $this->tmpDir], null);
+
+        $index->insertDocuments(new Documents(['entry::b' => ['title' => 'Bar']]));
+    }
+
+    #[Test]
+    public function deleting_holds_the_index_lock_across_the_read_and_the_write()
+    {
+        $path = $this->createIndexFile(['entry::a' => ['title' => 'Foo'], 'entry::b' => ['title' => 'Bar']]);
+        $this->expectIndexLock(
+            acquired: fn () => $this->assertCount(2, json_decode(file_get_contents($path), true)),
+            released: fn () => $this->assertSame(['entry::b' => ['title' => 'Bar']], json_decode(file_get_contents($path), true)),
+        );
+
+        $index = $this->getIndex('test', ['path' => $this->tmpDir], null);
+
+        $document = Mockery::mock(Searchable::class);
+        $document->shouldReceive('getSearchReference')->andReturn('entry::a');
+
+        $index->delete($document);
+    }
+
+    private function expectIndexLock(?\Closure $acquired = null, ?\Closure $released = null)
+    {
+        $lock = Mockery::mock(Lock::class);
+        $lock->shouldReceive('block')->withArgs(fn ($seconds, $callback) => $callback instanceof \Closure)->once()->andReturnUsing(function ($seconds, $callback) use ($acquired, $released) {
+            if ($acquired) {
+                $acquired();
+            }
+
+            $result = $callback();
+
+            if ($released) {
+                $released();
+            }
+
+            return $result;
+        });
+
+        Cache::shouldReceive('lock')->with('search-index-test', 60)->once()->andReturn($lock);
+
+        return $lock;
     }
 
     private function createIndexFile(array $data): string
