@@ -19,7 +19,9 @@ function showsOnHover(options) {
 }
 
 function showsOnFocus(options) {
-    return !!options;
+    if (!options || typeof options === 'string') return !!options;
+
+    return !options.hoverOnly;
 }
 
 function handleShow(el, binding) {

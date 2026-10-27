@@ -342,7 +342,7 @@ function scrollToBottom() {
                 elastic
                 :class="[inputClasses, floating ? 'ps-8.5!' : 'ps-9.5!']"
             />
-            <!-- The saved prompts as pills above the input, while you're in the chat and until it starts. They sit over the page just above the floating card, lined up with its right edge. Picking one runs it. mousedown.prevent keeps focus in the input, so they stay put. They come after the input in the page, so Tab goes from the input to them, before the controls on the card's edge. -->
+            <!-- The saved prompts as pills above the input, while you're in the chat and until it starts. They sit over the page just above the floating card, lined up with its right edge. Picking one runs it. mousedown.prevent keeps focus in the input, so they stay put. They come after the input in the page, so Tab goes from the input to them, before the controls on the card's edge. Their /command tooltip only shows on hover, not when tabbing through them. -->
             <div
                 v-if="floating && savedPrompts.length && !messages.length && !prompt && !showHelp"
                 class="pointer-events-none absolute -end-px bottom-full mb-3 flex max-w-full justify-end gap-1.5 opacity-0 transition-opacity group-focus-within/chat:pointer-events-auto group-focus-within/chat:opacity-100"
@@ -352,7 +352,7 @@ function scrollToBottom() {
                     :key="saved.command"
                     type="button"
                     class="max-w-36 cursor-pointer truncate rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800"
-                    v-tooltip="'/' + saved.command"
+                    v-tooltip="{ content: '/' + saved.command, hoverOnly: true }"
                     @mousedown.prevent
                     @click="runPrompt(saved)"
                 >
