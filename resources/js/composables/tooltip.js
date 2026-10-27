@@ -6,6 +6,8 @@ const html = ref(false);
 const copyable = ref(false);
 const contentClass = ref(null);
 const placement = ref('top');
+// How far from its target the tooltip sits
+const distance = ref(10);
 // Bumped to make the tooltip measure where its target is again, when the target has moved
 const moved = ref(0);
 // Whether the tooltip set its own delay, which then replaces floating-vue's, so it's the whole wait
@@ -164,6 +166,7 @@ function setContent(el, options) {
         copyable.value = false;
         contentClass.value = null;
         placement.value = 'top';
+        distance.value = 10;
         ownDelay.value = false;
     } else if (options && typeof options === 'object') {
         content.value = options.content || '';
@@ -171,6 +174,7 @@ function setContent(el, options) {
         copyable.value = options.copyable || false;
         contentClass.value = options.class || null;
         placement.value = options.placement || 'top';
+        distance.value = options.distance ?? 10;
         ownDelay.value = options.delay !== undefined;
     } else {
         content.value = '';
@@ -178,6 +182,7 @@ function setContent(el, options) {
         copyable.value = false;
         contentClass.value = null;
         placement.value = 'top';
+        distance.value = 10;
         ownDelay.value = false;
     }
 
@@ -294,6 +299,7 @@ export function useTooltip() {
         copyable: readonly(copyable),
         contentClass: readonly(contentClass),
         placement: readonly(placement),
+        distance: readonly(distance),
         moved: readonly(moved),
         ownDelay: readonly(ownDelay),
         targetEl: readonly(targetEl),

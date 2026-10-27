@@ -36,7 +36,8 @@ watch(
         // Found in the page rather than from a template ref, as ref arrays can be out of order once the list has changed
         const row = prompt?.instructions ? list.value?.querySelectorAll('[role=option]')[index] : null;
         // Tab asks for it, so it shows straight away. Hovering waits a moment, so it doesn't flash up as the pointer passes. (A delay of our own also turns off floating-vue's.)
-        const options = { content: prompt?.instructions, placement: 'left', class: 'max-w-64 text-xs', delay: hovered.value >= 0 ? 300 : 0 };
+        // It sits 10px clear of the panel's edge, as usual, rather than of the row, so it doesn't run into the highlight's pill and the panel's border (9px out from the row)
+        const options = { content: prompt?.instructions, placement: 'left', distance: 19, class: 'max-w-64 text-xs', delay: hovered.value >= 0 ? 300 : 0 };
 
         if (!row) {
             if (shownFor) dismissFor(shownFor);

@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
 import useCopy from '@/composables/copy';
 
-const { isVisible, content, html, copyable, contentClass, placement, moved, ownDelay, targetEl, registerContentEl } = useTooltip();
+const { isVisible, content, html, copyable, contentClass, placement, distance, moved, ownDelay, targetEl, registerContentEl } = useTooltip();
 const { copySupported, copy } = useCopy();
 
 const showTooltip = ref(false);
@@ -17,6 +17,7 @@ const displayHtml = ref(false);
 const displayCopyable = ref(false);
 const displayClass = ref(null);
 const displayPlacement = ref('top');
+const displayDistance = ref(10);
 const displayOwnDelay = ref(false);
 const isInteractive = computed(() => displayHtml.value || displayCopyable.value);
 
@@ -81,6 +82,7 @@ watch([isVisible, targetEl, content, moved], async ([visible, target]) => {
         displayCopyable.value = copyable.value;
         displayClass.value = contentClass.value;
         displayPlacement.value = placement.value;
+        displayDistance.value = distance.value;
         displayOwnDelay.value = ownDelay.value;
         displayContent.value = displayHtml.value ? sanitizeHtml(content.value) : content.value;
         updatePosition();
@@ -102,7 +104,7 @@ watch([isVisible, targetEl, content, moved], async ([visible, target]) => {
                 :shown="showTooltip"
                 :triggers="[]"
                 :placement="displayPlacement"
-                :distance="10"
+                :distance="displayDistance"
                 :delay="displayOwnDelay ? 0 : undefined"
             >
                 <span :style="spanStyle" />
