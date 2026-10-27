@@ -2,8 +2,6 @@
 import { computed } from 'vue';
 
 const props = defineProps({
-    /** Shown below the examples in the same box, so it needs no padding above. */
-    afterExamples: { type: Boolean, default: false },
     /** Whether there are examples on screen to pick from, here or elsewhere. */
     hasExamples: { type: Boolean, default: false },
 });
@@ -16,13 +14,15 @@ const shortcuts = [
     { keys: ['Enter'], text: 'Send' },
     { keys: ['Shift', 'Enter'], text: 'New line' },
     { keys: ['↑'], text: 'Pick an example', or: ['↓'], needsExamples: true },
+    { keys: ['↑'], text: 'Pick a saved prompt', or: ['↓'], needsExamples: false },
+    { keys: ['Tab'], text: 'Show what it does', needsExamples: false },
     { keys: ['Esc'], text: 'Back to the page' },
     { keys: ['/name'], text: 'Run a saved prompt' },
     { keys: ['/clear'], text: 'Start a new chat' },
 ];
 
-// Choosing an example only makes sense while they're showing
-const visible = computed(() => shortcuts.filter((shortcut) => !shortcut.needsExamples || props.hasExamples));
+// While the examples are showing, up and down choose one. Otherwise they go through the saved prompts.
+const visible = computed(() => shortcuts.filter((shortcut) => shortcut.needsExamples === undefined || shortcut.needsExamples === props.hasExamples));
 
 // The arrows and the words sit about 1px above the middle of their key, so push them down. The symbols (⌘ and /) are left alone here, but the slash is drawn about 0.9px low in its key, so it's lifted separately.
 const nudge = (key) => (['⌘', '/'].includes(key) ? '' : 'pt-0.5');
@@ -32,7 +32,7 @@ const keyClasses = 'inline-flex h-5 min-w-5 items-center justify-center rounded-
 
 <template>
     <!-- Laid out like the examples above it: a heading, then white cards with a ring -->
-    <div :class="['space-y-2 px-2 pb-2', afterExamples ? 'pt-3.5' : 'pt-2']">
+    <div class="space-y-2 p-2">
         <p class="px-1 text-sm tracking-tight text-gray-600 dark:text-gray-400">{{ __('Keyboard shortcuts') }}</p>
 
         <dl class="divide-y divide-gray-200 rounded-xl bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">

@@ -19,17 +19,22 @@ const inputClasses = computed(() =>
 );
 const prompt = ref('');
 
-// Floating, the help (the examples, then the saved prompts) is hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, the examples show above the input.
+// Floating, the help (the saved prompts) is hidden until you press / in the empty box (a hint shows while it's focused and empty). Docked, the examples show above the input.
 const showHelp = ref(false);
-// The help shows either the examples and saved prompts (opened with /), or the keyboard shortcuts on their own (opened with ?)
+// The help shows either the saved prompts (opened with /), or the keyboard shortcuts on their own (opened with ?)
 const helpView = ref('main');
 watch(showHelp, (open) => open || (helpView.value = 'main'));
+// The saved prompt highlighted in the help with up and down. Focus stays in the input, and Enter runs it.
+const activeHelpPrompt = ref(-1);
+watch([showHelp, helpView], () => (activeHelpPrompt.value = -1));
+// Tab shows the highlighted saved prompt's full instructions in a tooltip, and Tab again puts them away
+const explainPrompt = ref(false);
 
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
 const examples = useTemplateRef('examples');
-// Floating, the examples are only there once opened. Docked, they're there until the first message.
-const examplesVisible = computed(() => !messages.value.length && (floating.value ? showHelp.value && helpView.value === 'main' : true));
+// The examples only show docked, until the first message
+const examplesVisible = computed(() => !floating.value && !messages.value.length);
 
 // Move focus into the chat when it opens, so keyboard and screen reader users land on the input.
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
@@ -78,6 +83,7 @@ const commandMatches = computed(() =>
 );
 const activeCommand = ref(0);
 watch(commandQuery, () => (activeCommand.value = 0));
+watch([showHelp, helpView, commandMenuOpen], () => (explainPrompt.value = false));
 
 // When focus moves to something outside the chat, put the help away. (The key hint hides itself, as it only shows while focus is inside the card.)
 function onFocusOut(event) {
@@ -89,10 +95,11 @@ function onEnter(event) {
     if (event.target.tagName !== 'TEXTAREA') return;
 
     event.preventDefault();
+    if (showHelp.value && helpView.value === 'main' && activeHelpPrompt.value >= 0) return runPrompt(savedPrompts.value[activeHelpPrompt.value]);
     send();
 }
 
-function onKeydown(event) {
+async function onKeydown(event) {
     // Shift+Enter adds a new line natively. Alt+Enter doesn't in a textarea, so do it by hand, and tell the input (and autosize) it changed.
     if (event.key === 'Enter' && event.altKey && !event.shiftKey && !event.metaKey && !event.ctrlKey && event.target.tagName === 'TEXTAREA') {
         event.preventDefault();
@@ -101,9 +108,26 @@ function onKeydown(event) {
         return;
     }
 
-    // Any key typed in the input puts the help away. Modifiers on their own don't count, Escape and Tab have their own jobs, and up and down are for choosing an example, when the examples are in the help (floating, before the first message).
-    const choosingExample = (event.key === 'ArrowDown' || event.key === 'ArrowUp') && floating.value && examplesVisible.value;
-    if (showHelp.value && event.target.tagName === 'TEXTAREA' && !['Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Tab'].includes(event.key) && !choosingExample) {
+    // Up and down highlight the saved prompts in the help, from the bottom (Up) or the top (Down), opening it first if it's closed. Docked, before the first message, they're for the examples instead.
+    const promptsInHelp = savedPrompts.value.length && (!showHelp.value || helpView.value === 'main');
+    if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && !prompt.value && promptsInHelp && !examplesVisible.value) {
+        event.preventDefault();
+        const count = savedPrompts.value.length;
+        const from = showHelp.value ? activeHelpPrompt.value : -1;
+        showHelp.value = true;
+        await nextTick();
+        activeHelpPrompt.value = from < 0 ? (event.key === 'ArrowDown' ? 0 : count - 1) : (from + (event.key === 'ArrowDown' ? 1 : -1) + count) % count;
+        return;
+    }
+
+    if (event.key === 'Tab' && !event.shiftKey && showHelp.value && helpView.value === 'main' && activeHelpPrompt.value >= 0) {
+        event.preventDefault();
+        explainPrompt.value = !explainPrompt.value;
+        return;
+    }
+
+    // Any key typed in the input puts the help away. Modifiers on their own don't count, and Escape and Tab have their own jobs.
+    if (showHelp.value && event.target.tagName === 'TEXTAREA' && !['Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Tab'].includes(event.key)) {
         showHelp.value = false;
 
         // / opens the help, so pressing it again closes it rather than typing a slash
@@ -127,9 +151,12 @@ function onKeydown(event) {
             return;
         }
 
+        // Tab fills it in and shows what it does. Once it's filled in, Tab shows and hides that.
         if (event.key === 'Tab' && !event.shiftKey && count) {
             event.preventDefault();
-            prompt.value = '/' + commandMatches.value[activeCommand.value].command;
+            const filled = '/' + commandMatches.value[activeCommand.value].command;
+            explainPrompt.value = prompt.value === filled ? !explainPrompt.value : true;
+            prompt.value = filled;
             return;
         }
 
@@ -291,7 +318,7 @@ function scrollToBottom() {
             @keydown.enter.exact="onEnter"
             @keydown="onKeydown"
         >
-            <!-- Help (the examples, until there's a conversation, and the saved prompts), opened by pressing / in the empty box, or the keyboard shortcuts, opened with ? -->
+            <!-- Help (the saved prompts), opened by pressing / in the empty box, or the keyboard shortcuts, opened with ? -->
             <!-- The same fade up as the chat itself, in and out, a touch quicker -->
             <Transition
                 enter-active-class="transition duration-150 ease-out motion-reduce:transition-none"
@@ -306,15 +333,13 @@ function scrollToBottom() {
                 >
                     <!-- While typing a command, only the commands that match -->
                     <template v-if="commandMenuOpen">
-                        <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" @pick="runCommand" />
+                        <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" :explain="explainPrompt" @pick="runCommand" />
                         <p v-else class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
                     </template>
                     <!-- The keyboard shortcuts on their own. Esc or ? puts them away. -->
-                    <AiChatShortcuts v-else-if="helpView === 'shortcuts'" :has-examples="false" />
+                    <AiChatShortcuts v-else-if="helpView === 'shortcuts'" :has-examples="examplesVisible" />
                     <template v-else>
-                        <!-- Docked, the examples are already above the input until the first message -->
-                        <AiChatExamples v-if="floating && !messages.length" ref="examples" :examples="suggestions" padded @pick="send" @exit="focusInput" />
-                        <AiChatPrompts v-if="savedPrompts.length" :prompts="savedPrompts" :after-list="floating && !messages.length" @pick="runPrompt" />
+                        <AiChatPrompts v-if="savedPrompts.length" :prompts="savedPrompts" :active="activeHelpPrompt" :explain="explainPrompt" @pick="runPrompt" />
                         <!-- A hint along the foot, which also works as a button. mousedown.prevent keeps focus in the input. -->
                         <button
                             type="button"
