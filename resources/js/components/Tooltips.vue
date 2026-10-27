@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 import { useTooltip } from '@/composables/tooltip.js';
 import useCopy from '@/composables/copy';
 
-const { isVisible, content, html, copyable, targetEl, registerContentEl } = useTooltip();
+const { isVisible, content, html, copyable, contentClass, placement, moved, ownDelay, targetEl, registerContentEl } = useTooltip();
 const { copySupported, copy } = useCopy();
 
 const showTooltip = ref(false);
@@ -15,6 +15,9 @@ const tooltipKey = ref(0);
 const displayContent = ref('');
 const displayHtml = ref(false);
 const displayCopyable = ref(false);
+const displayClass = ref(null);
+const displayPlacement = ref('top');
+const displayOwnDelay = ref(false);
 const isInteractive = computed(() => displayHtml.value || displayCopyable.value);
 
 function isExternalHref(href) {
@@ -71,11 +74,14 @@ function updatePosition() {
     };
 }
 
-watch([isVisible, targetEl, content], async ([visible, target]) => {
+watch([isVisible, targetEl, content, moved], async ([visible, target]) => {
     if (visible && target) {
         // Update content and position (handles both initial show and target changes)
         displayHtml.value = html.value;
         displayCopyable.value = copyable.value;
+        displayClass.value = contentClass.value;
+        displayPlacement.value = placement.value;
+        displayOwnDelay.value = ownDelay.value;
         displayContent.value = displayHtml.value ? sanitizeHtml(content.value) : content.value;
         updatePosition();
         tooltipKey.value++;
@@ -95,14 +101,15 @@ watch([isVisible, targetEl, content], async ([visible, target]) => {
                 :key="tooltipKey"
                 :shown="showTooltip"
                 :triggers="[]"
-                placement="top"
+                :placement="displayPlacement"
                 :distance="10"
+                :delay="displayOwnDelay ? 0 : undefined"
             >
                 <span :style="spanStyle" />
                 <template #popper>
                     <div
                         :ref="registerContentEl"
-                        :class="{ 'tooltip-popper-interactive': isInteractive }"
+                        :class="[displayClass, { 'tooltip-popper-interactive': isInteractive }]"
                     >
                         <div v-if="displayHtml" v-html="displayContent" />
                         <span

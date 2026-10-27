@@ -4,6 +4,12 @@ const isVisible = ref(false);
 const content = ref('');
 const html = ref(false);
 const copyable = ref(false);
+const contentClass = ref(null);
+const placement = ref('top');
+// Bumped to make the tooltip measure where its target is again, when the target has moved
+const moved = ref(0);
+// Whether the tooltip set its own delay, which then replaces floating-vue's, so it's the whole wait
+const ownDelay = ref(false);
 const targetEl = shallowRef(null);
 const contentEl = shallowRef(null);
 
@@ -156,14 +162,23 @@ function setContent(el, options) {
         content.value = options;
         html.value = false;
         copyable.value = false;
+        contentClass.value = null;
+        placement.value = 'top';
+        ownDelay.value = false;
     } else if (options && typeof options === 'object') {
         content.value = options.content || '';
         html.value = options.html || false;
         copyable.value = options.copyable || false;
+        contentClass.value = options.class || null;
+        placement.value = options.placement || 'top';
+        ownDelay.value = options.delay !== undefined;
     } else {
         content.value = '';
         html.value = false;
         copyable.value = false;
+        contentClass.value = null;
+        placement.value = 'top';
+        ownDelay.value = false;
     }
 
     isInteractive() ? startTracking() : stopTracking();
@@ -218,7 +233,7 @@ function show(el, options) {
         if (content.value) {
             isVisible.value = true;
         }
-    }, 200);
+    }, options?.delay ?? 200);
 }
 
 function hide() {
@@ -267,16 +282,25 @@ function registerContentEl(el) {
     }
 }
 
+function reposition() {
+    if (isVisible.value) moved.value++;
+}
+
 export function useTooltip() {
     return {
         isVisible: readonly(isVisible),
         content: readonly(content),
         html: readonly(html),
         copyable: readonly(copyable),
+        contentClass: readonly(contentClass),
+        placement: readonly(placement),
+        moved: readonly(moved),
+        ownDelay: readonly(ownDelay),
         targetEl: readonly(targetEl),
         show,
         hide,
         dismissFor,
+        reposition,
         registerContentEl,
     };
 }
