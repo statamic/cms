@@ -3,6 +3,11 @@
 namespace Tests\Console\Commands;
 
 use Facades\Tests\Factories\EntryFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -276,18 +281,62 @@ class StaticWarmTest extends TestCase
     {
         config(['statamic.static_caching.strategy' => 'half']);
 
-        $mock = Mockery::mock(\GuzzleHttp\Client::class);
-        $mock->shouldReceive('send')->andReturnUsing(function ($request) {
-            $this->assertEquals('Bearer testtoken', $request->getHeaderLine('Authorization'));
-            $this->assertEquals('Bar', $request->getHeaderLine('X-Foo'));
-
-            return Mockery::mock(\GuzzleHttp\Psr7\Response::class);
-        });
-        $this->app->instance(\GuzzleHttp\Client::class, $mock);
+        $history = [];
+        $this->mockClient([new Response(200), new Response(200)], $history);
 
         $this->artisan('statamic:static:warm', [
             '--header' => ['Authorization: Bearer testtoken', 'X-Foo: Bar'],
         ])->assertExitCode(0);
+
+        $this->assertCount(2, $history);
+
+        foreach ($history as $transaction) {
+            $this->assertEquals('Bearer testtoken', $transaction['request']->getHeaderLine('Authorization'));
+            $this->assertEquals('Bar', $transaction['request']->getHeaderLine('X-Foo'));
+        }
+    }
+
+    #[Test]
+    public function it_sets_custom_headers_on_paginated_requests()
+    {
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm', [
+            '--header' => ['X-Foo: Bar'],
+        ])->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery());
+
+        $this->assertContains('page=2', $queries);
+        $this->assertContains('page=3', $queries);
+
+        foreach ($history as $transaction) {
+            $this->assertEquals('Bar', $transaction['request']->getHeaderLine('X-Foo'));
+        }
+    }
+
+    private function mockClient(array $responses, array &$history)
+    {
+        $handlerStack = HandlerStack::create(new MockHandler($responses));
+        $handlerStack->push(Middleware::history($history));
+
+        $this->app->bind(Client::class, fn ($app, $parameters) => new Client([
+            ...$parameters['config'],
+            'handler' => $handlerStack,
+        ]));
     }
 
     private function createPage($slug, $attributes = [])
