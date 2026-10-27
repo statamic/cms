@@ -298,7 +298,7 @@ function follow(text) {
                         class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
                     />
                 </form>
-                <!-- Hovering one shows its instructions -->
+                <!-- Hovering one shows its instructions, wrapped narrow so it reads as a bubble rather than one long line -->
                 <div v-if="fieldPrompts.length" class="flex flex-wrap gap-1.5">
                     <button
                         v-for="saved in fieldPrompts"
@@ -306,7 +306,7 @@ function follow(text) {
                         type="button"
                         class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
                         :aria-disabled="loading"
-                        v-tooltip="saved.instructions"
+                        v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs' }"
                         @click="focusClicked($event); !loading && follow(saved.name)"
                     >
                         {{ saved.name }}
