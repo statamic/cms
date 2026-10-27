@@ -124,7 +124,6 @@ class AssetsController extends CpController
             try {
                 $validator->validate();
             } catch (ValidationException $e) {
-                // The sanitized path can differ from the uploaded filename, so tell the uploader which asset exists.
                 return response()->json([
                     'message' => __('The given data was invalid.'),
                     'errors' => $e->errors(),
