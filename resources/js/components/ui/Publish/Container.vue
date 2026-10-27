@@ -186,10 +186,12 @@ watch(
     { deep: true },
 );
 
+// Cheaper than deep-watching meta, which traverses the whole meta tree on each change.
+const metaVersion = ref(0);
+
 watch(
-    meta,
-    (meta) => emit('update:meta', meta),
-    { deep: true },
+    [meta, metaVersion],
+    () => emit('update:meta', meta.value),
 );
 
 const avoidTrackingDirtyState = ref(false);
@@ -229,6 +231,7 @@ function setMeta(newMeta) {
 
 function setFieldMeta(path, value) {
     data_set(meta.value, path, value);
+    metaVersion.value++;
 }
 
 function syncField(path) {
@@ -240,6 +243,8 @@ function syncField(path) {
 }
 
 function desyncField(path) {
+    if (!trackingDirtyState.value) return;
+
     addLocalizedField(path);
     dirty();
 }
@@ -370,6 +375,7 @@ onUnmounted(() => {
 defineExpose({
     name: props.name,
     values,
+    meta,
     saving,
     saved,
     revealerFields,

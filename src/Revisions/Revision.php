@@ -30,6 +30,7 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
     protected $message;
     protected $action = 'revision';
     protected $attributes = [];
+    protected $withEvents = true;
 
     public function id()
     {
@@ -147,11 +148,23 @@ class Revision implements Arrayable, ContainsQueryableValues, Contract
         return true;
     }
 
+    public function deleteQuietly()
+    {
+        $this->withEvents = false;
+
+        return $this->delete();
+    }
+
     public function delete()
     {
+        $withEvents = $this->withEvents;
+        $this->withEvents = true;
+
         Revisions::delete($this);
 
-        RevisionDeleted::dispatch($this);
+        if ($withEvents) {
+            RevisionDeleted::dispatch($this);
+        }
     }
 
     public function isWorkingCopy(): bool

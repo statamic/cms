@@ -13,7 +13,11 @@ const entryClasses = computed(() => ({
     'border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900': props.entry.status === 'scheduled'
 }));
 
-const time = computed(() => DateFormatter.format(props.entry.date?.date || props.entry.date, 'time'))
+const time = computed(() => {
+    if (props.entry.date?.format_has_time === false) return null;
+
+    return DateFormatter.format(props.entry.date?.date || props.entry.date, 'time');
+});
 </script>
 
 <template>
@@ -25,6 +29,7 @@ const time = computed(() => DateFormatter.format(props.entry.date?.date || props
     >
         <span class="line-clamp-2" v-text="entry.title" />
         <span
+            v-if="time"
             class="hidden @4xl:block text-2xs text-gray-400 dark:text-gray-400 group-hover/entry:dark:text-gray-300"
             v-text="time"
         />

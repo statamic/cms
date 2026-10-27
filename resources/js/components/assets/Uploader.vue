@@ -94,13 +94,21 @@ export default {
             }
         },
 
+        isFileDrag(e) {
+            return Array.from(e.dataTransfer?.types ?? []).includes('Files');
+        },
+
         dragenter(e) {
+            if (!this.isFileDrag(e)) return;
+
             e.stopPropagation();
             e.preventDefault();
             this.dragging = true;
         },
 
         dragover(e) {
+            if (!this.isFileDrag(e)) return;
+
             e.stopPropagation();
             e.preventDefault();
         },
@@ -113,6 +121,8 @@ export default {
         },
 
         drop(e) {
+            if (!this.isFileDrag(e)) return;
+
             e.stopPropagation();
             e.preventDefault();
             this.dragging = false;
@@ -297,6 +307,7 @@ export default {
 
             upload.errorMessage = msg;
             upload.errorStatus = status;
+            upload.existingId = response?.existing;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },

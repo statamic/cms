@@ -1,0 +1,121 @@
+import { mount } from '@vue/test-utils';
+import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+import VideoFieldtype from '@/components/fieldtypes/VideoFieldtype.vue';
+import { publishContextKey } from '@/components/ui';
+
+window.__ = (key) => key;
+
+let intersect;
+
+beforeEach(() => {
+    vi.useFakeTimers();
+
+    window.IntersectionObserver = class {
+        constructor(callback) {
+            intersect = () => callback([{ isIntersecting: true, intersectionRatio: 1 }]);
+        }
+        observe() {}
+        disconnect() {}
+    };
+});
+
+afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+});
+
+const stub = (tag) => ({
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `<${tag} :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />`,
+});
+
+const mountVideoField = (props = {}) => {
+    return mount(VideoFieldtype, {
+        props: {
+            handle: 'video',
+            config: {},
+            meta: {},
+            ...props,
+        },
+        global: {
+            provide: { [publishContextKey]: {} },
+            stubs: {
+                'ui-input': stub('input'),
+                'ui-input-group': { template: '<div><slot /></div>' },
+                'ui-input-group-prepend': { template: '<span />' },
+                'ui-description': { template: '<p><slot /></p>' },
+            },
+        },
+    });
+};
+
+const cloudflare = 'https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/b209b1484821fff0ed2e5535fbb4ff7b';
+
+const preview = async (value) => {
+    const wrapper = mountVideoField({ value });
+    intersect();
+    await wrapper.vm.$nextTick();
+
+    return wrapper.find('iframe');
+};
+
+test('it does not preview a cloudflare manifest url', async () => {
+    expect((await preview(`${cloudflare}/manifest/video.m3u8`)).exists()).toBe(false);
+});
+
+test.each(['manifest/video.m3u8', 'manifest/video.mpd'])('it hints to use the video link for a cloudflare %s url', (path) => {
+    const wrapper = mountVideoField({ value: `${cloudflare}/${path}` });
+
+    expect(wrapper.find('p').text()).toBe('statamic::messages.video_fieldtype_cloudflare_manifest');
+});
+
+test.each(['watch', 'iframe'])('it does not hint for a cloudflare %s url', (path) => {
+    const wrapper = mountVideoField({ value: `${cloudflare}/${path}` });
+
+    expect(wrapper.find('p').exists()).toBe(false);
+});
+
+test('it previews a cloudflare iframe url', async () => {
+    expect((await preview(`${cloudflare}/iframe`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+});
+
+test('it keeps the player options of a cloudflare iframe url', async () => {
+    expect((await preview(`${cloudflare}/iframe?autoplay=true&muted=true`)).attributes('src')).toBe(`${cloudflare}/iframe?autoplay=true&muted=true`);
+});
+
+test('it drops the query string of a cloudflare watch url', async () => {
+    expect((await preview(`${cloudflare}/watch?autoplay=true`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+});
+
+test('it previews a cloudflare watch url as its iframe', async () => {
+    expect((await preview(`${cloudflare}/watch`)).attributes('src')).toBe(`${cloudflare}/iframe`);
+});
+
+test('it previews a cloudflare download as a video file', async () => {
+    expect((await preview(`${cloudflare}/downloads/default.mp4`)).attributes('src')).toBe(`${cloudflare}/downloads/default.mp4`);
+});
+
+test('it does not preview a cloudflare url with a malformed id', async () => {
+    expect((await preview('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/abc-123/iframe')).exists()).toBe(false);
+});
+
+test('it does not preview a cloudflare url with html in it', async () => {
+    expect((await preview('https://customer-wve7oze7jjxdb0j6.cloudflarestream.com/1234"><script>alert(1)</script>')).exists()).toBe(false);
+});
+
+test('it debounces updates while typing', async () => {
+    const wrapper = mountVideoField({ value: null });
+    const input = wrapper.find('input');
+
+    await input.setValue('https://www.youtube.com/watch?v=1');
+    await input.setValue('https://www.youtube.com/watch?v=12');
+    await input.setValue('https://www.youtube.com/watch?v=123');
+
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+
+    vi.runAllTimers();
+
+    expect(wrapper.emitted('update:value')).toHaveLength(1);
+    expect(wrapper.emitted('update:value')[0]).toEqual(['https://www.youtube.com/watch?v=123']);
+});

@@ -212,7 +212,6 @@ export default {
 
         editorAssetSaved(asset) {
             this.setAsset(asset);
-            this.closeEditor();
         },
     },
 };

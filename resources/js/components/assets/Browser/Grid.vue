@@ -4,26 +4,38 @@
         '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
     }">
         <!-- Folders -->
-        <section class="folder-grid-listing" v-if="folders.length || creatingFolder">
+        <TransitionGroup
+            v-if="folders.length || creatingFolder"
+            tag="section"
+            class="folder-grid-listing"
+            :move-class="reflowMoveClass"
+            :leave-active-class="reflowLeaveActiveClass"
+        >
             <div
                 v-if="!restrictFolderNavigation"
-                v-for="folder in folders"
+                v-for="folder in visibleFolders"
                 :key="folder.path"
-                class="group/folder relative p-1"
-                :class="{ 'rounded-xl ring-2 ring-blue-400': dragOverFolder === folder.path }"
+                class="group/folder relative rounded-xl p-1"
+                :class="[
+                    moveStateClasses(folder.path),
+                    { 'ring-2 ring-blue-400': dragOverFolder === folder.path },
+                ]"
                 :draggable="true"
-                @dragover.prevent="dragOverFolder = folder.path"
-                @dragleave.prevent="dragOverFolder = null"
-                @drop="
-                    handleFolderDrop(folder);
-                    dragOverFolder = null;
-                "
+                @dragover="folderDragOver($event, folder)"
+                @dragleave="folderDragLeave"
+                @drop.prevent="handleFolderDrop(folder)"
                 @dragstart="draggingFolder = folder.path"
                 @dragend="
                     draggingFolder = null;
                     dragOverFolder = null;
                 "
             >
+                <div
+                    v-if="isMoving(folder.path)"
+                    class="absolute inset-0 z-10 flex animate-in fade-in fill-mode-both items-center justify-center rounded-xl bg-white/75 [animation-delay:400ms] dark:bg-gray-900/75"
+                >
+                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                </div>
                 <ItemActions
                     :url="folderActionUrl"
                     :actions="folderActions(folder)"
@@ -35,7 +47,7 @@
                     <Context>
                         <template #trigger>
                             <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
-                                <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <AnimatedFolder :drop="dropFor(folder)" class="size-full text-blue-400/90 hover:text-blue-400" />
                                 <div
                                     class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
                                     v-text="folder.basename"
@@ -56,7 +68,7 @@
                     </Context>
                 </ItemActions>
             </div>
-            <div v-if="creatingFolder" class="group/folder relative p-1">
+            <div v-if="creatingFolder" key="creating-folder" class="group/folder relative p-1">
                 <div class="group h-[66px] w-[80px]">
                     <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
 
@@ -64,7 +76,7 @@
                         ref="newFolderInput"
                         v-model:modelValue="newFolderName"
                         :start-with-edit-mode="true"
-                        submit-mode="enter"
+                        submit-mode="both"
                         :placeholder="__('Name')"
                         :class="[
                             'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
@@ -80,15 +92,25 @@
                     />
                 </div>
             </div>
-        </section>
+        </TransitionGroup>
 
         <!-- Assets -->
-        <section class="asset-grid-listing" v-if="assets.length" :style="{ gridTemplateColumns: gridSize }">
+        <TransitionGroup
+            v-if="assets.length"
+            tag="section"
+            class="asset-grid-listing"
+            :style="{ gridTemplateColumns: gridSize }"
+            :move-class="reflowMoveClass"
+            :leave-active-class="reflowLeaveActiveClass"
+        >
             <div
-                v-for="(asset, index) in assets"
+                v-for="asset in visibleAssets"
                 :key="asset.id"
                 class="group relative"
-                :class="{ selected: isSelected(asset.id) }"
+                :class="[
+                    moveStateClasses(asset.id),
+                    { selected: isSelected(asset.id) },
+                ]"
             >
                 <ItemActions
                     :url="actionUrl"
@@ -103,18 +125,24 @@
                             <div
                                 class="asset-tile group relative bg-white dark:bg-gray-900"
                                 :class="[
-                                    { 'opacity-50!': draggingAsset === asset.id },
+                                    { 'opacity-50!': isDragging(asset.id) && !isMoving(asset.id) },
                                     asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
                                     asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
                                 ]"
                             >
+                                <div
+                                    v-if="isMoving(asset.id)"
+                                    class="absolute inset-0 z-10 flex animate-in fade-in fill-mode-both items-center justify-center rounded-[inherit] bg-white/75 [animation-delay:400ms] dark:bg-gray-900/75"
+                                >
+                                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                                </div>
                                 <button
                                     class="size-full"
                                     :draggable="true"
                                     @dragover.prevent
-                                    @dragstart="draggingAsset = asset.id"
+                                    @dragstart="assetDragStarted($event, asset)"
                                     @dragend="draggingAsset = null"
-                                    @click.stop="selectionClicked(index, $event)"
+                                    @click.stop="selectionClicked(assets.indexOf(asset), $event)"
                                     @dblclick.stop="$emit('edit-asset', asset)"
                                 >
                                     <div class="relative flex aspect-square size-full items-center justify-center" :class="{ 'cursor-pointer': maxFiles === 1 }">
@@ -128,6 +156,7 @@
                                                     'w-full p-4': asset.extension === 'svg',
                                                     'rounded-lg p-1': asset.orientation === 'square',
                                                 }"
+                                                @error="asset.thumbnail = null"
                                             />
                                             <file-icon v-else :extension="asset.extension" class="size-1/2" />
                                         </div>
@@ -173,7 +202,7 @@
                     <MiddleEllipsis :text="asset.basename" />
                 </div>
             </div>
-        </section>
+        </TransitionGroup>
 
         <!-- Empty state -->
         <div v-if="folders.length === 0 && assets.length === 0 && !creatingFolder" class="text-center text-gray-500 text-sm py-4">
@@ -184,6 +213,7 @@
 
 <script>
 import AssetBrowserMixin from './AssetBrowserMixin';
+import AnimatedFolder from './AnimatedFolder.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
 import {
     Context,
@@ -207,6 +237,7 @@ export default {
     mixins: [AssetBrowserMixin],
 
     components: {
+        AnimatedFolder,
         Breadcrumbs,
         ContextItem,
         ContextLabel,
@@ -226,16 +257,15 @@ export default {
 
     props: {
         assets: { type: Array },
-        selectedAssets: { type: Array },
         thumbnailSize: { type: Number },
         maxFiles: { type: Number },
         showCheckerboard: { type: Boolean, default: false },
         checkerboardMode: { type: String, default: 'transparent' },
+        reflowing: { type: Boolean, default: false },
     },
 
     data() {
         return {
-            dragOverFolder: null,
             shifting: false,
         };
     },
@@ -243,6 +273,20 @@ export default {
     computed: {
         gridSize() {
             return `repeat(auto-fill, minmax(${this.thumbnailSize}px, 1fr))`;
+        },
+
+        visibleAssets() {
+            return this.assets.filter((asset) => !this.isRemoved(asset.id));
+        },
+
+        // Only slide items into place after a move, not on every listing change like resizing or paginating.
+        reflowMoveClass() {
+            return this.reflowing ? 'transition-transform duration-300 ease-out' : undefined;
+        },
+
+        // Leaving items have to drop out of the layout for the others to slide into their space.
+        reflowLeaveActiveClass() {
+            return this.reflowing ? 'absolute' : undefined;
         },
     },
 

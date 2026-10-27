@@ -20,6 +20,7 @@ use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use UnexpectedValueException;
 
 class Outpost
 {
@@ -65,6 +66,8 @@ class Outpost
             return $this->handleRequestException($e);
         } catch (LockTimeoutException $e) {
             return $this->cacheAndReturnErrorResponse($e);
+        } catch (UnexpectedValueException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
         } finally {
             $lock->release();
         }
@@ -72,7 +75,7 @@ class Outpost
 
     private function performAndCacheRequest()
     {
-        return $this->cacheResponse(now()->addHour(), $this->performRequest());
+        return $this->cacheResponse(now()->addSeconds(random_int(50 * 60, 59 * 60)), $this->performRequest());
     }
 
     private function performRequest()
@@ -82,12 +85,21 @@ class Outpost
         }
 
         $response = $this->client->request('POST', self::ENDPOINT, [
-            'headers' => ['accept' => 'application/json'],
+            'headers' => [
+                'accept' => 'application/json',
+                'user-agent' => 'Statamic/'.Statamic::version(),
+            ],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
         ]);
 
-        return json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        if (! is_array($json)) {
+            throw new UnexpectedValueException('Invalid response body', 500);
+        }
+
+        return $json;
     }
 
     private function licenseKeyFileResponse()
@@ -100,12 +112,16 @@ class Outpost
             return ['error' => 500];
         }
 
-        return $response->put('packages', collect($response['packages'])->merge(
-            Addon::all()
-                ->reject(fn ($addon) => array_key_exists($addon->package(), $response['packages']))
+        $addons = Addon::all();
+
+        $packages = collect($response->get('packages', []))->only($addons->map->package()->all());
+
+        return $response->put('packages', $packages->merge(
+            $addons
+                ->reject(fn ($addon) => $packages->has($addon->package()))
                 ->mapWithKeys(fn ($addon) => [$addon->package() => [
-                    'valid' => ! $addon->isCommercial() || $addon->edition() === 'free',
-                    'exists' => $addon->existsOnMarketplace(),
+                    'valid' => ! $addon->hasMarketplaceData() || ! $addon->isCommercial() || $addon->edition() === 'free',
+                    'exists' => $addon->hasMarketplaceData() && $addon->existsOnMarketplace(),
                     'version_limit' => null,
                 ]])
         ))->toArray();
@@ -208,7 +224,7 @@ class Outpost
     {
         Log::debug('Error contacting Outpost: '.$e->getMessage());
 
-        return $this->cacheResponse(now()->addMinutes(5), ['error' => $e->getCode()]);
+        return $this->cacheResponse(now()->addSeconds(random_int(5 * 60, 10 * 60)), ['error' => $e->getCode()]);
     }
 
     private function cache()

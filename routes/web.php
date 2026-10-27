@@ -34,13 +34,14 @@ use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\CsrfTokenController;
 use Statamic\StaticCaching\NoCache\NoCacheController;
 use Statamic\StaticCaching\NoCache\NoCacheLocalize;
+use Statamic\StaticCaching\NoCache\ScriptController;
 
 Route::name('statamic.')->group(function () {
     Route::group(['prefix' => config('statamic.routes.action')], function () {
         Route::post('forms/{form}', [FormController::class, 'submit'])->middleware([HandlePrecognitiveRequests::class, 'throttle:statamic.forms'])->name('forms.submit');
 
         Route::get('protect/password', [PasswordProtectController::class, 'show'])->name('protect.password.show')->middleware([HandleInertiaRequests::class]);
-        Route::post('protect/password', [PasswordProtectController::class, 'store'])->name('protect.password.store');
+        Route::post('protect/password', [PasswordProtectController::class, 'store'])->middleware('throttle:statamic.protect.password')->name('protect.password.store');
 
         Route::get('fieldtypes/dictionaries/{dictionary}', DictionaryFieldtypeController::class)->middleware([CPAuthGuard::class, 'throttle:statamic.dictionaries'])->name('dictionary-fieldtype');
 
@@ -108,6 +109,11 @@ Route::name('statamic.')->group(function () {
 
         Route::post('csrf', CsrfTokenController::class)
             ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery']);
+
+        if (config('statamic.static_caching.script_delivery') === 'external') {
+            Route::get('nocache.js', [ScriptController::class, 'nocache'])->name('nocache.js');
+            Route::get('csrf.js', [ScriptController::class, 'csrf'])->name('csrf.js');
+        }
 
         Statamic::additionalActionRoutes();
     });

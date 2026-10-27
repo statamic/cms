@@ -109,6 +109,10 @@ export default {
 
         assetSaved(asset) {
             this.$emit('updated', asset);
+        },
+
+        assetCreated(assetId) {
+            this.$emit('id-changed', this.editingId, assetId);
             this.closeEditor();
         },
 

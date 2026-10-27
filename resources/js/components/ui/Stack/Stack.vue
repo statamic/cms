@@ -216,7 +216,7 @@ defineExpose({
     runCloseCallback,
 });
 
-provide('closeStack', close);
+provide('closeStack', runCloseCallback);
 </script>
 
 <template>
@@ -287,7 +287,7 @@ provide('closeStack', close);
                             v-if="shouldShowFloatingCloseButton"
                             class="fixed top-4 right-4"
                         >
-                            <Button icon="x" variant="ghost" @click="close" />
+                            <Button icon="x" variant="ghost" @click="runCloseCallback" />
                         </div>
                     </div>
                 </transition>
