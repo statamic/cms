@@ -201,6 +201,9 @@ class AiSettingsController extends CpController
             'button_label' => __('Add Prompt'),
             // Prototype: new prompts go on the end, rather than between others from a + that shows on hover
             'insert_between' => false,
+            // Prototype: instead of the usual expand, collapse and fullscreen controls above the list, one expand/collapse toggle in the section's header, by this id
+            'actions' => false,
+            'header_actions' => 'page-prompts-actions',
             'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
                 // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out, and switch_labels says what its switch does
                 'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
@@ -407,6 +410,8 @@ class AiSettingsController extends CpController
                         ],
                         [
                             'display' => __('Page Prompts'),
+                            // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
+                            'header_actions' => 'page-prompts-actions',
                             'instructions' => __('Jobs your team does often on a whole page, run in the AI chat by typing / and their name, like `/legal-check`. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
                             'fields' => [$this->pagePromptsField()],
                         ],
