@@ -194,7 +194,15 @@ class AiSettingsController extends CpController
             'insert_between' => false,
             'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
                 // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out
-                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'fields' => [
+                // pill_field shows where each is used on its row (a prototype addition to Replicator, like title_field), and switch_labels says what its switch does
+                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name',
+                    'pill_field' => 'use_on',
+                    'pill_options' => [
+                        'page' => ['label' => __('Page'), 'icon' => 'entry'],
+                        'fields' => ['label' => __('Fields'), 'icon' => 'fieldtype-text'],
+                    ],
+                    'switch_labels' => [__('Offered'), __('Switched off')],
+                    'fields' => [
                     ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'width' => 50, 'replicator_preview' => false]],
                     ['handle' => 'use_on', 'field' => ['type' => 'button_group', 'display' => __('Use On'), 'options' => ['page' => __('The page'), 'fields' => __('Fields')], 'default' => 'page', 'replicator_preview' => false, 'width' => 50]],
                     // Plain multi-selects rather than the relationship fieldtypes, whose choices stack up below them as draggable rows and leave a gap beside the name. These show them as chips.
