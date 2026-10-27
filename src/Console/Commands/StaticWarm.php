@@ -159,7 +159,7 @@ class StaticWarm extends Command
 
     private function client(): Client
     {
-        return new Client($this->clientConfig());
+        return app(Client::class, ['config' => $this->clientConfig()]);
     }
 
     private function clientConfig(): array
