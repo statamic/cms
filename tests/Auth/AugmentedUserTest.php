@@ -5,6 +5,8 @@ namespace Tests\Auth;
 use Carbon\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\AugmentedUser;
+use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\Data\AugmentedTestCase;
@@ -88,5 +90,39 @@ class AugmentedUserTest extends AugmentedTestCase
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
+    }
+
+    #[Test]
+    public function two_factor_recovery_codes_are_not_exposed_through_augmented_values()
+    {
+        $user = User::make()
+            ->id('user-id')
+            ->email('john@example.com')
+            ->data(['name' => 'John Smith']);
+
+        $user->save();
+
+        app(EnableTwoFactorAuthentication::class)($user);
+
+        $augmented = new AugmentedUser($user);
+
+        // The recovery codes are credentials, so the handle must not be part of
+        // the user's augmented data (Antlers templates, the API, GraphQL, ...).
+        $this->assertNotContains('two_factor_recovery_codes', $augmented->keys());
+        $this->assertNotContains('two_factor_recovery_codes', $augmented->select()->keys()->all());
+
+        $rendered = (string) Antlers::parse(
+            '{{ current_user.two_factor_recovery_codes }}',
+            ['current_user' => $user],
+            true
+        );
+
+        $this->assertSame('', $rendered);
+        $this->assertStringNotContainsString($user->get('two_factor_recovery_codes'), $rendered);
+
+        // The internal accessor used by the control panel and the login flow
+        // must keep working. It reads the stored value through __get(), which
+        // intentionally still resolves through the augmented layer.
+        $this->assertCount(8, $user->twoFactorRecoveryCodes());
     }
 }
