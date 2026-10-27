@@ -33,7 +33,7 @@ const keyClasses = 'inline-flex h-5 min-w-5 items-center justify-center rounded-
 <template>
     <!-- Laid out like the examples above it: a heading, then white cards with a ring -->
     <div class="space-y-2 p-2">
-        <p class="px-1 text-sm tracking-tight text-gray-600 dark:text-gray-400">{{ __('Keyboard shortcuts') }}</p>
+        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Keyboard shortcuts') }}</p>
 
         <dl class="divide-y divide-gray-200 rounded-xl bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">
             <div v-for="(shortcut, index) in visible" :key="index" class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-3 py-2 text-sm/5 text-gray-900 dark:text-gray-300">

@@ -36,7 +36,7 @@ defineExpose({ focusFirst, focusLast });
 
 <template>
     <div :class="['space-y-2', padded ? 'p-2' : '']">
-        <p class="px-1 text-sm tracking-tight text-gray-600 dark:text-gray-400">{{ __('Try asking') }}</p>
+        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Try asking') }}</p>
 
         <div ref="list" class="flex flex-col gap-2.5" @keydown="onKeydown">
             <!-- Styled like the CP's Card: white, a 1px ring, rounded-xl. -->

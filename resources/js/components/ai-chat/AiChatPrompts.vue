@@ -65,7 +65,7 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
 <template>
     <!-- Laid out like the keyboard shortcuts: a heading, then rows in one white card with a ring -->
     <div class="space-y-2 p-2">
-        <p class="px-1 text-sm tracking-tight text-gray-600 dark:text-gray-400">{{ __('Saved prompts') }}</p>
+        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
 
         <div ref="list" role="listbox" :aria-label="__('Saved prompts')" class="divide-y divide-gray-200 rounded-lg bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">
             <!-- mousedown.prevent keeps focus in the input, so picking one doesn't hide the menu before the click lands -->
