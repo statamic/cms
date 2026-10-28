@@ -3,6 +3,7 @@
 namespace Tests\Auth;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\AugmentedUser;
 use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
@@ -93,36 +94,27 @@ class AugmentedUserTest extends AugmentedTestCase
     }
 
     #[Test]
-    public function two_factor_recovery_codes_are_not_exposed_through_augmented_values()
+    #[DataProvider('twoFactorKeysProvider')]
+    public function it_doesnt_augment_two_factor_keys(string $key)
     {
-        $user = User::make()
-            ->id('user-id')
-            ->email('john@example.com')
-            ->data(['name' => 'John Smith']);
-
-        $user->save();
+        $user = tap(User::make()->email('john@example.com'))->save();
 
         app(EnableTwoFactorAuthentication::class)($user);
+        $user->set('two_factor_confirmed_at', now()->timestamp);
 
         $augmented = new AugmentedUser($user);
 
-        // The recovery codes are credentials, so the handle must not be part of
-        // the user's augmented data (Antlers templates, the API, GraphQL, ...).
-        $this->assertNotContains('two_factor_recovery_codes', $augmented->keys());
-        $this->assertNotContains('two_factor_recovery_codes', $augmented->select()->keys()->all());
+        $this->assertNotContains($key, $augmented->keys());
+        $this->assertNotContains($key, $augmented->select()->keys()->all());
+        $this->assertSame('', (string) Antlers::parse("{{ current_user:{$key} }}", ['current_user' => $user], true));
+    }
 
-        $rendered = (string) Antlers::parse(
-            '{{ current_user.two_factor_recovery_codes }}',
-            ['current_user' => $user],
-            true
-        );
-
-        $this->assertSame('', $rendered);
-        $this->assertStringNotContainsString($user->get('two_factor_recovery_codes'), $rendered);
-
-        // The internal accessor used by the control panel and the login flow
-        // must keep working. It reads the stored value through __get(), which
-        // intentionally still resolves through the augmented layer.
-        $this->assertCount(8, $user->twoFactorRecoveryCodes());
+    public static function twoFactorKeysProvider(): array
+    {
+        return [
+            'secret' => ['two_factor_secret'],
+            'recovery codes' => ['two_factor_recovery_codes'],
+            'confirmed at' => ['two_factor_confirmed_at'],
+        ];
     }
 }
