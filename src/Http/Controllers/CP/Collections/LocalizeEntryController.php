@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -18,13 +17,12 @@ class LocalizeEntryController extends CpController
 
         $site = $request->site;
 
-        // The lock stops concurrent requests from both finding nothing and
-        // both creating a localization.
-        return Cache::lock("localize-entry:{$entry->id()}:{$site}", 10)->block(5, function () use ($request, $entry, $site) {
-            $existing = Entry::query()
-                ->where('origin', $entry->id())
-                ->where('site', $site)
-                ->first();
+        // The lock is keyed on the root entry, so concurrent requests from any
+        // localization in the origin chain wait for each other.
+        return Cache::lock("localize-entry:{$entry->root()->id()}:{$site}", 10)->block(5, function () use ($request, $entry, $site) {
+            // Look through the whole origin chain, since the origin of a
+            // localization can be any existing localization.
+            $existing = $entry->in($site);
 
             if ($existing) {
                 return [

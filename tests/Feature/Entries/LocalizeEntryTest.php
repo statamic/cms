@@ -67,6 +67,25 @@ class LocalizeEntryTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_an_existing_localization_from_elsewhere_in_the_origin_chain()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'de' => ['url' => 'http://localhost/de/', 'locale' => 'de'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
+
+        $en = EntryFactory::collection(tap(Collection::make('blog')->revisionsEnabled(false))->save())->id('en-test')->slug('test')->create();
+        $de = EntryFactory::collection('blog')->id('de-test')->locale('de')->origin('en-test')->slug('test')->create();
+
+        $first = $this->actingAs($this->user())->localize($de, ['site' => 'fr'])->assertOk();
+        $second = $this->actingAs($this->user())->localize($en, ['site' => 'fr'])->assertOk();
+
+        $this->assertSame($first->json(), $second->json());
+        $this->assertCount(1, \Statamic\Facades\Entry::query()->where('collection', 'blog')->where('site', 'fr')->get());
+    }
+
+    #[Test]
     public function site_is_required()
     {
         $entry = EntryFactory::collection('blog')->slug('test')->create();
@@ -270,6 +289,7 @@ class LocalizeEntryTest extends TestCase
             'access cp',
             'access en site',
             'access fr site',
+            'access de site',
             'view blog entries',
             'edit blog entries',
             'view pages entries',
