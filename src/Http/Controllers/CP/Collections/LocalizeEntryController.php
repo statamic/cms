@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Illuminate\Cache\NoLock;
+use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\User;
@@ -19,7 +21,7 @@ class LocalizeEntryController extends CpController
 
         // The lock is keyed on the root entry, so concurrent requests from any
         // localization in the origin chain wait for each other.
-        return Cache::lock("localize-entry:{$entry->root()->id()}:{$site}", 10)->block(5, function () use ($request, $entry, $site) {
+        return $this->lock("localize-entry:{$entry->root()->id()}:{$site}", 10)->block(5, function () use ($request, $entry, $site) {
             // Look through the whole origin chain, since the origin of a
             // localization can be any existing localization.
             $existing = $entry->in($site);
@@ -40,5 +42,12 @@ class LocalizeEntryController extends CpController
                 'url' => $localized->editUrl(),
             ];
         });
+    }
+
+    private function lock(string $key, int $seconds)
+    {
+        return Cache::getStore() instanceof LockProvider
+            ? Cache::lock($key, $seconds)
+            : new NoLock($key, $seconds);
     }
 }
