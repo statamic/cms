@@ -107,6 +107,24 @@ class StoreTest extends TestCase
         $this->assertEquals($expected, $store->paths());
         $this->assertEquals(2, $cacheHits);
     }
+
+    #[Test]
+    public function index_usage_cached_by_another_process_is_kept()
+    {
+        // Two instances of the same store stand in for two processes warming
+        // the Stache in parallel. Each memoizes its own usage list, so the
+        // second write must merge with the cache instead of replacing it.
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+        $other = new TestStore;
+
+        $this->store->cacheIndexUsage('path');
+        $other->cacheIndexUsage('path');
+
+        $this->store->cacheIndexUsage('site');
+        $other->cacheIndexUsage('uri');
+
+        $this->assertEquals(['path', 'site', 'uri'], Cache::get($cacheKey));
+    }
 }
 
 class TestStore extends Store
