@@ -222,7 +222,7 @@ export default {
             return {
                 align: 'end',
                 side: 'bottom',
-                class: 'w-[32rem]',
+                class: 'w-[32rem] max-w-(--reka-popover-content-available-width)',
                 dismissible: this.deleting === false,
                 excludeZManipulation: true,
                 open: this.compactOpen,
