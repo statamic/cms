@@ -122,7 +122,11 @@
                                 <Breadcrumbs
                                     v-if="!restrictFolderNavigation"
                                     :path="path"
+                                    :droppable="draggingMovable"
+                                    :current-droppable="isSearching"
+                                    :open-paths="openDropPaths"
                                     @navigated="selectFolder"
+                                    @dropped="moveDraggedItemToFolder"
                                 />
                                 <div v-if="mode === 'grid'" class="flex items-center gap-2 mr-2">
                                     <ui-button
@@ -173,9 +177,9 @@
                                 :assets="items"
                                 :action-url="actionUrl"
                                 :thumbnail-size="gridThumbnailSize"
-                                :selected-assets="selectedAssets"
                                 :show-checkerboard="showCheckerboard"
                                 :checkerboard-mode="checkerboardMode"
+                                :reflowing="reflowing"
                                 v-bind="sharedAssetProps"
                                 v-on="sharedAssetEvents"
                             />
@@ -194,10 +198,12 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :redirect-after-crop="!autoselectUploads"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-started="actionStarted"
             @action-completed="actionCompleted"
         />
@@ -239,6 +245,22 @@ import {
 import Breadcrumbs from './Breadcrumbs.vue';
 import useCheckerboard from '@/composables/checkerboard.js';
 import { router } from '@inertiajs/vue3';
+
+// How long after a drop the move animation starts.
+const ANIMATION_DELAY = 250;
+
+// Matches the moved items' fade in AssetBrowserMixin's moveStateClasses(), after which they're removed from the layout.
+const FADE_OUT_DURATION = 300;
+
+// The folder stays open while the move is in progress, but at least this long so quick moves still read.
+// It covers the --animate-folder-open and --animate-folder-file durations in ui.css, plus a short pause.
+const FOLDER_MIN_OPEN_DURATION = 520;
+
+// Matches the --animate-folder-close duration in ui.css.
+const FOLDER_CLOSE_DURATION = 300;
+
+// Long enough for Grid's move transition to finish.
+const REFLOW_DURATION = 400;
 
 export default {
     mixins: [HasPreferences],
@@ -339,6 +361,13 @@ export default {
             shifting: false,
             lastItemClicked: null,
             preventDragging: false,
+            draggingMovable: false,
+            moving: [],
+            moved: [],
+            removed: [],
+            settlingMoves: [],
+            drops: [],
+            reflowing: false,
             gridThumbnailSize: this.$preferences.get('assets.browser_thumbnail_size', 200),
         };
     },
@@ -432,6 +461,10 @@ export default {
             return this.selectedAssets.length >= this.maxFiles;
         },
 
+        openDropPaths() {
+            return this.drops.filter((drop) => !drop.closing).map((drop) => drop.path);
+        },
+
         showAssetEditor() {
             return Boolean(this.editedAssetId);
         },
@@ -446,6 +479,11 @@ export default {
                 maxFiles: this.maxFiles,
                 restrictFolderNavigation: this.restrictFolderNavigation,
                 path: this.path,
+                selectedAssets: this.selectedAssets,
+                moving: this.moving,
+                moved: this.moved,
+                removed: this.removed,
+                drops: this.drops,
                 creatingFolder: this.creatingFolder,
                 creatingFolderError: this.creatingFolderError,
             };
@@ -464,6 +502,8 @@ export default {
                     this.creatingFolderError = false;
                 },
                 'prevent-dragging': (preventDragging) => (this.preventDragging = preventDragging),
+                'dragging-movable': (movable) => (this.draggingMovable = movable),
+                'move-items': this.moveItems,
                 'update:creatingFolderError': (value) => (this.creatingFolderError = value),
             };
         },
@@ -564,7 +604,8 @@ export default {
             }
 
             this.initializing = false;
-            this.loading = false;
+
+            this.settleMoves();
         },
 
         actionStarted() {
@@ -593,6 +634,12 @@ export default {
         },
 
         assetSaved() {
+            this.loadAssets();
+        },
+
+        assetCreated(id) {
+            this.closeAssetEditor();
+            this.autoselect(id);
             this.loadAssets();
         },
 
@@ -701,10 +748,7 @@ export default {
         },
 
         existingUploadSelected(upload) {
-            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.id}::${path}`;
-
-            this.selectedAssets.push(id);
+            this.selectedAssets.push(upload.existingId);
             this.$emit('selections-updated', this.selectedAssets);
         },
 
@@ -726,6 +770,147 @@ export default {
             this.page = 1;
 
             this.$emit('navigated', this.path);
+        },
+
+        moveItems({ url, action, items, destination }) {
+            const payload = {
+                action: action.handle,
+                context: action.context,
+                selections: items,
+                values: { folder: destination },
+            };
+
+            const files = items.slice(0, 3).map((item) => ({
+                thumbnail: this.assets.find((asset) => asset.id === item)?.thumbnail,
+            }));
+
+            // Dim the items straight away so the drop registers, but hold the animation back a moment
+            // so it finishes closer to when the server does. The request starts immediately.
+            const startedAt = Date.now();
+            let failed = false;
+
+            this.moving.push(...items);
+            this.actionStarted();
+
+            const opened = new Promise((resolve) => setTimeout(resolve, ANIMATION_DELAY)).then(() => {
+                if (failed) return false;
+
+                this.openDrop(destination, files);
+
+                // Search results span every folder, so moved items stay in the listing instead of leaving it.
+                if (this.isSearching) return true;
+
+                const stillMoving = items.filter((item) => this.moving.includes(item));
+
+                this.moving = this.moving.filter((item) => !stillMoving.includes(item));
+                this.moved.push(...stillMoving);
+
+                setTimeout(() => this.removeMovedItems(stillMoving), FADE_OUT_DURATION);
+
+                return true;
+            });
+
+            this.$axios
+                .post(url, payload)
+                .then(({ data }) => {
+                    const folder = destination === '/' ? __('All') : destination.split('/').pop();
+
+                    Statamic.$toast.success(
+                        __n('Moved to :folder|Moved :count items to :folder', items.length, { folder }),
+                    );
+
+                    // Keep the items hidden until the refreshed listing arrives without them.
+                    this.settlingMoves.push({ items, callback: data.callback });
+                })
+                .catch((error) => {
+                    failed = true;
+                    this.forgetMoves(items);
+                    Statamic.$toast.error(error.response?.data?.message || __('Action failed'));
+                })
+                .finally(() => {
+                    opened.then((didOpen) => didOpen && this.closeDrop(destination));
+
+                    // Fast moves wait for the items to fade out, so the refresh doesn't cut the animation short.
+                    const wait = startedAt + ANIMATION_DELAY + FADE_OUT_DURATION - Date.now();
+
+                    setTimeout(() => this.$refs.listing?.refresh(), Math.max(0, wait));
+                });
+        },
+
+        openDrop(path, files) {
+            const now = Date.now();
+            const open = this.drops.find((drop) => drop.path === path && !drop.closing);
+
+            // Dropping into a folder that's already open drops the new files in without reopening it.
+            if (open) {
+                open.pending++;
+                open.files = files;
+                open.fileKey = now;
+                return;
+            }
+
+            this.drops = [
+                ...this.drops.filter((drop) => drop.path !== path),
+                { id: now, fileKey: now, path, files, pending: 1, openedAt: now, closing: false },
+            ];
+        },
+
+        closeDrop(path) {
+            const drop = this.drops.find((drop) => drop.path === path && !drop.closing);
+
+            if (!drop || --drop.pending > 0) return;
+
+            const wait = drop.openedAt + FOLDER_MIN_OPEN_DURATION - Date.now();
+
+            setTimeout(() => {
+                // Another move into the same folder may have started while we waited.
+                if (drop.pending > 0) return;
+
+                drop.closing = true;
+
+                setTimeout(() => (this.drops = this.drops.filter((other) => other !== drop)), FOLDER_CLOSE_DURATION);
+            }, Math.max(0, wait));
+        },
+
+        removeMovedItems(items) {
+            const stillMoved = items.filter((item) => this.moved.includes(item));
+
+            if (!stillMoved.length) return;
+
+            this.reflow();
+            this.removed.push(...stillMoved);
+        },
+
+        forgetMoves(items) {
+            this.moving = this.moving.filter((item) => !items.includes(item));
+            this.moved = this.moved.filter((item) => !items.includes(item));
+            this.removed = this.removed.filter((item) => !items.includes(item));
+        },
+
+        settleMoves() {
+            this.forgetMoves(this.settlingMoves.flatMap(({ items }) => items));
+
+            this.settlingMoves.forEach(({ callback }) => {
+                // Moved assets get new IDs, so the action tells us how to keep them selected. Doing it in the
+                // same render as the refresh stops them visibly deselecting before they disappear.
+                if (callback) Statamic.$callbacks.call(callback[0], ...callback.slice(1));
+            });
+
+            this.settlingMoves = [];
+
+            // Keep the progress bar going while another move is still in flight.
+            this.loading = this.moving.length > 0 || this.moved.length > 0;
+        },
+
+        reflow() {
+            this.reflowing = true;
+
+            clearTimeout(this.reflowTimeout);
+            this.reflowTimeout = setTimeout(() => (this.reflowing = false), REFLOW_DURATION);
+        },
+
+        moveDraggedItemToFolder(path) {
+            this.$refs[this.mode]?.handleFolderDrop({ path });
         },
 
         selectRange(from, to) {
@@ -768,19 +953,23 @@ export default {
 
         uploadCompleted(asset) {
             if (this.autoselectUploads) {
-                this.sortColumn = 'last_modified';
-                this.sortDirection = 'desc';
-
-                if (this.maxFiles === 1) {
-                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
-                } else if (!this.reachedSelectionLimit) {
-                    this.selectedAssets.push(asset.id);
-                }
-                this.$emit('selections-updated', this.selectedAssets);
+                this.autoselect(asset.id);
             }
 
             this.loadAssets();
             this.$toast.success(__(':file uploaded', { file: asset.basename }));
+        },
+
+        autoselect(id) {
+            this.sortColumn = 'last_modified';
+            this.sortDirection = 'desc';
+
+            if (this.maxFiles === 1) {
+                this.selectedAssets.splice(0, this.selectedAssets.length, id);
+            } else if (!this.reachedSelectionLimit) {
+                this.selectedAssets.push(id);
+            }
+            this.$emit('selections-updated', this.selectedAssets);
         },
 
         uploadError(upload, uploads) {

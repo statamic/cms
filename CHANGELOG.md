@@ -1,5 +1,94 @@
 # Release Notes
 
+## 6.39.0 (2026-10-29)
+
+### What's new
+- Add fieldtype inspection commands [#15737](https://github.com/statamic/cms/issues/15737) by @jackmcdade
+
+### What's fixed
+- Fix HTML getting encoded when pasting a copied Bard set [#15718](https://github.com/statamic/cms/issues/15718) by @mynetx
+- Send Statamic user agent in Outpost/API requests [#15727](https://github.com/statamic/cms/issues/15727) by @duncanmcclean
+- Fix site handle warning not showing when saving sites [#15722](https://github.com/statamic/cms/issues/15722) by @lazerg
+- Fix relationship select field crashing when switching localizations [#15485](https://github.com/statamic/cms/issues/15485) by @duncanmcclean
+- Fix nested Bard losing characters when typing fast [#15717](https://github.com/statamic/cms/issues/15717) by @o1y
+- Fix Comb boolean words being used as raw regex [#15723](https://github.com/statamic/cms/issues/15723) by @edalzell
+- Fix Search utility when index names are customized [#15729](https://github.com/statamic/cms/issues/15729) by @jasonbaciulis
+- Lock the Comb index file across each read-modify-write [#15725](https://github.com/statamic/cms/issues/15725) by @edalzell
+- Fix "Discard and use existing file" adding an asset that doesn't exist [#15716](https://github.com/statamic/cms/issues/15716) by @mynetx
+- Look up the Comb index once when paginating search results [#15724](https://github.com/statamic/cms/issues/15724) by @edalzell
+- Prevent `static:warm` from dropping `--header` values on paginated pages [#15278](https://github.com/statamic/cms/issues/15278) by @steveparks
+- Write the Comb index once when updating on a sync queue [#15726](https://github.com/statamic/cms/issues/15726) by @edalzell
+- Harden user augmentation [#15733](https://github.com/statamic/cms/issues/15733) by @tsurutanmen
+- Fix infinite recursion when evaluating cyclic link fields [#15731](https://github.com/statamic/cms/issues/15731) by @qmeister
+- Fix duplicate localizations [#15732](https://github.com/statamic/cms/issues/15732) by @qmeister
+- Keep the compact array popover within small screens [#15738](https://github.com/statamic/cms/issues/15738) by @mynetx
+- Stop parallel Stache warming losing cached index usages [#15736](https://github.com/statamic/cms/issues/15736) by @edalzell
+- Defer image cache stats in the Cache Manager [#15743](https://github.com/statamic/cms/issues/15743) by @duncanmcclean
+- Fix duplicate labels on Bard, Replicator & Group fields in Grid tables [#15750](https://github.com/statamic/cms/issues/15750) by @duncanmcclean
+- Keep crop copies in the asset selector [#15741](https://github.com/statamic/cms/issues/15741) by @duncanmcclean
+- Bump `prosemirror-view` to 1.42.8 [#15752](https://github.com/statamic/cms/issues/15752) by @duncanmcclean
+- Fix CP header avatar for assets in private containers [#15611](https://github.com/statamic/cms/issues/15611) by @lazerg
+- Add missing English translation for elevated session verification code [#15742](https://github.com/statamic/cms/issues/15742) by @duncanmcclean
+- Bump the npm_and_yarn group across 1 directory with 2 updates [#15751](https://github.com/statamic/cms/issues/15751) by @dependabot
+
+
+
+## 6.38.0 (2026-10-23)
+
+### What's new
+- Drag assets and folders onto breadcrumbs [#15677](https://github.com/statamic/cms/issues/15677) by @jaygeorge
+- Drag a whole selection of assets at once [#15678](https://github.com/statamic/cms/issues/15678) by @jaygeorge
+- Add Cloudflare Stream support to the video fieldtype [#15459](https://github.com/statamic/cms/issues/15459) by @edalzell
+- Allow Live Preview while creating entries [#15648](https://github.com/statamic/cms/issues/15648) by @matsantosz
+
+### What's fixed
+- Fix dragging assets onto folders in list view [#15676](https://github.com/statamic/cms/issues/15676) by @jaygeorge
+- Don't rebuild Bard editors when the content hasn't changed [#15700](https://github.com/statamic/cms/issues/15700) by @o1y
+- Fix Bard sets picking up wrong values when splitting a list [#15701](https://github.com/statamic/cms/issues/15701) by @o1y
+- Fix Bard set fields losing characters when typing fast [#15702](https://github.com/statamic/cms/issues/15702) by @o1y
+- Keep Bard set node views alive across saves [#15689](https://github.com/statamic/cms/issues/15689) by @edalzell
+- Fix spacing between wrapped combobox chips [#15708](https://github.com/statamic/cms/issues/15708) by @jaygeorge
+- Optically centre badge text [#15710](https://github.com/statamic/cms/issues/15710) by @jaygeorge
+- Optically centre chip text [#15711](https://github.com/statamic/cms/issues/15711) by @jaygeorge
+- Fix Bard set dropdowns closing right after opening [#15709](https://github.com/statamic/cms/issues/15709) by @o1y
+- Persist Replicator set collapse state to meta [#15688](https://github.com/statamic/cms/issues/15688) by @edalzell
+- Stop deep-watching publish container meta [#15713](https://github.com/statamic/cms/issues/15713) by @o1y
+- German translations [#15707](https://github.com/statamic/cms/issues/15707) by @helloDanuk
+- French translations [#15706](https://github.com/statamic/cms/issues/15706) by @ebeauchamps
+
+
+
+## 6.37.0 (2026-10-22)
+
+### What's new
+- Add --no-cache-clear option to statamic:install [#15664](https://github.com/statamic/cms/issues/15664) by @edalzell
+- Expose expanded sections on tabs [#15694](https://github.com/statamic/cms/issues/15694) by @jasonvarga
+
+### What's fixed
+- Make read-only fields easier to spot [#15663](https://github.com/statamic/cms/issues/15663) by @jaygeorge
+- Fix cache misses for namespaced and subfolder fieldsets [#15666](https://github.com/statamic/cms/issues/15666) by @daun
+- Skip driver check for universally supported image formats [#15665](https://github.com/statamic/cms/issues/15665) by @daun
+- Only check the selected site when building the navigation sidebar items [#15668](https://github.com/statamic/cms/issues/15668) by @lazerg
+- Remove architectural lines when leaving a navigation page [#15681](https://github.com/statamic/cms/issues/15681) by @jaygeorge
+- Speed up Stache entry queries by id and by value [#15669](https://github.com/statamic/cms/issues/15669) by @porstendorfer
+- Refetch bulk actions when selections are replaced [#15674](https://github.com/statamic/cms/issues/15674) by @jaygeorge
+- Resolve validation placeholders for fields inside a Group [#15670](https://github.com/statamic/cms/issues/15670) by @mynetx
+- Keep elastic textareas sized to their content [#15683](https://github.com/statamic/cms/issues/15683) by @o1y
+- Speed up the control panel on large entries [#15679](https://github.com/statamic/cms/issues/15679) by @o1y
+- Make field ids unique across publish containers [#15682](https://github.com/statamic/cms/issues/15682) by @mynetx
+- Fix assignments leaking from Antlers includes rendered inside loops [#15671](https://github.com/statamic/cms/issues/15671) by @daun
+- Keep keyboard focus inside the licensing alert [#15673](https://github.com/statamic/cms/issues/15673) by @jaygeorge
+- Make Stack and Modal close buttons respect beforeClose [#15685](https://github.com/statamic/cms/issues/15685) by @jasonvarga
+- Handle invalid outpost responses [#15691](https://github.com/statamic/cms/issues/15691) by @jasonvarga
+- Harden glide query param logic [#15693](https://github.com/statamic/cms/issues/15693) by @jasonvarga
+- Fix dragging assets onto folders in the asset selector [#15695](https://github.com/statamic/cms/issues/15695) by @jasonvarga
+- Fix CP downloads for Inertia requests on inertia-laravel 3.5.2 [#15697](https://github.com/statamic/cms/issues/15697) by @jasonvarga
+- Bump the github-actions group with 3 updates [#15672](https://github.com/statamic/cms/issues/15672) by @dependabot
+- Bump follow-redirects from 1.16.0 to 1.16.1 [#15686](https://github.com/statamic/cms/issues/15686) by @dependabot
+- Bump the npm_and_yarn group across 1 directory with 2 updates [#15696](https://github.com/statamic/cms/issues/15696) by @dependabot
+
+
+
 ## 6.36.0 (2026-10-16)
 
 ### What's new

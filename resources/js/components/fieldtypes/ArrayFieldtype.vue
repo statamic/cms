@@ -135,7 +135,7 @@
                 >
                     <ui-button @click="addValue()" :disabled="atMax" v-if="!isReadOnly && !isSingle && !isKeyed" :text="addButton" size="sm" :class="compactFooterButtonClass" />
                     <ui-button v-if="isCompact" class="ms-auto" :class="compactFooterButtonClass" size="sm" @click="setCompactOpen(false)">
-                        <span class="st-text-trim-cap">{{ __('Close') }}</span>
+                        <span class="st-text-trim-optical-cap">{{ __('Close') }}</span>
                         <span class="ms-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded bg-gray-200/50 px-1 font-semibold uppercase text-[0.625rem] text-gray-600 dark:bg-gray-900 dark:text-gray-400/85">
                             Esc
                         </span>
@@ -234,7 +234,7 @@ export default {
             return {
                 align: 'end',
                 side: 'bottom',
-                class: 'w-[32rem]',
+                class: 'w-[32rem] max-w-(--reka-popover-content-available-width)',
                 dismissible: this.deleting === false,
                 excludeZManipulation: true,
                 open: this.compactOpen,

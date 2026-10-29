@@ -61,6 +61,22 @@ class ReportThemeUsageTest extends TestCase
     }
 
     #[Test]
+    public function it_sends_the_statamic_user_agent()
+    {
+        Http::preventStrayRequests();
+        Http::fake();
+
+        $outpost = Mockery::mock(Outpost::class);
+        $outpost->shouldReceive('usingLicenseKeyFile')->andReturnFalse();
+
+        $job = new ReportThemeUsage(null, ['id' => 1]);
+
+        $job->handle($outpost);
+
+        Http::assertSent(fn (Request $request) => $request->header('User-Agent') === ['Statamic/3.0.0-testing']);
+    }
+
+    #[Test]
     public function it_doesnt_report_if_using_license_key_file()
     {
         Http::preventStrayRequests();

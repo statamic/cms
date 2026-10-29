@@ -1,6 +1,7 @@
 import { expect, test, vi } from 'vitest';
 import Editor from '@/components/assets/Editor/Editor.vue';
 import Asset from '@/components/fieldtypes/assets/Asset';
+import Browser from '@/components/assets/Browser/Browser.vue';
 
 function keydown(key, target, modifier) {
     const component = {
@@ -58,6 +59,30 @@ test('keeps crop copies in the asset field', () => {
     expect(editor.$emit).toHaveBeenCalledWith('created', 'assets::crop.png');
     expect(asset.$emit).toHaveBeenCalledWith('id-changed', 'assets::source.png', 'assets::crop.png');
     expect(asset.closeEditor).toHaveBeenCalled();
+});
+
+test.each([
+    [1, ['assets::crop.png']],
+    [2, ['assets::source.png', 'assets::crop.png']],
+])('selects crop copies in the asset selector when max files is %s', (maxFiles, selections) => {
+    const browser = {
+        maxFiles,
+        editedAssetId: 'assets::source.png',
+        selectedAssets: ['assets::source.png'],
+        reachedSelectionLimit: false,
+        $emit: vi.fn(),
+        $nextTick: (callback) => callback(),
+        $refs: { listing: { refresh: vi.fn() } },
+    };
+
+    Object.entries(Browser.methods).forEach(([name, method]) => (browser[name] = method.bind(browser)));
+
+    browser.assetCreated('assets::crop.png');
+
+    expect(browser.editedAssetId).toBeNull();
+    expect(browser.selectedAssets).toEqual(selections);
+    expect(browser.$emit).toHaveBeenCalledWith('selections-updated', selections);
+    expect(browser.$refs.listing.refresh).toHaveBeenCalled();
 });
 
 function navigate(method, { dirty = true, saving = false, save = () => Promise.resolve() } = {}) {
