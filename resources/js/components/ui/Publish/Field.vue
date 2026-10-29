@@ -5,6 +5,7 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
+    Badge,
     Field,
     Icon,
     Label,
@@ -13,6 +14,7 @@ import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
 import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
+import useAiChanges from '@/composables/use-ai-changes.js';
 import { permissions } from '@api';
 
 const props = defineProps({
@@ -111,7 +113,13 @@ function valueUpdated(value) {
     if (value === existingValue) return;
     setFieldValue(fullPath.value, value);
     desync();
+    // Prototype: you've changed it yourself, so it's no longer the AI's change
+    aiChanges.forget(containerName.value, fullPath.value);
 }
+
+// Prototype: whether the AI chat changed this field (and what it held before), until you edit it yourself or save
+const aiChanges = useAiChanges();
+const aiChange = computed(() => aiChanges.changeFor(containerName.value, fullPath.value));
 
 function metaUpdated(value) {
     setFieldMeta(metaFullPath.value, value);
@@ -322,6 +330,11 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
+                    <!-- Prototype: the AI chat changed this field. Undo puts back what was there. The badge takes the CP's primary colour, so it follows the theme. -->
+                    <span v-if="aiChange" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
+                        <Badge size="sm" class="bg-primary/5 border-primary/40 text-primary dark:border dark:bg-gray-800 dark:border-primary/60 dark:text-white" :text="__('Changed by AI')" />
+                        <button type="button" class="cursor-pointer hover:text-gray-900 hover:underline dark:hover:text-white" @click="aiChanges.undo(containerName, fullPath)">{{ __('Undo') }}</button>
+                    </span>
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                     <span v-if="shouldMarkReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">

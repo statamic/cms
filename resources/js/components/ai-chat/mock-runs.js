@@ -1,9 +1,13 @@
 import { reactive } from 'vue';
+import { router } from '@inertiajs/vue3';
+import useAiChanges from '@/composables/use-ai-changes.js';
+import { cp_url } from '@/bootstrap/globals.js';
 
 // Prototype: pretend the chat is driving Statamic the way the MCP does. Nothing here is real. It turns what you typed
 // into a plan of tool calls, then plays them one after another so each card goes pending, running, done.
 //
 // Each step: the tool, the arguments it was called with, what it reported back, and how long it "runs" for (ms).
+// A step can also have an `action`, which really happens once it has run, like opening an entry or filling in its fields.
 
 const slug = (text, words = 5) =>
     text
@@ -22,20 +26,64 @@ const subjectOf = (text) => {
     return titleCase((about ? about[1] : text).replace(/[.!?]+$/, '').trim());
 };
 
+// The entry the edit scenario works on: the demo entry, with plain text fields to fill in
+const summerSale = {
+    title: 'Our summer sale',
+    url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001'),
+    values: {
+        subtitle: 'Our biggest ever discounts on outdoor furniture',
+        excerpt: 'Up to half off every outdoor furniture range, from loungers to dining sets, until Sunday.',
+        meta_description: 'Up to 50% off outdoor furniture in our summer sale. Loungers, dining sets and more, until Sunday.',
+    },
+    labels: { subtitle: 'Subtitle', excerpt: 'Excerpt', meta_description: 'Meta Description' },
+};
+
 const scenarios = [
     {
-        // "Create a new homepage image", "use this as the hero image..."
-        match: /\b(image|photo|picture|hero|asset|banner)s?\b/i,
-        plan: (text, who) => ({
-            title: 'Update published entry',
-            permission: 'publish entries',
-            steps: [
-                { tool: 'statamic.search_assets', args: 'container: assets · query: "homepage"', result: '4 matching images found', ms: 1000 },
-                { tool: 'statamic.update_entry', args: 'entry: pages::en::home', result: 'hero_image updated · copy unchanged', ms: 1200 },
-                { tool: 'statamic.publish_entry', args: `authorized_as: ${who.name} · permission checked`, result: 'Published content change committed', ms: 1100 },
-            ],
-            done: { text: 'The homepage has a new hero image' },
-        }),
+        // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
+        // If the entry isn't open, it opens it first (the chat stays put across the visit), so you see the changes where they'd be made.
+        match: /\b(tighten|tidy|rewrite|improve|shorten|shorter|fix|typo|excerpt|subtitle|meta)\b/i,
+        plan: () => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const isOpen = window.location.href.startsWith(summerSale.url());
+            const fields = Object.keys(summerSale.values);
+
+            return {
+                title: 'Edit entry',
+                permission: 'edit entries',
+                steps: [
+                    ...(isOpen
+                        ? []
+                        : [
+                              { tool: 'statamic.search_entries', args: 'query: "summer sale"', result: `1 entry found · ${summerSale.title}`, ms: 900 },
+                              {
+                                  tool: 'cp.open_entry',
+                                  args: `entry: "${summerSale.title}"`,
+                                  result: 'Opened in the editor',
+                                  ms: 300,
+                                  action: async () => {
+                                      const opened = nextForm();
+                                      router.visit(summerSale.url());
+                                      await opened;
+                                  },
+                              },
+                          ]),
+                    { tool: 'statamic.get_blueprint', args: 'collection: ai_suggestions · blueprint: article', result: '5 fields loaded', ms: 700 },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: `fields: ${fields.join(', ')}`,
+                        result: 'Changed in the form · not saved',
+                        ms: 1100,
+                        action: () => currentForm() && fill(summerSale.values),
+                    },
+                ],
+                done: {
+                    text: `Changed ${fields.length} fields on ${summerSale.title}`,
+                    items: fields.map((field) => summerSale.labels[field]),
+                    note: 'Nothing’s saved yet. Check them over, then save or publish as usual.',
+                },
+            };
+        },
     },
     {
         // "Create a blog post about our latest product"
@@ -126,9 +174,14 @@ const promptScenarios = {
         permission: 'edit assets',
         steps: [
             { tool: 'statamic.get_entry', args: `entry: "${page}" · fields: assets`, result: '9 images used', ms: 900 },
-            { tool: 'statamic.update_asset', args: 'assets: 6 without alt · field: alt', result: 'Alt text written for 6 images', ms: 1600 },
+            { tool: 'statamic.get_assets', args: 'assets: 9 · fields: alt', result: '6 without alt text', ms: 1000 },
         ],
-        done: { text: 'Alt text added to 6 images', note: '3 already had some, and were left alone.' },
+        // Alt text is saved on the image, not with this entry, so it can't wait for you to save the entry. It suggests rather than changes.
+        done: {
+            text: 'Alt text for 6 images',
+            items: ['sale-hero.jpg: “A teak lounger on a sunny patio”', 'dining-set.jpg: “Six-seat outdoor dining set under a parasol”', 'hammock.jpg: “Striped hammock between two trees”', '…and 3 more'],
+            note: 'Nothing was changed, as alt text saves on each image straight away.',
+        },
     }),
     'seo-check': (page) => ({
         permission: 'view entries',
@@ -168,6 +221,7 @@ export async function playRun(run, onChange = () => {}) {
         step.state = 'running';
         onChange();
         await wait(step.ms);
+        await step.action?.();
         step.state = 'done';
         onChange();
         await wait(250);

@@ -3,6 +3,7 @@ import { computed, provide, ref, watch, onMounted, onUnmounted, useTemplateRef }
 import useResizable from '@/composables/use-resizable.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 import AiChat from '@/components/ai-chat/AiChat.vue';
+import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChatCloseControl from '@/components/ai-chat/AiChatCloseControl.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import { Tabs, TabList, TabTrigger } from '@ui';
@@ -24,6 +25,8 @@ const left = {
 const pagePanelActive = ref(false);
 const pagePanelLabel = ref(null);
 const { open: chatOpen, floating: chatFloating, messages: chatMessages } = useAiChat();
+// Start keeping track of the open publish form now, before any page's form mounts, so the chat can fill it in
+useAiChanges();
 
 // Switching between floating and docked swaps the floating card in or out of the page. That isn't opening or closing the chat, so skip its fade then, or it plays as a distraction while the sidebar appears instantly.
 const switchingLayout = ref(false);
