@@ -8,7 +8,7 @@ import { cp_url } from '@/bootstrap/globals.js';
 //
 // Each step: the tool, the arguments it was called with, what it reported back, and how long it "runs" for (ms).
 // A step can also have an `action`, which really happens once it has run, like opening an entry or filling in its fields.
-// An action can ask you something (see ask()), and can stop the run by returning { stop: outcome }.
+// An action can ask you something (see ask()), and can stop the run by returning { stop: outcome }, plus cancelled: true if you called it off.
 
 
 const slug = (text, words = 5) =>
@@ -257,7 +257,7 @@ async function openEntry(entry, ask, nextForm) {
             ],
         });
 
-        if (choice === 'cancel') return { stop: stopped };
+        if (choice === 'cancel') return { stop: stopped, cancelled: true };
 
         if (choice === 'save') {
             // The same as pressing ⌘S / Ctrl+S on the page, so it saves the way the page normally does
@@ -295,7 +295,7 @@ export async function playRun(run, onChange = () => {}) {
         if (result?.stop) {
             run.steps.slice(i).forEach((later) => (later.state = 'skipped'));
             run.done = result.stop;
-            run.status = 'done';
+            run.status = result.cancelled ? 'cancelled' : 'done';
             onChange();
             return;
         }

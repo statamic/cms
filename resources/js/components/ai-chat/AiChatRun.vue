@@ -14,6 +14,7 @@ const badge = computed(() =>
         // A pointer clicking: it's your move
         waiting: { color: 'default', text: __('Needs you'), icon: 'cursor-click' },
         done: { color: 'emerald', text: __('Done') },
+        cancelled: { color: 'default', text: __('Cancelled') },
     })[props.run.status],
 );
 </script>
@@ -53,13 +54,14 @@ const badge = computed(() =>
             </div>
         </div>
 
-        <!-- The outcome, built like the tool-call cards above it: a tick and the same spacing -->
+        <!-- The outcome, built like the tool-call cards above it: a tick (or a cross, if you cancelled) and the same spacing -->
         <div
-            v-if="run.status === 'done'"
+            v-if="run.status === 'done' || run.status === 'cancelled'"
             class="flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
-                <AiChatDoneIcon />
+                <Icon v-if="run.status === 'cancelled'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
+                <AiChatDoneIcon v-else />
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">
                 <p class="text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
