@@ -15,7 +15,7 @@ const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it. The empty box is 34px tall (it measured 33.5), so the card's edges and focus ring land on whole pixels and the send button is centred in the ring.
         'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! pe-12! dark:bg-transparent!'
-        : 'pe-10 focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-primary),#60a5fa)_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-primary)_45%,transparent)]',
+        : 'pe-10 focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)]',
 );
 const prompt = ref('');
 
@@ -457,7 +457,7 @@ function scrollToBottom() {
                 size="xs"
                 round
                 :class="floating ? 'end-4.75 bottom-[12px]' : 'end-5.25 bottom-5.25'"
-                class="absolute border-0 bg-none! bg-primary! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-primary-hover! disabled:opacity-100! disabled:bg-primary/8! dark:disabled:bg-primary/20! [&_svg]:opacity-100! disabled:[&_svg]:text-primary/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
+                class="absolute border-0 bg-none! bg-ai! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-ai-hover! disabled:opacity-100! disabled:bg-ai/8! dark:disabled:bg-ai/20! [&_svg]:opacity-100! disabled:[&_svg]:text-ai/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 tabindex="-1"
                 v-tooltip="__('Send')"

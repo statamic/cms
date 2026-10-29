@@ -91,7 +91,7 @@ const usageText = computed(() =>
             <span class="font-medium text-gray-900 dark:text-white">{{ money(spent) }}</span>{{ ' ' }}{{ usageText }}
         </p>
         <div v-if="limit" class="h-1.5 w-full max-w-80 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10" role="presentation">
-            <div class="h-full rounded-full bg-primary" :style="{ width: `${usedPercent}%` }" />
+            <div class="h-full rounded-full bg-ai" :style="{ width: `${usedPercent}%` }" />
         </div>
     </div>
 </template>
