@@ -77,6 +77,20 @@ class Link extends Fieldtype
         ];
     }
 
+    public function rules(): array
+    {
+        return [
+            ...parent::rules(),
+            function ($attribute, $value, $fail) {
+                $parent = $this->field->parent();
+
+                if ($this->field->handle() === 'redirect' && $parent instanceof Entry && $value === 'entry::'.$parent->id()) {
+                    $fail(__('statamic::validation.link_cannot_reference_itself'));
+                }
+            },
+        ];
+    }
+
     public function augment($value)
     {
         $localize = ! $this->canSelectAcrossSites();
