@@ -25,24 +25,17 @@ class CacheManagerTest extends TestCase
         Storage::disk('glide')->put('containers/main/foo.jpg/abc.jpg', 'foo');
         Storage::disk('glide')->put('containers/main/bar.jpg/def.jpg', 'barbaz');
 
-        $this->actingAs(tap(User::make()->makeSuper())->save());
-
         $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
             ->get(cp_route('utilities.cache'))
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('utilities/Cache')
                 ->missing('images')
+                ->loadDeferredProps(fn (AssertableInertia $reload) => $reload
+                    ->where('images.count', 2)
+                    ->where('images.size', '9 B')
+                )
             );
-
-        $this
-            ->get(cp_route('utilities.cache'), [
-                'X-Inertia' => 'true',
-                'X-Inertia-Partial-Component' => 'utilities/Cache',
-                'X-Inertia-Partial-Data' => 'images',
-            ])
-            ->assertOk()
-            ->assertJsonPath('props.images.count', 2)
-            ->assertJsonPath('props.images.size', '9 B');
     }
 }
