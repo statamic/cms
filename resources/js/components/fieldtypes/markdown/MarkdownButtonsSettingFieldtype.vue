@@ -4,8 +4,12 @@
             <button
                 v-for="button in buttons"
                 :key="button.name"
+                type="button"
                 v-tooltip="button.text"
+                class="relative hover:bg-white/10!"
                 :class="{ active: enabled(button.name) }"
+                :aria-label="button.text"
+                :aria-pressed="enabled(button.name)"
                 @click="toggleButton(button.name)"
             >
                 <ui-icon :name="button.svg" />
@@ -91,6 +95,17 @@ export default {
                 swapAnimation: { horizontal: true },
                 plugins: [Plugins.SwapAnimation],
                 distance: 10,
+                classes: {
+                    'source:dragging': [
+                        'draggable-source--is-dragging',
+                        'bg-gray-800!',
+                        'opacity-100!',
+                        'shadow-lg',
+                        'ring-1',
+                        'ring-white/15',
+                        'z-10',
+                    ],
+                },
             })
                 .on('sortable:stop', (e) => {
                     this.buttons.splice(e.newIndex, 0, this.buttons.splice(e.oldIndex, 1)[0]);
