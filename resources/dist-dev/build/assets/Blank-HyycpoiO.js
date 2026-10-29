@@ -1,0 +1,9 @@
+import { q as renderSlot } from "./vue.esm-bundler-DDHDr1YM.js";
+import { t as _plugin_vue_export_helper_default } from "./_plugin-vue_export-helper-DjkACiAr.js";
+// resources/js/pages/layout/Blank.vue
+var _sfc_main = {};
+function _sfc_render(_ctx, _cache) {
+	return renderSlot(_ctx.$slots, "default");
+}
+var Blank_default = /*#__PURE__*/ _plugin_vue_export_helper_default(_sfc_main, [["render", _sfc_render], ["__file", "Blank.vue"]]);
+export { Blank_default as default };
