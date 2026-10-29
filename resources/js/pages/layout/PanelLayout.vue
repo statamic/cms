@@ -6,6 +6,8 @@ import AiChat from '@/components/ai-chat/AiChat.vue';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChatCloseControl from '@/components/ai-chat/AiChatCloseControl.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
+import AiChatMoveHint from '@/components/ai-chat/AiChatMoveHint.vue';
+import { moving } from '@/components/ai-chat/mock-runs.js';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -168,6 +170,7 @@ onUnmounted(() => {
             tabindex="-1"
             style="order: 2"
             class="sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-mr-2 mx-auto focus:outline-none ps-2"
+            :class="{ 'z-(--z-index-max)': chatInPanel && moving.title }"
         >
             <Tabs v-if="showRightTabs" v-model="rightTab">
                 <TabList class="mx-0! px-3 pt-2">
@@ -185,6 +188,9 @@ onUnmounted(() => {
             </div>
         </div>
     </Teleport>
+
+    <!-- Before the floating chat, so the fade it brings over the page (and the nav) stays under the chat. A docked chat is lifted above it while it's there. -->
+    <AiChatMoveHint />
 
     <!-- The floating chat fades up as it opens and fades back down as it closes, the same movement both ways. Reduced motion skips it. It stays mounted while closed (hidden), so opening it doesn't wait on building the chat and the animation starts straight away. -->
     <Transition
