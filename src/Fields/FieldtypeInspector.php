@@ -6,6 +6,9 @@ use BackedEnum;
 use Illuminate\Support\Collection;
 use Statamic\Statamic;
 
+/**
+ * @internal
+ */
 class FieldtypeInspector
 {
     public function __construct(private FieldtypeRepository $fieldtypes)
