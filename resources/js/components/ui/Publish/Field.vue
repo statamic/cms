@@ -330,7 +330,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <!-- Prototype: the AI chat changed this field. The badge takes the CP's primary colour, so it follows the theme. Undo puts back what was there, set like the Read Only note (small grey text after an icon, the reverse of the CP's refresh arrow), with a hover background as it's a button. -->
+                    <!-- Prototype: the AI chat changed this field. The badge takes the CP's primary colour, so it follows the theme. Undo puts back what was there, set like the Read Only note (small grey text after a U-turn arrow), with a hover background as it's a button. -->
                     <span v-if="aiChange" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
                         <Badge size="sm" class="bg-primary/5 border-primary/40 text-primary dark:border dark:bg-gray-800 dark:border-primary/60 dark:text-white" :text="__('Changed by AI')" />
                         <button type="button" class="cursor-pointer rounded-md px-1 py-0.5 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white" @click="aiChanges.undo(containerName, fullPath)">
