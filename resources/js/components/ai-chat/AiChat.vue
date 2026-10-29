@@ -30,6 +30,17 @@ watch([showHelp, helpView], () => (activeHelpPrompt.value = -1));
 // Tab shows the highlighted saved prompt's full instructions in a tooltip, and Tab again puts them away
 const explainPrompt = ref(false);
 
+// A run waiting for an answer from you (see ask() in mock-runs.js)
+const waitingRun = computed(() => messages.value.findLast((message) => message.run?.waiting)?.run);
+// A question shows in place of the input. Its first choice takes focus, so Enter picks it and Esc picks the last (Cancel).
+const askInInput = computed(() => !!waitingRun.value);
+const askFirst = useTemplateRef('askFirst');
+watch(askInInput, (asking) => (asking ? nextTick(() => askFirst.value?.[0]?.$el?.focus()) : focusInput()));
+
+function answer(value) {
+    waitingRun.value?.waiting.answer(value);
+}
+
 const thread = useTemplateRef('thread');
 const form = useTemplateRef('form');
 const examples = useTemplateRef('examples');
@@ -352,6 +363,28 @@ function scrollToBottom() {
                     </template>
                 </div>
             </Transition>
+            <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted, so the three choices fit on one row. -->
+            <div
+                v-if="askInInput"
+                :class="floating ? 'inset-x-1.5 bottom-1.5' : 'inset-x-2.5 bottom-2.5'"
+                class="absolute z-(--z-index-portal) space-y-2.5 rounded-xl bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
+                @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
+            >
+                <p class="text-[0.8125rem]/5 text-gray-800 dark:text-gray-200">{{ waitingRun.waiting.question }}</p>
+                <div class="flex flex-wrap justify-end gap-1">
+                    <Button
+                        v-for="(choice, i) in [...waitingRun.waiting.choices].reverse()"
+                        :key="choice.value"
+                        :ref="i === waitingRun.waiting.choices.length - 1 ? 'askFirst' : undefined"
+                        size="xs"
+                        :variant="i === waitingRun.waiting.choices.length - 1 ? 'primary' : i === 0 ? 'ghost' : 'default'"
+                        @click="answer(choice.value)"
+                    >
+                        {{ choice.label }}
+                        <kbd v-if="i === waitingRun.waiting.choices.length - 1" class="ms-1 font-sans opacity-70">↵</kbd>
+                    </Button>
+                </div>
+            </div>
             <!-- Like the command palette's search row, an icon in front of the text -->
             <Icon
                 name="ai-chat"
