@@ -6,6 +6,7 @@ use Facades\Statamic\Routing\ResolveRedirect;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
@@ -149,6 +150,45 @@ class LinkTest extends TestCase
         Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
 
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'entry', 'url' => '/the-entry-url', 'icon' => 'collections'],
+            $fieldtype->preProcessIndex('entry::entry-id')
+        );
+    }
+
+    #[Test]
+    public function it_pre_processes_entry_on_another_site_with_absolute_url_for_index()
+    {
+        $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $entry->shouldReceive('locale')->andReturn('fr');
+        $entry->shouldReceive('absoluteUrl')->once()->andReturn('http://example.fr/the-entry-url');
+        $entry->shouldNotReceive('url');
+
+        Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'entry', 'url' => 'http://example.fr/the-entry-url', 'icon' => 'collections'],
+            $fieldtype->preProcessIndex('entry::entry-id')
+        );
+    }
+
+    #[Test]
+    public function it_pre_processes_entry_on_the_parents_site_with_relative_url_for_index()
+    {
+        $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $entry->shouldReceive('locale')->andReturn('fr');
+        $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
+        $entry->shouldNotReceive('absoluteUrl');
+
+        $parent = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $parent->shouldReceive('locale')->andReturn('fr');
+
+        Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
+
+        $fieldtype = (new Link)->setField((new Field('test', ['type' => 'link']))->setParent($parent));
 
         $this->assertEquals(
             ['type' => 'entry', 'url' => '/the-entry-url', 'icon' => 'collections'],
