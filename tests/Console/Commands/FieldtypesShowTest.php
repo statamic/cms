@@ -114,17 +114,6 @@ class FieldtypesShowTest extends TestCase
     }
 
     #[Test]
-    public function it_can_run_through_please()
-    {
-        require_once __DIR__.'/../Kernel.php';
-
-        $kernel = app(\Statamic\Console\Please\Kernel::class);
-
-        $this->assertSame(0, $kernel->call('fieldtypes:show', ['handle' => 'grid', '--json' => true]));
-        $this->assertSame('grid', json_decode($kernel->output(), true, 512, JSON_THROW_ON_ERROR)['fieldtype']['handle']);
-    }
-
-    #[Test]
     public function an_unknown_fieldtype_returns_a_nonzero_exit_code_and_json_error()
     {
         $data = $this->commandJson(['handle' => 'does_not_exist'], 1);

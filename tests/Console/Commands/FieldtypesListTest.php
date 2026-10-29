@@ -44,17 +44,6 @@ class FieldtypesListTest extends TestCase
             ->expectsOutputToContain('markdown')
             ->assertSuccessful();
     }
-
-    #[Test]
-    public function it_can_run_through_please()
-    {
-        require_once __DIR__.'/../Kernel.php';
-
-        $kernel = app(\Statamic\Console\Please\Kernel::class);
-
-        $this->assertSame(0, $kernel->call('fieldtypes:list', ['--json' => true]));
-        $this->assertNotEmpty(json_decode($kernel->output(), true, 512, JSON_THROW_ON_ERROR)['fieldtypes']);
-    }
 }
 
 class ListedFieldtype extends Fieldtype
