@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Contracts\Query\Builder;
 use Statamic\Facades\URL;
 use Statamic\Fields\Value;
 
@@ -43,11 +44,21 @@ trait HasAvatar
     }
 
     /**
+     * The avatar asset from the asset field.
+     */
+    public function avatarFieldAsset()
+    {
+        $value = $this->avatarFieldValue()->value();
+
+        return $value instanceof Builder ? $value->first() : $value;
+    }
+
+    /**
      * The URL of the avatar from the asset field.
      */
     public function avatarFieldUrl()
     {
-        return optional($this->avatarFieldValue()->value())->url();
+        return optional($this->avatarFieldAsset())->url();
     }
 
     /**
@@ -55,7 +66,7 @@ trait HasAvatar
      */
     public function avatarFieldSquareThumbnailUrl()
     {
-        $assetId = optional($this->avatarFieldValue()->value())->id();
+        $assetId = optional($this->avatarFieldAsset())->id();
 
         if (! $assetId) {
             return null;
