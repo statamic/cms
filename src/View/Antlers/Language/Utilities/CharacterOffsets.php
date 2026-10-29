@@ -148,6 +148,8 @@ class CharacterOffsets
     }
 
     /**
+     * @internal
+     *
      * @param  string  $source
      * @param  int[]  $characterOffsets
      * @return array{0: array<int, int>, 1: array<int, int>}

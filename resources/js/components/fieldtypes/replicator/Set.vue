@@ -150,6 +150,18 @@ function startMovingFromMenu() {
 
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
+
+const dropdownJustClosed = ref(false);
+let dropdownJustClosedTimeout = null;
+
+function onSetDropdownClosed() {
+    dropdownJustClosed.value = true;
+    if (dropdownJustClosedTimeout) clearTimeout(dropdownJustClosedTimeout);
+    dropdownJustClosedTimeout = setTimeout(() => {
+        dropdownJustClosed.value = false;
+        dropdownJustClosedTimeout = null;
+    }, 150);
+}
 </script>
 
 <template>
@@ -167,6 +179,9 @@ reveal.use(rootEl, () => emit('expanded'));
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
                 'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
+                'border-dashed border-gray-300 dark:border-gray-600': readOnly && !hasError,
+                'border-dashed': readOnly && hasError,
                 'focus-outline': moving,
             }"
             :data-collapsed="collapsed ?? undefined"
@@ -177,7 +192,8 @@ reveal.use(rootEl, () => emit('expanded'));
         >
             <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
             <header
-                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 data-readonly:dark:!bg-transparent hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :data-readonly="readOnly ? true : undefined"
                 :class="{
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
@@ -192,10 +208,10 @@ reveal.use(rootEl, () => emit('expanded'));
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
-                            {{ __(setGroup.display) }}
-                            <Icon name="chevron-right" class="relative top-px size-3" />
+                            <span class="st-text-trim-optical-cap">{{ __(setGroup.display) }}</span>
+                            <Icon name="chevron-right" class="size-3" />
                         </span>
-                        {{ __(config.display) || config.handle }}
+                        <span class="st-text-trim-optical-cap">{{ __(config.display) || config.handle }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
@@ -224,7 +240,7 @@ reveal.use(rootEl, () => emit('expanded'));
                         @update:model-value="toggleEnabledState"
                         v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
                     />
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>

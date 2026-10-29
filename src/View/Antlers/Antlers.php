@@ -40,6 +40,7 @@ class Antlers
         }
     }
 
+    /** @internal */
     public function parseWithoutInstrumentation($str, $variables = [], $trusted = false)
     {
         return InstrumentationState::withoutInstrumentation(

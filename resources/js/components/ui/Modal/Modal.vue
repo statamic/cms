@@ -29,8 +29,10 @@ const props = defineProps({
     open: { type: Boolean, default: false },
     /** Callback that fires before the modal closes. */
     beforeClose: { type: Function, default: () => true },
-    /** When `true`, clicking outside the modal will dismiss it. */
+    /** When `true`, clicking outside the modal or pressing Esc will dismiss it. */
     dismissible: { type: Boolean, default: true },
+    /** When `true`, focus moves to the first focusable element on open. When `false`, focus stays on the dialog so Tab reaches the first control. */
+    autofocus: { type: Boolean, default: true },
 });
 
 const restAttrs = computed(() => {
@@ -70,7 +72,9 @@ const titleId = useId();
 const labelledBy = computed(() => hasModalTitleComponent.value || props.title ? titleId : undefined);
 const isUsingOpenProp = computed(() => instance?.vnode.props?.hasOwnProperty('open'));
 const portal = computed(() => modal.value ? `#portal-target-${modal.value.id}` : null);
-const isTopPortal = computed(() => portals.all()[portals.all().length - 1].id === modal.value.id);
+// Not just the last portal created: fields like Bard register inline portals as they load,
+// which would switch off the focus trap of a modal opened on page load (e.g. the licensing alert).
+const isTopPortal = computed(() => portals.top()?.id === modal.value.id);
 
 function open() {
     if (!modal.value) modal.value = portals.create('modal');
@@ -86,7 +90,7 @@ function open() {
             emit('opened');
             nextTick(() => {
                 hidePageBehind();
-                focusFirstFocusable();
+                focusOnOpen();
             });
         });
     });
@@ -100,13 +104,23 @@ const FOCUSABLE_SELECTOR = [
     'textarea:not([disabled])',
 ].join(', ');
 
-function focusFirstFocusable() {
+function focusOnOpen() {
+    if (!props.autofocus) {
+        modalContent.value?.focus();
+        return;
+    }
+
     const first = modalContent.value?.querySelector(FOCUSABLE_SELECTOR);
     if (first instanceof HTMLElement) {
         first.focus();
     } else {
         modalContent.value?.focus();
     }
+}
+
+// Modal owns initial focus; prevent FocusScope from focusing the first tabbable first.
+function onMountAutoFocus(event) {
+    event.preventDefault();
 }
 
 function hidePageBehind() {
@@ -143,7 +157,6 @@ function dismiss() {
     if (!runCloseCallback()) return;
 
     emit('dismissed');
-    close();
 }
 
 function updateOpen(value) {
@@ -187,7 +200,7 @@ defineExpose({
     runCloseCallback,
 });
 
-provide('closeModal', close);
+provide('closeModal', runCloseCallback);
 provide('modalTitleId', titleId);
 </script>
 
@@ -196,7 +209,7 @@ provide('modalTitleId', titleId);
         <slot name="trigger" />
     </div>
     <teleport :to="portal" v-if="mounted && portal">
-        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal">
+        <FocusScope loop :trapped="isTopPortal" class="vue-portal-target modal" @mount-auto-focus="onMountAutoFocus">
             <transition
                 enter-active-class="duration-200"
                 enter-from-class="opacity-0"
@@ -215,7 +228,7 @@ provide('modalTitleId', titleId);
                 leave-from-class="opacity-100 scale-100"
                 leave-to-class="opacity-0 scale-95"
             >
-                <div ref="modalContent" v-if="visible" role="dialog" aria-modal="true" :aria-labelledby="labelledBy" v-bind="restAttrs" :class="[modalClasses, attrs.class]" data-ui-modal-content>
+                <div ref="modalContent" v-if="visible" role="dialog" aria-modal="true" tabindex="-1" :aria-labelledby="labelledBy" v-bind="restAttrs" :class="[modalClasses, attrs.class]" data-ui-modal-content>
                     <div class="relative space-y-3 rounded-xl overflow-auto max-h-[60vh] border border-gray-400/60 bg-white p-4 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:border-none dark:bg-gray-800 dark:shadow-[0_1px_16px_-2px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10">
                         <div v-if="!hasModalTitleComponent && (title || icon)" :id="titleId" data-ui-modal-title class="flex items-center gap-2">
                             <Icon :name="icon" v-if="icon" class="size-4" />

@@ -20,7 +20,9 @@ class Marketplace
 
         return static::$packagesCache[$hash] ??= Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $packages) {
             try {
-                $response = Client::post($uri, ['packages' => $packages]);
+                if (! $response = Client::post($uri, ['packages' => $packages])) {
+                    return [0 => collect()];
+                }
 
                 return [60 => collect($response['data'])];
             } catch (TransferException $e) {
@@ -35,11 +37,11 @@ class Marketplace
         $hash = md5(json_encode($params));
 
         return Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $params) {
-            $fallback = [5 => ['data' => collect(), 'meta' => null]];
+            $fallback = ['data' => collect(), 'meta' => null];
 
             try {
                 if (! $response = Client::get($uri, $params)) {
-                    return $fallback;
+                    return [0 => $fallback];
                 }
 
                 return [60 => [
@@ -47,7 +49,7 @@ class Marketplace
                     'meta' => $response['meta'] ?? null,
                 ]];
             } catch (TransferException $e) {
-                return $fallback;
+                return [5 => $fallback];
             }
         });
     }
@@ -78,7 +80,9 @@ class Marketplace
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
             try {
-                $response = Client::get($uri);
+                if (! $response = Client::get($uri)) {
+                    return [0 => collect()];
+                }
 
                 return [60 => collect($response['data'])];
             } catch (TransferException $e) {

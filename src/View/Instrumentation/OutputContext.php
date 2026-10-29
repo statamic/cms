@@ -160,7 +160,7 @@ final class OutputContext
                 return $this->pending($index, $length, self::TAG);
             }
 
-            if (! ctype_alpha($html[$nameStart])) {
+            if (! HtmlSpec::isAsciiAlpha($html[$nameStart])) {
                 if ($html[$nameStart] === '>') {
                     return $nameStart + 1;
                 }
@@ -169,7 +169,7 @@ final class OutputContext
 
                 return $nameStart;
             }
-        } elseif (! ctype_alpha($next)) {
+        } elseif (! HtmlSpec::isAsciiAlpha($next)) {
             return $nameStart;
         }
 

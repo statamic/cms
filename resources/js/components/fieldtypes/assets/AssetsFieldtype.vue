@@ -1,5 +1,9 @@
 <template>
-    <div data-asset-browser class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl [.link-fieldtype_&]:bg-transparent">
+    <div
+        data-asset-browser
+        :data-asset-picker-visible="pickerVisible || null"
+        class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl [.link-fieldtype_&]:bg-transparent"
+    >
         <div
             v-if="hasPendingDynamicFolder"
             class="w-full rounded-md border border-dashed px-4 py-3 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
@@ -27,7 +31,7 @@
                 </div>
 
                 <div
-                    v-if="!isReadOnly && showPicker"
+                    v-if="pickerVisible"
                     data-asset-picker
                     class="not-[.link-fieldtype_&]:p-2 not-[.link-fieldtype_&]:border border-gray-300 dark:border-gray-700 dark:bg-gray-850 rounded-xl flex flex-wrap items-center gap-y-1 gap-x-3"
                     :class="{
@@ -426,6 +430,10 @@ export default {
             if (this.maxFilesReached && (this.isInGridField || this.isInLinkField)) return false;
 
             return true;
+        },
+
+        pickerVisible() {
+            return !this.isReadOnly && this.showPicker;
         },
 
         showSetAlt() {

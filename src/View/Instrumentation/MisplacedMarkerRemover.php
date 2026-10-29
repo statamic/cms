@@ -164,7 +164,7 @@ final class MisplacedMarkerRemover
             $nameStart++;
         }
 
-        if (! ctype_alpha($this->html[$nameStart] ?? '')) {
+        if (! HtmlSpec::isAsciiAlpha($this->html[$nameStart] ?? '')) {
             $this->scanBogusMarkup($next);
 
             return;

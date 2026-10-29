@@ -199,6 +199,7 @@ class DocumentParser
         $this->isVirtual = $isVirtual;
     }
 
+    /** @internal */
     public function inheritRuntimeLineSeed($inherit = true)
     {
         $this->inheritRuntimeLineSeed = $inherit;

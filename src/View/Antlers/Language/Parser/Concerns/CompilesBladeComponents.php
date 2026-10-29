@@ -9,9 +9,12 @@ use Stillat\BladeParser\Nodes\Components\ParameterType;
 
 trait CompilesBladeComponents
 {
+    /** @internal */
     public const COMPONENT_PROXY_PREFIX = '%component_proxy:';
 
     /**
+     * @internal
+     *
      * @param  string  $content
      * @return bool
      */
@@ -48,6 +51,10 @@ trait CompilesBladeComponents
             $params .= ' component_name___="'.$name.'"';
         }
 
+        if ($bound = $this->getBoundParameterNames($component)) {
+            $params .= ' component_bound___="'.implode(',', $bound).'"';
+        }
+
         $proxy = self::COMPONENT_PROXY_PREFIX;
 
         if ($component->isClosingTag && ! $component->isSelfClosing) {
@@ -65,6 +72,15 @@ trait CompilesBladeComponents
         $close = $this->mapComponentMarkup($component->isClosedBy, "{{ /{$proxy}$tagMethod }}");
 
         return $open.$innerContent.$close;
+    }
+
+    protected function getBoundParameterNames(ComponentNode $component): array
+    {
+        return collect($component->parameters)
+            ->filter(fn ($parameter) => in_array($parameter->type, [ParameterType::DynamicVariable, ParameterType::ShorthandDynamicVariable]))
+            ->map(fn ($parameter) => $parameter->materializedName)
+            ->values()
+            ->all();
     }
 
     protected function getParamValue(string $value): string

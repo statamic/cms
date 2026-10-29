@@ -18,6 +18,6 @@
             "@statamic/cms/*": ["packages/cms/src/*"]
         }
     },
-    "include": ["resources/js/**/*", ".storybook/**/*"],
+    "include": ["resources/js/**/*", "resources/js/**/*.vue", ".storybook/**/*"],
     "exclude": ["node_modules", "resources/dist", "resources/dist-dev"]
 }

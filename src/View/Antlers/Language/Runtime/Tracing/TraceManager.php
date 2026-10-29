@@ -84,6 +84,8 @@ class TraceManager
     }
 
     /**
+     * @internal
+     *
      * @param  RuntimeTracerContract|TracerContract  $tracer
      * @return void
      */
@@ -105,7 +107,11 @@ class TraceManager
         ));
     }
 
-    /** @return RuntimeTracerContract[] */
+    /**
+     * @internal
+     *
+     * @return RuntimeTracerContract[]
+     */
     public function tracers()
     {
         return $this->tracers;
@@ -183,6 +189,7 @@ class TraceManager
         $this->frames[] = [spl_object_id($node), $span, $handles, $processorId, $processorDepth];
     }
 
+    /** @internal */
     public function traceProcessorScopeComplete(NodeProcessor $processor, int $processorDepth)
     {
         if ($this->frames !== []) {
@@ -256,6 +263,7 @@ class TraceManager
         }
     }
 
+    /** @internal */
     public function traceRenderStart()
     {
         self::$openRenders ??= new WeakMap;
@@ -273,7 +281,11 @@ class TraceManager
         self::$openRenders[$this] = true;
     }
 
-    /** @return int */
+    /**
+     * @internal
+     *
+     * @return int
+     */
     public function renderDepth()
     {
         return count($this->renderBoundaries);

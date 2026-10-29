@@ -34,6 +34,7 @@ class AntlersLoop extends AntlersString
         return $this->render()[0];
     }
 
+    /** @internal */
     public function instrumented()
     {
         return $this->render()[1];
