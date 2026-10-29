@@ -204,7 +204,7 @@ function follow(text) {
         <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
         <div ref="panel" @keydown="onArrowKey">
             <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
-                <Icon :name="icon" class="size-3.5 text-primary" />
+                <Icon :name="icon" class="size-3.5 text-ai" />
                 <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                     {{ __('Suggestions') }}
                 </span>
