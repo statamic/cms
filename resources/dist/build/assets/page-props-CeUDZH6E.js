@@ -1,0 +1,1 @@
+import"./vue.esm-bundler-BCxpZ5YU.js";import{s as e}from"./index.esm-CVUdQd29.js";function t(){let t=e();return new Proxy({},{get(e,n){return t.props._statamic?.[n]}})}export{t};

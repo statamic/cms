@@ -1,0 +1,1 @@
+import{H as e,T as t,p as n,x as r}from"./vue.esm-bundler-BCxpZ5YU.js";import{g as i,r as a}from"./index-cuuXKBAD.js";var o={__name:`Show`,props:[`title`,`html`],setup(o){return(s,c)=>(e(),r(n,null,[t(a,{title:[s.__(o.title),s.__(`Utilities`)]},null,8,[`title`]),t(i,{html:o.html},null,8,[`html`])],64))}};export{o as default};
