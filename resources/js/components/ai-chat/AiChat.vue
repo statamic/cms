@@ -363,7 +363,7 @@ function scrollToBottom() {
                     </template>
                 </div>
             </Transition>
-            <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted, so the three choices fit on one row. -->
+            <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted. -->
             <div
                 v-if="askInInput"
                 :class="floating ? 'inset-x-1.5 bottom-1.5' : 'inset-x-2.5 bottom-2.5'"
@@ -371,17 +371,18 @@ function scrollToBottom() {
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
                 <p class="text-[0.8125rem]/5 text-gray-800 dark:text-gray-200">{{ waitingRun.waiting.question }}</p>
-                <div class="flex flex-wrap justify-end gap-1">
+                <!-- The choices are stacked full width, the main one first, as three don't fit in a row at this size -->
+                <div class="flex flex-col gap-1.5">
                     <Button
-                        v-for="(choice, i) in [...waitingRun.waiting.choices].reverse()"
+                        v-for="(choice, i) in waitingRun.waiting.choices"
                         :key="choice.value"
-                        :ref="i === waitingRun.waiting.choices.length - 1 ? 'askFirst' : undefined"
-                        size="xs"
-                        :variant="i === waitingRun.waiting.choices.length - 1 ? 'primary' : i === 0 ? 'ghost' : 'default'"
+                        :ref="i === 0 ? 'askFirst' : undefined"
+                        size="sm"
+                        :variant="i === 0 ? 'primary' : i === waitingRun.waiting.choices.length - 1 ? 'ghost' : 'default'"
+                        class="w-full"
                         @click="answer(choice.value)"
                     >
-                        {{ choice.label }}
-                        <kbd v-if="i === waitingRun.waiting.choices.length - 1" class="ms-1 font-sans opacity-70">↵</kbd>
+                        <span class="inline-flex items-center gap-1">{{ choice.label }}<kbd v-if="i === 0" class="font-sans opacity-70">↵</kbd></span>
                     </Button>
                 </div>
             </div>
