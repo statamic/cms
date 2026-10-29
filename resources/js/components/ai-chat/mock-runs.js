@@ -241,6 +241,9 @@ async function until(check, timeout = 8000) {
     return check();
 }
 
+// Where the chat is taking you, while the page changes
+export const moving = reactive({ title: null });
+
 // Opens an entry so the chat can fill it in, with the chat staying put across the visit.
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
 async function openEntry(entry, ask, nextForm) {
@@ -275,13 +278,20 @@ async function openEntry(entry, ask, nextForm) {
         }
     }
 
+    // Say where it's going, with just long enough to read it before the page changes. This is the only time the move adds, so keep it short.
+    moving.title = entry.title;
+    await wait(800);
+
     // If something else stops the visit, there's no new form, so stop rather than fill in the page that's open.
     const opened = nextForm();
     let started = false;
     router.visit(entry.url(), { onStart: () => (started = true) });
     await wait(50);
-    if (!started) return { stop: stopped };
-    if (!(await opened)) return { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
+    if (!started) return (moving.title = null), { stop: stopped };
+    if (!(await opened)) return (moving.title = null), { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
+    // The new page is open. The blur stays over it for a moment, so you see it arrive, then lifts. The chat carries on underneath
+    // rather than waiting for it: a real model takes this long to pick its next step anyway, so it adds no time.
+    setTimeout(() => moving.title === entry.title && (moving.title = null), 800);
 }
 
 // Plays the run: each step goes running, waits, then done. onChange lets the thread keep itself scrolled to the bottom.
