@@ -50,7 +50,7 @@ onMounted(() => open.value && focusInput());
 
 // Prototype: same examples as the command palette.
 const suggestions = [
-    { text: 'Create a new homepage image', icon: 'assets' },
+    { text: 'Tighten up the summer sale entry', icon: 'entry' },
     { text: 'Create a blog post about our latest product', icon: 'entry' },
     { text: 'Create a landing page for the summer sale', icon: 'page' },
 ];
