@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { nextTick, reactive } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import { cp_url } from '@/bootstrap/globals.js';
@@ -8,6 +8,8 @@ import { cp_url } from '@/bootstrap/globals.js';
 //
 // Each step: the tool, the arguments it was called with, what it reported back, and how long it "runs" for (ms).
 // A step can also have an `action`, which really happens once it has run, like opening an entry or filling in its fields.
+// An action can ask you something (see ask()), and can stop the run by returning { stop: outcome }.
+
 
 const slug = (text, words = 5) =>
     text
@@ -61,11 +63,7 @@ const scenarios = [
                                   args: `entry: "${summerSale.title}"`,
                                   result: 'Opened in the editor',
                                   ms: 300,
-                                  action: async () => {
-                                      const opened = nextForm();
-                                      router.visit(summerSale.url());
-                                      await opened;
-                                  },
+                                  action: (ask) => openEntry(summerSale, ask, nextForm),
                               },
                           ]),
                     { tool: 'statamic.get_blueprint', args: 'collection: ai_suggestions · blueprint: article', result: '5 fields loaded', ms: 700 },
@@ -215,13 +213,93 @@ export function planPromptRun(prompt) {
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Asks you something in the chat and waits for the answer. The chat shows `run.waiting` (where depends on the option) and calls its answer() with a choice's value.
+function ask(run, step, question, onChange) {
+    return new Promise((resolve) => {
+        step.state = 'waiting';
+        run.status = 'waiting';
+        run.waiting = {
+            ...question,
+            answer: (value) => {
+                run.waiting = null;
+                step.state = 'running';
+                run.status = 'working';
+                onChange();
+                resolve(value);
+            },
+        };
+        onChange();
+    });
+}
+
+// Waits for something to become true, checking every so often, and gives up after a while
+async function until(check, timeout = 8000) {
+    for (let waited = 0; waited < timeout; waited += 100) {
+        if (check()) return true;
+        await wait(100);
+    }
+    return check();
+}
+
+// Opens an entry so the chat can fill it in, with the chat staying put across the visit.
+// If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
+async function openEntry(entry, ask, nextForm) {
+    const page = currentPage();
+    const stopped = { text: 'Stopped before opening ' + entry.title, note: `Nothing was changed, and your changes to “${page}” are still there.` };
+
+    if (Statamic.$dirty.count()) {
+        const choice = await ask({
+            question: `Your changes to “${page}” aren’t saved yet. I need to open “${entry.title}” to make this change.`,
+            choices: [
+                { value: 'save', label: 'Save and continue' },
+                { value: 'leave', label: 'Don’t save' },
+                { value: 'cancel', label: 'Cancel' },
+            ],
+        });
+
+        if (choice === 'cancel') return { stop: stopped };
+
+        if (choice === 'save') {
+            // The same as pressing ⌘S / Ctrl+S on the page, so it saves the way the page normally does
+            const mac = navigator.platform.toUpperCase().includes('MAC');
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 's', code: 'KeyS', keyCode: 83, which: 83, metaKey: mac, ctrlKey: !mac, bubbles: true }));
+            if (!(await until(() => !Statamic.$dirty.count()))) {
+                return { stop: { text: `Couldn’t save “${page}”`, note: 'Nothing was changed. Check the form for errors, then ask again.' } };
+            }
+        }
+
+        if (choice === 'leave') {
+            Statamic.$dirty.names().forEach((name) => Statamic.$dirty.remove(name));
+            Statamic.$dirty.disableWarning();
+            await nextTick();
+        }
+    }
+
+    // If something else stops the visit, there's no new form, so stop rather than fill in the page that's open.
+    const opened = nextForm();
+    let started = false;
+    router.visit(entry.url(), { onStart: () => (started = true) });
+    await wait(50);
+    if (!started) return { stop: stopped };
+    if (!(await opened)) return { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
+}
+
 // Plays the run: each step goes running, waits, then done. onChange lets the thread keep itself scrolled to the bottom.
 export async function playRun(run, onChange = () => {}) {
-    for (const step of run.steps) {
+    for (const [i, step] of run.steps.entries()) {
         step.state = 'running';
         onChange();
         await wait(step.ms);
-        await step.action?.();
+
+        const result = await step.action?.((question) => ask(run, step, question, onChange));
+        if (result?.stop) {
+            run.steps.slice(i).forEach((later) => (later.state = 'skipped'));
+            run.done = result.stop;
+            run.status = 'done';
+            onChange();
+            return;
+        }
+
         step.state = 'done';
         onChange();
         await wait(250);
