@@ -277,8 +277,15 @@ function runPrompt(saved) {
     }, 500);
 }
 
+// Glides down for the small steps, as a run adds a line or two. From further up (a long chat, or a run that grew a lot), it jumps
+// straight there, as a smooth scroll that far takes a while and keeps chasing the bottom as more comes in.
 function scrollToBottom() {
-    nextTick(() => thread.value?.scrollTo({ top: thread.value.scrollHeight, behavior: 'smooth' }));
+    nextTick(() => {
+        const el = thread.value;
+        if (!el) return;
+        const distance = el.scrollHeight - el.clientHeight - el.scrollTop;
+        el.scrollTo({ top: el.scrollHeight, behavior: distance > el.clientHeight / 2 ? 'instant' : 'smooth' });
+    });
 }
 </script>
 
