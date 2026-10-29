@@ -3,9 +3,13 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Cache\Events\WritingKey;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,6 +17,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Token;
 use Statamic\GraphQL\Queries\PingQuery;
+use Statamic\GraphQL\ResponseCache\DefaultCache;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -80,8 +85,10 @@ class RequestCacheTest extends TestCase
         config(['statamic.graphql.cache.expiry' => 13]);
         app()->instance('request-tracking', $requests = Collection::make());
 
+        Cache::forever('gql-cache:generation', 'abc');
+
         // md5('{one}')_md5(json_encode(['foo' => 'bar']))
-        $key = 'gql-cache:0737a8fd85124abab1445165f4753936_9bb58f26192e4ba00f01e2e7b136bbd8';
+        $key = 'gql-cache:abc:0737a8fd85124abab1445165f4753936_9bb58f26192e4ba00f01e2e7b136bbd8';
 
         Carbon::setTestNow(now());
         $this->assertFalse(Cache::has($key));
@@ -176,6 +183,62 @@ class RequestCacheTest extends TestCase
         $this->assertEquals('test', Cache::get('completely-unrelated-thing'));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15523
+     */
+    #[Test]
+    public function it_busts_responses_cached_concurrently_when_content_is_saved()
+    {
+        $entry = EntryFactory::collection('test')->create();
+
+        $requestOne = Request::create('/graphql', 'POST', ['query' => '{one}']);
+        $requestTwo = Request::create('/graphql', 'POST', ['query' => '{two}']);
+
+        $workerOne = new DefaultCache;
+        $workerTwo = new DefaultCache;
+
+        $workerOne->get($requestOne);
+        $workerTwo->get($requestTwo);
+
+        $workerTwoIsWriting = false;
+
+        Event::listen(WritingKey::class, function () use (&$workerTwoIsWriting, $workerTwo, $requestTwo) {
+            if ($workerTwoIsWriting) {
+                return;
+            }
+
+            $workerTwoIsWriting = true;
+            $workerTwo->put($requestTwo, new JsonResponse(['data' => ['two' => 'two']]));
+        });
+
+        $workerOne->put($requestOne, new JsonResponse(['data' => ['one' => 'one']]));
+
+        $entry->save();
+
+        $this->assertNull((new DefaultCache)->get($requestOne));
+        $this->assertNull((new DefaultCache)->get($requestTwo));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15523
+     */
+    #[Test]
+    public function it_doesnt_cache_a_stale_response_when_content_is_saved_mid_request()
+    {
+        $entry = EntryFactory::collection('test')->create();
+
+        $request = Request::create('/graphql', 'POST', ['query' => '{one}']);
+
+        $worker = new DefaultCache;
+        $worker->get($request);
+
+        $entry->save();
+
+        $worker->put($request, new JsonResponse(['data' => ['one' => 'one']]));
+
+        $this->assertNull((new DefaultCache)->get($request));
+    }
+
     #[Test]
     public function it_ignores_configured_events()
     {
@@ -213,11 +276,13 @@ class RequestCacheTest extends TestCase
     #[Test]
     public function it_caches_response_data_as_primitives()
     {
+        Cache::forever('gql-cache:generation', 'abc');
+
         app()->instance('request-tracking', $requests = Collection::make());
 
         $this->post('/graphql', ['query' => '{one}']);
 
-        $key = 'gql-cache:'.md5('{one}').'_'.md5(json_encode(null));
+        $key = 'gql-cache:abc:'.md5('{one}').'_'.md5(json_encode(null));
         $cached = Cache::get($key);
 
         $this->assertIsArray($cached);
