@@ -34,20 +34,15 @@ return [
     | HTML Instrumentation
     |--------------------------------------------------------------------------
     |
-    | When enabled, rendered Antlers regions are wrapped in HTML comments and
-    | attributes that point back to the templates they came from. Analysis
-    | is cached by template content; set "cache" to false to skip that.
+    | When enabled, rendered Antlers output is annotated with markers that
+    | point back to the templates it came from. Since the markers expose
+    | template details, this is intended for development and tooling.
     |
     */
 
     'instrumentation' => [
         'enabled' => env('STATAMIC_ANTLERS_INSTRUMENTATION', false),
         'cache' => env('STATAMIC_ANTLERS_INSTRUMENTATION_CACHE', true),
-        'comments' => true,
-        'prefix' => 'antlers',
-        'attributes' => [],
-        'metadata' => [],
-        'componentPrefixes' => [],
     ],
 
     /*
