@@ -26,6 +26,7 @@
                             :item-class="sortableItemClass"
                             :handle-class="sortableHandleClass"
                             :animate="value.length <= 20"
+                            :distance="pointerDragThreshold"
                             append-to="body"
                             constrain-dimensions
                             @update:model-value="sorted($event)"
@@ -49,12 +50,15 @@
                                     :enabled="set.enabled"
                                     :read-only="isReadOnly"
                                     :can-add-set="canAddSet"
+                                    :can-reorder="!isReadOnly && value.length > 1"
+                                    :total-sets="value.length"
                                     :has-error="setHasError(set._id)"
                                     :show-field-previews="config.previews"
                                     @collapsed="collapseSet(set._id)"
                                     @expanded="expandSet(set._id)"
                                     @duplicated="duplicateSet(set._id)"
                                     @removed="removed(set, index)"
+                                    @moved="moved"
                                 >
                                     <template v-slot:picker>
                                         <add-set-button
@@ -63,6 +67,7 @@
                                             :sets="setConfigs"
                                             :index="index"
                                             :enabled="canAddSet"
+                                            :read-only="isReadOnly"
                                             :is-first="index === 0"
                                             :show-connector="!(index === 0 && config.hide_display)"
                                             :loading-set="loadingSet"
@@ -81,6 +86,7 @@
                             :index="value.length"
                             :label="config.button_label"
                             :is-first="value.length === 0"
+                            :read-only="isReadOnly"
                             :loading-set="loadingSet"
                             @added="addSet"
                         />
@@ -97,7 +103,7 @@ import { nanoid as uniqid } from 'nanoid';
 import ReplicatorSet from './Set.vue';
 import AddSetButton from './AddSetButton.vue';
 import ManagesSetMeta from './ManagesSetMeta';
-import { SortableList } from '../../sortable/Sortable';
+import { SortableList, arrayMove, POINTER_DRAG_THRESHOLD } from '../../sortable/Sortable';
 import { data_get } from "@/bootstrap/globals.js";
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import { keepElementUnderPointer } from '@/util/keepElementUnderPointer.js';
@@ -109,6 +115,10 @@ export default {
         ReplicatorSet,
         SortableList,
         AddSetButton,
+    },
+
+    setup() {
+        return { pointerDragThreshold: POINTER_DRAG_THRESHOLD };
     },
 
     data() {
@@ -237,6 +247,12 @@ export default {
             this.dragging = false;
             this.$refs.sets?.classList.remove('replicator-dragging');
             this.$emit('blur');
+        },
+
+        moved(from, to) {
+            if (from === to || to < 0 || to >= this.value.length) return;
+
+            this.update(arrayMove(this.value, from, to));
         },
 
         addSet(handle, index) {
@@ -400,8 +416,11 @@ export default {
             }, 1);
         },
 
-        collapsed(collapsed) {
-            this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        collapsed: {
+            deep: true,
+            handler(collapsed) {
+                this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+            },
         },
 
         loadingSet(loading) {

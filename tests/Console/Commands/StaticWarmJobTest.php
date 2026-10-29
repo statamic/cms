@@ -68,6 +68,36 @@ class StaticWarmJobTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_headers_on_dispatched_static_warm_jobs_for_paginated_pages()
+    {
+        Queue::fake();
+
+        $mock = new MockHandler([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+        ]);
+
+        $handlerStack = HandlerStack::create($mock);
+
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/blog', ['X-Foo' => 'Bar']), ['handler' => $handlerStack]);
+
+        $job->handle();
+
+        Queue::assertPushed(StaticWarmJob::class, 3);
+
+        Queue::assertPushed(StaticWarmJob::class, function (StaticWarmJob $job) {
+            return $job->request->getHeaderLine('X-Foo') === 'Bar';
+        });
+
+        Queue::assertNotPushed(StaticWarmJob::class, function (StaticWarmJob $job) {
+            return $job->request->getHeaderLine('X-Foo') !== 'Bar';
+        });
+    }
+
+    #[Test]
     public function subsequent_paginated_pages_dont_dispatch_static_warm_jobs()
     {
         Queue::fake();

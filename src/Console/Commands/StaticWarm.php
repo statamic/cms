@@ -133,14 +133,18 @@ class StaticWarm extends Command
             return $url;
         });
 
-        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+        $headers = $this->parseHeaders($this->option('header'));
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url, $headers))->all();
 
         $pool = new Pool($this->client(), $requests, [
             'concurrency' => $this->concurrency(),
             'fulfilled' => function (Response $response, $index) use ($urls) {
                 $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
             },
-            'rejected' => [$this, 'outputFailureLine'],
+            'rejected' => function ($exception, $index) use ($urls) {
+                $this->outputFailureLineFor($urls->get($index), $exception);
+            },
         ]);
 
         $promise = $pool->promise();
@@ -157,7 +161,7 @@ class StaticWarm extends Command
 
     private function client(): Client
     {
-        return new Client($this->clientConfig());
+        return app(Client::class, ['config' => $this->clientConfig()]);
     }
 
     private function clientConfig(): array
@@ -183,7 +187,12 @@ class StaticWarm extends Command
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($this->uris()->get($index));
+        $this->outputFailureLineFor($this->uris()->get($index), $exception);
+    }
+
+    private function outputFailureLineFor(string $url, $exception): void
+    {
+        $uri = $this->getRelativeUri($url);
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();

@@ -1,6 +1,11 @@
 <template>
+    <div v-if="loading" class="flex h-10 items-center gap-2 text-sm text-gray-500">
+        <Icon name="loading" class="size-4" />
+        {{ __('Loading') }}
+    </div>
+
     <Combobox
-        v-if="!loading"
+        v-else
         :clearable="config.clearable"
         :placeholder="__(config.placeholder)"
         :read-only="isReadOnly"
@@ -21,7 +26,7 @@
 
 <script>
 import Fieldtype from './Fieldtype.vue';
-import { Combobox } from '@/components/ui';
+import { Combobox, Icon } from '@/components/ui';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
@@ -38,7 +43,7 @@ function ensureCacheClearedOnNavigation() {
 }
 
 export default {
-    components: { Combobox },
+    components: { Combobox, Icon },
     mixins: [Fieldtype],
 
     data: function () {

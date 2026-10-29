@@ -26,6 +26,7 @@ defineProps([
     'listingUrl',
     'previewTargets',
     'itemActions',
+    'itemActionUrl',
     'hasTemplate',
 ]);
 </script>
@@ -59,6 +60,7 @@ defineProps([
         :listing-url="listingUrl"
         :preview-targets="previewTargets"
         :initial-item-actions="itemActions"
+        :item-action-url="itemActionUrl"
         :has-template="hasTemplate"
     />
 </template>

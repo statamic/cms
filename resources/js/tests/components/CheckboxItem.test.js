@@ -30,3 +30,33 @@ test('aria-describedby and the description element share the custom id', () => {
     expect(wrapper.find('[role="checkbox"]').attributes('aria-describedby')).toBe('custom-checkbox-id-description');
     expect(wrapper.find('p').attributes('id')).toBe('custom-checkbox-id-description');
 });
+
+test('the label prop is rendered as the aria-label', () => {
+    const wrapper = mount(Checkbox, {
+        props: { label: 'Subscribe' },
+    });
+
+    expect(wrapper.find('[role="checkbox"]').attributes('aria-label')).toBe('Subscribe');
+});
+
+test('no aria-label is rendered when the label comes from the slot', () => {
+    const wrapper = mount(Checkbox, {
+        props: { value: 'subscribe' },
+        slots: { default: () => 'Subscribe' },
+    });
+
+    expect(wrapper.find('[role="checkbox"]').attributes('aria-label')).toBeUndefined();
+});
+
+test('indeterminate sets data-state and shows the dash indicator', () => {
+    const wrapper = mount(Checkbox, {
+        props: { label: 'Select items', modelValue: false, indeterminate: true },
+    });
+
+    const root = wrapper.find('[role="checkbox"]');
+
+    expect(root.attributes('data-state')).toBe('indeterminate');
+    expect(root.attributes('aria-checked')).toBe('mixed');
+    expect(wrapper.find('svg path').attributes('d')).toBe('M2 1H8');
+});
+

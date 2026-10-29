@@ -26,6 +26,7 @@ export default {
                     return {
                         value: option[valueKey],
                         label: `${__(option[labelKey]) || option[valueKey]}`,
+                        ...(option.icon ? { icon: option.icon } : {}),
                     };
                 }
 

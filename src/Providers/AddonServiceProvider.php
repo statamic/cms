@@ -116,7 +116,9 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
-     * @var list<string> - URLs of Vite entry points
+     * Vite entry point(s). A string or list is shorthand for the `input` key.
+     *
+     * @var string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}|null
      */
     protected $vite = null;
 
@@ -667,6 +669,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::script($name, "{$filename}.js?v=".md5($version));
     }
 
+    /**
+     * @param  string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}  $config
+     */
     public function registerVite($config)
     {
         $name = $this->getAddon()->packageName();
@@ -815,9 +820,12 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function registerSettingsBlueprint(array $blueprint): self
+    protected function registerSettingsBlueprint(array|Closure $blueprint): self
     {
-        $this->app->bind("statamic.addons.{$this->getAddon()->slug()}.settings_blueprint", fn () => $blueprint);
+        $this->app->scoped(
+            "statamic.addons.{$this->getAddon()->slug()}.settings_blueprint",
+            fn () => $blueprint instanceof Closure ? $blueprint() : $blueprint
+        );
 
         return $this;
     }
@@ -829,7 +837,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         }
 
         if (file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
-            $this->registerSettingsBlueprint(YAML::file($path)->parse());
+            $this->registerSettingsBlueprint(fn () => YAML::file($path)->parse());
         }
 
         return $this;

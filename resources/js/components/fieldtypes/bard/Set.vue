@@ -5,11 +5,9 @@
             class="shadow-ui-sm relative w-full rounded-lg border border-gray-300 bg-white text-base dark:border-white/10 dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black"
             :dir="uiDirection"
             :class="{
-                // We’re styling a Set so that it shows a “selection outline” when selected with the mouse or keyboard.
-                // The extra `&:not(:has(:focus-within))` rule turns that outline off if any element inside the Set has focus (e.g. when editing inside a Bard field).
-                // This prevents the outer selection outline from showing while the user is actively working inside the Set.
-                'st-set-is-selected [&:not(:has(:focus-within))]:border-blue-400! [&:not(:has(:focus-within))]:dark:border-blue-400! [&:not(:has(:focus-within))]:before:content-[\'\'] [&:not(:has(:focus-within))]:before:absolute [&:not(:has(:focus-within))]:before:inset-[-1px] [&:not(:has(:focus-within))]:before:pointer-events-none [&:not(:has(:focus-within))]:before:border-2 [&:not(:has(:focus-within))]:before:border-blue-400 [&:not(:has(:focus-within))]:dark:before:border-blue-400 [&:not(:has(:focus-within))]:before:rounded-lg': showSelectionHighlight,
+                'st-set-is-selected': showSelectionHighlight,
                 'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
             }"
             :data-type="config.handle"
             contenteditable="false"
@@ -17,10 +15,13 @@
             @paste.stop
             @cut.stop
             @dragstart="preventNodeSelectionDrag"
+            @mousedown="onMousedown"
+            @click="keepButtonGroupFocused"
         >
             <div ref="content" hidden />
             <header
-                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                class="group/header animate-border-color show-focus-within flex items-center rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 data-readonly:dark:!bg-transparent hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :data-readonly="isReadOnly ? true : undefined"
                 :class="{
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields && fieldsReady
                 }"
@@ -32,10 +33,10 @@
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" :pill="true" color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
-                            {{ __(setGroup.display) }}
-                            <Icon name="chevron-right" class="relative top-px size-3" />
+                            <span class="st-text-trim-optical-cap">{{ __(setGroup.display) }}</span>
+                            <Icon name="chevron-right" class="size-3" />
                         </span>
-                        {{ __(config.display) || config.handle }}
+                        <span class="st-text-trim-optical-cap">{{ __(config.display) || config.handle }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
@@ -50,9 +51,14 @@
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!isReadOnly">
-                    <Switch size="xs" v-model="enabled" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
+                    <Switch
+                        size="xs"
+                        v-model="enabled"
+                        :label="__('Included in output')"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
 
-                    <Dropdown>
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" @mousedown.prevent />
                         </template>
@@ -144,6 +150,12 @@ export default {
         return {
             hasBeenExpanded: !initiallyCollapsed,
             fieldsReady: !initiallyCollapsed,
+        };
+    },
+
+    data() {
+        return {
+            dropdownJustClosed: false,
         };
     },
 
@@ -414,6 +426,65 @@ export default {
             this._dragRoot = null;
         },
 
+        onSetDropdownClosed() {
+            this.dropdownJustClosed = true;
+            if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
+            this._dropdownJustClosedTimeout = setTimeout(() => {
+                this.dropdownJustClosed = false;
+                this._dropdownJustClosedTimeout = null;
+            }, 150);
+        },
+
+        onMousedown(event) {
+            this.focusClickedButton(event);
+            this.preventFormControlNodeSelection(event);
+        },
+
+        clickedButton(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            return target?.closest('button:not(:disabled)');
+        },
+
+        focusClickedButton(event) {
+            // Safari doesn't focus buttons on click, which breaks the :focus-within rules for the selection outline.
+            // Buttons that keep focus elsewhere on purpose (e.g. with @mousedown.prevent) are left alone.
+            if (event.defaultPrevented) return;
+
+            const button = this.clickedButton(event);
+            if (!button) return;
+
+            button.focus({ preventScroll: true });
+
+            // Safari's default mousedown action then moves focus off the button again, which makes
+            // the outline flicker until it's re-focused. Preventing it keeps focus where we put it.
+            if (document.activeElement === button) event.preventDefault();
+        },
+
+        keepButtonGroupFocused(event) {
+            const button = this.clickedButton(event);
+            if (!button?.closest('[data-ui-button-group]')) return;
+
+            // Some components re-focus a wrapper after a click, so put focus back on the button.
+            // If the click moved focus somewhere else on purpose (e.g. into a modal), leave it there.
+            const refocus = () => {
+                const active = document.activeElement;
+                if (active === button) return;
+                if (active && active !== document.body && !active.contains(button)) return;
+
+                button.focus({ preventScroll: true });
+            };
+
+            requestAnimationFrame(refocus);
+            setTimeout(refocus, 0);
+        },
+
+        preventFormControlNodeSelection(event) {
+            const target = event.target instanceof Element ? event.target : event.target.parentElement;
+
+            if (target?.closest('[data-ui-combobox], [data-ui-input], [data-interactive]')) event.stopPropagation();
+        },
+
         preventNodeSelectionDrag(event) {
             // When the set is node-selected, an invisible DOM selection spans the whole set.
             // Dragging from anywhere inside it (e.g. a grid row's drag handle) would natively
@@ -433,9 +504,11 @@ export default {
             () => data_get(this.publishContainer.values.value, this.fieldPathPrefix),
             (values) => {
 				if (! values) return;
-                if (JSON.stringify(values) === JSON.stringify(this.node.attrs.values)) return;
+                const json = JSON.stringify(values);
+                if (json === JSON.stringify(this.node.attrs.values)) return;
 
-                this.updateAttributes({ values });
+                // A copy, so later edits to the container's object can't change the node without a transaction.
+                this.updateAttributes({ values: JSON.parse(json) });
             },
             { deep: true }
         );
@@ -532,6 +605,7 @@ export default {
 
     beforeUnmount() {
         this._setUnmounted = true;
+        if (this._dropdownJustClosedTimeout) clearTimeout(this._dropdownJustClosedTimeout);
         this._draggableObserver?.disconnect();
     },
 };

@@ -10,6 +10,7 @@ import {
     DropdownSeparator,
     Button,
     DropdownMenu,
+    DragHandle,
     PublishFields as Fields,
     PublishFieldsProvider as FieldsProvider,
     injectPublishContext as injectContainerContext,
@@ -21,8 +22,10 @@ import usePreviewText from '@/composables/use-preview-text';
 import { createMountScheduler } from '@/util/createMountScheduler.js';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import analyzeSetConditions from '@/components/field-conditions/analyzeSetConditions.js';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
+import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
-const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed']);
+const emit = defineEmits(['collapsed', 'expanded', 'duplicated', 'removed', 'moved']);
 
 const replicatorSets = inject('replicatorSets');
 const mountScheduler = inject('mountScheduler', createMountScheduler());
@@ -41,6 +44,11 @@ const props = defineProps({
     enabled: Boolean,
     hasError: Boolean,
     canAddSet: Boolean,
+    canReorder: Boolean,
+    totalSets: {
+        type: Number,
+        default: 0,
+    },
     showFieldPreviews: Boolean,
 });
 
@@ -193,19 +201,61 @@ watch(
     { deep: true, immediate: true },
 );
 
+const {
+    moving,
+    moveOrigin,
+    rootEl: reorderFocusEl,
+    status: reorderStatus,
+    startMoving,
+} = useKeyboardItemReorder({
+    index: () => props.index,
+    total: () => props.totalSets,
+    onMove: (from, to) => emit('moved', from, to),
+});
+
+function startMovingFromHandle() {
+    startMoving('start');
+}
+
+function startMovingFromMenu() {
+    startMoving('end');
+}
+
 const rootEl = ref();
 reveal.use(rootEl, () => emit('expanded'));
+
+const dropdownJustClosed = ref(false);
+let dropdownJustClosedTimeout = null;
+
+function onSetDropdownClosed() {
+    dropdownJustClosed.value = true;
+    if (dropdownJustClosedTimeout) clearTimeout(dropdownJustClosedTimeout);
+    dropdownJustClosedTimeout = setTimeout(() => {
+        dropdownJustClosed.value = false;
+        dropdownJustClosedTimeout = null;
+    }, 150);
+}
 </script>
 
 <template>
-    <div ref="rootEl" :class="sortableItemClass">
+    <div
+        :class="sortableItemClass"
+        :data-moving="moving || undefined"
+    >
         <slot name="picker" />
         <div
+            ref="rootEl"
+            tabindex="-1"
             layout
             data-replicator-set
+            data-reorder-focus
             class="relative w-full rounded-lg border border-gray-300 text-base dark:border-white/10 bg-white dark:bg-gray-900 dark:inset-shadow-2xs dark:inset-shadow-black shadow-ui-sm dark:[&_[data-ui-switch]]:border-gray-600 dark:[&_[data-ui-switch]]:border-1"
             :class="{
-                'border-red-500': hasError
+                'border-red-500': hasError,
+                'st-dropdown-just-closed': dropdownJustClosed,
+                'border-dashed border-gray-300 dark:border-gray-600': readOnly && !hasError,
+                'border-dashed': readOnly && hasError,
+                'focus-outline': moving,
             }"
             :data-collapsed="collapsed ?? undefined"
             :data-error="hasError ?? undefined"
@@ -213,26 +263,29 @@ reveal.use(rootEl, () => emit('expanded'));
             :data-readonly="readOnly ?? undefined"
             :data-type="config.handle"
         >
+            <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
             <header
-                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                class="group/header animate-border-color flex items-center show-focus-within rounded-[calc(var(--radius-lg)-1px)] px-1.5 antialiased duration-200 bg-gray-100/50 dark:bg-gray-925 data-readonly:dark:!bg-transparent hover:bg-gray-100 dark:hover:bg-gray-950/45 border-gray-300 dark:shadow-md"
+                :data-readonly="readOnly ? true : undefined"
                 :class="{
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields && fieldsReady
                 }"
                 @pointerenter="prewarmFields"
             >
-                <Icon
-                    name="handles"
-                    :class="sortableHandleClass"
-                    class="size-4 cursor-grab text-gray-400"
+                <DragHandle
                     v-if="!readOnly"
+                    :keyboard-reorder="canReorder"
+                    :class="sortableHandleClass"
+                    class="shrink-0"
+                    @keyboard-reorder="startMovingFromHandle"
                 />
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
                     <Badge size="lg" pill color="white" class="px-3">
                         <span v-if="isSetGroupVisible" class="flex items-center gap-2">
-                            {{ __(setGroup.display) }}
-                            <Icon name="chevron-right" class="relative top-px size-3" />
+                            <span class="st-text-trim-optical-cap">{{ __(setGroup.display) }}</span>
+                            <Icon name="chevron-right" class="size-3" />
                         </span>
-                        {{ __(config.display) || config.handle }}
+                        <span class="st-text-trim-optical-cap">{{ __(config.display) || config.handle }}</span>
                     </Badge>
                     <Icon
                         v-if="config.instructions && !collapsed"
@@ -247,8 +300,21 @@ reveal.use(rootEl, () => emit('expanded'));
                     />
                 </button>
                 <div class="flex items-center gap-2" v-if="!readOnly">
-                    <Switch size="xs" :model-value="enabled" @update:model-value="toggleEnabledState" v-tooltip="enabled ? __('Included in output') : __('Hidden from output')" />
-                    <Dropdown>
+                    <button
+                        ref="reorderFocusEl"
+                        type="button"
+                        class="sr-only"
+                        :tabindex="moving ? 0 : -1"
+                        :aria-label="__('messages.keyboard_item_reorder_instructions')"
+                    />
+                    <Switch
+                        size="xs"
+                        :model-value="enabled"
+                        :label="__('Included in output')"
+                        @update:model-value="toggleEnabledState"
+                        v-tooltip="enabled ? __('Included in output') : __('Hidden from output')"
+                    />
+                    <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />
                         </template>
@@ -257,22 +323,37 @@ reveal.use(rootEl, () => emit('expanded'));
                                 v-if="fieldActions.length"
                                 v-for="action in fieldActions"
                                 :text="action.title"
+                                :icon="action.icon"
                                 :variant="action.dangerous ? 'destructive' : 'default'"
                                 @click="action.run(action)"
                             />
                             <DropdownSeparator v-if="fieldActions.length" />
                             <DropdownItem
                                 :text="__(collapsed ? __('Expand Set') : __('Collapse Set'))"
+                                :icon="collapsed ? 'expand' : 'collapse'"
                                 @click="toggleCollapsedState"
                             />
-                            <DropdownItem v-if="canAddSet" :text="__('Duplicate Set')" @click="emit('duplicated')" />
+                            <DropdownItem
+                                v-if="canReorder"
+                                :text="__('Move')"
+                                icon="move-vertical"
+                                @click="startMovingFromMenu"
+                            />
+                            <DropdownItem
+                                v-if="canAddSet"
+                                :text="__('Duplicate Set')"
+                                icon="duplicate"
+                                @click="emit('duplicated')"
+                            />
                             <DropdownItem
                                 :text="__('Delete Set')"
+                                icon="trash"
                                 variant="destructive"
                                 @click="deletingSet = true"
                             />
                         </DropdownMenu>
                     </Dropdown>
+                    <div class="sr-only" aria-live="polite">{{ reorderStatus }}</div>
                 </div>
             </header>
 

@@ -31,5 +31,15 @@ Use the `pill` prop to round out the badge.
 Badges can be used as links by passing an `href` prop. They will use Inertia to navigate unless you add `target="_blank"` to open in a new tab.
 <Canvas of={BadgeStories.Link} sourceState={'shown'} />
 
+## Custom content
+Text from the `text` prop, or plain text in the default slot, is trimmed so it sits optically centred. If you pass your own elements in the slot, add the `st-text-trim-optical-cap` class to the element holding the text so it lines up with other badges.
+
+```html
+<Badge>
+    <StatusIndicator status="published" />
+    <span class="st-text-trim-optical-cap">About us</span>
+</Badge>
+```
+
 ## Arguments
 <ArgTypes of={BadgeStories} />

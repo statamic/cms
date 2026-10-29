@@ -7,7 +7,7 @@
                     :status="item.status"
                     class="h-1"
                 />
-                <span v-text="item.title" />
+                <span class="st-text-trim-optical-cap" v-text="item.title" />
             </Badge>
             <Dropdown v-if="hasMore && !showingAll">
                 <template #trigger>

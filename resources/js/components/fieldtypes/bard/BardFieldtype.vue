@@ -141,6 +141,7 @@ import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -157,7 +158,8 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { BardTable as Table } from './BardTable.js';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
@@ -166,6 +168,7 @@ import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
+import { IgnoreAriaHidden } from './IgnoreAriaHidden';
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
@@ -440,15 +443,27 @@ export default {
         value(value, oldValue) {
             if (!this.editor) return;
 
-            if (this.editor.view.dom.contains(document.activeElement)) return;
+            if (this.valueMatchesEditor(value)) return;
+
+            // A repeat of the old value would undo typing that's still debounced.
+            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
 
             const oldContent = this.editor.getJSON();
-            const content = this.valueToContent(value);
 
-            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent(false);
-                this.editor.commands.setContent(content, true);
+            // Sets sync their own values into the editor, so a rebuild for those would only destroy their fields.
+            const oldNodes = oldContent.content ?? [];
+            if (this.onlySetValuesDiffer(value, oldNodes)) return;
+
+            // Same when the server has only stripped empty nodes, which can be deleted in place.
+            const emptyNodes = this.removableEmptyNodes(oldNodes);
+            const keptNodes = oldNodes.filter((node, i) => !emptyNodes.includes(i));
+            if (keptNodes.length && keptNodes.length < oldNodes.length && this.onlySetValuesDiffer(value, keptNodes)) {
+                this.deleteNodes(emptyNodes);
+                return;
             }
+
+            this.editor.commands.clearContent(false);
+            this.editor.commands.setContent(this.valueToContent(clone(value)), true);
         },
 
         readOnly(readOnly) {
@@ -993,7 +1008,12 @@ export default {
                         return count;
                     };
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Sets look up their values by index, so moving them can't wait for the debounce.
+                    const setPositions = (nodes) => (nodes ?? []).map((node) => (node.type === 'set' ? node.attrs.id : '')).join();
+
+                    if (countNodes(oldJson) !== countNodes(newJson) || setPositions(oldJson) !== setPositions(newJson)) {
+                        this.debounceNextUpdate = false;
+                    }
 
                     this.json = newJson;
 
@@ -1052,6 +1072,88 @@ export default {
             return value?.length ? { type: 'doc', content: value } : null;
         },
 
+        // Mirrors Bard::removeEmptyNodes() on the PHP side.
+        removableEmptyNodes(nodes) {
+            const isEmpty = (node) => ['heading', 'paragraph'].includes(node.type) && !node.content;
+
+            if (this.config.remove_empty_nodes === true) {
+                return nodes.flatMap((node, i) => (isEmpty(node) ? [i] : []));
+            }
+
+            if (this.config.remove_empty_nodes !== 'trim') return [];
+
+            let start = 0;
+            while (start < nodes.length && isEmpty(nodes[start])) start++;
+
+            let end = nodes.length - 1;
+            while (end > start && isEmpty(nodes[end])) end--;
+
+            return nodes.flatMap((node, i) => (i < start || i > end ? [i] : []));
+        },
+
+        deleteNodes(indexes) {
+            const { tr, doc } = this.editor.state;
+            const ranges = [];
+
+            doc.forEach((node, offset, i) => {
+                if (indexes.includes(i)) ranges.push([offset, offset + node.nodeSize]);
+            });
+
+            ranges.reverse().forEach(([from, to]) => tr.delete(from, to));
+
+            // A selection that lands on a set would change its decorations and recreate its node view.
+            tr.setSelection(TextSelection.between(tr.selection.$from, tr.selection.$from, -1));
+
+            this.editor.view.dispatch(tr);
+        },
+
+        // Set field edits are already in the container. Emitting them back would hand each field a copy of its own value.
+        update(value) {
+            if (this.editor && this.valueMatchesEditor(this.value) && this.valueMatchesEditor(value)) return;
+
+            this.$emit('update:value', value);
+        },
+
+        // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
+        valueMatchesEditor(value) {
+            const content = this.valueToContent(value);
+            const current = this.editor.getJSON();
+
+            if (JSON.stringify(content) === JSON.stringify(current)) return true;
+
+            const node = this.contentToNode(content);
+
+            return node !== null && node.eq(this.editor.state.doc);
+        },
+
+        contentToNode(content) {
+            try {
+                return this.editor.schema.nodeFromJSON(
+                    content ?? { type: 'doc', content: [{ type: 'paragraph' }] },
+                );
+            } catch (error) {
+                return null;
+            }
+        },
+
+        onlySetValuesDiffer(value, oldNodes) {
+            const node = this.contentToNode(this.valueToContent(value));
+
+            if (node === null) return false;
+
+            return JSON.stringify(this.withoutSetValues(node.toJSON().content)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        },
+
+        withoutSetValues(nodes) {
+            return nodes.map((node) => {
+                if (node.type === 'set') return { ...node, attrs: { ...node.attrs, values: null } };
+
+                if (node.content) return { ...node, content: this.withoutSetValues(node.content) };
+
+                return node;
+            });
+        },
+
         getExtensions() {
             let modeExts = this.inputIsInline ? [DocumentInline] : [DocumentBlock, HardBreak];
 
@@ -1107,7 +1209,7 @@ export default {
             });
 
             let exts = [
-                CharacterCount.configure({ limit: this.config.character_limit }),
+                CharacterCount.configure(),
                 ...modeExts,
                 DisableCtrlEnter,
                 SlashSetPicker.configure({
@@ -1124,6 +1226,7 @@ export default {
                 }),
                 Gapcursor,
                 History,
+                IgnoreAriaHidden,
                 Paragraph,
                 Set.configure({ bard: this, foo: 'bar' }),
                 Text,

@@ -255,6 +255,32 @@ class TermsTest extends TestCase
         $this->assertTrue($provider->contains($d->in('en')));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15542
+     */
+    #[Test]
+    public function it_can_use_a_query_scope_and_a_custom_filter()
+    {
+        CustomTermsScope::register();
+
+        Taxonomy::make('tags')->sites(['en'])->save();
+        $a = tap(Term::make('a')->taxonomy('tags')->dataForLocale('en', []))->save();
+        $b = tap(Term::make('b')->taxonomy('tags')->dataForLocale('en', []))->save();
+        $c = tap(Term::make('c')->taxonomy('tags')->dataForLocale('en', ['is_searchable' => false]))->save();
+
+        $provider = $this->makeProvider(null, [
+            'searchables' => 'content',
+            'query_scope' => 'custom_terms_scope',
+            'filter' => fn ($term) => $term->slug() !== 'b',
+        ]);
+
+        $this->assertEquals(['term::tags::a::en'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a->in('en')));
+        $this->assertFalse($provider->contains($b->in('en')));
+        $this->assertFalse($provider->contains($c->in('en')));
+    }
+
     private function makeProvider($locale, $config)
     {
         $index = $this->makeIndex($locale, $config);
