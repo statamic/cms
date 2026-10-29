@@ -30,8 +30,8 @@ const badge = computed(() =>
             :key="step.tool"
             :class="[
                 'flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
-                step.state === 'pending' || step.state === 'skipped' ? 'opacity-60' : '',
-                step.state === 'waiting' ? 'ring-gray-400! dark:ring-gray-500!' : '',
+                // Waiting is faded like the steps still to come, as the question itself is in the input
+                ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
             ]"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
