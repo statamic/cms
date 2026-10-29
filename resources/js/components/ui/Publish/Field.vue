@@ -330,12 +330,11 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <!-- Prototype: the AI chat changed this field. The badge takes the CP's primary colour, so it follows the theme. Undo puts back what was there, set like the Read Only note (small grey text after an icon), with a hover background as it's a button. -->
+                    <!-- Prototype: the AI chat changed this field. The badge takes the CP's primary colour, so it follows the theme. Undo puts back what was there, set like the Read Only note (small grey text after an icon, the reverse of the CP's refresh arrow), with a hover background as it's a button. -->
                     <span v-if="aiChange" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
                         <Badge size="sm" class="bg-primary/5 border-primary/40 text-primary dark:border dark:bg-gray-800 dark:border-primary/60 dark:text-white" :text="__('Changed by AI')" />
                         <button type="button" class="cursor-pointer rounded-md px-1 py-0.5 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white" @click="aiChanges.undo(containerName, fullPath)">
-                            <!-- Phosphor arrow-counter-clockwise -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" class="inline size-3 -mt-0.5 me-0.5 align-middle"><path d="M224,128a96,96,0,0,1-94.71,96H128A95.38,95.38,0,0,1,62.1,197.8a8,8,0,0,1,11-11.63A80,80,0,1,0,71.43,71.39a3.07,3.07,0,0,1-.26.25L44.59,96H72a8,8,0,0,1,0,16H24a8,8,0,0,1-8-8V56a8,8,0,0,1,16,0V85.8L60.25,60A96,96,0,0,1,224,128Z" /></svg>
+                            <Icon name="undo" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
                             {{ __('Undo') }}
                         </button>
                     </span>
