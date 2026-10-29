@@ -133,7 +133,11 @@ class RuntimeConfiguration
      */
     public $allowMethodsInUserContent = false;
 
-    /** @var bool */
+    /**
+     * @internal
+     *
+     * @var bool
+     */
     public $annotateHtmlContext = false;
 
     /**
@@ -150,7 +154,11 @@ class RuntimeConfiguration
         $this->preparsers[] = $callable;
     }
 
-    /** @return void */
+    /**
+     * @internal
+     *
+     * @return void
+     */
     public function removePreparser(callable $callable)
     {
         $this->preparsers = array_values(array_filter(
@@ -160,6 +168,8 @@ class RuntimeConfiguration
     }
 
     /**
+     * @internal
+     *
      * @param  callable|null  $previous
      * @param  callable|null  $replacement
      * @return void
@@ -195,7 +205,11 @@ class RuntimeConfiguration
         return $this->preparsers;
     }
 
-    /** @return bool */
+    /**
+     * @internal
+     *
+     * @return bool
+     */
     public function hasRegisteredTracers()
     {
         if ($this->traceManager === null) {
@@ -209,7 +223,11 @@ class RuntimeConfiguration
         return $this->traceManager->spanTracers() !== [];
     }
 
-    /** @return TraceManager */
+    /**
+     * @internal
+     *
+     * @return TraceManager
+     */
     public function enableTracing()
     {
         if ($this->traceManager === null) {
@@ -235,7 +253,11 @@ class RuntimeConfiguration
         $this->visitors[] = $visitor;
     }
 
-    /** @return void */
+    /**
+     * @internal
+     *
+     * @return void
+     */
     public function removeVisitor(NodeVisitorContract $visitor)
     {
         if (! in_array($visitor, $this->visitors, true)) {

@@ -408,7 +408,11 @@ class NodeProcessor
         return $this;
     }
 
-    /** @return bool */
+    /**
+     * @internal
+     *
+     * @return bool
+     */
     public function triggerRenderStart()
     {
         if (! $this->isTracingEnabled()) {

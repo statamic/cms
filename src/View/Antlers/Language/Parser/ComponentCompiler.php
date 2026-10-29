@@ -16,6 +16,7 @@ class ComponentCompiler
 
     protected ?ComponentSourceMap $sourceMap = null;
 
+    /** @internal */
     public function sourceMap(): ?ComponentSourceMap
     {
         return $this->sourceMap;

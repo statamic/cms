@@ -9,9 +9,12 @@ use Stillat\BladeParser\Nodes\Components\ParameterType;
 
 trait CompilesBladeComponents
 {
+    /** @internal */
     public const COMPONENT_PROXY_PREFIX = '%component_proxy:';
 
     /**
+     * @internal
+     *
      * @param  string  $content
      * @return bool
      */

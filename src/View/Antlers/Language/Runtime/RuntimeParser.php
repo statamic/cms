@@ -40,6 +40,7 @@ use Throwable;
 
 class RuntimeParser implements Parser
 {
+    /** @internal */
     const CAPTURED_CONTENT = '__captured';
 
     /**
