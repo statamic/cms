@@ -11,7 +11,8 @@ const props = defineProps({
 const badge = computed(() =>
     ({
         working: { color: 'blue', text: __('Working') },
-        waiting: { color: 'default', text: __('Needs you') },
+        // A pointer clicking: it's your move
+        waiting: { color: 'default', text: __('Needs you'), icon: 'cursor-click' },
         done: { color: 'emerald', text: __('Done') },
     })[props.run.status],
 );
