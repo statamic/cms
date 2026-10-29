@@ -11,6 +11,8 @@ use Statamic\Statamic;
  */
 class FieldtypeInspector
 {
+    private array $unresolved = [];
+
     public function __construct(private FieldtypeRepository $fieldtypes)
     {
     }
@@ -30,11 +32,16 @@ class FieldtypeInspector
     {
         $fieldtype = $this->fieldtypes->find($handle);
 
+        $this->unresolved = [];
+        $config = $this->definitions($fieldtype->configFields(), ['config']);
+        $common = $this->definitions(Field::commonFieldOptions(), ['common']);
+
         return [
             'statamic_version' => Statamic::version(),
             'fieldtype' => $this->metadata($handle, $fieldtype),
-            'config' => $this->definitions($fieldtype->configFields()),
-            'common' => $this->definitions(Field::commonFieldOptions()),
+            'config' => $config,
+            'common' => $common,
+            'unresolved' => $this->unresolved,
         ];
     }
 
@@ -52,14 +59,14 @@ class FieldtypeInspector
         ];
     }
 
-    private function definitions(Fields $fields): array
+    private function definitions(Fields $fields, array $path): array
     {
         return $fields->all()
-            ->map(fn (Field $field) => $this->definition($field))
+            ->map(fn (Field $field, $handle) => $this->definition($field, [...$path, $handle]))
             ->all();
     }
 
-    private function definition(Field $field): array
+    private function definition(Field $field, array $path): array
     {
         $definition = $field->config();
         $editorType = $definition['type'] ?? null;
@@ -71,16 +78,13 @@ class FieldtypeInspector
             ! array_key_exists('options', $definition)
             && in_array($editorType, ['bard_buttons_setting', 'markdown_buttons_setting'], true)
         ) {
-            $definition['options'] = [
-                'status' => 'unresolved',
-                'source' => 'editor',
-            ];
+            $this->unresolved[] = ['path' => [...$path, 'options'], 'source' => 'editor'];
         }
 
-        return $this->normalize($definition);
+        return $this->normalize($definition, $path);
     }
 
-    private function normalize(mixed $value): mixed
+    private function normalize(mixed $value, array $path): mixed
     {
         if ($value instanceof BackedEnum) {
             return $value->value;
@@ -91,14 +95,15 @@ class FieldtypeInspector
         }
 
         if (is_array($value)) {
-            return array_map(fn ($item) => $this->normalize($item), $value);
+            return collect($value)
+                ->map(fn ($item, $key) => $this->normalize($item, [...$path, $key]))
+                ->all();
         }
 
         if (is_object($value) || is_resource($value)) {
-            return [
-                'status' => 'unresolved',
-                'php_type' => get_debug_type($value),
-            ];
+            $this->unresolved[] = ['path' => $path, 'source' => 'php', 'php_type' => get_debug_type($value)];
+
+            return null;
         }
 
         return $value;

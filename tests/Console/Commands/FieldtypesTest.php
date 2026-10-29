@@ -53,6 +53,9 @@ class FieldtypesTest extends TestCase
         $this->assertSame('visible', $data['common']['visibility']['default']);
         $this->assertArrayHasKey('instructions', $data['common']);
         $this->assertArrayNotHasKey('mode', $data['common']);
+        $this->assertSame([
+            ['path' => ['common', 'handle', 'validate', 1], 'source' => 'php', 'php_type' => 'Statamic\\Rules\\Handle'],
+        ], $data['unresolved']);
     }
 
     #[Test]
@@ -62,14 +65,16 @@ class FieldtypesTest extends TestCase
 
         $this->assertContains('bold', $data['config']['buttons']['default']);
         $this->assertSame('bard_buttons_setting', $data['config']['buttons']['editor_type']);
-        $this->assertSame(['status' => 'unresolved', 'source' => 'editor'], $data['config']['buttons']['options']);
+        $this->assertArrayNotHasKey('options', $data['config']['buttons']);
+        $this->assertContains(['path' => ['config', 'buttons', 'options'], 'source' => 'editor'], $data['unresolved']);
         $this->assertSame(['buttons' => 'contains_any anchor, image'], $data['config']['container']['if']);
         $this->assertSame('fixed', $data['config']['toolbar_mode']['default']);
 
         $data = $this->commandJson('statamic:fieldtypes:show', ['handle' => 'markdown']);
 
         $this->assertSame('markdown_buttons_setting', $data['config']['buttons']['editor_type']);
-        $this->assertSame(['status' => 'unresolved', 'source' => 'editor'], $data['config']['buttons']['options']);
+        $this->assertArrayNotHasKey('options', $data['config']['buttons']);
+        $this->assertContains(['path' => ['config', 'buttons', 'options'], 'source' => 'editor'], $data['unresolved']);
     }
 
     #[Test]
@@ -85,11 +90,13 @@ class FieldtypesTest extends TestCase
         $this->assertSame(['mode' => 'enabled'], $data['config']['limit']['if']);
         $this->assertSame(0, $data['config']['limit']['default']);
         $this->assertNull($data['config']['optional']['default']);
-        $this->assertSame(['status' => 'unresolved', 'php_type' => 'Closure'], $data['config']['dynamic']['options']);
-        $this->assertSame(['status' => 'unresolved', 'php_type' => 'stdClass'], $data['config']['nested']['default']['value']);
+        $this->assertNull($data['config']['dynamic']['options']);
+        $this->assertNull($data['config']['nested']['default']['value']);
         $this->assertSame('<fg=red>Inspection</>', $data['fieldtype']['title']);
         $this->assertSame('text', $data['config']['nested']['editor_type']);
         $this->assertSame('content_block', $data['config']['nested']['default']['type']);
+        $this->assertContains(['path' => ['config', 'dynamic', 'options'], 'source' => 'php', 'php_type' => 'Closure'], $data['unresolved']);
+        $this->assertContains(['path' => ['config', 'nested', 'default', 'value'], 'source' => 'php', 'php_type' => 'stdClass'], $data['unresolved']);
     }
 
     #[Test]
