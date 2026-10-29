@@ -1,5 +1,6 @@
 import { ref } from 'vue';
-import { createFieldSync, fieldHighlightDuration, fieldManifestId } from './FieldSync.js';
+import { createFieldSync, fieldHighlightDuration } from './FieldSync.js';
+import { fieldManifestId } from './FieldIndex.js';
 
 export function useIframeManager(iframeContentContainer, onSelectField = () => {}, onCancelSelectFields = () => {}) {
     const previousUrl = ref(null);

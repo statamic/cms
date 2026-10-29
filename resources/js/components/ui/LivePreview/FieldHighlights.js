@@ -64,3 +64,45 @@ export function createHighlightOverlay(doc) {
         },
     };
 }
+
+export function createTimedHighlight(win, fadeDuration, onChange) {
+    let path = null;
+    let faded = false;
+    let fadeTimer;
+    let clearTimer;
+
+    function cancelTimers() {
+        win.clearTimeout(fadeTimer);
+        win.clearTimeout(clearTimer);
+    }
+
+    return {
+        get path() {
+            return path;
+        },
+
+        get faded() {
+            return faded;
+        },
+
+        show(newPath, duration) {
+            cancelTimers();
+            path = newPath;
+            faded = false;
+            onChange();
+
+            fadeTimer = win.setTimeout(() => {
+                faded = true;
+                onChange();
+
+                clearTimer = win.setTimeout(() => {
+                    path = null;
+                    faded = false;
+                    onChange();
+                }, fadeDuration);
+            }, duration);
+        },
+
+        dispose: cancelTimers,
+    };
+}
