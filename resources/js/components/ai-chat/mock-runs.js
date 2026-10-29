@@ -295,7 +295,7 @@ export async function playRun(run, onChange = () => {}) {
         if (result?.stop) {
             run.steps.slice(i).forEach((later) => (later.state = 'skipped'));
             run.done = result.stop;
-            run.status = result.cancelled ? 'cancelled' : 'done';
+            run.status = result.cancelled ? 'cancelled' : 'stopped';
             onChange();
             return;
         }

@@ -15,6 +15,8 @@ const badge = computed(() =>
         waiting: { color: 'default', text: __('Needs you'), icon: 'cursor-click' },
         done: { color: 'emerald', text: __('Done') },
         cancelled: { color: 'default', text: __('Cancelled') },
+        // It couldn't carry on, like when saving your changes failed
+        stopped: { color: 'default', text: __('Stopped') },
     })[props.run.status],
 );
 </script>
@@ -54,13 +56,13 @@ const badge = computed(() =>
             </div>
         </div>
 
-        <!-- The outcome, built like the tool-call cards above it: a tick (or a cross, if you cancelled) and the same spacing -->
+        <!-- The outcome, built like the tool-call cards above it: a tick (or a cross, if it was cancelled or stopped) and the same spacing -->
         <div
-            v-if="run.status === 'done' || run.status === 'cancelled'"
+            v-if="['done', 'cancelled', 'stopped'].includes(run.status)"
             class="flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
-                <Icon v-if="run.status === 'cancelled'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
+                <Icon v-if="run.status !== 'done'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
                 <AiChatDoneIcon v-else />
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">
