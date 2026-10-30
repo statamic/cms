@@ -270,9 +270,11 @@ async function openEntry(entry, ask, nextForm) {
 }
 
 // Plays the run: each step goes running, waits, then done. onChange lets the thread keep itself scrolled to the bottom.
+// shownAt and endedAt note when each card first appears, so it only opens up then, not every time the chat is drawn again (see AiChatRun.vue).
 export async function playRun(run, onChange = () => {}) {
     for (const [i, step] of run.steps.entries()) {
         step.state = 'running';
+        step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back
         step.page = { title: currentPage(), url: window.location.pathname };
         onChange();
@@ -280,9 +282,13 @@ export async function playRun(run, onChange = () => {}) {
 
         const result = await step.action?.((question) => ask(run, step, question, onChange));
         if (result?.stop) {
-            run.steps.slice(i).forEach((later) => (later.state = 'skipped'));
+            run.steps.slice(i).forEach((later) => {
+                later.shownAt ??= Date.now();
+                later.state = 'skipped';
+            });
             run.done = result.stop;
             run.status = result.cancelled ? 'cancelled' : 'stopped';
+            run.endedAt = Date.now();
             onChange();
             return;
         }
@@ -293,5 +299,6 @@ export async function playRun(run, onChange = () => {}) {
     }
 
     run.status = 'done';
+    run.endedAt = Date.now();
     onChange();
 }
