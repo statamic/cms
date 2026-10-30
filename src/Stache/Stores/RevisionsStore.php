@@ -32,6 +32,7 @@ class RevisionsStore extends BasicStore
             ->date(($date = $yaml['date'] ?? null) ? Carbon::createFromTimestamp($date, config('app.timezone')) : null)
             ->user($yaml['user'] ?? false)
             ->message($yaml['message'] ?? null)
+            ->publishAt(($publishAt = $yaml['publish_at'] ?? null) ? Carbon::createFromTimestamp($publishAt, config('app.timezone')) : null)
             ->attributes($yaml['attributes'] ?? []);
     }
 }

@@ -56,4 +56,28 @@ class RevisionsTest extends TestCase
 
         $this->assertEquals(['id' => '123', 'published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar'], 'date' => '1482624000'], $revision->attributes());
     }
+
+    #[Test]
+    public function converts_publish_at_to_timestamp_when_saving()
+    {
+        Carbon::setTestNow(now());
+
+        $revision = (new Revision)
+            ->date(now())
+            ->publishAt(now());
+
+        $this->assertEquals(now()->timestamp, $revision->fileData()['publish_at']);
+    }
+
+    #[Test]
+    public function outputs_publish_at_when_to_array()
+    {
+        Carbon::setTestNow(now());
+
+        $revision = (new Revision)
+            ->date(now())
+            ->publishAt(now());
+
+        $this->assertEquals(now()->timestamp, $revision->toArray()['publish_at']);
+    }
 }

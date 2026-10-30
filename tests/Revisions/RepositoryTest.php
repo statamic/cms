@@ -15,7 +15,9 @@ use Tests\TestCase;
 class RepositoryTest extends TestCase
 {
     private $stache;
+
     private $directory;
+
     private $repo;
 
     public function setUp(): void
@@ -114,5 +116,13 @@ class RepositoryTest extends TestCase
 
         $this->assertInstanceOf(Revision::class, $revision);
         $this->assertEquals('working', $revision->action());
+    }
+
+    #[Test]
+    public function it_loads_publish_at_as_carbon()
+    {
+        $revision = $this->repo->whereKey('123')->last();
+
+        $this->assertEquals(1553644800, $revision->publishAt()->timestamp);
     }
 }
