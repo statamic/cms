@@ -8,8 +8,10 @@ use Statamic\Facades\Site;
 use Statamic\Search\Algolia\Index as AlgoliaIndex;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\Null\NullIndex;
+use Statamic\Search\Typesense\Index as TypesenseIndex;
 use Statamic\Support\Manager;
 use Statamic\Support\Str;
+use Typesense\Client as TypesenseClient;
 
 class IndexManager extends Manager
 {
@@ -120,6 +122,20 @@ class IndexManager extends Manager
         $client = SearchClient::create($credentials['id'], $credentials['secret']);
 
         return new AlgoliaIndex($client, $name, $config, $locale);
+    }
+
+    public function createTypesenseDriver(array $config, $name, $locale)
+    {
+        $clientConfig = $config['client'] ?? [];
+        $clientConfig['api_key'] ??= $config['credentials']['api_key'] ?? '';
+        $clientConfig['nodes'] ??= $config['nodes'] ?? [];
+
+        return new TypesenseIndex(
+            new TypesenseClient($clientConfig),
+            $name,
+            $config,
+            $locale,
+        );
     }
 
     protected function callLocalizedCustomCreator(array $config, string $name, ?string $locale)
