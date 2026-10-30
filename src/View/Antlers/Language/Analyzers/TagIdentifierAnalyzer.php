@@ -26,22 +26,16 @@ class TagIdentifierAnalyzer
         $identifier = new TagIdentifier();
         $identifier->content = trim($input);
 
-        $parts = explode(':', $input);
+        [$name, $methodPart] = self::splitNameAndMethodPart($input);
 
-        if (count($parts) == 1) {
-            $identifier->name = trim($parts[0]);
+        $identifier->name = trim($name);
+
+        if ($methodPart === null) {
             $identifier->methodPart = null;
             $identifier->compound = $identifier->name;
-        } elseif (count($parts) > 1) {
-            $name = array_shift($parts);
-            $methodPart = implode(':', $parts);
-
-            $identifier->name = trim($name);
+        } else {
             $identifier->methodPart = trim($methodPart);
             $identifier->compound = $identifier->name.':'.$identifier->methodPart;
-        } else {
-            $identifier->name = trim($input);
-            $identifier->methodPart = '';
         }
 
         if (Str::startsWith($identifier->name, '/')) {
@@ -50,5 +44,21 @@ class TagIdentifierAnalyzer
         }
 
         return $identifier;
+    }
+
+    /**
+     * Splits the input into the tag name and method part at the first
+     * single colon. Double colons act as a namespace separator and
+     * remain part of the name (e.g. `namespace::tag:method`).
+     */
+    public static function splitNameAndMethodPart(string $input): array
+    {
+        // Mask double colons so the namespace separator
+        // is not mistaken for the name/method boundary.
+        if (($pos = strpos(strtr($input, ['::' => '__']), ':')) === false) {
+            return [$input, null];
+        }
+
+        return [substr($input, 0, $pos), substr($input, $pos + 1)];
     }
 }
