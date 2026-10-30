@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Statamic\Contracts\GraphQL\ResponseCache;
 use Statamic\Events\Event;
+use WeakMap;
 
 class DefaultCache implements ResponseCache
 {
-    private ?string $generation = null;
+    private ?WeakMap $generations = null;
 
     public function get(Request $request)
     {
@@ -69,12 +70,14 @@ class DefaultCache implements ResponseCache
         $query = $request->input('query');
         $vars = $request->input('variables');
 
-        return 'gql-cache:'.$this->getGeneration().':'.md5($query).'_'.md5(json_encode($vars));
+        return 'gql-cache:'.$this->getGeneration($request).':'.md5($query).'_'.md5(json_encode($vars));
     }
 
-    private function getGeneration(): string
+    private function getGeneration(Request $request): string
     {
-        return $this->generation ??= Cache::rememberForever($this->getGenerationKey(), fn () => Str::random());
+        $this->generations ??= new WeakMap;
+
+        return $this->generations[$request] ??= Cache::rememberForever($this->getGenerationKey(), fn () => Str::random());
     }
 
     private function getGenerationKey(): string

@@ -240,6 +240,18 @@ class RequestCacheTest extends TestCase
     }
 
     #[Test]
+    public function a_long_lived_cache_uses_the_current_generation_for_each_request()
+    {
+        $cache = new DefaultCache;
+
+        $cache->put(Request::create('/graphql', 'POST', ['query' => '{one}']), new JsonResponse(['data' => ['one' => 'old']]));
+
+        Cache::forget('gql-cache:generation');
+
+        $this->assertNull($cache->get(Request::create('/graphql', 'POST', ['query' => '{one}'])));
+    }
+
+    #[Test]
     public function it_ignores_configured_events()
     {
         $entry = EntryFactory::collection('test')->create();
