@@ -11,6 +11,8 @@ const props = defineProps({
     page: { type: Object, required: true },
     /** The page the cards above were on, if any, so the line can carry on from them up to this dot */
     previous: { type: Object, default: null },
+    /** Whether the page has only just come up in a run that's playing, so the dot drops into place (rather than every time the chat is drawn again) */
+    arriving: { type: Boolean, default: false },
 });
 
 const inertiaPage = usePage();
@@ -30,7 +32,7 @@ const line = (p) => (isHere(p) ? 'w-px bg-ai/30' : 'border-s border-dashed borde
         <span v-if="previous" :class="['absolute start-[21.5px] -top-6 bottom-1/2', line(previous)]" />
         <span :class="['absolute start-[21.5px] top-1/2 bottom-0', line(page)]" />
         <!-- The dot drops down the line into place as the page arrives -->
-        <span :class="['ai-trail-drop absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', here ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']" />
+        <span :class="[arriving ? 'ai-trail-drop' : '', 'absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', here ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']" />
         <span v-if="here" class="flex items-center gap-1.5 text-gray-900 dark:text-white">
             <Icon :name="icon" class="size-3.5! text-gray-500 dark:text-gray-400" />
             {{ page.title }}
