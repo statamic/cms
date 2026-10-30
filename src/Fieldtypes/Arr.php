@@ -106,9 +106,15 @@ class Arr extends Fieldtype
         }
 
         return collect($data)
-            ->mapWithKeys(fn ($item) => [
-                (string) $item['key'] => $item['value'],
-            ])
+            ->mapWithKeys(function ($item) {
+                $key = (string) $item['key'];
+
+                if (array_key_exists('hidden', $item) && $item['hidden'] === true) {
+                    return [$key => ['value' => $item['value'], 'hidden' => true]];
+                }
+
+                return [$key => $item['value']];
+            })
             ->all();
     }
 
@@ -126,7 +132,19 @@ class Arr extends Fieldtype
         if ($this->config('expand')) {
             return collect($data)
                 ->when($this->isKeyed(), fn ($items) => $items->reject(fn ($value) => is_null($value)))
-                ->map(fn ($value, $key) => ['key' => $key, 'value' => $value])
+                ->map(function ($value, $key) {
+                    if (is_array($value) && array_key_exists('value', $value) && ($value['hidden'] ?? false) === true) {
+                        return [
+                            'key' => $key,
+                            'value' => $value['value'],
+                            'hidden' => true,
+                        ];
+                    }
+
+                    $val = is_array($value) && array_key_exists('value', $value) ? $value['value'] : $value;
+
+                    return ['key' => $key, 'value' => $val];
+                })
                 ->values()
                 ->all();
         }

@@ -79,6 +79,49 @@ class ExportSubmissionsTest extends TestCase
             ->assertDontSee('email');
     }
 
+    #[Test]
+    public function it_exports_all_submissions_including_partials()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv')
+            ->assertOk();
+
+        $this->assertEqualsCanonicalizing(['Alice', 'Bravo', 'Charlie', 'Delta'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_exports_all_submissions_including_partials_when_sorted()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv', ['sort' => 'name', 'order' => 'asc'])
+            ->assertOk();
+
+        $this->assertEquals(['Alice', 'Bravo', 'Charlie', 'Delta'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_exports_submissions_filtered_by_status()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $finalized = $this->export($form, 'csv', ['sort' => 'name', 'filters' => base64_encode(json_encode(['submission_status' => ['status' => 'finalized']]))]);
+        $this->assertEquals(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($finalized->getContent()));
+
+        $partial = $this->export($form, 'csv', ['sort' => 'name', 'filters' => base64_encode(json_encode(['submission_status' => ['status' => 'partial']]))]);
+        $this->assertEquals(['Delta'], $this->namesFromCsv($partial->getContent()));
+    }
+
     private function createFormWithSubmissions()
     {
         $blueprint = Blueprint::makeFromFields(['name' => ['type' => 'text']]);

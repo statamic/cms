@@ -60,52 +60,25 @@ class UpdateFormTest extends TestCase
     }
 
     #[Test]
-    public function it_updates_emails()
+    public function it_updates_restrictions()
     {
         $form = tap(Form::make('test'))->save();
-        $this->assertNull($form->email());
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($form, ['email' => [
-                [
-                    'to' => 'john@example.com',
-                    'from' => 'jane@example.com',
-                    'reply_to' => null,
-                    'subject' => null,
-                    'text' => null,
-                    'html' => null,
-                    'markdown' => false,
-                    'attachments' => false,
-                ],
-                [
-                    'to' => 'foo@example.com',
-                    'from' => 'bar@example.com',
-                    'reply_to' => null,
-                    'subject' => null,
-                    'text' => 'emails.contact.text',
-                    'html' => 'emails.contact.html',
-                    'markdown' => true,
-                    'attachments' => true,
-                ],
-            ]])
+            ->update($form, [
+                'submission_limit' => 5,
+                'submission_limit_period' => 'day',
+                'closed_message' => 'Sorry, we are isClosed.',
+                'require_login' => true,
+            ])
             ->assertOk();
 
         $updated = Form::all()->first();
-        $this->assertEquals([
-            [
-                'to' => 'john@example.com',
-                'from' => 'jane@example.com',
-            ],
-            [
-                'to' => 'foo@example.com',
-                'from' => 'bar@example.com',
-                'text' => 'emails.contact.text',
-                'html' => 'emails.contact.html',
-                'markdown' => true,
-                'attachments' => true,
-            ],
-        ], $updated->email());
+        $this->assertEquals(5, $updated->get('submission_limit'));
+        $this->assertEquals('day', $updated->get('submission_limit_period'));
+        $this->assertEquals('Sorry, we are isClosed.', $updated->get('closed_message'));
+        $this->assertTrue($updated->get('require_login'));
     }
 
     #[Test]

@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Illuminate\Contracts\Support\Htmlable;
+use Statamic\Forms\Fieldtypes\Fallback;
 
 class RenderableField implements Htmlable
 {
@@ -29,8 +30,12 @@ class RenderableField implements Htmlable
             'slot' => $this->slot,
         ]);
 
+        $view = $this->field->formField()
+            ? $this->field->formField()->fieldtype()->view()
+            : (new Fallback)->wrapping($this->field->fieldtype())->view();
+
         return static::minify(
-            view($this->field->fieldtype()->view(), $data)->render(),
+            view($view, $data)->render(),
         );
     }
 

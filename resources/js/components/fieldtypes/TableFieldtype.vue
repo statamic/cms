@@ -14,7 +14,7 @@
 
             <section :class="{ 'mt-14 p-4 dark:bg-gray-800': fullScreenMode }">
                 <table class="table-contained" v-if="rowCount">
-                    <thead>
+                    <thead v-if="showHeader">
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th v-for="(column, index) in columnCount" :key="index">
@@ -23,7 +23,7 @@
                                     <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')" v-tooltip="__('Delete Column')" class="-me-1" />
                                 </div>
                             </th>
-                            <th class="row-controls"></th>
+                            <th class="row-controls" v-if="canDeleteRows"></th>
                         </tr>
                     </thead>
 
@@ -47,7 +47,15 @@
                                     />
                                 </td>
                                 <td class="row-controls" v-if="canDeleteRows">
-                                    <ui-button icon="x" variant="subtle" size="xs" round @click="confirmDeleteRow(rowIndex)" :aria-label="__('Delete Row')" v-tooltip="__('Delete Row')" />
+                                    <ui-button
+                                        icon="x"
+                                        variant="subtle"
+                                        size="xs"
+                                        round
+                                        @click="confirmDeleteRow(rowIndex)"
+                                        :aria-label="__('Delete Row')"
+                                        v-tooltip="__('Delete Row')"
+                                    />
                                 </td>
                             </tr>
                         </tbody>
@@ -55,9 +63,9 @@
                 </table>
 
                 <div class="flex gap-2">
-                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="__('Add Row')" size="sm" />
+                    <ui-button @click="addRow" :disabled="atRowMax" v-if="canAddRows" :text="addRowButtonText" size="sm" />
 
-                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns" :text="__('Add Column')" size="sm" />
+                    <ui-button @click="addColumn" :disabled="atColumnMax" v-if="canAddColumns && showAddColumnControl" :text="__('Add Column')" size="sm" />
                 </div>
             </section>
 
@@ -165,8 +173,20 @@ export default {
             return !this.isReadOnly && this.rowCount > 0;
         },
 
+        showAddColumnControl() {
+            return this.config.show_add_column !== false;
+        },
+
         canDeleteColumns() {
             return !this.isReadOnly && this.columnCount > 1;
+        },
+
+        addRowButtonText() {
+            return this.config.add_row_text ? __(this.config.add_row_text) : __('Add Row');
+        },
+
+        showHeader() {
+            return this.config.show_header !== false;
         },
 
         replicatorPreview() {
