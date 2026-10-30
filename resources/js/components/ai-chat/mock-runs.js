@@ -6,7 +6,7 @@ import { cp_url } from '@/bootstrap/globals.js';
 // Prototype: pretend the chat is driving Statamic the way the MCP does. Nothing here is real. It turns what you typed
 // into a plan of tool calls, then plays them one after another so each card goes pending, running, done.
 //
-// Each step: the tool, the arguments it was called with, what it reported back, and how long it "runs" for (ms).
+// Each step: the tool, the arguments it was called with (and the same in words, as its detail), what it reported back, and how long it "runs" for (ms).
 // A step can also have an `action`, which really happens once it has run, like opening an entry or filling in its fields.
 // An action can ask you something (see ask()), and can stop the run by returning { stop: outcome }, plus cancelled: true if you called it off.
 
@@ -19,6 +19,9 @@ const slug = (text, words = 5) =>
         .filter(Boolean)
         .slice(0, words)
         .join('-') || 'untitled';
+
+// "Subtitle, Excerpt and Meta Description"
+const list = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0] ?? '');
 
 const titleCase = (text) => text.replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -52,24 +55,25 @@ const scenarios = [
 
             return {
                 title: 'Edit entry',
-                permission: 'edit entries',
                 steps: [
                     ...(isOpen
                         ? []
                         : [
-                              { tool: 'statamic.search_entries', args: 'query: "summer sale"', result: `1 entry found · ${summerSale.title}`, ms: 900 },
+                              { tool: 'statamic.search_entries', args: 'query: "summer sale"', detail: 'For “summer sale”', result: `1 entry found · ${summerSale.title}`, ms: 900 },
                               {
                                   tool: 'cp.open_entry',
                                   args: `entry: "${summerSale.title}"`,
+                                  detail: summerSale.title,
                                   result: 'Opened in the editor',
                                   ms: 300,
                                   action: (ask) => openEntry(summerSale, ask, nextForm),
                               },
                           ]),
-                    { tool: 'statamic.get_blueprint', args: 'collection: ai_suggestions · blueprint: article', result: '5 fields loaded', ms: 700 },
+                    { tool: 'statamic.get_blueprint', args: 'collection: ai_suggestions · blueprint: article', detail: 'Article, in AI Suggestions', result: '5 fields loaded', ms: 700 },
                     {
                         tool: 'cp.fill_fields',
                         args: `fields: ${fields.join(', ')}`,
+                        detail: list(fields.map((field) => summerSale.labels[field])),
                         result: 'Changed in the form · not saved',
                         ms: 1100,
                         action: () => currentForm() && fill(summerSale.values),
@@ -88,11 +92,10 @@ const scenarios = [
         match: /\b(blog|post|article|news)\b/i,
         plan: (text) => ({
             title: 'Create draft entry',
-            permission: 'create entries',
             steps: [
-                { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: article', result: '12 fields loaded', ms: 800 },
-                { tool: 'statamic.create_entry', args: 'collection: blog · status: draft', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
-                { tool: 'statamic.update_entry', args: `entry: blog::en::${slug(subjectOf(text))}`, result: 'content written · seo_description set', ms: 1500 },
+                { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: article', detail: 'Article, in Blog', result: '12 fields loaded', ms: 800 },
+                { tool: 'statamic.create_entry', args: 'collection: blog · status: draft', detail: 'A draft in Blog', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
+                { tool: 'statamic.update_entry', args: `entry: blog::en::${slug(subjectOf(text))}`, detail: `“${subjectOf(text)}” in Blog`, result: 'content written · seo_description set', ms: 1500 },
             ],
             done: { text: 'Saved as a draft, ready for review' },
         }),
@@ -102,11 +105,10 @@ const scenarios = [
         match: /\b(landing|page|campaign|sale)\b/i,
         plan: (text) => ({
             title: 'Create draft page',
-            permission: 'create pages',
             steps: [
-                { tool: 'statamic.get_blueprint', args: 'collection: pages · blueprint: landing_page', result: '9 fields loaded', ms: 800 },
-                { tool: 'statamic.create_entry', args: 'collection: pages · status: draft', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
-                { tool: 'statamic.update_entry', args: `entry: pages::en::${slug(subjectOf(text))}`, result: '3 blocks added · hero, features, call_to_action', ms: 1500 },
+                { tool: 'statamic.get_blueprint', args: 'collection: pages · blueprint: landing_page', detail: 'Landing Page, in Pages', result: '9 fields loaded', ms: 800 },
+                { tool: 'statamic.create_entry', args: 'collection: pages · status: draft', detail: 'A draft in Pages', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
+                { tool: 'statamic.update_entry', args: `entry: pages::en::${slug(subjectOf(text))}`, detail: `“${subjectOf(text)}” in Pages`, result: '3 blocks added · hero, features, call_to_action', ms: 1500 },
             ],
             done: { text: 'Landing page saved as a draft' },
         }),
@@ -116,32 +118,20 @@ const scenarios = [
         match: /./,
         plan: (text) => ({
             title: 'Search content',
-            permission: 'view entries',
             steps: [
-                { tool: 'statamic.search_entries', args: `query: "${text.trim().slice(0, 40)}"`, result: '8 entries found', ms: 1000 },
-                { tool: 'statamic.get_entry', args: 'entry: most relevant', result: 'Loaded for review', ms: 800 },
+                { tool: 'statamic.search_entries', args: `query: "${text.trim().slice(0, 40)}"`, detail: `For “${text.trim().slice(0, 40)}”`, result: '8 entries found', ms: 1000 },
+                { tool: 'statamic.get_entry', args: 'entry: most relevant', detail: 'The best match', result: 'Loaded for review', ms: 800 },
             ],
             done: { text: 'Found 8 matching entries' },
         }),
     },
 ];
 
-function whoIsAsking() {
-    const user = typeof Statamic !== 'undefined' ? Statamic.user : null;
-
-    return {
-        name: user?.name || user?.email || 'You',
-        role: user?.super ? 'Super user' : 'Editor',
-    };
-}
-
 export function planRun(text) {
-    const who = whoIsAsking();
-    const plan = scenarios.find((s) => s.match.test(text)).plan(text, who);
+    const plan = scenarios.find((s) => s.match.test(text)).plan(text);
 
     return reactive({
         ...plan,
-        who,
         status: 'working', // working, then done
         steps: plan.steps.map((step) => ({ ...step, state: 'pending' })), // pending, running, then done
     });
@@ -153,10 +143,9 @@ const currentPage = () => document.title.split(/ [‹›] /)[0] || 'this page';
 // What each of the example saved prompts (see AiSettingsController) pretends to do. Any others follow their instructions, vaguely.
 const promptScenarios = {
     'legal-check': (page) => ({
-        permission: 'view entries',
         steps: [
-            { tool: 'statamic.get_entry', args: `entry: "${page}"`, result: 'Loaded · 1,180 words', ms: 1000 },
-            { tool: 'statamic.get_blueprint', args: 'fields: content, terms', result: 'No terms field', ms: 700 },
+            { tool: 'statamic.get_entry', args: `entry: "${page}"`, detail: `“${page}”`, result: 'Loaded · 1,180 words', ms: 1000 },
+            { tool: 'statamic.get_blueprint', args: 'fields: content, terms', detail: 'Its Content and Terms fields', result: 'No terms field', ms: 700 },
         ],
         done: {
             text: '3 things to check before this goes live',
@@ -169,10 +158,9 @@ const promptScenarios = {
         },
     }),
     'alt-text': (page) => ({
-        permission: 'edit assets',
         steps: [
-            { tool: 'statamic.get_entry', args: `entry: "${page}" · fields: assets`, result: '9 images used', ms: 900 },
-            { tool: 'statamic.get_assets', args: 'assets: 9 · fields: alt', result: '6 without alt text', ms: 1000 },
+            { tool: 'statamic.get_entry', args: `entry: "${page}" · fields: assets`, detail: `The images on “${page}”`, result: '9 images used', ms: 900 },
+            { tool: 'statamic.get_assets', args: 'assets: 9 · fields: alt', detail: 'Alt text on 9 images', result: '6 without alt text', ms: 1000 },
         ],
         // Alt text is saved on the image, not with this entry, so it can't wait for you to save the entry. It suggests rather than changes.
         done: {
@@ -182,8 +170,7 @@ const promptScenarios = {
         },
     }),
     'seo-check': (page) => ({
-        permission: 'view entries',
-        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}" · fields: seo`, result: 'Loaded', ms: 1000 }],
+        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}" · fields: seo`, detail: `The SEO fields on “${page}”`, result: 'Loaded', ms: 1000 }],
         done: {
             text: '2 fixes suggested',
             items: ['The meta title is 72 characters. Search results cut it at about 60.', 'There’s no meta description. Try: “Everything in the summer sale, up to half off until Sunday.”'],
@@ -196,8 +183,7 @@ const promptScenarios = {
 export function planPromptRun(prompt) {
     const page = currentPage();
     const scenario = promptScenarios[prompt.command] ?? (() => ({
-        permission: 'view entries',
-        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}"`, result: 'Loaded', ms: 1000 }],
+        steps: [{ tool: 'statamic.get_entry', args: `entry: "${page}"`, detail: `“${page}”`, result: 'Loaded', ms: 1000 }],
         done: { text: `Done, following the “${prompt.name}” instructions` },
     }));
     const plan = scenario(page);
@@ -205,7 +191,6 @@ export function planPromptRun(prompt) {
     return reactive({
         ...plan,
         title: prompt.name,
-        who: whoIsAsking(),
         status: 'working',
         steps: plan.steps.map((step) => ({ ...step, state: 'pending' })),
     });
@@ -241,9 +226,6 @@ async function until(check, timeout = 8000) {
     return check();
 }
 
-// Where the chat is taking you, while the page changes
-export const moving = reactive({ title: null });
-
 // Opens an entry so the chat can fill it in, with the chat staying put across the visit.
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
 async function openEntry(entry, ask, nextForm) {
@@ -278,26 +260,21 @@ async function openEntry(entry, ask, nextForm) {
         }
     }
 
-    // Say where it's going, with just long enough to read it before the page changes. This is the only time the move adds, so keep it short.
-    moving.title = entry.title;
-    await wait(800);
-
     // If something else stops the visit, there's no new form, so stop rather than fill in the page that's open.
     const opened = nextForm();
     let started = false;
     router.visit(entry.url(), { onStart: () => (started = true) });
     await wait(50);
-    if (!started) return (moving.title = null), { stop: stopped };
-    if (!(await opened)) return (moving.title = null), { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
-    // The new page is open. The blur stays over it for a moment, so you see it arrive, then lifts. The chat carries on underneath
-    // rather than waiting for it: a real model takes this long to pick its next step anyway, so it adds no time.
-    setTimeout(() => moving.title === entry.title && (moving.title = null), 800);
+    if (!started) return { stop: stopped };
+    if (!(await opened)) return { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
 }
 
 // Plays the run: each step goes running, waits, then done. onChange lets the thread keep itself scrolled to the bottom.
 export async function playRun(run, onChange = () => {}) {
     for (const [i, step] of run.steps.entries()) {
         step.state = 'running';
+        // The page it happened on, so the cards can show the way you've been taken, and get you back
+        step.page = { title: currentPage(), url: window.location.pathname };
         onChange();
         await wait(step.ms);
 
