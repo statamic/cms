@@ -45,6 +45,9 @@ const pageChangesAt = (i) => i === 0 || props.run.steps[i].page?.url !== props.r
 const line = (step) =>
     isHere(step.page) ? 'before:w-px before:bg-ai/30' : 'before:border-s before:border-dashed before:border-gray-300 dark:before:border-gray-600';
 
+// Cards open up as they first appear in a run that's playing, but not when the chat is drawn again later (opened, docked, or after a page change)
+const justNow = (time) => time && Date.now() - time < 1000;
+
 const stepTitle = (step) => {
     const labels = toolLabels[step.tool];
     return labels ? __(labels[step.state === 'done' ? 1 : 0]) : step.tool;
@@ -71,8 +74,8 @@ const stepTitle = (step) => {
                     // Waiting is faded like the steps still to come, as the question itself is in the input
                     ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
                     line(step),
-                    // Each card only appears once its step starts, opening up from nothing
-                    'ai-card-in',
+                    // Each card only appears once its step starts, opening up from nothing as it does
+                    justNow(step.shownAt) ? 'ai-card-in' : '',
                     step.state === 'pending' ? 'hidden' : '',
                 ]"
             >
@@ -104,7 +107,7 @@ const stepTitle = (step) => {
                 'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                 line(run.steps.findLast((step) => step.page) ?? {}),
                 // And the outcome comes in the same way once it's done
-                'ai-card-in',
+                justNow(run.endedAt) ? 'ai-card-in' : '',
             ]"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
