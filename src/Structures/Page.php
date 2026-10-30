@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use ArrayAccess;
+use Facades\Statamic\Routing\ResolveRedirect;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -80,7 +81,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function url()
     {
         if ($this->url) {
-            return $this->url;
+            return $this->resolveCustomUrl();
         }
 
         if (! $entry = $this->entry()) {
@@ -93,7 +94,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function urlWithoutRedirect()
     {
         if ($this->url) {
-            return $this->url;
+            return $this->resolveCustomUrl();
         }
 
         if (! $entry = $this->entry()) {
@@ -101,6 +102,36 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         }
 
         return $this->linksToAnotherSite($entry) ? $entry->absoluteUrlWithoutRedirect() : $entry->urlWithoutRedirect();
+    }
+
+    public function customUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * When the navigation blueprint uses a link field for the url, the custom url
+     * can be a reference like "entry::id" or "asset::container::path".
+     */
+    private function resolveCustomUrl()
+    {
+        if (! Str::contains($this->url, '::')) {
+            return $this->url;
+        }
+
+        $canSelectAcrossSites = $this->structure() instanceof Nav && $this->structure()->canSelectAcrossSites();
+
+        $item = ResolveRedirect::item($this->url, $this, ! $canSelectAcrossSites);
+
+        if (! is_object($item)) {
+            return $item;
+        }
+
+        if ($item instanceof Entry && $this->linksToAnotherSite($item)) {
+            return $item->absoluteUrl();
+        }
+
+        return $item->url();
     }
 
     private function linksToAnotherSite(Entry $entry)
@@ -272,7 +303,9 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         }
 
         if ($this->url) {
-            return $this->absoluteUrl = URL::makeAbsolute($this->url);
+            $url = $this->resolveCustomUrl();
+
+            return $this->absoluteUrl = $url ? URL::makeAbsolute($url) : null;
         }
 
         return $this->absoluteUrl = optional($this->entry())->absoluteUrl();
