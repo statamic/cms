@@ -392,6 +392,26 @@ export default {
             return text.slice(delimiter.length, -delimiter.length);
         },
 
+        toggleHeading(level) {
+            const startPoint = this.codemirror.getCursor('start');
+            const endPoint = this.codemirror.getCursor('end');
+            const pattern = /^(\s*)(#{1,6})(?:\s+|$)/;
+            const delimiter = '#'.repeat(level);
+            const prefix = delimiter + ' ';
+
+            for (let i = startPoint.line; i <= endPoint.line; i++) {
+                const text = this.codemirror.getLine(i);
+                const heading = text.match(pattern);
+                const newText = heading
+                    ? text.replace(pattern, heading[2] === delimiter ? '$1' : '$1' + prefix)
+                    : text.replace(/^(\s*)/, '$1' + prefix);
+
+                this.codemirror.replaceRange(newText, { line: i, ch: 0 }, { line: i, ch: Infinity });
+            }
+
+            this.codemirror.focus();
+        },
+
         toggleLine(type) {
             const startPoint = this.codemirror.getCursor('start');
             const endPoint = this.codemirror.getCursor('end');
