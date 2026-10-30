@@ -11,7 +11,7 @@ window.cp_url = (url) => url;
 window.__ = (key) => key;
 preferences.initialize({}, {});
 
-const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), props = {} } = {}) => {
+const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), props = {}, provide = {} } = {}) => {
     return mount(AssetsFieldtype, {
         shallow: true,
         props: {
@@ -25,6 +25,7 @@ const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), pro
             ...props,
         },
         global: {
+            provide,
             mocks: {
                 $axios: { post: axiosPost },
                 $progress: { loading: () => {} },
@@ -33,22 +34,13 @@ const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), pro
     });
 };
 
-test('selecting the existing file references it by the container id', () => {
-    const post = vi.fn(() => Promise.resolve({ data: [] }));
-    const field = makeField({ axiosPost: post });
-
-    field.vm.uploadSelected({ basename: 'user.png' });
-
-    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::user.png'] });
-});
-
-test('the existing file id includes the configured folder', () => {
+test('selecting the existing file references the asset the server reported', () => {
     const post = vi.fn(() => Promise.resolve({ data: [] }));
     const field = makeField({ axiosPost: post, props: { config: { folder: 'sub' } } });
 
-    field.vm.uploadSelected({ basename: 'user.png' });
+    field.vm.uploadSelected({ basename: 'My File.PNG', existingId: 'main::sub/my-file.png' });
 
-    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::sub/user.png'] });
+    expect(post).toHaveBeenCalledWith('assets-fieldtype', { assets: ['main::sub/my-file.png'] });
 });
 
 test('loading assets for a new value does not emit an update when the ids are unchanged', async () => {
@@ -89,4 +81,38 @@ test('removing an asset emits an update', async () => {
     await flushPromises();
 
     expect(field.emitted('update:value')).toEqual([[['main::b.jpg']]]);
+});
+
+const singleAssetField = (provide = {}) =>
+    makeField({
+        provide,
+        props: {
+            value: ['main::a.jpg'],
+            config: { max_files: 1 },
+            meta: {
+                container: { id: 'main', can_view: true, can_upload: true },
+                data: [{ id: 'main::a.jpg' }],
+            },
+        },
+    });
+
+test('an upload replaces the asset in a link field', async () => {
+    const field = singleAssetField({ isInLinkField: true });
+    await flushPromises();
+
+    field.vm.uploadComplete({ id: 'main::b.jpg' });
+    await flushPromises();
+    field.vm.uploadComplete({ id: 'main::c.jpg' });
+    await flushPromises();
+
+    expect(field.emitted('update:value')).toEqual([[['main::b.jpg']], [['main::c.jpg']]]);
+});
+
+test('an upload is appended in a single asset field so validation can flag it', async () => {
+    const field = singleAssetField();
+    await flushPromises();
+
+    field.vm.uploadComplete({ id: 'main::b.jpg' });
+
+    expect(field.vm.assets).toEqual([{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }]);
 });
