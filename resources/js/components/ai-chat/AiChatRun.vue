@@ -67,6 +67,7 @@ const stepTitle = (step) => {
                 v-if="step.page && pageChangesAt(i)"
                 :page="step.page"
                 :previous="i ? run.steps[i - 1].page : null"
+                :arriving="justNow(step.shownAt)"
             />
             <div
                 :class="[
