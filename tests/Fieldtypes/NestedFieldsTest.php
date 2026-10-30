@@ -85,6 +85,7 @@ class NestedFieldsTest extends TestCase
                 'replicator_preview' => true,
                 'duplicate' => true,
                 'actions' => true,
+                'revisable' => true,
                 'type' => 'assets',
                 'max_files' => 2,
                 'container' => 'main',

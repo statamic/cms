@@ -213,7 +213,10 @@ class EntryRevisionsTest extends TestCase
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
-        $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
+        $this->setTestBlueprint('test', [
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text', 'revisable' => false],
+        ]);
         $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
         $user = User::make()->id('user-1')->assignRole('test')->save();
 
@@ -226,6 +229,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
+                'bar' => 'foo',
             ])->create();
 
         tap($entry->makeWorkingCopy(), function ($copy) {
@@ -248,6 +252,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'foo modified in working copy',
+            'bar' => 'foo',
             'updated_at' => $now->timestamp,
             'updated_by' => $user->id(),
         ], $entry->data()->all());
@@ -576,6 +581,48 @@ class EntryRevisionsTest extends TestCase
         $this->assertEquals('existing foo', $entry->get('foo'));
         $this->assertFalse($entry->published()); // everything except publish state gets restored
         $this->assertCount(1, $entry->revisions());
+    }
+
+    #[Test]
+    public function it_keeps_non_revisable_fields_when_restoring_an_unpublished_entrys_contents()
+    {
+        $this->setTestBlueprint('test', [
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text', 'revisable' => false],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        tap((new Revision)
+            ->key('collections/blog/en/123')
+            ->date(Carbon::createFromTimestamp('1553546421', config('app.timezone')))
+            ->attributes([
+                'published' => true,
+                'slug' => 'existing-slug',
+                'data' => ['foo' => 'existing foo'],
+            ]))->save();
+
+        $entry = EntryFactory::id('123')
+            ->slug('test')
+            ->collection('blog')
+            ->published(false)
+            ->data([
+                'blueprint' => 'test',
+                'foo' => 'bar',
+                'bar' => 'not tracked by revisions',
+                'stale' => 'not in the revision',
+            ])->create();
+
+        $this
+            ->actingAs($user)
+            ->restore($entry, ['revision' => '1553546421'])
+            ->assertOk()
+            ->assertSessionHas('success');
+
+        $entry = Entry::find($entry->id());
+        $this->assertEquals('existing foo', $entry->get('foo'));
+        $this->assertEquals('not tracked by revisions', $entry->get('bar'));
+        $this->assertFalse($entry->has('stale'));
     }
 
     #[Test]

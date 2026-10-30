@@ -258,6 +258,11 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
 
+            // have to save in case there are non-revisable fields
+            if ($saved) {
+                $this->saveNonRevisableFields($entry);
+            }
+
             // catch any changes through RevisionSaving event
             $entry = $entry->fromWorkingCopy();
         } else {
@@ -498,5 +503,24 @@ class EntriesController extends CpController
         if (Site::multiEnabled() && ! $collection->sites()->contains($site->handle())) {
             return redirect()->back()->with('error', __('Collection is not available on site ":handle".', ['handle' => $site->handle]));
         }
+    }
+
+    private function saveNonRevisableFields(EntryContract $entry): void
+    {
+        $fresh = $entry->fresh();
+        $handles = collect($entry->nonRevisableFields());
+        $values = $entry->data()->only($handles->all());
+
+        // A localization's data only holds the localized handles, so a non-revisable
+        // field missing from it has been synced back to the origin and must be removed.
+        $removed = $handles->diff($values->keys())->filter(fn ($handle) => $fresh->has($handle));
+
+        if ($values->isEmpty() && $removed->isEmpty()) {
+            return;
+        }
+
+        $removed->each(fn ($handle) => $fresh->remove($handle));
+
+        $fresh->merge($values)->updateLastModified(User::current())->save();
     }
 }
