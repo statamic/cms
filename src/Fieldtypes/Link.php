@@ -3,9 +3,11 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Link\ArrayableLink;
@@ -117,7 +119,7 @@ class Link extends Fieldtype
             return null;
         }
 
-        if (! ($url = is_object($item) ? $item->url() : $item)) {
+        if (! ($url = $this->indexUrl($item))) {
             return null;
         }
 
@@ -177,6 +179,26 @@ class Link extends Fieldtype
             'showFirstChildOption' => $this->showFirstChildOption(),
             'types' => $types,
         ];
+    }
+
+    private function indexUrl($item)
+    {
+        if (! is_object($item)) {
+            return $item;
+        }
+
+        if ($item instanceof Localization && $item->locale() !== $this->indexSite()) {
+            return $item->absoluteUrl();
+        }
+
+        return $item->url();
+    }
+
+    private function indexSite(): string
+    {
+        $parent = $this->field->parent();
+
+        return $parent instanceof Localization ? $parent->locale() : Site::selected()->handle();
     }
 
     private function linkTypeFor($value): ?string
