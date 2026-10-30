@@ -60,13 +60,20 @@ const stepTitle = (step) => {
 
         <!-- One card per tool call, like the CP's Card. They go from pending, to running, to done. A marker for the page they happened on sits above the first, and wherever the page changes. -->
         <template v-for="(step, i) in run.steps" :key="step.tool">
-            <AiChatPageMarker v-if="step.page && pageChangesAt(i)" :page="step.page" :previous="i ? run.steps[i - 1].page : null" />
+            <AiChatPageMarker
+                v-if="step.page && pageChangesAt(i)"
+                :page="step.page"
+                :previous="i ? run.steps[i - 1].page : null"
+            />
             <div
                 :class="[
                     'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                     // Waiting is faded like the steps still to come, as the question itself is in the input
                     ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
                     line(step),
+                    // Each card only appears once its step starts, opening up from nothing
+                    'ai-card-in',
+                    step.state === 'pending' ? 'hidden' : '',
                 ]"
             >
                 <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
@@ -96,6 +103,8 @@ const stepTitle = (step) => {
                 // In from the line like the cards above, which carries on down beside it, for the page it finished on
                 'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                 line(run.steps.findLast((step) => step.page) ?? {}),
+                // And the outcome comes in the same way once it's done
+                'ai-card-in',
             ]"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
@@ -113,3 +122,22 @@ const stepTitle = (step) => {
         </div>
     </div>
 </template>
+
+<style>
+/* The cards open up from nothing, pushing what's below down smoothly rather than appearing all at once. Reduced motion skips it. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-card-in {
+        interpolate-size: allow-keywords;
+        animation: ai-card-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+}
+
+@keyframes ai-card-in {
+    from {
+        opacity: 0;
+        height: 0;
+        padding-block: 0;
+        overflow: clip;
+    }
+}
+</style>

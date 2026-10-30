@@ -29,7 +29,8 @@ const line = (p) => (isHere(p) ? 'w-px bg-ai/30' : 'border-s border-dashed borde
         <!-- The line joins up through the dot: from the cards above, and on down to the cards below -->
         <span v-if="previous" :class="['absolute start-[21.5px] -top-6 bottom-1/2', line(previous)]" />
         <span :class="['absolute start-[21.5px] top-1/2 bottom-0', line(page)]" />
-        <span :class="['absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', here ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']" />
+        <!-- The dot drops down the line into place as the page arrives -->
+        <span :class="['ai-trail-drop absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', here ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']" />
         <span v-if="here" class="flex items-center gap-1.5 text-gray-900 dark:text-white">
             <Icon :name="icon" class="size-3.5! text-gray-500 dark:text-gray-400" />
             {{ page.title }}
@@ -42,3 +43,18 @@ const line = (p) => (isHere(p) ? 'w-px bg-ai/30' : 'border-s border-dashed borde
     </div>
 </template>
 
+<style>
+/* 24px down the line, with a slight settle. Reduced motion skips it. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-trail-drop {
+        animation: ai-trail-drop 450ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    }
+}
+
+@keyframes ai-trail-drop {
+    from {
+        opacity: 0;
+        transform: translateY(-24px);
+    }
+}
+</style>
