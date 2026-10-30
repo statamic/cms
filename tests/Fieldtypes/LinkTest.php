@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Illuminate\Support\Facades\Validator;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -44,6 +45,39 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals('/foo', $augmented->value());
         $this->assertEquals(['url' => '/foo'], $augmented->toArray());
+    }
+
+    #[Test]
+    #[DataProvider('selfReferenceProvider')]
+    public function it_doesnt_allow_an_entry_to_link_to_itself($value, $passes)
+    {
+        $field = new Field('redirect', ['type' => 'link']);
+        $field->setParent((new Entry)->id('abc'));
+
+        $validator = Validator::make(['redirect' => $value], $field->rules());
+
+        $this->assertSame($passes, $validator->passes());
+    }
+
+    public static function selfReferenceProvider()
+    {
+        return [
+            'itself' => ['entry::abc', false],
+            'another entry' => ['entry::def', true],
+            'url' => ['/abc', true],
+            'child' => ['@child', true],
+        ];
+    }
+
+    #[Test]
+    public function it_allows_an_entry_to_link_to_itself_in_a_non_redirect_field()
+    {
+        $field = new Field('cta', ['type' => 'link']);
+        $field->setParent((new Entry)->id('abc'));
+
+        $validator = Validator::make(['cta' => 'entry::abc'], $field->rules());
+
+        $this->assertTrue($validator->passes());
     }
 
     #[Test]

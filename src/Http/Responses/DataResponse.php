@@ -82,7 +82,8 @@ class DataResponse implements Responsable
         // they might have set one of the magic values like @child or entry::some-id.
         $redirect = ResolveRedirect::resolve($redirect, $this->data);
 
-        if ($redirect === 404) {
+        // Missing target (404) or a redirect loop (null).
+        if ($redirect === 404 || $redirect === null) {
             throw new NotFoundHttpException;
         }
 
