@@ -25,10 +25,10 @@ class Partial extends Tags
 
         $context = array_diff_key($this->context->all(), array_flip(IncludeTag::VIEW_DATA_KEYS));
 
-        $variables = array_merge($context, $this->params->all(), [
+        $variables = $this->withInstrumentedSlot(array_merge($context, $this->params->all(), [
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? $this->getSlotContent() : null,
-        ]);
+        ]));
 
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()

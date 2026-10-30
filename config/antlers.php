@@ -17,6 +17,36 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Tracing
+    |--------------------------------------------------------------------------
+    |
+    | When tracing is enabled, every tracer listed here is resolved from the
+    | container and notified as every Antlers node is entered and exited.
+    |
+    */
+
+    'tracing' => env('STATAMIC_ANTLERS_TRACING', false),
+
+    'tracers' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTML Instrumentation
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, rendered Antlers output is annotated with markers that
+    | point back to the templates it came from. Since the markers expose
+    | template details, this is intended for development and tooling.
+    |
+    */
+
+    'instrumentation' => [
+        'enabled' => env('STATAMIC_ANTLERS_INSTRUMENTATION', false),
+        'cache' => env('STATAMIC_ANTLERS_INSTRUMENTATION_CACHE', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Guarded Variables
     |--------------------------------------------------------------------------
     |

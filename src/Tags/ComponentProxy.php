@@ -9,6 +9,7 @@ use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\DynamicComponent;
 use ReflectionClass;
+use Statamic\View\Instrumentation\InstrumentationState;
 use Throwable;
 
 class ComponentProxy extends Tags
@@ -35,11 +36,15 @@ class ComponentProxy extends Tags
     public function index()
     {
         $___obLevel = ob_get_level();
+        $__env = null;
+        $renderIncremented = false;
+        $componentStackPushed = false;
 
         try {
             $__env = $this->context['__env'] ?? view();
 
             $__env->incrementRender();
+            $renderIncremented = true;
 
             $componentName = $this->params['component_name___'];
             $tagCompiler = $this->makeComponentTagCompiler();
@@ -93,22 +98,38 @@ class ComponentProxy extends Tags
                 ]);
 
                 self::$componentStack[] = [$component, $contextData];
+                $componentStackPushed = true;
 
-                echo $this->parse($contextData);
+                echo InstrumentationState::withoutInstrumentation(
+                    fn () => $this->parse($contextData)
+                );
             }
 
-            $result = $__env->renderComponent();
+            $result = InstrumentationState::withinComponentView(
+                fn () => $__env->renderComponent()
+            );
 
             $__env->decrementRender();
+            $renderIncremented = false;
             $__env->flushStateIfDoneRendering();
 
-            if ($this->content) {
+            if ($componentStackPushed) {
                 array_pop(self::$componentStack);
+                $componentStackPushed = false;
             }
 
             return ltrim($result);
         } catch (Throwable $e) {
             $this->handleViewException($e, $___obLevel);
+        } finally {
+            if ($componentStackPushed) {
+                array_pop(self::$componentStack);
+            }
+
+            if ($renderIncremented && $__env !== null) {
+                $__env->decrementRender();
+                $__env->flushStateIfDoneRendering();
+            }
         }
     }
 
@@ -125,7 +146,9 @@ class ComponentProxy extends Tags
 
             $__env->slot($slot, null, $this->escapeBoundAttributes($context));
 
-            echo $this->parse($contextData);
+            echo InstrumentationState::withoutInstrumentation(
+                fn () => $this->parse($contextData)
+            );
 
             $__env->endSlot();
         } catch (Throwable $e) {

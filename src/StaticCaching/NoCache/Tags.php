@@ -2,10 +2,11 @@
 
 namespace Statamic\StaticCaching\NoCache;
 
+use Statamic\Contracts\View\Instrumentation\ComposesRenderedOutput;
 use Statamic\Facades\Antlers;
 use Statamic\StaticCaching\Middleware\Cache;
 
-class Tags extends \Statamic\Tags\Tags
+class Tags extends \Statamic\Tags\Tags implements ComposesRenderedOutput
 {
     public static $handle = 'nocache';
     public static $stack = 0;

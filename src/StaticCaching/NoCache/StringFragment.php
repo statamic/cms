@@ -5,6 +5,7 @@ namespace Statamic\StaticCaching\NoCache;
 use Statamic\Facades\File;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 
 class StringFragment
 {
@@ -31,6 +32,8 @@ class StringFragment
         $path = $this->createTemporaryView($view = $this->region.Str::random());
 
         $this->data['__frontmatter'] = Arr::pull($this->data, 'view', []);
+
+        $this->data[RuntimeParser::CAPTURED_CONTENT] = true;
 
         $rendered = view('nocache::'.$view, $this->data)->render();
 
