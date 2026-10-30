@@ -140,6 +140,7 @@ return [
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Activez les sauts de ligne automatiques.',
     'markdown.config.automatic_links' => 'Activez la liaison automatique de toutes les URL.',
+    'markdown.config.buttons' => '',
     'markdown.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'markdown.config.escape_markup' => 'Échappez le balisage HTML en ligne (ex. `<div>` vers `&lt;div&gt;`).',
     'markdown.config.folder' => 'Le dossier à partir duquel commencer la navigation.',

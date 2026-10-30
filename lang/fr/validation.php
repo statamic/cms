@@ -165,6 +165,7 @@ return [
     'parent_exceeds_max_depth' => 'Cela dépasserait la profondeur maximale.',
     'reserved' => 'Mot réservé par le système.',
     'reserved_field_handle' => 'Le champ avec l’identifiant :handle est un mot réservé.',
+    'link_cannot_reference_itself' => '',
     'unique_entry_value' => 'Cette valeur a déjà été prise.',
     'unique_form_handle' => 'Cette valeur a déjà été prise.',
     'unique_term_value' => 'Cette valeur a déjà été prise.',
