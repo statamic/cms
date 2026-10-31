@@ -90,3 +90,24 @@ test('heading buttons replace existing levels across selected lines', () => {
 
     expect(editor.codemirror.getValue()).toBe('## First\n  ## Second\n## Plain text\n## ####### Not a heading');
 });
+
+test.each([
+    ['bold', '**'],
+    ['italic', '_'],
+    ['strikethrough', '~~'],
+    ['code', '`'],
+])('the %s button toggles a selection spanning multiple lines', (type, delimiter) => {
+    const codemirror = new CodeMirror.Doc('first line\nsecond line');
+    codemirror.focus = vi.fn();
+    const { toggleInline, getText, removeInline } = MarkdownFieldtype.methods;
+    const editor = { codemirror, toggleInline, getText, removeInline };
+
+    codemirror.setSelection({ line: 0, ch: 0 }, { line: 1, ch: 11 });
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe(`${delimiter}first line\nsecond line${delimiter}`);
+
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe('first line\nsecond line');
+});

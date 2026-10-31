@@ -356,10 +356,10 @@ export default {
 
         toggleInline(type) {
             const elements = {
-                bold: { pattern: /^\*{2}(.*)\*{2}$/, delimiter: '**' },
-                code: { pattern: /^\`(.*)\`$/, delimiter: '`' },
-                italic: { pattern: /^\_(.*)\_$/, delimiter: '_' },
-                strikethrough: { pattern: /^\~\~(.*)\~\~$/, delimiter: '~~' },
+                bold: { pattern: /^\*{2}(.*)\*{2}$/s, delimiter: '**' },
+                code: { pattern: /^\`(.*)\`$/s, delimiter: '`' },
+                italic: { pattern: /^\_(.*)\_$/s, delimiter: '_' },
+                strikethrough: { pattern: /^\~\~(.*)\~\~$/s, delimiter: '~~' },
             };
 
             const replacements = this.selections.map(selection => {
