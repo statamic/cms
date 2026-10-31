@@ -329,8 +329,10 @@ function stopFollowing() {
                         v-else
                         :class="[
                             'max-w-[85%] rounded-xl px-3 py-2 text-sm',
-                            // A new turn gets a little more room above it, so it doesn't merge with the answer before
-                            message.role === 'user' && i > 0 ? 'mt-7.5' : 'mb-5',
+                            // A new turn gets a little more room above it, so it doesn't merge with the answer before. Your message has the same 16px
+                            // below it every time, down to the start of its answer.
+                            message.role === 'user' && i > 0 ? 'mt-7.5' : '',
+                            message.role === 'user' ? 'mb-4' : 'mb-5',
                             message.role === 'user'
                                 // Your messages are plain light grey, so they stand apart from the white cards of the answers
                                 ? 'ms-auto bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
