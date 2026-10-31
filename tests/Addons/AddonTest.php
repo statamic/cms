@@ -314,6 +314,7 @@ class AddonTest extends TestCase
         $this->assertFalse($this->makeFromPackage([])->isCommercial());
     }
 
+    #[Test]
     public function it_gets_the_autoloaded_directory()
     {
         $addon = $this->makeFromPackage(['autoload' => 'src']);
