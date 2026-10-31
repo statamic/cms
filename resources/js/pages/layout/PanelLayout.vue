@@ -37,11 +37,23 @@ watch(chatFloating, () => {
     setTimeout(() => (switchingLayout.value = false), 100);
 }, { flush: 'sync' });
 
-// A quiet card until the input is focused: a plain grey 1px edge. Focusing it brings in the purple-to-blue gradient edge, a 1px blue line just inside it (so 2px in all, like a focused field's outline), and a purple glow. The outline is drawn over the edge, so nothing moves.
-const chatCardClasses = 'rounded-xl border border-transparent ps-2.25 focus-within:outline-1 focus-within:-outline-offset-2 focus-within:outline-blue-400 focus-within:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(var(--color-gray-200),var(--color-gray-200))_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(var(--color-gray-700),var(--color-gray-700))_border-box] focus-within:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus-within:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box]';
+// A quiet card until the input is focused: a plain grey 1px edge. Focusing it brings in the purple-to-blue gradient edge, a 1px blue line just inside it (so 2px in all, like a focused field's outline), and a purple glow. The outline is drawn over the edge, so nothing moves. While a run is working, or waiting for you, it keeps the same focused look (data-working), even once focus has moved to the page.
+const chatCardClasses = 'rounded-xl border border-transparent ps-2.25 focus-within:outline-1 focus-within:-outline-offset-2 focus-within:outline-blue-400 focus-within:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(var(--color-gray-200),var(--color-gray-200))_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(var(--color-gray-700),var(--color-gray-700))_border-box] focus-within:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus-within:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] data-working:outline-1 data-working:-outline-offset-2 data-working:outline-blue-400 data-working:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] data-working:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:data-working:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box]';
 
 // Once a chat has started, hovering the floating chat (while it isn't focused, which has its own stronger glow) brings in a softer version of the focus glow, at about half its strength. It eases in slowly, over 700ms, and out quicker. Before then it's just an input, so it stays quiet.
 const chatCardHoverClasses = computed(() => (chatMessages.value.length ? '[&:hover:not(:focus-within)]:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_22%,transparent)]' : ''));
+
+// While a run is working, or waiting for you, the floating chat keeps its focused look, even once focus has moved to the page
+const chatWorking = computed(() => chatMessages.value.some((message) => ['working', 'waiting'].includes(message.run?.status)));
+
+// Once it stops, the card is marked as released for a second, while the focused look fades away (see the style block)
+const chatReleased = ref(false);
+let releaseTimer;
+watch(chatWorking, (working) => {
+    clearTimeout(releaseTimer);
+    chatReleased.value = !working;
+    if (!working) releaseTimer = setTimeout(() => (chatReleased.value = false), 1200);
+});
 
 // The chat only uses the right panel when it's docked there, rather than floating in the corner.
 const chatInPanel = computed(() => chatOpen.value && !chatFloating.value);
@@ -204,7 +216,9 @@ onUnmounted(() => {
             v-if="chatFloating"
             v-show="chatOpen"
             :class="[chatCardClasses, chatCardHoverClasses]"
-            class="transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+            :data-working="chatWorking || undefined"
+            :data-released="chatReleased || undefined"
+            class="ai-chat-card transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatCloseControl />
@@ -215,3 +229,51 @@ onUnmounted(() => {
 
     <slot />
 </template>
+
+<style>
+/* Once a run finishes, the floating chat's focused look (see chatCardClasses) fades away over a second: the edge from purple and blue to
+   its quiet grey, with the blue line and glow. The edge's two colours are registered so they can fade, which a gradient can't on its own.
+   Not while the chat is focused, which keeps its look. Reduced motion lets go at once. */
+@property --ai-edge-a {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+@property --ai-edge-b {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .ai-chat-card[data-released]:not(:focus-within) {
+        --ai-card-bg: white;
+        --ai-edge-quiet: var(--color-gray-200);
+        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
+        outline: 1px solid transparent;
+        outline-offset: -2px;
+        animation: ai-chat-release 1s ease-out both;
+    }
+
+    .dark .ai-chat-card[data-released]:not(:focus-within) {
+        --ai-card-bg: var(--color-gray-900);
+        --ai-edge-quiet: var(--color-gray-700);
+    }
+}
+
+@keyframes ai-chat-release {
+    from {
+        --ai-edge-a: var(--color-ai);
+        --ai-edge-b: var(--color-ai-end);
+        outline-color: var(--color-blue-400);
+        box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--color-ai) 45%, transparent);
+    }
+    to {
+        --ai-edge-a: var(--ai-edge-quiet);
+        --ai-edge-b: var(--ai-edge-quiet);
+        outline-color: transparent;
+        box-shadow: 0 10px 40px -10px transparent;
+    }
+}
+</style>
