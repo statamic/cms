@@ -332,8 +332,8 @@ function stopFollowing() {
                             // A new turn gets a little more room above it, so it doesn't merge with the answer before
                             message.role === 'user' && i > 0 ? 'mt-7.5' : 'mb-5',
                             message.role === 'user'
-                                // Your messages are a white card with a ring, like the CP's Card and the tool-call cards
-                                ? 'ms-auto bg-white text-gray-900 ring ring-gray-200 dark:bg-gray-850 dark:text-gray-200 dark:ring-gray-700/80'
+                                // Your messages are plain light grey, so they stand apart from the white cards of the answers
+                                ? 'ms-auto bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
                         ]"
                     >
