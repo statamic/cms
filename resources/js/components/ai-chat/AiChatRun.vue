@@ -10,11 +10,9 @@ const props = defineProps({
     run: { type: Object, required: true },
 });
 
+// How it ended, shown at the bottom of the outcome card, under what it did. There's no badge while it's going: the cards show that.
 const badge = computed(() =>
     ({
-        working: { color: 'blue', text: __('Working') },
-        // A pointer clicking: it's your move
-        waiting: { color: 'default', text: __('Needs you'), icon: 'cursor-click' },
         done: { color: 'emerald', text: __('Done') },
         cancelled: { color: 'default', text: __('Cancelled') },
         // It couldn't carry on, like when saving your changes failed
@@ -56,11 +54,7 @@ const stepTitle = (step) => {
 
 <template>
     <div class="space-y-3">
-        <div class="flex items-center gap-2 px-1">
-            <p class="text-sm font-medium tracking-tight text-gray-700 dark:text-white">{{ run.title }}</p>
-            <Badge pill v-bind="badge" />
-        </div>
-
+        <!-- No title or status: the request above says what the job is, and the cards' spinners and ticks show how it's going -->
         <!-- One card per tool call, like the CP's Card. They go from pending, to running, to done. A marker for the page they happened on sits above the first, and wherever the page changes. -->
         <template v-for="(step, i) in run.steps" :key="step.tool">
             <AiChatPageMarker
@@ -122,6 +116,8 @@ const stepTitle = (step) => {
                     <li v-for="item in run.done.items" :key="item">{{ item }}</li>
                 </ul>
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
+                <!-- Done (or Cancelled, or Stopped) signs it off, under what it did -->
+                <Badge pill size="sm" v-bind="badge" class="mt-2.5" />
             </div>
         </div>
     </div>
