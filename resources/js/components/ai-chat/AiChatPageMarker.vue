@@ -24,8 +24,9 @@ const here = computed(() => isHere(props.page));
 // and its dot sets off from there, so the purple never goes missing in between.
 const purple = computed(() => here.value || props.latest);
 
-// Each page shows an icon for the kind of page it is, from the URL, using the CP's own icons
-const icon = computed(() => (props.page.url.endsWith('/dashboard') ? 'dashboard' : props.page.url.includes('/entries/') ? 'entry' : props.page.url.includes('/collections/') ? 'collections' : 'page'));
+// Each page shows an icon: an entry gets the entry icon, and anything else the same icon as its section in the CP's nav (Dashboard,
+// Navigation, Assets…), noted when the chat was there (see mock-runs.js). The page icon if neither.
+const icon = computed(() => (props.page.url.includes('/entries/') ? 'entry' : (props.page.icon ?? 'page')));
 
 // The same line as between the cards (see AiChatRun.vue): a soft AI colour beside the page you're on, dashed grey beside pages you've left
 const line = (p) => (isHere(p) ? 'w-px bg-ai/30' : 'border-s border-dashed border-gray-300 dark:border-gray-600');

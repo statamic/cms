@@ -1,5 +1,5 @@
 import { nextTick, reactive } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import { cp_url } from '@/bootstrap/globals.js';
 
@@ -139,6 +139,8 @@ export function planRun(text) {
 
 // The page the chat was asked about, from the browser tab's title ("Our summer sale ‹ Statamic")
 const currentPage = () => document.title.split(/ [‹›] /)[0] || 'this page';
+// The icon the Control Panel's nav shows for the section you're in (like Navigation, or Assets), so the trail can show the same one
+const currentNavIcon = () => usePage().props._statamic?.nav?.flatMap((section) => section.items).find((item) => item.active)?.icon ?? null;
 
 // What each of the example saved prompts (see AiSettingsController) pretends to do. Any others follow their instructions, vaguely.
 const promptScenarios = {
@@ -233,7 +235,7 @@ export const moving = reactive({ title: null });
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
 // goingTo puts the new page on the chat's trail as soon as it has opened, so its dot sets off straight away (see AiChatPageMarker.vue).
 async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
-    const to = () => ({ title: entry.title, url: new URL(entry.url(), window.location.origin).pathname });
+    const to = () => ({ title: entry.title, url: new URL(entry.url(), window.location.origin).pathname, icon: currentNavIcon() });
     const page = currentPage();
     const stopped = { text: 'Stopped before opening ' + entry.title, note: `Nothing was changed, and your changes to “${page}” are still there.` };
 
@@ -289,7 +291,7 @@ export async function playRun(run, onChange = () => {}) {
         step.state = 'running';
         step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back
-        step.page = step.page?.url === window.location.pathname ? step.page : { title: currentPage(), url: window.location.pathname };
+        step.page = step.page?.url === window.location.pathname ? step.page : { title: currentPage(), url: window.location.pathname, icon: currentNavIcon() };
         onChange();
         await wait(step.ms);
 
