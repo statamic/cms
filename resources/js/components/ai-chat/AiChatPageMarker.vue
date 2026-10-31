@@ -6,6 +6,8 @@ import { Icon } from '@ui';
 // Marks, on the line through the ticks of the chat's step cards, the page the cards below it happened on: a dot, with the page's name in line with the card titles.
 // The line sits 21.5px in, so its 1px width is centred on the ticks (the cards' 14px padding plus half a 16px tick).
 // The page you're on has a filled AI-coloured dot with a soft ring round it, which is enough to mark it. Any other is a link back to it.
+// The purple dot's soft ring takes up some of the room before the page's icon, so a grey dot (with no ring) has its icon 4px further left
+// to look the same distance away.
 // Each page after the first has more room above it (24px rather than the cards' 12px; margins between siblings overlap, so mt-6 is the whole gap), so each page's cards read as a group.
 const props = defineProps({
     page: { type: Object, required: true },
@@ -64,7 +66,7 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
 </script>
 
 <template>
-    <div ref="marker" data-trail-marker :class="['relative flex items-center gap-2 ps-10 text-xs', previous ? 'mt-6!' : '']" :style="travelStyle">
+    <div ref="marker" data-trail-marker :class="['relative flex items-center gap-2 text-xs', purple ? 'ps-10' : 'ps-9', previous ? 'mt-6!' : '']" :style="travelStyle">
         <!-- The line joins up through the dot: from the cards above, and on down to the cards below. It sits under the travelling dot. -->
         <span v-if="previous" :class="['absolute -z-20 start-[21.5px] -top-6 bottom-1/2', line(previous)]" />
         <span :class="['absolute -z-20 start-[21.5px] top-1/2 bottom-0', line(page)]" />
@@ -77,8 +79,9 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
             data-trail-dot
             :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', purple ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']"
         />
-        <span v-if="here" class="flex items-center gap-1.5 text-gray-900 dark:text-white">
-            <Icon :name="icon" class="size-3.5! text-gray-500 dark:text-gray-400" />
+        <!-- Every page's name is the same quiet grey, so the purple dot alone marks where you are. The pages you've left are links back. -->
+        <span v-if="here" class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
+            <Icon :name="icon" class="size-3.5! text-gray-400 dark:text-gray-500" />
             {{ page.title }}
         </span>
         <button v-else type="button" class="flex cursor-pointer items-center gap-1.5 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white" @click="router.visit(page.url)">
