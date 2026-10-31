@@ -277,15 +277,38 @@ function runPrompt(saved) {
     }, 500);
 }
 
-// Glides down for the small steps, as a run adds a line or two. From further up (a long chat, or a run that grew a lot), it jumps
-// straight there, as a smooth scroll that far takes a while and keeps chasing the bottom as more comes in.
+// Glides down for the small steps, as a run adds a line or two. The cards open up over a moment as they come in (see AiChatRun.vue), so
+// the bottom keeps moving as it scrolls. Rather than aim for where the bottom is now and correct afterwards, it follows the bottom down,
+// easing a fifth of the way each frame, in one movement, and keeps following a moment after it arrives in case a card is still opening.
+// From further up (a long chat, or a run that grew a lot), it jumps most of the way first, as gliding that far takes a while.
+// Scrolling yourself (wheel or touch) stops it following. The scrollbar is hidden while it follows, as being moved a little every frame
+// makes it flicker in and out.
+let following;
+const followingBottom = ref(false);
 function scrollToBottom() {
     nextTick(() => {
         const el = thread.value;
         if (!el) return;
-        const distance = el.scrollHeight - el.clientHeight - el.scrollTop;
-        el.scrollTo({ top: el.scrollHeight, behavior: distance > el.clientHeight / 2 ? 'instant' : 'smooth' });
+        if (el.scrollHeight - el.clientHeight - el.scrollTop > el.clientHeight / 2) el.scrollTop = el.scrollHeight;
+        cancelAnimationFrame(following);
+        followingBottom.value = true;
+        let still = 0;
+        const step = () => {
+            const gap = el.scrollHeight - el.clientHeight - el.scrollTop;
+            if (gap > 0.5) {
+                el.scrollTop += gap > 2 ? gap / 5 : gap;
+                still = 0;
+            }
+            if (still++ < 30) following = requestAnimationFrame(step);
+            else followingBottom.value = false;
+        };
+        following = requestAnimationFrame(step);
     });
+}
+
+function stopFollowing() {
+    cancelAnimationFrame(following);
+    followingBottom.value = false;
 }
 </script>
 
@@ -295,7 +318,7 @@ function scrollToBottom() {
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
         <!-- While the help is open it dims, so the help stands out in front of it -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's. The same room below the last card as above the first. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2 py-3.5 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp || commandMenuOpen ? 'opacity-40' : '']">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2 py-3.5 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
