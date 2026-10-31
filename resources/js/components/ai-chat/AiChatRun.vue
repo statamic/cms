@@ -38,8 +38,13 @@ const toolLabels = {
 const inertiaPage = usePage();
 const isHere = (p) => p?.url === inertiaPage.url.split('?')[0];
 const pageChangesAt = (i) => i === 0 || props.run.steps[i].page?.url !== props.run.steps[i - 1].page?.url;
+// The latest page in the trail, while the run is still going, so its dot can stay purple until the next page's takes over
+const latestPageAt = computed(() =>
+    ['working', 'waiting'].includes(props.run.status) ? props.run.steps.findLastIndex((step, i) => step.page && pageChangesAt(i)) : -1,
+);
 
 // The bit of line in the gap above each card: a soft AI colour on the page you're on, and dashed grey on pages you've left behind
+// It sits underneath everything, so the trail's dot passes over it (and under the cards) as it travels down to a new page (see AiChatPageMarker.vue)
 const line = (step) =>
     isHere(step.page) ? 'before:w-px before:bg-ai/30' : 'before:border-s before:border-dashed before:border-gray-300 dark:before:border-gray-600';
 
@@ -53,7 +58,8 @@ const stepTitle = (step) => {
 </script>
 
 <template>
-    <div class="space-y-3">
+    <!-- isolate: the trail's line and travelling dot sit underneath the cards (with negative z-indexes), and this keeps them above whatever the chat sits on -->
+    <div class="isolate space-y-3">
         <!-- No title or status: the request above says what the job is, and the cards' spinners and ticks show how it's going -->
         <!-- One card per tool call, like the CP's Card. They go from pending, to running, to done. A marker for the page they happened on sits above the first, and wherever the page changes. -->
         <template v-for="(step, i) in run.steps" :key="step.tool">
@@ -61,11 +67,12 @@ const stepTitle = (step) => {
                 v-if="step.page && pageChangesAt(i)"
                 :page="step.page"
                 :previous="i ? run.steps[i - 1].page : null"
-                :arriving="justNow(step.shownAt)"
+                :arriving="justNow(step.pageAt ?? step.shownAt)"
+                :latest="i === latestPageAt"
             />
             <div
                 :class="[
-                    'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
+                    'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                     // Waiting is faded like the steps still to come, as the question itself is in the input
                     ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
                     line(step),
@@ -99,7 +106,7 @@ const stepTitle = (step) => {
             v-if="['done', 'cancelled', 'stopped'].includes(run.status)"
             :class="[
                 // In from the line like the cards above, which carries on down beside it, for the page it finished on
-                'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
+                'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                 line(run.steps.findLast((step) => step.page) ?? {}),
                 // And the outcome comes in the same way once it's done
                 justNow(run.endedAt) ? 'ai-card-in' : '',

@@ -66,7 +66,7 @@ const scenarios = [
                                   detail: summerSale.title,
                                   result: 'Opened in the editor',
                                   ms: 300,
-                                  action: (ask) => openEntry(summerSale, ask, nextForm),
+                                  action: (ask, goingTo) => openEntry(summerSale, ask, nextForm, goingTo),
                               },
                           ]),
                     { tool: 'statamic.get_blueprint', args: 'collection: ai_suggestions · blueprint: article', detail: 'Article, in AI Suggestions', result: '5 fields loaded', ms: 700 },
@@ -231,7 +231,9 @@ export const moving = reactive({ title: null });
 
 // Opens an entry so the chat can fill it in, with the chat staying put across the visit.
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
-async function openEntry(entry, ask, nextForm) {
+// goingTo puts the new page on the chat's trail as soon as it has opened, so its dot sets off straight away (see AiChatPageMarker.vue).
+async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
+    const to = () => ({ title: entry.title, url: new URL(entry.url(), window.location.origin).pathname });
     const page = currentPage();
     const stopped = { text: 'Stopped before opening ' + entry.title, note: `Nothing was changed, and your changes to “${page}” are still there.` };
 
@@ -274,6 +276,7 @@ async function openEntry(entry, ask, nextForm) {
     await wait(50);
     if (!started) return (moving.title = null), { stop: stopped };
     if (!(await opened)) return (moving.title = null), { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
+    goingTo(to());
     // The new page is open. The blur stays over it for a moment, so you see it arrive, then lifts. The chat carries on underneath
     // rather than waiting for it: a real model takes this long to pick its next step anyway, so it adds no time.
     setTimeout(() => moving.title === entry.title && (moving.title = null), 800);
@@ -286,11 +289,19 @@ export async function playRun(run, onChange = () => {}) {
         step.state = 'running';
         step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back
-        step.page = { title: currentPage(), url: window.location.pathname };
+        step.page = step.page?.url === window.location.pathname ? step.page : { title: currentPage(), url: window.location.pathname };
         onChange();
         await wait(step.ms);
 
-        const result = await step.action?.((question) => ask(run, step, question, onChange));
+        // A step that moves you puts the new page on the trail as it opens, on the next step, rather than waiting for that step to start
+        const goingTo = (page) => {
+            const next = run.steps[i + 1];
+            if (!next) return;
+            next.page = page;
+            next.pageAt = Date.now();
+            onChange();
+        };
+        const result = await step.action?.((question) => ask(run, step, question, onChange), goingTo);
         if (result?.stop) {
             run.steps.slice(i).forEach((later) => {
                 later.shownAt ??= Date.now();
