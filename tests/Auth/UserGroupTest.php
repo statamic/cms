@@ -113,6 +113,7 @@ class UserGroupTest extends TestCase
         $this->assertEquals($group, $return);
     }
 
+    #[Test]
     public function it_adds_a_role_using_handle()
     {
         $role = new class extends Role

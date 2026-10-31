@@ -333,6 +333,7 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
     }
 
+    #[Test]
     public function entries_are_found_using_where_null()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1'])->create();
