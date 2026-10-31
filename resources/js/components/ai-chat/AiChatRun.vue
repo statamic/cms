@@ -37,6 +37,11 @@ const toolLabels = {
 // page changes. Any page you're not on is a link back to it.
 const inertiaPage = usePage();
 const isHere = (p) => p?.url === inertiaPage.url.split('?')[0];
+// The trail (the line, dots and page names) only shows for a run that takes you somewhere: one that's been on more than one page, or that's
+// going to open a page. On a run that stays put, the cards stand on their own.
+const moves = computed(
+    () => new Set(props.run.steps.filter((step) => step.page).map((step) => step.page.url)).size > 1 || props.run.steps.some((step) => step.tool === 'cp.open_entry'),
+);
 const pageChangesAt = (i) => i === 0 || props.run.steps[i].page?.url !== props.run.steps[i - 1].page?.url;
 // The latest page in the trail, while the run is still going, so its dot can stay purple until the next page's takes over
 const latestPageAt = computed(() =>
@@ -46,7 +51,9 @@ const latestPageAt = computed(() =>
 // The bit of line in the gap above each card: a soft AI colour on the page you're on, and dashed grey on pages you've left behind
 // It sits underneath everything, so the trail's dot passes over it (and under the cards) as it travels down to a new page (see AiChatPageMarker.vue)
 const line = (step) =>
-    isHere(step.page) ? 'before:w-px before:bg-ai/30' : 'before:border-s before:border-dashed before:border-gray-300 dark:before:border-gray-600';
+    !moves.value
+        ? ''
+        : isHere(step.page) ? 'before:w-px before:bg-ai/30' : 'before:border-s before:border-dashed before:border-gray-300 dark:before:border-gray-600';
 
 // Cards open up as they first appear in a run that's playing, but not when the chat is drawn again later (opened, docked, or after a page change)
 const justNow = (time) => time && Date.now() - time < 1000;
@@ -64,7 +71,7 @@ const stepTitle = (step) => {
         <!-- One card per tool call, like the CP's Card. They go from pending, to running, to done. A marker for the page they happened on sits above the first, and wherever the page changes. -->
         <template v-for="(step, i) in run.steps" :key="step.tool">
             <AiChatPageMarker
-                v-if="step.page && pageChangesAt(i)"
+                v-if="moves && step.page && pageChangesAt(i)"
                 :page="step.page"
                 :previous="i ? run.steps[i - 1].page : null"
                 :arriving="justNow(step.pageAt ?? step.shownAt)"
