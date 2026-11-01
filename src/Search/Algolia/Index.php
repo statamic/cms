@@ -83,16 +83,20 @@ class Index extends BaseIndex
         return $this;
     }
 
-    public function searchUsingApi($query, $fields = null)
+    public function searchUsingApi($query, $fields = null, $arguments = [])
     {
-        $arguments = ['query' => $query];
+        $params = ['query' => $query];
 
         if ($fields) {
-            $arguments['restrictSearchableAttributes'] = implode(',', Arr::wrap($fields));
+            $params['restrictSearchableAttributes'] = implode(',', Arr::wrap($fields));
+        }
+
+        foreach ($arguments as $key => $value) {
+            $params[Str::camel($key)] = $value;
         }
 
         try {
-            $response = $this->client()->searchSingleIndex($this->name, $arguments);
+            $response = $this->client()->searchSingleIndex($this->name, $params);
         } catch (AlgoliaException $e) {
             $this->handleAlgoliaException($e);
         }
