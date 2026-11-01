@@ -334,8 +334,9 @@ function stopFollowing() {
                             message.role === 'user' && i > 0 ? 'mt-7.5' : '',
                             message.role === 'user' ? 'mb-4' : 'mb-5',
                             message.role === 'user'
-                                // Your messages are plain light grey, so they stand apart from the white cards of the answers
-                                ? 'ms-auto bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                                // Your messages are plain grey, so they stand apart from the white cards of the answers. Docked, they're a step darker, as the
+                                // sidebar is already the page's light grey.
+                                ? ['ms-auto text-gray-900 dark:bg-gray-800 dark:text-gray-100', floating ? 'bg-gray-100' : 'bg-gray-200']
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
                         ]"
                     >
