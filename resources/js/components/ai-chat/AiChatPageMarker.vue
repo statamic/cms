@@ -67,9 +67,11 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
 
 <template>
     <div ref="marker" data-trail-marker :class="['relative flex items-center gap-2 text-xs', purple ? 'ps-10' : 'ps-9', previous ? 'mt-6!' : '']" :style="travelStyle">
-        <!-- The line joins up through the dot: from the cards above, and on down to the cards below. It sits under the travelling dot. -->
-        <span v-if="previous" :class="['absolute -z-20 start-[21.5px] -top-6 bottom-1/2', line(previous)]" />
-        <span :class="['absolute -z-20 start-[21.5px] top-1/2 bottom-0', line(page)]" />
+        <!-- The line joins up through the dot: from the cards above, and on down to the cards below. It sits under the travelling dot.
+             It stops 4px short of the dot (9px from its middle: its 5px radius and a 4px gap), rather than the dot having a ring to cut it off,
+             as a ring would need to match whatever the chat sits on (white floating, the page's grey docked). -->
+        <span v-if="previous" :class="['absolute -z-20 start-[21.5px] -top-6 bottom-[calc(50%+9px)]', line(previous)]" />
+        <span :class="['absolute -z-20 start-[21.5px] top-[calc(50%+9px)] bottom-0', line(page)]" />
         <!-- The purple line drawn down behind the dot as it travels (under the cards, like the dot), which then fades. It starts at the edge of the last page's dot rather than its middle, so it doesn't cross it. -->
         <span v-if="travels" class="ai-trail-line absolute -z-10 start-[21px] top-1/2 w-0.5 rounded-full bg-ai" :style="{ height: `${distance - 5}px`, marginTop: `${5 - distance}px` }" />
         <!-- The dot comes down the line into place as the page arrives, passing under the cards on the way, like the line, so it's only seen in the gaps between them.
@@ -77,7 +79,7 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
              last page's dot, and never crosses over a card. -->
         <span
             data-trail-dot
-            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full ring-4 ring-white dark:ring-gray-900', purple ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 bg-white dark:border-gray-500 dark:bg-gray-900']"
+            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full', purple ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 dark:border-gray-500']"
         />
         <!-- Every page's name is the same quiet grey, so the purple dot alone marks where you are. The pages you've left are links back. -->
         <span v-if="here" class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
