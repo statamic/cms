@@ -35,7 +35,7 @@
                     </publish-field-fullscreen-header>
 
                     <div class="bard-fixed-toolbar" v-if="editor && !readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed && toolbarIsNearViewport">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -233,6 +233,8 @@ export default {
             buttons: [],
             collapsed: this.meta.collapsed,
             mounted: false,
+            toolbarIsNearViewport: false,
+            toolbarObserver: null,
             initError: null,
             pageHeader: null,
             escBinding: null,
@@ -422,6 +424,8 @@ export default {
 
 		this.$nextTick(() => this.mounted = true);
 
+        this.observeToolbarVisibility();
+
         this.pageHeader = document.querySelector('.global-header');
 
         if (!commandPaletteCallbackRegistered) {
@@ -446,6 +450,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.toolbarObserver?.disconnect();
         this.editor?.destroy();
         this.escBinding?.destroy();
     },
@@ -853,6 +858,25 @@ export default {
             }
 
             this.buttons = buttons;
+        },
+
+        // Rendering every toolbar button adds up on entries with lots of Bard fields, so they're
+        // only rendered once the editor is close to being scrolled into view, or its set is expanded.
+        observeToolbarVisibility() {
+            this.toolbarObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting) return;
+
+                    this.toolbarIsNearViewport = true;
+                    this.toolbarObserver.disconnect();
+                },
+                {
+                    root: this.$refs.container.closest('[scroll-region]'),
+                    rootMargin: '500px',
+                },
+            );
+
+            this.toolbarObserver.observe(this.$refs.container);
         },
 
         buttonIsActive(button) {

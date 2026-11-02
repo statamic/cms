@@ -104,12 +104,22 @@ function focusEditor(wrapper) {
     vi.spyOn(document, 'activeElement', 'get').mockReturnValue(wrapper.vm.editor.view.dom);
 }
 
+let intersect;
+
 beforeEach(() => {
     window.Statamic = {
         $components: { has: () => true, register: () => {} },
         $fieldActions: { get: () => [] },
         $commandPalette: { preventIf: () => {}, add: () => {} },
         $config: { get: () => null },
+    };
+
+    window.IntersectionObserver = class {
+        constructor(callback) {
+            intersect = () => callback([{ isIntersecting: true }]);
+        }
+        observe() {}
+        disconnect() {}
     };
 });
 
@@ -133,6 +143,18 @@ test('a loading indicator is shown in place of the editor and toolbar until the 
 
     expect(wrapper.find('.bard-loading').exists()).toBe(false);
     expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+});
+
+test('toolbar buttons are rendered once the editor is near the viewport', async () => {
+    const wrapper = await mountField({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(false);
+
+    intersect();
+    await nextTick();
+
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(true);
 });
 
 // Serializing the whole document is expensive, and the reading time is the only thing that needs it.
