@@ -394,7 +394,8 @@ async function until(check, timeout = 8000) {
 }
 
 // Where the chat is taking you, while the page changes (see AiChatMoveHint.vue)
-export const moving = reactive({ title: null });
+// arrivedAt notes when it got there, so the header message can say you have arrived (see AiChatMoveHint.vue)
+export const moving = reactive({ title: null, arrivedAt: null });
 
 // Opens an entry so the chat can fill it in, with the chat staying put across the visit.
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
@@ -444,6 +445,7 @@ async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
     if (!started) return (moving.title = null), { stop: stopped };
     if (!(await opened)) return (moving.title = null), { stop: { text: 'Couldn’t open ' + entry.title, note: 'Nothing was changed.' } };
     goingTo(to());
+    moving.arrivedAt = Date.now();
     // The new page is open. The blur stays over it for a moment, so you see it arrive, then lifts. The chat carries on underneath
     // rather than waiting for it: a real model takes this long to pick its next step anyway, so it adds no time.
     setTimeout(() => moving.title === entry.title && (moving.title = null), 800);
