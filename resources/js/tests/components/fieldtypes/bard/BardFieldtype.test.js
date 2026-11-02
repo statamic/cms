@@ -98,6 +98,8 @@ function focusEditor(wrapper) {
     vi.spyOn(document, 'activeElement', 'get').mockReturnValue(wrapper.vm.editor.view.dom);
 }
 
+let intersect;
+
 beforeEach(() => {
     window.Statamic = {
         $components: { has: () => true, register: () => {} },
@@ -105,9 +107,29 @@ beforeEach(() => {
         $commandPalette: { preventIf: () => {}, add: () => {} },
         $config: { get: () => null },
     };
+
+    window.IntersectionObserver = class {
+        constructor(callback) {
+            intersect = () => callback([{ isIntersecting: true }]);
+        }
+        observe() {}
+        disconnect() {}
+    };
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+test('toolbar buttons are rendered once the editor is near the viewport', async () => {
+    const wrapper = await mountField({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(false);
+
+    intersect();
+    await nextTick();
+
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(true);
+});
 
 // Serializing the whole document is expensive, and the reading time is the only thing that needs it.
 test('the document is not serialized to html on mount when reading time is disabled', async () => {
