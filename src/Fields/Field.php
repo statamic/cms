@@ -447,21 +447,18 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($fieldtype->config());
 
+        $defaults = Blink::once('common-field-option-defaults', function () {
+            return self::commonFieldOptions()->all()->map->defaultValue()->all();
+        });
+
         return array_merge(
-            self::commonFieldOptionDefaults(),
+            $defaults,
             $this->config,
             $fields->preProcess()->values()->all(),
             [
                 'component' => $fieldtype->component(),
             ]
         );
-    }
-
-    private static function commonFieldOptionDefaults(): array
-    {
-        return Blink::once('common-field-option-defaults', function () {
-            return self::commonFieldOptions()->all()->map->defaultValue()->all();
-        });
     }
 
     public function meta()
