@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
 use Statamic\Rules\Handle;
@@ -447,13 +448,20 @@ class Field implements Arrayable
         $fields = $fieldtype->configFields()->addValues($fieldtype->config());
 
         return array_merge(
-            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            self::commonFieldOptionDefaults(),
             $this->config,
             $fields->preProcess()->values()->all(),
             [
                 'component' => $fieldtype->component(),
             ]
         );
+    }
+
+    private static function commonFieldOptionDefaults(): array
+    {
+        return Blink::once('common-field-option-defaults', function () {
+            return self::commonFieldOptions()->all()->map->defaultValue()->all();
+        });
     }
 
     public function meta()
