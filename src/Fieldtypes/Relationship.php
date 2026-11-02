@@ -138,7 +138,6 @@ abstract class Relationship extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value())->all(),
-            'columns' => $this->getColumns(),
             'itemDataUrl' => $this->getItemDataUrl(),
             'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),

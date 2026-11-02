@@ -18,9 +18,22 @@ function rekeyGlobs(globbed) {
         const parts = path.split('/');
         const fileName = parts[parts.length - 1];
         const iconName = fileName.replace('.svg', '');
-        cleaned[iconName] = globbed[path];
+        cleaned[iconName] = importOnce(globbed[path]);
     }
     return cleaned;
+}
+
+function importOnce(loader) {
+    let promise = null;
+
+    return () => {
+        promise ??= loader().catch((error) => {
+            promise = null;
+            throw error;
+        });
+
+        return promise;
+    };
 }
 
 export function registerIconSetFromStrings(name, icons) {
