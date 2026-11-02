@@ -62,6 +62,14 @@ const line = (step) =>
         : isHere(step.page) ? 'before:w-px before:bg-ai/30' : 'before:border-s before:border-dashed before:border-gray-300 dark:before:border-gray-600';
 
 // Cards open up as they first appear in a run that's playing, but not when the chat is drawn again later (opened, docked, or after a page change)
+// Once one of those has played, take its class off. The floating chat is only hidden while it's closed, and showing it again would play
+// anything still marked to animate all over again. The line the trail's dot draws has faded by then, so it goes for good.
+function settle(event) {
+    const el = event.target;
+    if (event.animationName === 'ai-card-in') el.classList.remove('ai-card-in');
+    if (event.animationName === 'ai-trail-drop') el.classList.remove('ai-trail-drop');
+    if (event.animationName === 'ai-trail-line-fade') el.style.display = 'none';
+}
 const justNow = (time) => time && Date.now() - time < 1000;
 
 const stepTitle = (step) => {
@@ -72,7 +80,7 @@ const stepTitle = (step) => {
 
 <template>
     <!-- isolate: the trail's line and travelling dot sit underneath the cards (with negative z-indexes), and this keeps them above whatever the chat sits on -->
-    <div class="isolate space-y-3">
+    <div class="isolate space-y-3" @animationend="settle">
         <!-- No title or status: the request above says what the job is, and the cards' spinners and ticks show how it's going -->
         <!-- One card per tool call, like the CP's Card. They go from pending, to running, to done. A marker for the page they happened on sits above the first, and wherever the page changes. -->
         <template v-for="(step, i) in run.steps" :key="step.tool">
