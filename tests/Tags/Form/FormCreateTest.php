@@ -718,8 +718,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_asset_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_asset_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie">',
         ], [
@@ -733,8 +736,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_assets_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_multiple_assets_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
