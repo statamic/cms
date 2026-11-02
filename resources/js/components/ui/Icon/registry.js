@@ -14,14 +14,12 @@ function rekeyGlobs(globbed) {
         const parts = path.split('/');
         const fileName = parts[parts.length - 1];
         const iconName = fileName.replace('.svg', '');
-        cleaned[iconName] = loadOnce(globbed[path]);
+        cleaned[iconName] = importOnce(globbed[path]);
     }
     return cleaned;
 }
 
-// Vite checks the whole document for its preload links on every dynamic import, which adds up
-// when a page renders hundreds of icons. Each icon only needs importing once.
-function loadOnce(loader) {
+function importOnce(loader) {
     let promise = null;
 
     return () => {
