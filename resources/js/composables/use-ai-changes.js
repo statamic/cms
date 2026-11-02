@@ -46,6 +46,7 @@ async function fill(values, gap = 350) {
     for (const [path, value] of Object.entries(values)) {
         const k = key(form.name, path);
         if (!changes.has(k)) changes.set(k, { before: form.values.value[path] ?? null });
+        changes.get(k).at = Date.now();
         form.setFieldValue(path, value);
         await new Promise((resolve) => setTimeout(resolve, gap));
     }
@@ -63,8 +64,12 @@ export default function useAiChanges() {
         nextForm,
         fill,
         changeFor: (container, path) => changes.get(key(container, path)),
-        // You edited it yourself, so it's yours now
-        forget: (container, path) => changes.delete(key(container, path)),
+        // You edited it yourself, so it's yours now. Not straight after the AI filled it in, though: some fields (like Bard) send their
+        // value back tidied up as they take it in, which isn't you editing it.
+        forget: (container, path) => {
+            const change = changes.get(key(container, path));
+            if (change && Date.now() - change.at > 1000) changes.delete(key(container, path));
+        },
         undo: (container, path) => {
             const change = changes.get(key(container, path));
             if (!change || form?.name !== container) return;
