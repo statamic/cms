@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
@@ -500,6 +501,50 @@ EOT
         ], [
             'favourite_animals' => ['cat', 'rat'],
         ]);
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_checkboxes_field_with_a_single_option($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<br>',
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+        ], [
+            'handle' => 'favourite_animals',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                ],
+            ],
+        ]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-terms-field-yes-option" type="checkbox" name="terms[]" value="yes" required>I agree</label>',
+        ], [
+            'handle' => 'terms',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'yes' => 'I agree',
+                ],
+            ],
+        ]);
+    }
+
+    public static function templateLanguageProvider()
+    {
+        return [
+            'antlers' => ['antlers'],
+            'blade' => ['blade'],
+        ];
     }
 
     #[Test]
