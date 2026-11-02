@@ -870,7 +870,10 @@ export default {
                     this.toolbarIsNearViewport = true;
                     this.toolbarObserver.disconnect();
                 },
-                { rootMargin: '500px' },
+                {
+                    root: this.$refs.container.closest('[scroll-region]'),
+                    rootMargin: '500px',
+                },
             );
 
             this.toolbarObserver.observe(this.$refs.container);
