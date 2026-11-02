@@ -43,6 +43,12 @@ const summerSale = {
     labels: { subtitle: 'Subtitle', excerpt: 'Excerpt', meta_description: 'Meta Description' },
 };
 
+// The homepage, for questions about it: a demo entry standing in for the site's real Home page
+const homepage = {
+    title: 'Home',
+    url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000002'),
+};
+
 const scenarios = [
     {
         // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
@@ -83,6 +89,39 @@ const scenarios = [
                     text: `Changed ${fields.length} fields on ${summerSale.title}`,
                     items: fields.map((field) => summerSale.labels[field]),
                     note: 'Nothing’s saved yet. Check them over, then save or publish as usual.',
+                },
+            };
+        },
+    },
+    {
+        // "How can I update the homepage?" It finds the page and takes you there, then says which fields do what, and offers to make the change.
+        match: /\bhome\s?page\b/i,
+        plan: () => {
+            const { nextForm } = useAiChanges();
+            const isOpen = window.location.href.startsWith(homepage.url());
+
+            return {
+                title: 'Find the homepage',
+                steps: [
+                    ...(isOpen
+                        ? []
+                        : [
+                              { tool: 'statamic.search_entries', args: 'query: "home" · collection: pages', detail: 'For “home”, in Pages', result: `1 page found · ${homepage.title}`, ms: 900 },
+                              {
+                                  tool: 'cp.open_entry',
+                                  args: `entry: "${homepage.title}"`,
+                                  detail: homepage.title,
+                                  result: 'Opened in the editor',
+                                  ms: 300,
+                                  action: (ask, goingTo) => openEntry(homepage, ask, nextForm, goingTo),
+                              },
+                          ]),
+                    { tool: 'statamic.get_blueprint', args: 'collection: pages · blueprint: home', detail: 'Home, in Pages', result: '4 fields loaded', ms: 700 },
+                ],
+                done: {
+                    text: 'This is your homepage. Its main fields:',
+                    items: ['Title: the big heading at the top', 'Subtitle: the line under it', 'Excerpt: the short summary in listings', 'Meta Description: what shows in Google'],
+                    note: 'Change what you need, then save or publish as usual. Or tell me what it should say, and I’ll fill it in for you.',
                 },
             };
         },
