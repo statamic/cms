@@ -20,6 +20,10 @@ const badge = computed(() =>
     })[props.run.status],
 );
 
+// The tooltip on each link it added: the page it goes to, then its URL in grey
+const escape = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const linkTooltip = (link) => ({ content: `${escape(link.to)} <span class="opacity-60">· ${escape(link.url)}</span>`, html: true });
+
 // Each tool call in words: what it's doing while it runs (or waits to), and what it did once it's done. The tool's own name is in the tooltip.
 const toolLabels = {
     'statamic.search_entries': ['Searching Entries', 'Searched Entries'],
@@ -139,6 +143,12 @@ const stepTitle = (step) => {
                         <button type="button" :title="result.text" class="cursor-pointer font-medium text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900 dark:text-white dark:decoration-gray-600 dark:hover:decoration-white" @click="router.visit(result.url())">
                             {{ result.title }}
                         </button>
+                    </li>
+                </ul>
+                <!-- The links it added: the words that are now links, in blue and underlined like links, so you can spot them in the field. Hover one to see the page it goes to, and its URL. -->
+                <ul v-if="run.done.links" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
+                    <li v-for="link in run.done.links" :key="link.text">
+                        <span v-tooltip="linkTooltip(link)" class="cursor-default text-blue-600 underline decoration-blue-600/50 underline-offset-2 dark:text-blue-400 dark:decoration-blue-400/50">{{ link.text }}</span>
                     </li>
                 </ul>
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
