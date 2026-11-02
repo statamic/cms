@@ -46,6 +46,8 @@ class HandleInertiaRequests extends Middleware
 
     public function handle(Request $request, Closure $next)
     {
+        config(['inertia.devtools.enabled' => false]);
+
         return parent::handle($request, function ($request) use ($next) {
             $response = $next($request);
 

@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar" v-if="editor && !readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed && toolbarIsNearViewport">
                             <component
                                 v-for="button in visibleButtons(buttons)"
@@ -116,6 +116,12 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
+                        <div v-else-if="!editor" class="bard-loading">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <ui-icon name="loading" class="size-4" />
+                                {{ __('Loading') }}
+                            </div>
+                        </div>
                         <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
@@ -181,6 +187,15 @@ import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
 import { useContentDirection } from '@/composables/content-direction';
+import { preloadIcons } from '@/components/ui/Icon/registry.js';
+
+preloadIcons(
+    'default',
+    import.meta.glob(
+        '../../../../svg/icons/{h1,h2,h3,h4,h5,h6,text-bold,text-italic,text-underline,text-strike-through,text-small,list-ul,list-ol,eraser,quote,superscript,subscript,insert-link,add-table,insert-image,code-inline,code-block,hr,paragraph-align-left,paragraph-align-center,paragraph-align-right,paragraph-align-justified}.svg',
+        { query: '?raw', import: 'default', eager: true },
+    ),
+);
 
 const lowlight = createLowlight(common);
 let tiptap = null;

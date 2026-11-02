@@ -6,6 +6,8 @@ import { closeHistory } from '@tiptap/pm/history';
 import { hideOthers } from 'aria-hidden';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
+import { availableButtons } from '@/components/fieldtypes/bard/buttons.js';
+import { getIconSet } from '@/components/ui/Icon/registry.js';
 import Provider from '@/components/portals/Provider.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants.js';
@@ -30,7 +32,16 @@ function listItem(text) {
 }
 
 async function mountField(config = {}, initialValue = value, container = {}) {
-    const wrapper = mount(BardFieldtype, {
+    const wrapper = mountFieldWithoutWaiting(config, initialValue, container);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await wrapper.vm.$nextTick();
+
+    return wrapper;
+}
+
+function mountFieldWithoutWaiting(config = {}, initialValue = value, container = {}) {
+    return mount(BardFieldtype, {
         props: {
             value: initialValue,
             handle: 'content',
@@ -64,11 +75,6 @@ async function mountField(config = {}, initialValue = value, container = {}) {
             },
         },
     });
-
-    await vi.waitUntil(() => wrapper.vm.editor);
-    await wrapper.vm.$nextTick();
-
-    return wrapper;
 }
 
 async function mountFieldInContainer(config, initialValue) {
@@ -118,6 +124,26 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+test('every toolbar button icon is preloaded', () => {
+    const preloaded = Object.keys(getIconSet('default').preloaded);
+    const icons = availableButtons().map((button) => button.svg);
+
+    expect(preloaded.toSorted()).toEqual(icons.toSorted());
+});
+
+test('a loading indicator is shown in place of the editor and toolbar until the editor has been created', async () => {
+    const wrapper = mountFieldWithoutWaiting({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(false);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await nextTick();
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(false);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+});
 
 test('toolbar buttons are rendered once the editor is near the viewport', async () => {
     const wrapper = await mountField({ toolbar_mode: 'fixed' });
