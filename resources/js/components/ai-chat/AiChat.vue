@@ -9,7 +9,7 @@ import AiChatRun from './AiChatRun.vue';
 import { planPromptRun, planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, messages, floating, focusRequests, leave, newChat } = useAiChat();
+const { open, messages, floating, focusRequests, demoRequest, leave, newChat } = useAiChat();
 // Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card: the purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field) and a purple glow.
 const inputClasses = computed(() =>
     floating.value
@@ -252,6 +252,24 @@ function send(text = prompt.value) {
         playRun(run, scrollToBottom);
     }, 500);
 }
+
+// Prototype: a demo button types its request into the input, a few letters at a time, then sends it
+let demoTyping = null;
+watch(demoRequest, (request) => {
+    if (!request) return;
+    demoRequest.value = null;
+    clearInterval(demoTyping);
+    prompt.value = '';
+    focusInput();
+    let typed = 0;
+    demoTyping = setInterval(() => {
+        typed = Math.min(request.text.length, typed + 2);
+        prompt.value = request.text.slice(0, typed);
+        if (typed < request.text.length) return;
+        clearInterval(demoTyping);
+        setTimeout(() => send(request.text), 350);
+    }, 30);
+});
 
 // From the help or the command menu: a saved prompt runs, and /clear starts a new chat
 const runCommand = (command) => (command.builtIn ? send('/clear') : runPrompt(command));

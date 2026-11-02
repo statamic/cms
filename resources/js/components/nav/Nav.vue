@@ -4,6 +4,7 @@ import { Badge, Icon } from '@ui';
 import useNavigation from './navigation.js';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import DynamicHtmlRenderer from '@/components/DynamicHtmlRenderer.vue';
+import AiChatDemos from '@/components/ai-chat/AiChatDemos.vue';
 import { setCpNavToggleHandler, clearCpNavToggleHandler } from './nav-toggle-channel.js';
 
 const { nav, setParentActive, setChildActive } = useNavigation();
@@ -233,5 +234,7 @@ function shouldRenderAsInertiaLink(item) {
                 </li>
             </ul>
         </div>
+        <!-- Prototype: buttons for demoing the AI chat -->
+        <AiChatDemos />
     </nav>
 </template>

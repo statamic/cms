@@ -27,6 +27,8 @@ watch(floating, (value) => store(floatingKey, value));
 
 // Bumped to ask the chat to focus its input when it's already open.
 const focusRequests = ref(0);
+// Prototype: a request for the chat to play out, from the demo buttons at the bottom of the nav (see AiChatDemos.vue)
+const demoRequest = ref(null);
 // Where focus was before it moved into the chat, so Esc and the shortcut can hand it back.
 let previousFocus = null;
 
@@ -52,6 +54,7 @@ export default function useAiChat() {
         messages,
         floating,
         focusRequests,
+        demoRequest,
         toggle: () => {
             if (!open.value) rememberFocus();
             open.value = !open.value;
@@ -71,6 +74,13 @@ export default function useAiChat() {
             } else {
                 focusRequests.value++;
             }
+        },
+        // Prototype: start a new chat and type the request into it, as if you had (see AiChat.vue)
+        demo: (text) => {
+            if (!open.value) rememberFocus();
+            open.value = true;
+            messages.value = [];
+            demoRequest.value = { text };
         },
         // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
         shortcut: () => {
