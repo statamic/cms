@@ -5,16 +5,20 @@ export function getIconSet(name) {
 }
 
 export function registerIconSet(name, globbed) {
-    registry.set(name, { type: 'glob', data: rekeyGlobs(globbed) });
+    registry.set(name, { type: 'glob', data: rekeyGlobs(globbed, importOnce), preloaded: {} });
 }
 
-function rekeyGlobs(globbed) {
+export function preloadIcons(name, globbed) {
+    Object.assign(registry.get(name).preloaded, rekeyGlobs(globbed));
+}
+
+function rekeyGlobs(globbed, map = (value) => value) {
     const cleaned = {};
     for (const path in globbed) {
         const parts = path.split('/');
         const fileName = parts[parts.length - 1];
         const iconName = fileName.replace('.svg', '');
-        cleaned[iconName] = importOnce(globbed[path]);
+        cleaned[iconName] = map(globbed[path]);
     }
     return cleaned;
 }
