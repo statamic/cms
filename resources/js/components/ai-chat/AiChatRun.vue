@@ -124,7 +124,8 @@ const stepTitle = (step) => {
                 <AiChatDoneIcon v-else />
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">
-                <p class="text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
+                <!-- The summary can run to two lines, so it's set tighter than the body text (18px lines rather than 19.5px) -->
+                <p class="text-[0.8125rem]/[1.375] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
                 <!-- What it changed, or found (for jobs that check, like a saved legal check). The bullets hang out to the left, in the gap by the tick, so the names line up with the title. -->
                 <ul v-if="run.done.items" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
                     <li v-for="item in run.done.items" :key="item">{{ item }}</li>
@@ -132,7 +133,7 @@ const stepTitle = (step) => {
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- Done (or Cancelled, or Stopped) signs it off, under what it did -->
                 <!-- The small size with a little more room either side, and medium weight, so the pill doesn't look cramped -->
-                <Badge pill size="sm" v-bind="badge" class="mt-2.5 px-2 font-medium" />
+                <Badge pill size="sm" v-bind="badge" class="px-2 font-medium" />
             </div>
         </div>
     </div>
