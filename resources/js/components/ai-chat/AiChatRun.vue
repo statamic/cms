@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { Badge, Icon } from '@ui';
 import AiChatDoneIcon from './AiChatDoneIcon.vue';
 import AiChatPageMarker from './AiChatPageMarker.vue';
@@ -24,6 +24,7 @@ const badge = computed(() =>
 const toolLabels = {
     'statamic.search_entries': ['Searching Entries', 'Searched Entries'],
     'statamic.get_entry': ['Reading the Entry', 'Read the Entry'],
+    'statamic.get_entries': ['Reading the Entries', 'Read the Entries'],
     'statamic.get_blueprint': ['Reading the Blueprint', 'Read the Blueprint'],
     'statamic.get_assets': ['Looking at Assets', 'Looked at Assets'],
     'statamic.create_entry': ['Creating an Entry', 'Created an Entry'],
@@ -130,6 +131,15 @@ const stepTitle = (step) => {
                 <!-- What it changed, or found (for jobs that check, like a saved legal check). The bullets hang out to the left, in the gap by the tick, so the names line up with the title. -->
                 <ul v-if="run.done.items" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
                     <li v-for="item in run.done.items" :key="item">{{ item }}</li>
+                </ul>
+                <!-- What it found, for searches: each entry's name, a link to open it, with the line that matched in its tooltip -->
+                <ul v-if="run.done.results" class="space-y-1 pt-0.5 text-xs/5">
+                    <li v-for="result in run.done.results" :key="result.title" class="flex items-center gap-1.5">
+                        <Icon name="entry" class="size-3.5! text-gray-400" />
+                        <button type="button" :title="result.text" class="cursor-pointer font-medium text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900 dark:text-white dark:decoration-gray-600 dark:hover:decoration-white" @click="router.visit(result.url())">
+                            {{ result.title }}
+                        </button>
+                    </li>
                 </ul>
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- Done (or Cancelled, or Stopped) signs it off, under what it did -->
