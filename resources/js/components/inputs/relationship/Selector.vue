@@ -177,10 +177,6 @@ export default {
         site: String,
         type: String, // todo: this controls the extra column that is commented out in the new table at the moment.
         name: String,
-        initialColumns: {
-            type: Array,
-            default: () => [],
-        },
         tree: Object,
     },
 
@@ -190,7 +186,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             selections: clone(this.initialSelections),
-            columns: this.initialColumns,
             view: 'list',
         };
     },

@@ -44,6 +44,7 @@ class TemplateFieldtypeScaffoldingTest extends ScaffoldingTestCase
         );
     }
 
+    #[Test]
     public function it_scaffolds_nested_template_fieldtype_blade()
     {
         $result = $this->scaffoldBladeField($this->nestedField());
