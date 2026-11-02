@@ -61,6 +61,27 @@ const searchResults = [
     { title: 'Home', url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000002'), text: 'Handmade sofas, tables and outdoor furniture, delivered free across the UK.' },
 ];
 
+// A blog post to add links to: a demo entry with a Bard field. Each paragraph is a list of bits of text, and the bits that become links
+// say where to: the link itself, and the page's title and URL to show. The same paragraphs make up the post before (without the links) and after.
+const gardenRange = {
+    title: 'Our new garden range',
+    url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000003'),
+    paragraphs: [
+        ['Our new garden range is here, just in time for the ', ['summer sale', 'statamic://entry::7f3c2a10-ai00-4c1e-9b2a-sugg00000001', 'Our summer sale', '/our-summer-sale'], '. Every piece is handmade in our workshop in Devon from sustainably sourced oak.'],
+        ['There are loungers, dining sets and benches, all designed to sit together. If you’re new to ', ['outdoor furniture', '/outdoor-furniture', 'Outdoor Furniture', '/outdoor-furniture'], ', our ', ['care guide', '/care-guide', 'Caring for Oak', '/care-guide'], ' explains how to keep oak looking its best year after year.'],
+        ['As always, ', ['delivery is free across the UK', '/delivery', 'Delivery', '/delivery'], ', and you can see the whole range in our ', ['showrooms', '/showrooms', 'Showrooms', '/showrooms'], '.'],
+    ],
+};
+const gardenRangeLinks = gardenRange.paragraphs.flat().filter(Array.isArray);
+// The paragraphs as Bard's content, with the links in
+const withLinks = (paragraphs) =>
+    paragraphs.map((bits) => ({
+        type: 'paragraph',
+        content: bits.map((bit) =>
+            Array.isArray(bit) ? { type: 'text', marks: [{ type: 'link', attrs: { href: bit[1], rel: null, target: null, title: null } }], text: bit[0] } : { type: 'text', text: bit },
+        ),
+    }));
+
 const scenarios = [
     {
         // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
@@ -100,6 +121,55 @@ const scenarios = [
                 done: {
                     text: `Changed ${fields.length} fields on ${summerSale.title}`,
                     items: fields.map((field) => summerSale.labels[field]),
+                    note: 'Nothing’s saved yet. Check them over, then save or publish as usual.',
+                },
+            };
+        },
+    },
+    {
+        // "Add links throughout the garden range blog post". It opens the post, finds pages it mentions, and links to them in its content,
+        // leaving saving to you. (Before the blog scenario, as "post" would match that.)
+        match: /\blinks?\b/i,
+        plan: () => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const isOpen = window.location.href.startsWith(gardenRange.url());
+
+            return {
+                title: 'Add links',
+                steps: [
+                    ...(isOpen
+                        ? []
+                        : [
+                              { tool: 'statamic.search_entries', args: 'query: "garden range" · collection: blog', detail: 'For “garden range”, in Blog', result: `1 entry found · ${gardenRange.title}`, ms: 900 },
+                              {
+                                  tool: 'cp.open_entry',
+                                  args: `entry: "${gardenRange.title}"`,
+                                  detail: gardenRange.title,
+                                  result: 'Opened in the editor',
+                                  ms: 300,
+                                  action: (ask, goingTo) => openEntry(gardenRange, ask, nextForm, goingTo),
+                              },
+                          ]),
+                    { tool: 'statamic.get_entry', args: `entry: "${gardenRange.title}" · field: content`, detail: 'Its content', result: `${gardenRange.paragraphs.length} paragraphs read`, ms: 800 },
+                    {
+                        tool: 'statamic.search_entries',
+                        args: `query: ${gardenRangeLinks.map((link) => `"${link[0]}"`).join(', ')}`,
+                        detail: 'Pages the post mentions',
+                        result: `${gardenRangeLinks.length} pages to link to`,
+                        ms: 1200,
+                    },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: 'fields: content',
+                        detail: 'Content',
+                        result: `${gardenRangeLinks.length} links added · not saved`,
+                        ms: 1000,
+                        action: () => currentForm() && fill({ content: withLinks(gardenRange.paragraphs) }),
+                    },
+                ],
+                done: {
+                    text: `Added ${gardenRangeLinks.length} links to “${gardenRange.title}”`,
+                    links: gardenRangeLinks.map((link) => ({ text: link[0], to: link[2], url: link[3] })),
                     note: 'Nothing’s saved yet. Check them over, then save or publish as usual.',
                 },
             };

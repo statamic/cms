@@ -10,6 +10,7 @@ const demos = [
     { label: 'Update homepage', icon: 'ai-chat', text: 'How can I update the homepage?' },
     { label: 'Fix summer sale', icon: 'ai-edit', text: 'Tighten up the summer sale entry' },
     { label: 'Write a blog post', icon: 'ai-sparks', text: 'Create a blog post about our new garden range' },
+    { label: 'Add links to a post', icon: 'link', text: 'Add links throughout the garden range blog post' },
     { label: 'Find content', icon: 'ai-search-spark', text: 'Which entries mention outdoor furniture?' },
 ];
 </script>
