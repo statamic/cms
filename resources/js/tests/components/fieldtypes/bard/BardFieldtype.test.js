@@ -6,6 +6,8 @@ import { closeHistory } from '@tiptap/pm/history';
 import { hideOthers } from 'aria-hidden';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
+import { availableButtons } from '@/components/fieldtypes/bard/buttons.js';
+import { getIconSet } from '@/components/ui/Icon/registry.js';
 import Provider from '@/components/portals/Provider.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants.js';
@@ -112,6 +114,13 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+test('every toolbar button icon is preloaded', () => {
+    const preloaded = Object.keys(getIconSet('default').preloaded);
+    const icons = availableButtons().map((button) => button.svg);
+
+    expect(preloaded.toSorted()).toEqual(icons.toSorted());
+});
 
 test('a loading indicator is shown in place of the editor and toolbar until the editor has been created', async () => {
     const wrapper = mountFieldWithoutWaiting({ toolbar_mode: 'fixed' });
