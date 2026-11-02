@@ -34,7 +34,7 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
+                    <div class="bard-fixed-toolbar" v-if="editor && !readOnly && showFixedToolbar && !fullScreenMode">
                         <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
                             <component
                                 v-for="button in visibleButtons(buttons)"
@@ -116,6 +116,12 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
+                        <div v-else-if="!editor" class="bard-loading">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <ui-icon name="loading" class="size-4" />
+                                {{ __('Loading') }}
+                            </div>
+                        </div>
                         <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div

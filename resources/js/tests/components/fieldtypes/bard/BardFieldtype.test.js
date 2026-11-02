@@ -30,7 +30,16 @@ function listItem(text) {
 }
 
 async function mountField(config = {}, initialValue = value, container = {}) {
-    const wrapper = mount(BardFieldtype, {
+    const wrapper = mountFieldWithoutWaiting(config, initialValue, container);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await wrapper.vm.$nextTick();
+
+    return wrapper;
+}
+
+function mountFieldWithoutWaiting(config = {}, initialValue = value, container = {}) {
+    return mount(BardFieldtype, {
         props: {
             value: initialValue,
             handle: 'content',
@@ -64,11 +73,6 @@ async function mountField(config = {}, initialValue = value, container = {}) {
             },
         },
     });
-
-    await vi.waitUntil(() => wrapper.vm.editor);
-    await wrapper.vm.$nextTick();
-
-    return wrapper;
 }
 
 async function mountFieldInContainer(config, initialValue) {
@@ -108,6 +112,19 @@ beforeEach(() => {
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+test('a loading indicator is shown in place of the editor and toolbar until the editor has been created', async () => {
+    const wrapper = mountFieldWithoutWaiting({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(false);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await nextTick();
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(false);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+});
 
 // Serializing the whole document is expensive, and the reading time is the only thing that needs it.
 test('the document is not serialized to html on mount when reading time is disabled', async () => {
