@@ -363,11 +363,16 @@ export default {
             };
 
             const replacements = this.selections.map(selection => {
-                const text = this.getText(selection);
                 const { delimiter, pattern } = elements[type];
-                return text.match(pattern)
-                    ? this.removeInline(selection, delimiter)
+                const selected = this.getText(selection);
+                // Markdown ignores emphasis delimiters next to whitespace (code spans don't), so keep it outside of them.
+                const [, before, text, after] = type === 'code' || !selected.trim()
+                    ? [null, '', selected, '']
+                    : selected.match(/^(\s*)(.*?)(\s*)$/s);
+                const toggled = text.match(pattern)
+                    ? text.slice(delimiter.length, -delimiter.length)
                     : `${delimiter}${text}${delimiter}`;
+                return before + toggled + after;
             });
 
             this.codemirror.replaceSelections(replacements, 'around');
