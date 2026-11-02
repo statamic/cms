@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Button, Icon, Textarea } from '@ui';
+import { Avatar, Button, Icon, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
 import AiChatPrompts from './AiChatPrompts.vue';
 import AiChatShortcuts from './AiChatShortcuts.vue';
@@ -10,6 +10,9 @@ import { planPromptRun, planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
 const { open, messages, floating, focusRequests, demoRequest, leave, newChat } = useAiChat();
+// You, for your avatar beside your messages
+const user = Statamic.user;
+
 // Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card: the purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field) and a purple glow.
 const inputClasses = computed(() =>
     floating.value
@@ -343,24 +346,33 @@ function stopFollowing() {
                 <AiChatExamples v-if="!floating && !messages.length" ref="examples" :examples="suggestions" @pick="send" @exit="focusInput" />
                 <template v-for="(message, i) in messages" :key="i">
                     <AiChatRun v-if="message.run" :run="message.run" />
+                    <!-- Your messages have your avatar beside them -->
                     <div
                         v-else
                         :class="[
-                            'max-w-[85%] rounded-xl px-3 py-2 text-sm',
+                            'flex items-start',
                             // A new turn gets a little more room above it, so it doesn't merge with the answer before. Your message has the same 16px
                             // below it every time, down to the start of its answer.
                             message.role === 'user' && i > 0 ? 'mt-7.5' : '',
-                            message.role === 'user' ? 'mb-4' : 'mb-5',
-                            message.role === 'user'
-                                // Your messages are plain grey, so they stand apart from the white cards of the answers. Docked, they're a step darker, as the
-                                // sidebar is already the page's light grey.
-                                ? ['ms-auto text-gray-900 dark:bg-gray-800 dark:text-gray-100', floating ? 'bg-gray-100' : 'bg-gray-200']
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+                            message.role === 'user' ? 'mb-4 justify-end' : 'mb-5',
                         ]"
                     >
-                        {{ message.text }}
-                        <!-- A saved prompt also shows its command, so you learn to type it -->
-                        <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
+                        <div
+                            :class="[
+                                'max-w-[85%] rounded-xl rounded-se-lg px-3 py-2 text-sm',
+                                message.role === 'user'
+                                    // Your messages are plain grey, so they stand apart from the white cards of the answers. Docked, they're a step darker, as the
+                                    // sidebar is already the page's light grey.
+                                    ? ['text-gray-900 dark:bg-gray-800 dark:text-gray-100', floating ? 'bg-gray-100' : 'bg-gray-200']
+                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
+                            ]"
+                        >
+                            {{ message.text }}
+                            <!-- A saved prompt also shows its command, so you learn to type it -->
+                            <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
+                        </div>
+                        <!-- 20px, 6px from the bubble, level with its top -->
+                        <Avatar v-if="message.role === 'user'" :user="user" class="ms-1.5 size-5 shrink-0 text-[0.5rem]" />
                     </div>
                 </template>
             </div>
