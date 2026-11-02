@@ -49,6 +49,12 @@ const homepage = {
     url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000002'),
 };
 
+// Where a new blog post is written: a new entry's form (the demo collection's, as its fields are plain text)
+const newBlogPost = {
+    title: 'New blog post',
+    url: () => cp_url('collections/ai_suggestions/entries/create/default'),
+};
+
 const scenarios = [
     {
         // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
@@ -127,17 +133,50 @@ const scenarios = [
         },
     },
     {
-        // "Create a blog post about our latest product"
+        // "Create a blog post about our new garden range". It opens a new entry and writes it in the form, and leaves saving to you,
+        // the same as when it edits one.
         match: /\b(blog|post|article|news)\b/i,
-        plan: (text) => ({
-            title: 'Create draft entry',
-            steps: [
-                { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: article', detail: 'Article, in Blog', result: '12 fields loaded', ms: 800 },
-                { tool: 'statamic.create_entry', args: 'collection: blog · status: draft', detail: 'A draft in Blog', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
-                { tool: 'statamic.update_entry', args: `entry: blog::en::${slug(subjectOf(text))}`, detail: `“${subjectOf(text)}” in Blog`, result: 'content written · seo_description set', ms: 1500 },
-            ],
-            done: { text: 'Saved as a draft, ready for review' },
-        }),
+        plan: (text) => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const subject = subjectOf(text);
+            const about = subject.toLowerCase();
+            const values = {
+                title: subject,
+                subtitle: `A first look at ${about}`,
+                excerpt: `What’s new in ${about}, what it’s made from, and where to see it for yourself.`,
+                meta_description: `${subject}: a first look at what’s new, what it’s made from and where to see it.`,
+            };
+            const fields = Object.keys(values);
+            const labels = { title: 'Title', ...summerSale.labels };
+
+            return {
+                title: 'Write a blog post',
+                steps: [
+                    { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: article', detail: 'Article, in Blog', result: '5 fields loaded', ms: 800 },
+                    {
+                        tool: 'cp.new_entry',
+                        args: 'collection: blog · blueprint: article',
+                        detail: 'An Article, in Blog',
+                        result: 'Opened in the editor',
+                        ms: 300,
+                        action: (ask, goingTo) => openEntry(newBlogPost, ask, nextForm, goingTo),
+                    },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: `fields: ${fields.join(', ')}`,
+                        detail: list(fields.map((field) => labels[field])),
+                        result: 'Written in the form · not saved',
+                        ms: 1600,
+                        action: () => currentForm() && fill(values),
+                    },
+                ],
+                done: {
+                    text: `Wrote “${subject}”`,
+                    items: fields.map((field) => labels[field]),
+                    note: 'Nothing’s saved yet. Check it over, then save it as a draft or publish it.',
+                },
+            };
+        },
     },
     {
         // "Create a landing page for the summer sale"
