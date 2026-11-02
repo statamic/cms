@@ -22,7 +22,7 @@ abstract class FormTestCase extends TestCase
             'field' => [
                 'type' => 'text',
                 'display' => 'Full Name',
-                'validate' => 'min:3|alpha_num',
+                'validate' => ['min:3', 'alpha_num'],
             ],
         ],
         [
@@ -31,7 +31,7 @@ abstract class FormTestCase extends TestCase
                 'type' => 'text',
                 'input_type' => 'email',
                 'display' => 'Email Address',
-                'validate' => 'required|email',
+                'validate' => ['required', 'email'],
             ],
         ],
         [
@@ -39,7 +39,7 @@ abstract class FormTestCase extends TestCase
             'field' => [
                 'type' => 'textarea',
                 'display' => 'Message',
-                'validate' => 'sometimes|required',
+                'validate' => ['sometimes', 'required'],
             ],
         ],
     ];
@@ -102,7 +102,7 @@ abstract class FormTestCase extends TestCase
         $handle = str_shuffle('nobodymesseswiththehoff');
 
         $fields = $oldData
-            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
+            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => ['required']]]], [$fieldConfig])
             : [$fieldConfig];
 
         $this->createForm(['fields' => $fields], $handle);
