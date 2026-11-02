@@ -21,6 +21,8 @@ class ViewServiceProviderTest extends TestCase
     #[Test]
     public function it_lets_the_umask_decide_the_nocache_view_directory_permissions()
     {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
         app('files')->deleteDirectory($directory = storage_path('statamic/tmp/nocache'));
 
         $originalUmask = umask(0002);
