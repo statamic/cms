@@ -6,6 +6,15 @@ import useAiChat from '@/composables/use-ai-chat.js';
 // types the request in, as if you had. What happens is up to the mock runs (see mock-runs.js).
 const { demo } = useAiChat();
 
+// The demos are at the bottom of the nav, so once one is clicked, jump the nav back to the top, so it looks as it normally would.
+// The demo starts a couple of seconds later, so you see the page settle first. Clicking another in the meantime starts that one instead.
+let starting = null;
+function play(event, text) {
+    event.currentTarget.closest('.nav-main')?.scrollTo({ top: 0 });
+    clearTimeout(starting);
+    starting = setTimeout(() => demo(text), 2000);
+}
+
 const demos = [
     { label: 'Update homepage', icon: 'ai-chat', text: 'How can I update the homepage?' },
     { label: 'Fix summer sale', icon: 'ai-edit', text: 'Tighten up the summer sale entry' },
@@ -21,7 +30,7 @@ const demos = [
         <div class="section-title">{{ __('AI Demos') }}</div>
         <ul>
             <li v-for="item in demos" :key="item.label">
-                <a href="#" role="button" :title="item.text" @click.prevent="demo(item.text)">
+                <a href="#" role="button" :title="item.text" @click.prevent="play($event, item.text)">
                     <Icon :name="item.icon" />
                     <span>{{ __(item.label) }}</span>
                 </a>
