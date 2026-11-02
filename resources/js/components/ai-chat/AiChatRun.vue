@@ -131,7 +131,8 @@ const stepTitle = (step) => {
                 </ul>
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- Done (or Cancelled, or Stopped) signs it off, under what it did -->
-                <Badge pill size="sm" v-bind="badge" class="mt-2.5" />
+                <!-- The small size with a little more room either side, and medium weight, so the pill doesn't look cramped -->
+                <Badge pill size="sm" v-bind="badge" class="mt-2.5 px-2 font-medium" />
             </div>
         </div>
     </div>
