@@ -2,7 +2,7 @@
 import { Button } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { messages, close, leave } = useAiChat();
+const { messages, close, leave, floating } = useAiChat();
 
 // Put the chat away and hand focus back to where it was before the chat, like Esc does.
 function dismiss() {
@@ -12,14 +12,22 @@ function dismiss() {
 </script>
 
 <template>
-    <!-- Closes the chat without the keyboard, once a chat has started. It's where the Clear button used to be, and looks like it did, but in the neutral grey of a default button, with the x after the word. It sits over the thread's top right corner in both layouts, the same distance from the top and the side, and shows on hover or focus. Before the first message there's no room for it, and the header's Ask button closes it. -->
-    <!-- "Close" is mostly lowercase, so it looks low next to the x. Nudge the word up 1px so they look level. -->
+    <!-- Closes the chat without the keyboard, once a chat has started: a small x, shown on hover or focus. Floating, it straddles the card's top right corner, with the dock button's look (white, a thin grey border and a shadow), so it never covers your first message. Docked, it sits in the thread's top right, the same 28px square. Before the first message there's no room for it, and the header's Ask button closes it. -->
+    <!-- Half of it hangs outside the card, so an invisible patch 26px bigger all round sits under it, and hovering that counts as hovering the card. Coming at it from outside, it shows before you reach it. It's separate from the button, so a click near it doesn't close the chat. -->
+    <!-- It also waits half a second before fading once you leave the card, so it doesn't vanish as you head for it from inside -->
+    <span v-if="messages.length && floating" aria-hidden="true" class="absolute -end-10 -top-10 z-(--z-index-above) size-20" />
     <Button
         v-if="messages.length"
         size="sm"
-        icon-append="x"
-        :text="__('Close')"
-        class="absolute end-2 top-2 z-(--z-index-above) opacity-0 shadow-none! transition-opacity focus-visible:opacity-100 group-hover/chat:opacity-100 pointer-coarse:opacity-100 [&_svg]:size-3.5! [&>div]:-translate-y-px"
+        icon="x"
+        :aria-label="__('Close')"
+        v-tooltip="__('Close')"
+        :class="
+            floating
+                ? '-end-3.5 -top-3.5 rounded-lg! border! border-gray-200! bg-white! text-gray-600! shadow-md! hover:text-gray-900! dark:border-gray-600! dark:bg-gray-800! dark:text-gray-300! dark:hover:text-white!'
+                : 'end-2 top-2 shadow-none!'
+        "
+        class="absolute z-(--z-index-above) size-7! opacity-0 transition-opacity delay-500 focus-visible:opacity-100 group-hover/chat:delay-0 focus-visible:delay-0 group-hover/chat:opacity-100 pointer-coarse:opacity-100 [&_svg]:size-3.5!"
         @click="dismiss"
     />
 </template>
