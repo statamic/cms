@@ -5,7 +5,6 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
-    Badge,
     Field,
     Icon,
     Label,
@@ -15,6 +14,7 @@ import ShowField from '@/components/field-conditions/ShowField.js';
 import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
 import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
+import AiChangeControls from '@/components/ai-chat/AiChangeControls.vue';
 import { permissions } from '@api';
 
 const props = defineProps({
@@ -330,14 +330,8 @@ const fieldtypeComponentEvents = computed(() => ({
                     <template v-else-if="config.hide_display">
                         <span class="sr-only">{{ __(config.display) }}</span>
                     </template>
-                    <!-- Prototype: the AI chat changed this field. The badge takes the theme's AI colour. Undo puts back what was there, set like the Read Only note (small grey text after a U-turn arrow), with a hover background as it's a button. -->
-                    <span v-if="aiChange" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
-                        <Badge size="sm" class="bg-ai/5 border-ai/40 text-ai dark:border dark:bg-gray-800 dark:border-ai/60 dark:text-white" :text="__('Changed by AI')" />
-                        <button type="button" class="cursor-pointer rounded-md px-1 py-0.5 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white" @click="aiChanges.undo(containerName, fullPath)">
-                            <Icon name="undo" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
-                            {{ __('Undo') }}
-                        </button>
-                    </span>
+                    <!-- Prototype: the AI chat changed this field. The badge takes the theme's AI colour, with ways to see what changed and undo it (see AiChangeControls.vue). -->
+                    <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="label" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                     <span v-if="shouldMarkReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">
@@ -370,6 +364,8 @@ const fieldtypeComponentEvents = computed(() => ({
                     @apply="valueUpdated"
                 />
             </div>
+            <!-- Prototype: what the AI chat changed, under the field, once you open it from the badge -->
+            <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="below" />
         </Field>
     </slot>
 </template>

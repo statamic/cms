@@ -46,7 +46,7 @@ async function fill(values, gap = 350) {
     for (const [path, value] of Object.entries(values)) {
         const k = key(form.name, path);
         if (!changes.has(k)) changes.set(k, { before: form.values.value[path] ?? null });
-        changes.get(k).at = Date.now();
+        Object.assign(changes.get(k), { after: value, at: Date.now() });
         form.setFieldValue(path, value);
         await new Promise((resolve) => setTimeout(resolve, gap));
     }
