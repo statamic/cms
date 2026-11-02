@@ -55,6 +55,12 @@ const newBlogPost = {
     url: () => cp_url('collections/ai_suggestions/entries/create/default'),
 };
 
+// What a search finds: the demo entries, and the line in each that matched (shown in each one's tooltip)
+const searchResults = [
+    { title: summerSale.title, url: summerSale.url, text: 'The biggest discounts we have ever done on all of our outdoor furniture ranges this year' },
+    { title: 'Home', url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000002'), text: 'Handmade sofas, tables and outdoor furniture, delivered free across the UK.' },
+];
+
 const scenarios = [
     {
         // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
@@ -192,16 +198,27 @@ const scenarios = [
         }),
     },
     {
-        // Anything else is treated as looking something up
+        // Anything else is treated as looking something up: "Which entries mention outdoor furniture?"
+        // It answers with the entries it found, each a link to open it.
         match: /./,
-        plan: (text) => ({
-            title: 'Search content',
-            steps: [
-                { tool: 'statamic.search_entries', args: `query: "${text.trim().slice(0, 40)}"`, detail: `For “${text.trim().slice(0, 40)}”`, result: '8 entries found', ms: 1000 },
-                { tool: 'statamic.get_entry', args: 'entry: most relevant', detail: 'The best match', result: 'Loaded for review', ms: 800 },
-            ],
-            done: { text: 'Found 8 matching entries' },
-        }),
+        plan: (text) => {
+            const query = (text.match(/\b(?:mention|mentions|about|with|containing|for)\s+(.+?)[?.!]*$/i)?.[1] ?? text.replace(/[?.!]+$/, '')).trim().slice(0, 40);
+            const found = searchResults;
+
+            return {
+                title: 'Search content',
+                steps: [
+                    { tool: 'statamic.search_entries', args: `query: "${query}"`, detail: `For “${query}”`, result: `${found.length} entries found`, ms: 1000 },
+                    { tool: 'statamic.get_entries', args: `entries: ${found.map((result) => result.title).join(', ')}`, detail: list(found.map((result) => result.title)), result: 'Read where each mentions it', ms: 900 },
+                ],
+                done: {
+                    text: `${found.length} entries mention “${query}”`,
+                    results: found,
+                    // The names are links already, so it just offers the next step
+                    note: 'Want me to change any of them?',
+                },
+            };
+        },
     },
 ];
 
