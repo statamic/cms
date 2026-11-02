@@ -5,7 +5,11 @@ export function getIconSet(name) {
 }
 
 export function registerIconSet(name, globbed) {
-    registry.set(name, { type: 'glob', data: rekeyGlobs(globbed) });
+    registry.set(name, { type: 'glob', data: rekeyGlobs(globbed), preloaded: {} });
+}
+
+export function preloadIcons(name, globbed) {
+    Object.assign(registry.get(name).preloaded, rekeyGlobs(globbed));
 }
 
 function rekeyGlobs(globbed) {

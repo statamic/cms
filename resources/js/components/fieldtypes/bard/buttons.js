@@ -1,3 +1,13 @@
+import { preloadIcons } from '@/components/ui/Icon/registry.js';
+
+preloadIcons(
+    'default',
+    import.meta.glob(
+        '../../../../svg/icons/{h1,h2,h3,h4,h5,h6,text-bold,text-italic,text-underline,text-strike-through,text-small,list-ul,list-ol,eraser,quote,superscript,subscript,insert-link,add-table,insert-image,code-inline,code-block,hr,paragraph-align-left,paragraph-align-center,paragraph-align-right,paragraph-align-justified}.svg',
+        { query: '?raw', import: 'default', eager: true },
+    ),
+);
+
 const availableButtons = () => [
     {
         name: 'h1',
