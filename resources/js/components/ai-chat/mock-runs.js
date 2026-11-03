@@ -93,6 +93,17 @@ const openingHoursPost = {
     ],
 };
 
+// The About page in French, for the translating idea: written into a new entry's form (the demo collection's Blog Post blueprint, as for drafting)
+const aboutInFrench = {
+    title: 'À propos',
+    url: () => cp_url('collections/ai_suggestions/entries/create/default?blueprint=blog_post'),
+    paragraphs: [
+        ['Nous sommes un atelier familial installé dans le Devon, où nous fabriquons à la main des meubles d’extérieur en chêne depuis 1998.'],
+        ['Chaque pièce est conçue pour durer : du chêne issu de forêts gérées durablement, des assemblages traditionnels et une finition qui vieillit bien.'],
+        ['Passez nous voir dans l’un de nos showrooms, ou écrivez-nous : nous serons ravis de vous aider à choisir.'],
+    ],
+};
+
 // The ideas from the research notes ("Ideas to mock up next"), each a scenario of its own. They come first, as their requests would
 // otherwise be caught by the broader ones below ("typo" by the edit, "field" by the edit, "post" by the blog post).
 
@@ -244,24 +255,45 @@ const ideaScenarios = [
         }),
     },
     {
-        // 5 · "Translate the About page into French". It makes a French draft, and offers a preview.
+        // 5 · "Translate the About page into French". Like drafting a post, it opens a new entry and writes the translation in the form, so you
+        // see the page take shape, and leaves saving to you. (A real one would open the About page's French version, and fill that in.)
         match: /\btranslat/i,
-        plan: () => ({
-            title: 'Translate a page',
-            steps: [
-                { tool: 'statamic.get_entry', args: 'entry: pages::about · site: default', detail: 'About, in English', result: 'Loaded · 640 words', ms: 900 },
-                { tool: 'statamic.localize_entry', args: 'entry: pages::about · site: french · status: draft', detail: 'Into French', result: '“À propos” saved as a French draft', ms: 1800 },
-            ],
-            done: {
-                text: 'Translated About into French',
-                items: ['“À propos”, on the French site', 'Title, Content and Meta Description'],
-                note: 'It’s a draft, so it isn’t live. The English page is unchanged.',
-                actions: [
-                    { label: 'Preview', url: () => '/', newTab: true },
-                    { label: 'Edit', url: () => cp_url('collections/pages') },
+        plan: () => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+
+            return {
+                title: 'Translate a page',
+                steps: [
+                    { tool: 'statamic.get_entry', args: 'entry: pages::about · site: default', detail: 'About, in English', result: 'Loaded · 640 words', ms: 900 },
+                    {
+                        tool: 'cp.new_entry',
+                        args: 'collection: pages · site: french',
+                        detail: 'The French version',
+                        result: 'Opened in the editor',
+                        ms: 300,
+                        action: (ask, goingTo) => openEntry(aboutInFrench, ask, nextForm, goingTo),
+                    },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: 'fields: title, content',
+                        detail: 'Title and Content, in French',
+                        result: `Title and ${aboutInFrench.paragraphs.length} paragraphs written · not saved`,
+                        ms: 600,
+                        // The title, then the content a paragraph at a time, as if it's being translated
+                        action: async () => {
+                            if (!currentForm()) return;
+                            await fill({ title: 'À propos' });
+                            for (let i = 1; i <= aboutInFrench.paragraphs.length; i++) await fill({ content: withLinks(aboutInFrench.paragraphs.slice(0, i)) }, 900);
+                        },
+                    },
                 ],
-            },
-        }),
+                done: {
+                    text: 'Translated About into French',
+                    items: ['Title: “À propos”', `Content: ${aboutInFrench.paragraphs.length} paragraphs`],
+                    note: 'Nothing’s saved yet. Check it over, then save it as a draft or publish it. The English page is unchanged.',
+                },
+            };
+        },
     },
     {
         // 6 · "Summarise this week's contact form submissions". Read only: it changes nothing.
