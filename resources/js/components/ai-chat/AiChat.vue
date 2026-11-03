@@ -56,13 +56,29 @@ const examplesVisible = computed(() => !floating.value && !messages.value.length
 // Closing is done with the same header button, which still has focus, so there's nothing to restore.
 const focusInput = () => nextTick(() => form.value?.querySelector('textarea')?.focus());
 watch(open, (isOpen) => {
-    if (isOpen) focusInput();
-    else showHelp.value = false; // the floating chat stays mounted while closed, so put the help away
+    if (isOpen) {
+        focusInput();
+        settleIcons();
+    } else showHelp.value = false; // the floating chat stays mounted while closed, so put the help away
 });
+
+// Prototype: the chat icon turns into the mic as focus comes into the chat (phase 2). Opening the chat moves focus straight in, so the mic
+// should simply be there as the chat appears, not fade in after it. So the icons don't fade for a moment after it opens (or moves).
+const iconsSettling = ref(false);
+let settling;
+function settleIcons() {
+    iconsSettling.value = true;
+    clearTimeout(settling);
+    settling = setTimeout(() => (iconsSettling.value = false), 300);
+}
 // The keyboard shortcut asks for focus when the chat is already open.
 watch(focusRequests, focusInput);
 // Switching between docked and floating remounts the chat, so refocus then too.
-onMounted(() => open.value && focusInput());
+onMounted(() => {
+    if (!open.value) return;
+    focusInput();
+    settleIcons();
+});
 
 // Prototype: same examples as the command palette.
 const suggestions = [
@@ -342,7 +358,8 @@ function cancelDictating() {
 const micClasses = computed(() => [
     '-translate-y-px',
     floating.value ? [messages.value.length ? 'start-[15px]' : 'start-1.5', 'top-[12.5px]'] : 'start-2 top-[22px]',
-    !dictating.value && 'transition-opacity duration-200 opacity-0 pointer-events-none group-focus-within/chat:opacity-100 group-focus-within/chat:pointer-events-auto',
+    !dictating.value && 'opacity-0 pointer-events-none group-focus-within/chat:opacity-100 group-focus-within/chat:pointer-events-auto',
+    !dictating.value && !iconsSettling.value && 'transition-opacity duration-200',
 ]);
 
 
@@ -528,7 +545,7 @@ function stopFollowing() {
             <!-- Like the command palette's search row, an icon in front of the text. While phase 2 is demoed, it turns into the mic once you're in the chat. -->
             <Icon
                 name="ai-chat"
-                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', phaseTwo && (dictating ? 'opacity-0' : 'transition-opacity duration-200 group-focus-within/chat:opacity-0'), floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
+                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', phaseTwo && (dictating ? 'opacity-0' : ['group-focus-within/chat:opacity-0', !iconsSettling && 'transition-opacity duration-200']), floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
             />
             <!-- Prototype: the mic, where the chat icon is. It stays lit while you speak. It comes before the input in the page, as it does on screen,
                  so Shift+Tab from the input reaches it. Tabbing to it shows it too, as focus is then in the chat. -->
