@@ -85,6 +85,7 @@ class CoreNav
                     })
                     ->map(function ($collection) {
                         return Nav::item($collection->title())
+                            ->id('content::collections::'.$collection->handle())
                             ->url(
                                 $collection->sites()->contains(Site::selected()->handle())
                                     ? $collection->showUrl()
@@ -122,6 +123,7 @@ class CoreNav
                             : true;
 
                         return Nav::item($nav->title())
+                            ->id('content::navigation::'.$nav->handle())
                             ->url($availableInSelectedSite ? $nav->showUrl() : $nav->editUrl())
                             ->can('view', $nav)
                             ->extra([
@@ -145,6 +147,7 @@ class CoreNav
             ->children(function () {
                 return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
+                        ->id('content::taxonomies::'.$taxonomy->handle())
                         ->url($taxonomy->showUrl())
                         ->can('view', $taxonomy)
                         ->extra([
@@ -168,6 +171,7 @@ class CoreNav
             ->children(function () {
                 return AssetContainerAPI::all()->sortBy->title()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
+                        ->id('content::assets::'.$assetContainer->handle())
                         ->url($assetContainer->showUrl())
                         ->can('view', $assetContainer)
                         ->extra([
@@ -198,6 +202,7 @@ class CoreNav
                         $localized = $globalSet->inSelectedSite();
 
                         return Nav::item($globalSet->title())
+                            ->id('content::globals::'.$globalSet->handle())
                             ->url($localized ? $localized->editUrl() : $globalSet->editUrl())
                             ->can('view', $globalSet)
                             ->extra([
@@ -251,6 +256,7 @@ class CoreNav
             ->children(function () {
                 return FormAPI::all()->sortBy->title()->map(function ($form) {
                     return Nav::item($form->title())
+                        ->id('tools::forms::'.$form->handle())
                         ->url($form->showUrl())
                         ->can('view', $form)
                         ->extra(['breadcrumbs' => ['configure_url' => $form->editUrl()]]);
