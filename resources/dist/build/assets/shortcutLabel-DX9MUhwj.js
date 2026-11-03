@@ -1,0 +1,1 @@
+function e(e){let t=typeof navigator<`u`&&(navigator.userAgentData?.platform||navigator.platform)||``,n=/Mac|iPhone|iPad|iPod/i.test(t)?`Cmd`:`Ctrl`;return e.split(`+`).map(e=>e===`mod`?n:e.charAt(0).toUpperCase()+e.slice(1)).join(`+`)}export{e as t};
