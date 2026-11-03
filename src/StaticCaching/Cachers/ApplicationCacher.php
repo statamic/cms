@@ -7,6 +7,7 @@ use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Page;
+use Statamic\Support\Str;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -161,5 +162,77 @@ class ApplicationCacher extends AbstractCacher
             });
 
         UrlInvalidated::dispatch($url, $domain);
+    }
+
+    /**
+     * Invalidate multiple URLs.
+     *
+     * Invalidating URLs one at a time reads and rewrites the domain's whole URL
+     * index for every match, which gets slow when many URLs are invalidated at
+     * once on a site with a large index. Instead, the URLs are grouped by domain
+     * and each domain's index is rewritten once.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function invalidateUrls($urls)
+    {
+        collect($urls)
+            ->flatMap(fn ($url) => Str::contains($url, '*')
+                ? $this->getPathsAndDomainsMatchingWildcard($url)
+                : [$this->getPathAndDomain($url)])
+            ->groupBy(fn ($pathAndDomain) => $pathAndDomain[1])
+            ->each(fn ($pathsAndDomains, $domain) => $this->invalidatePaths(
+                $pathsAndDomains->pluck(0)->unique()->all(),
+                $domain
+            ));
+    }
+
+    private function getPathsAndDomainsMatchingWildcard($wildcard)
+    {
+        [$wildcard, $domain] = $this->getPathAndDomain(substr($wildcard, 0, -1));
+
+        return $this->getUrls($domain)
+            ->filter(fn ($url) => str_starts_with($url, $wildcard))
+            ->map(fn ($url) => [$url, $domain])
+            ->values()
+            ->all();
+    }
+
+    private function invalidatePaths(array $paths, string $domain)
+    {
+        $lookup = array_flip($paths);
+
+        // Same matching as invalidateUrl(): the path itself, or any query string version of it.
+        $keys = $this->getUrls($domain)
+            ->filter(function ($value) use ($lookup) {
+                if (isset($lookup[$value])) {
+                    return true;
+                }
+
+                $offset = 0;
+
+                while (($position = strpos($value, '?', $offset)) !== false) {
+                    if (isset($lookup[substr($value, 0, $position)])) {
+                        return true;
+                    }
+
+                    $offset = $position + 1;
+                }
+
+                return false;
+            })
+            ->keys()
+            ->all();
+
+        foreach ($keys as $key) {
+            $this->cache->forget($this->normalizeKey('responses:'.$key));
+        }
+
+        $this->forgetUrls($keys, $domain);
+
+        foreach ($paths as $path) {
+            UrlInvalidated::dispatch($path, $domain);
+        }
     }
 }

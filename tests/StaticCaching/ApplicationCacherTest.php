@@ -2,6 +2,9 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
@@ -296,6 +299,147 @@ class ApplicationCacherTest extends TestCase
             'configured base domain' => ['http://base.com', 'http://base.com/foo'],
             'another domain' => ['http://another.com', 'http://another.com/foo'],
         ];
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_removes_the_html_and_the_urls()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'onemore' => '/onemore',
+            'two' => '/two',
+            'three' => '/three',
+        ]);
+        $cache->forever('static-cache:'.md5('http://another.com').'.urls', [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        foreach (['one', 'oneqs', 'onemore', 'two', 'three'] as $key) {
+            $cache->forever('static-cache:responses:'.$key, $key.' html content');
+        }
+
+        $cacher->invalidateUrls(['/one', 'two', 'http://another.com/two', '/one', '/not-cached']);
+
+        $this->assertEquals([
+            'onemore' => '/onemore',
+            'three' => '/three',
+        ], $cacher->getUrls()->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://another.com')->all());
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNull($cache->get('static-cache:responses:oneqs'));
+        $this->assertNull($cache->get('static-cache:responses:two'));
+        $this->assertNotNull($cache->get('static-cache:responses:onemore'));
+        $this->assertNotNull($cache->get('static-cache:responses:three'));
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_supports_wildcards()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'blog' => '/blog',
+            'one' => '/blog/one',
+            'two' => '/blog/two?page=2',
+            'about' => '/about',
+            'contact' => '/contact',
+        ]);
+
+        $cacher->invalidateUrls(['/blog/*', '/contact']);
+
+        $this->assertEquals([
+            'blog' => '/blog',
+            'about' => '/about',
+        ], $cacher->getUrls()->all());
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_rewrites_each_domains_url_index_once()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $urls = collect(range(1, 50))->mapWithKeys(fn ($i) => ["key{$i}" => "/page/{$i}"])->all();
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', $urls);
+        $cache->forever('static-cache:'.md5('http://another.com').'.urls', $urls);
+
+        $writes = [];
+        Event::listen(KeyWritten::class, function ($event) use (&$writes) {
+            $writes[] = $event->key;
+        });
+
+        $cacher->invalidateUrls([
+            ...collect(range(1, 40))->map(fn ($i) => "/page/{$i}")->all(),
+            '/page/4*',
+            'http://another.com/page/1',
+            'http://another.com/page/2',
+        ]);
+
+        $this->assertEquals([
+            'static-cache:'.md5('http://example.com').'.urls',
+            'static-cache:'.md5('http://another.com').'.urls',
+        ], $writes);
+        $this->assertEquals(['key50' => '/page/50'], $cacher->getUrls()->all());
+        $this->assertCount(48, $cacher->getUrls('http://another.com'));
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_dispatches_an_event_for_each_url()
+    {
+        Event::fake([UrlInvalidated::class]);
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://base.com']);
+        $this->instance(Cacher::class, $cacher);
+        $cache->forever('static-cache:'.md5('http://base.com').'.urls', [
+            'one' => '/blog/one',
+            'two' => '/blog/two',
+        ]);
+
+        $cacher->invalidateUrls(['/foo', 'http://another.com/bar', '/blog/*']);
+
+        Event::assertDispatchedTimes(UrlInvalidated::class, 4);
+        foreach (['http://base.com/foo', 'http://another.com/bar', 'http://base.com/blog/one', 'http://base.com/blog/two'] as $url) {
+            Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === $url);
+        }
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_matches_invalidating_them_one_at_a_time()
+    {
+        $urls = [
+            'home' => '/',
+            'a' => '/product/a',
+            'aqs' => '/product/a?ref=1',
+            'ab' => '/product/ab',
+            'b' => '/product/b',
+            'c' => '/category/books?page=2&sort=asc',
+            'cqs' => '/category/books?page=2&sort=asc?x',
+            'd' => '/category/books',
+        ];
+        $invalidate = ['/product/a', '/category/books?page=2&sort=asc', '/not-cached', 'http://other.com/product/b', '/categ*'];
+
+        $batched = new ApplicationCacher($batchedCache = new CacheRepository(new ArrayStore), ['base_url' => 'http://example.com']);
+        $single = new ApplicationCacher($singleCache = new CacheRepository(new ArrayStore), ['base_url' => 'http://example.com']);
+
+        foreach ([$batchedCache, $singleCache] as $cache) {
+            $cache->forever('static-cache:'.md5('http://example.com').'.urls', $urls);
+            foreach (array_keys($urls) as $key) {
+                $cache->forever('static-cache:responses:'.$key, 'html content');
+            }
+        }
+
+        $batched->invalidateUrls($invalidate);
+        collect($invalidate)->each(fn ($url) => str_contains($url, '*')
+            ? (fn () => $this->invalidateWildcardUrl($url))->call($single)
+            : $single->invalidateUrl($url));
+
+        $this->assertEquals($single->getUrls()->all(), $batched->getUrls()->all());
+        foreach (array_keys($urls) as $key) {
+            $this->assertSame($singleCache->has('static-cache:responses:'.$key), $batchedCache->has('static-cache:responses:'.$key), $key);
+        }
     }
 
     #[Test]
