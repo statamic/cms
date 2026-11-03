@@ -61,7 +61,10 @@ class Structure extends Tags
         ]);
 
         if ($tree) {
-            $tree = array_slice($tree, max(0, $this->params->int('offset')), max(0, $this->params->int('limit')) ?: null);
+            $offset = max(0, $this->params->int('offset'));
+            $limit = max(0, $this->params->int('limit')) ?: null;
+
+            $tree = array_slice($tree, $offset, $limit);
         }
 
         $value = $this->toArray($tree);
