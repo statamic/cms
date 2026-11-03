@@ -315,4 +315,12 @@ EOT
 
         $this->assertArrayHasKey('_token', $form['params']);
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->post('/!/auth/password/email')->assertNotFound();
+    }
 }

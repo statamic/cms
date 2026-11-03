@@ -155,6 +155,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Front-end Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Determines if Statamic registers front-end registration routes to power
+    | {{ user:login_form }} and related tags. Doesn't affect the Control Panel.
+    |
+    */
+
+    'frontend_auth_enabled' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Impersonation
     |--------------------------------------------------------------------------
     |

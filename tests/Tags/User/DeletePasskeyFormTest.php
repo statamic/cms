@@ -151,4 +151,12 @@ class DeletePasskeyFormTest extends TestCase
             ->deleteJson(route('statamic.passkeys.destroy', ['id' => 'nonexistent']))
             ->assertStatus(403);
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->delete('/!/auth/passkeys/id')->assertNotFound();
+    }
 }

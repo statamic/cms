@@ -256,4 +256,13 @@ class TwoFactorChallengeFormTest extends TestCase
     {
         return app(Google2FA::class)->getCurrentOtp($user->twoFactorSecretKey());
     }
+
+    #[Test]
+    public function it_returns_404_when_frontend_authentication_is_disabled(): void
+    {
+        config(['statamic.users.frontend_auth_enabled' => false]);
+
+        $this->get('/!/auth/two-factor-challenge')->assertNotFound();
+        $this->post('/!/auth/two-factor-challenge')->assertNotFound();
+    }
 }
