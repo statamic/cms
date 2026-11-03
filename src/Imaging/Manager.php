@@ -86,7 +86,7 @@ class Manager
     public function cpManipulationPresets()
     {
         $presets = array_merge(
-            ['small' => 400],
+            ['small' => 400, 'large' => 1600],
             config('statamic.cp.thumbnail_presets', [])
         );
 
