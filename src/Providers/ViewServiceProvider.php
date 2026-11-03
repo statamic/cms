@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\View as ViewFactory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Contracts\View\Antlers\Parser as ParserContract;
-use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Statamic;
 use Statamic\StaticCaching\NoCache\Region;
@@ -426,7 +425,7 @@ PHP;
 
     public function boot()
     {
-        File::makeDirectory($nocacheViews = storage_path('statamic/tmp/nocache'));
+        app('files')->makeDirectory($nocacheViews = storage_path('statamic/tmp/nocache'), mode: 0777, recursive: true, force: true);
 
         ViewFactory::addNamespace('nocache__views', $nocacheViews);
 

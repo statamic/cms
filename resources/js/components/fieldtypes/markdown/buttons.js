@@ -1,4 +1,40 @@
 const availableButtons = () => [
+    {
+        name: 'h1',
+        text: __('Heading 1'),
+        command: (editor) => editor.toggleHeading(1),
+        svg: 'h1',
+    },
+    {
+        name: 'h2',
+        text: __('Heading 2'),
+        command: (editor) => editor.toggleHeading(2),
+        svg: 'h2',
+    },
+    {
+        name: 'h3',
+        text: __('Heading 3'),
+        command: (editor) => editor.toggleHeading(3),
+        svg: 'h3',
+    },
+    {
+        name: 'h4',
+        text: __('Heading 4'),
+        command: (editor) => editor.toggleHeading(4),
+        svg: 'h4',
+    },
+    {
+        name: 'h5',
+        text: __('Heading 5'),
+        command: (editor) => editor.toggleHeading(5),
+        svg: 'h5',
+    },
+    {
+        name: 'h6',
+        text: __('Heading 6'),
+        command: (editor) => editor.toggleHeading(6),
+        svg: 'h6',
+    },
     { name: 'bold', text: __('Bold'), command: (editor) => editor.toggleInline('bold'), svg: 'text-bold' },
     { name: 'italic', text: __('Italic'), command: (editor) => editor.toggleInline('italic'), svg: 'text-italic' },
     { name: 'strikethrough', text: __('Strikethrough'), command: (editor) => editor.toggleInline('strikethrough'), svg: 'text-strike-through' },

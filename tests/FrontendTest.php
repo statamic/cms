@@ -236,6 +236,15 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_redirecting_to_itself_is_not_found()
+    {
+        $this->withStandardFakeErrorViews();
+        $this->createPage('about', ['with' => ['redirect' => 'entry::about']]);
+
+        $this->get('/about')->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_are_visible_if_using_live_preview()
     {
         $this->withStandardBlueprints();

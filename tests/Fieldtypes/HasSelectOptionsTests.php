@@ -104,6 +104,29 @@ trait HasSelectOptionsTests
                 'two',
                 ['two'],
             ],
+            'numeric keys with string value' => [
+                [
+                    ['key' => 926450000, 'value' => 'One'],
+                    ['key' => 926450001, 'value' => 'Two'],
+                ],
+                '926450001',
+                ['Two'],
+            ],
+            'numeric keys with differently formatted string value' => [
+                [
+                    ['key' => 1, 'value' => 'One'],
+                ],
+                '01',
+                ['01'],
+            ],
+            'numeric and string keys with string value' => [
+                [
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => '1', 'value' => 'String One'],
+                ],
+                '1',
+                ['String One'],
+            ],
         ];
     }
 }

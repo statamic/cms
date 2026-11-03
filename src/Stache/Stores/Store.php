@@ -393,7 +393,9 @@ abstract class Store
 
     public function clear()
     {
-        $this->paths()->keys()->each(function ($key) {
+        $cachedPaths = $this->paths ?? Stache::cacheStore()->get($this->pathsCacheKey(), []);
+
+        collect($cachedPaths)->keys()->each(function ($key) {
             $this->forgetItem($key);
         });
 
