@@ -1,5 +1,69 @@
 # Release Notes
 
+## 6.40.0 (2026-11-03)
+
+### What's new
+- Add Heading buttons to the Markdown fieldtype [#15753](https://github.com/statamic/cms/issues/15753) by @jackmcdade
+- Add limit and offset parameters to the nav tag [#15777](https://github.com/statamic/cms/issues/15777) by @mynetx
+
+### What's fixed
+- Keep only one uploaded asset in a link field [#15756](https://github.com/statamic/cms/issues/15756) by @mynetx
+- Fix infinite recursion on self-referencing redirects [#15746](https://github.com/statamic/cms/issues/15746) by @marcorieser
+- Show select option labels for numeric keys in form submissions [#15744](https://github.com/statamic/cms/issues/15744) by @mynetx
+- Use absolute URL in link index column for entries on another site [#15755](https://github.com/statamic/cms/issues/15755) by @edalzell
+- Fix GraphQL and REST API response caches missing keys on invalidation under concurrent requests [#15747](https://github.com/statamic/cms/issues/15747) by @duncanmcclean
+- Only add the required attribute to checkboxes with a single option [#15760](https://github.com/statamic/cms/issues/15760) by @mynetx
+- Fix invalid ARIA in the command palette [#15759](https://github.com/statamic/cms/issues/15759) by @mynetx
+- Fix nocache directory permissions [#15762](https://github.com/statamic/cms/issues/15762) by @duncanmcclean
+- Fix update badge showing "0" when using Redis as cache store [#15767](https://github.com/statamic/cms/issues/15767) by @joshuablum
+- Speed up rendering icons by only importing each one once [#15766](https://github.com/statamic/cms/issues/15766) by @duncanmcclean
+- Remove unused fieldtype meta [#15769](https://github.com/statamic/cms/issues/15769) by @duncanmcclean
+- Speed up permission checks [#15773](https://github.com/statamic/cms/issues/15773) by @duncanmcclean
+- Disable Inertia DevTools in the Control Panel [#15774](https://github.com/statamic/cms/issues/15774) by @duncanmcclean
+- Speed up button groups on large entries [#15765](https://github.com/statamic/cms/issues/15765) by @duncanmcclean
+- Only build common field option defaults once [#15772](https://github.com/statamic/cms/issues/15772) by @duncanmcclean
+- Show a loading indicator while Bard loads [#15770](https://github.com/statamic/cms/issues/15770) by @duncanmcclean
+- Only render Bard toolbar buttons when they're needed [#15768](https://github.com/statamic/cms/issues/15768) by @duncanmcclean
+- Fix toggling Markdown formatting on multi-line selections [#15775](https://github.com/statamic/cms/issues/15775) by @mynetx
+- Fix new entries in structured collections having no URL until the next request [#15776](https://github.com/statamic/cms/issues/15776) by @mynetx
+- Avoid parsing every file when clearing a cold Stache [#15771](https://github.com/statamic/cms/issues/15771) by @duncanmcclean
+- French translations [#15757](https://github.com/statamic/cms/issues/15757) by @ebeauchamps
+
+
+
+## 6.39.0 (2026-10-29)
+
+### What's new
+- Add fieldtype inspection commands [#15737](https://github.com/statamic/cms/issues/15737) by @jackmcdade
+
+### What's fixed
+- Fix HTML getting encoded when pasting a copied Bard set [#15718](https://github.com/statamic/cms/issues/15718) by @mynetx
+- Send Statamic user agent in Outpost/API requests [#15727](https://github.com/statamic/cms/issues/15727) by @duncanmcclean
+- Fix site handle warning not showing when saving sites [#15722](https://github.com/statamic/cms/issues/15722) by @lazerg
+- Fix relationship select field crashing when switching localizations [#15485](https://github.com/statamic/cms/issues/15485) by @duncanmcclean
+- Fix nested Bard losing characters when typing fast [#15717](https://github.com/statamic/cms/issues/15717) by @o1y
+- Fix Comb boolean words being used as raw regex [#15723](https://github.com/statamic/cms/issues/15723) by @edalzell
+- Fix Search utility when index names are customized [#15729](https://github.com/statamic/cms/issues/15729) by @jasonbaciulis
+- Lock the Comb index file across each read-modify-write [#15725](https://github.com/statamic/cms/issues/15725) by @edalzell
+- Fix "Discard and use existing file" adding an asset that doesn't exist [#15716](https://github.com/statamic/cms/issues/15716) by @mynetx
+- Look up the Comb index once when paginating search results [#15724](https://github.com/statamic/cms/issues/15724) by @edalzell
+- Prevent `static:warm` from dropping `--header` values on paginated pages [#15278](https://github.com/statamic/cms/issues/15278) by @steveparks
+- Write the Comb index once when updating on a sync queue [#15726](https://github.com/statamic/cms/issues/15726) by @edalzell
+- Harden user augmentation [#15733](https://github.com/statamic/cms/issues/15733) by @tsurutanmen
+- Fix infinite recursion when evaluating cyclic link fields [#15731](https://github.com/statamic/cms/issues/15731) by @qmeister
+- Fix duplicate localizations [#15732](https://github.com/statamic/cms/issues/15732) by @qmeister
+- Keep the compact array popover within small screens [#15738](https://github.com/statamic/cms/issues/15738) by @mynetx
+- Stop parallel Stache warming losing cached index usages [#15736](https://github.com/statamic/cms/issues/15736) by @edalzell
+- Defer image cache stats in the Cache Manager [#15743](https://github.com/statamic/cms/issues/15743) by @duncanmcclean
+- Fix duplicate labels on Bard, Replicator & Group fields in Grid tables [#15750](https://github.com/statamic/cms/issues/15750) by @duncanmcclean
+- Keep crop copies in the asset selector [#15741](https://github.com/statamic/cms/issues/15741) by @duncanmcclean
+- Bump `prosemirror-view` to 1.42.8 [#15752](https://github.com/statamic/cms/issues/15752) by @duncanmcclean
+- Fix CP header avatar for assets in private containers [#15611](https://github.com/statamic/cms/issues/15611) by @lazerg
+- Add missing English translation for elevated session verification code [#15742](https://github.com/statamic/cms/issues/15742) by @duncanmcclean
+- Bump the npm_and_yarn group across 1 directory with 2 updates [#15751](https://github.com/statamic/cms/issues/15751) by @dependabot
+
+
+
 ## 6.38.0 (2026-10-23)
 
 ### What's new

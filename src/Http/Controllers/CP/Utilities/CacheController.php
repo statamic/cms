@@ -25,7 +25,7 @@ class CacheController extends CpController
             'stache' => $this->getStacheStats(),
             'cache' => $this->getApplicationCacheStats(),
             'static' => $this->getStaticCacheStats(),
-            'images' => $this->getImageCacheStats(),
+            'images' => Inertia::defer(fn () => $this->getImageCacheStats()),
             'clearAllUrl' => cp_route('utilities.cache.clear-all'),
             'clearStacheUrl' => cp_route('utilities.cache.clear-stache'),
             'warmStacheUrl' => cp_route('utilities.cache.warm-stache'),

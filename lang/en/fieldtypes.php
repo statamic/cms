@@ -140,6 +140,7 @@ return [
     'list.title' => 'List',
     'markdown.config.automatic_line_breaks' => 'Enables automatic line breaks.',
     'markdown.config.automatic_links' => 'Enables automatic linking of any URLs.',
+    'markdown.config.buttons' => 'Choose which buttons to show in the toolbar. Drag to rearrange.',
     'markdown.config.container' => 'Choose which asset container to use for this field.',
     'markdown.config.escape_markup' => 'Escapes inline HTML markup (e.g. `<div>` to `&lt;div&gt;`).',
     'markdown.config.folder' => 'Specify the initial directory.',

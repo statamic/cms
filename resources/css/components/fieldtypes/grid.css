@@ -96,7 +96,7 @@
                 @apply hidden;
             }
 
-            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
+            .grid-cell :is(.replicator-fieldtype, .bard-fieldtype, .group-fieldtype) [data-ui-input-group] :is([data-ui-field-header], [data-ui-label], [data-ui-description]) {
                 @apply block;
             }
 
