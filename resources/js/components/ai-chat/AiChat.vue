@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Avatar, Button, Icon, Textarea } from '@ui';
+import { Avatar, Button, Icon, Input, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
 import AiChatPrompts from './AiChatPrompts.vue';
 import AiChatShortcuts from './AiChatShortcuts.vue';
@@ -42,8 +42,14 @@ const askInInput = computed(() => !!waitingRun.value);
 const askFirst = useTemplateRef('askFirst');
 watch(askInInput, (asking) => (asking ? nextTick(() => askFirst.value?.[0]?.$el?.focus()) : focusInput()));
 
+// A question can come with a time to change (like when to publish), which the answer then carries (see ask() in mock-runs.js)
+const askTime = ref(null);
+watch(waitingRun, (run) => (askTime.value = run?.waiting.time ?? null));
+
 function answer(value) {
-    waitingRun.value?.waiting.answer(value);
+    const waiting = waitingRun.value?.waiting;
+    if (!waiting) return;
+    waiting.time === undefined ? waiting.answer(value) : waiting.answer(value, askTime.value || waiting.time);
 }
 
 const thread = useTemplateRef('thread');
@@ -527,6 +533,8 @@ function stopFollowing() {
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
                 <p class="text-[0.8125rem]/5 text-gray-800 dark:text-gray-200">{{ waitingRun.waiting.question }}</p>
+                <!-- A time to change, when the question has one -->
+                <Input v-if="waitingRun.waiting.time !== undefined" v-model="askTime" type="time" size="sm" :aria-label="__('Time')" />
                 <!-- The choices are stacked full width, the main one first, as three don't fit in a row at this size -->
                 <div class="flex flex-col gap-1.5">
                     <Button

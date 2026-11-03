@@ -82,7 +82,221 @@ const withLinks = (paragraphs) =>
         ),
     }));
 
+// A new blog post for the drafting idea: the demo collection's Blog Post blueprint, which has a Bard field to write into
+const openingHoursPost = {
+    title: 'New blog post',
+    url: () => cp_url('collections/ai_suggestions/entries/create/default?blueprint=blog_post'),
+    paragraphs: [
+        ['From Monday 1 December, our showrooms are open later on weekdays: 9am to 7pm, Monday to Friday. Saturdays stay 9am to 5pm, and we’re still closed on Sundays.'],
+        ['Lots of you told us you can only visit after work, so we’ve moved our hours to suit. The extra two hours each evening mean there’s time to sit on every sofa before you choose.'],
+        ['Our online shop and delivery times aren’t changing. If you’d like a quiet look round, Tuesday and Wednesday evenings are the calmest.'],
+    ],
+};
+
+// The ideas from the research notes ("Ideas to mock up next"), each a scenario of its own. They come first, as their requests would
+// otherwise be caught by the broader ones below ("typo" by the edit, "field" by the edit, "post" by the blog post).
+
+// Next Monday, for "Publish it next Monday at 9am"
+const nextMonday = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + (((8 - date.getDay()) % 7) || 7));
+    return date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+};
+
+// The time asked for, as 24-hour "9:00" or "14:30": "at 9am", "at 2.30pm", "at 14:00". Null if there isn't one.
+const timeIn = (text) => {
+    const match = text.match(/\bat\s+(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?\b/i);
+    if (!match) return null;
+    let hour = Number(match[1]) % 12 + (match[3]?.toLowerCase() === 'pm' ? 12 : 0);
+    if (!match[3] && Number(match[1]) >= 12) hour = Number(match[1]);
+    return `${hour}:${match[2] ?? '00'}`;
+};
+// The time it was scheduled for, once you've said, for the outcome
+const scheduled = reactive({ time: null });
+
+const ideaScenarios = [
+    {
+        // 1 · "Fix the typo 'recieve' on the Contact page". It fixes it in a working copy, so the live page stays as it is until it's published.
+        match: /\brecieve\b|\btypo\b.*\bcontact\b/i,
+        plan: () => ({
+            title: 'Fix a typo',
+            steps: [
+                { tool: 'statamic.search_entries', args: 'query: "recieve" · collection: pages', detail: 'For “recieve”, in Pages', result: '1 page found · Contact', ms: 900 },
+                { tool: 'statamic.update_entry', args: 'entry: pages::contact · find: "recieve" · replace: "receive"', detail: 'Contact, in Pages', result: 'Working copy created · live unchanged', ms: 1100 },
+            ],
+            done: {
+                text: 'Fixed “recieve” on Contact',
+                diff: { label: 'Content', before: 'We’ll recieve your message and reply within two working days.', after: 'We’ll receive your message and reply within two working days.' },
+                note: 'This is in a working copy. The live page is unchanged until you publish it.',
+                actions: [{ label: 'Review and publish', url: () => cp_url('collections/pages') }],
+            },
+        }),
+    },
+    {
+        // 2 · "Write a blog post about our new opening hours". It opens a new blog post and writes it in the form, so you see the page take
+        // shape: the title, then the post a paragraph at a time. Saving it (as a draft, or published) is up to you.
+        match: /\bopening hours\b/i,
+        plan: () => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const title = 'Our new opening hours';
+
+            return {
+                title: 'Draft a blog post',
+                steps: [
+                    { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog_post', detail: 'Blog Post, in Blog', result: '2 fields loaded', ms: 800 },
+                    {
+                        tool: 'cp.new_entry',
+                        args: 'collection: blog · blueprint: blog_post',
+                        detail: 'A Blog Post, in Blog',
+                        result: 'Opened in the editor',
+                        ms: 300,
+                        action: (ask, goingTo) => openEntry(openingHoursPost, ask, nextForm, goingTo),
+                    },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: 'fields: title, content',
+                        detail: 'Title and Content',
+                        result: `Title and ${openingHoursPost.paragraphs.length} paragraphs written · not saved`,
+                        ms: 600,
+                        // The title, then the content growing a paragraph at a time, as if it's being written
+                        action: async () => {
+                            if (!currentForm()) return;
+                            await fill({ title });
+                            for (let i = 1; i <= openingHoursPost.paragraphs.length; i++) await fill({ content: withLinks(openingHoursPost.paragraphs.slice(0, i)) }, 900);
+                        },
+                    },
+                ],
+                done: {
+                    text: `Wrote “${title}”`,
+                    items: ['Title', `Content: ${openingHoursPost.paragraphs.length} paragraphs, on the new hours, why they’ve changed and when they start`],
+                    note: 'Nothing’s saved yet. Check it over, then save it as a draft or publish it.',
+                },
+            };
+        },
+    },
+    {
+        // 3 · "Publish it next Monday at 9am". Publishing is never done without asking, so it stops for approval first.
+        // Without a time ("Publish it next Monday"), it goes for 9:00, says so, and lets you change it in the question.
+        match: /\b(publish|schedule)\b/i,
+        plan: (text) => {
+            const asked = timeIn(text);
+            const day = nextMonday();
+            const when = (time) => `${day} at ${time}`;
+
+            return {
+                title: 'Schedule publishing',
+                steps: [
+                    { tool: 'statamic.get_entry', args: 'entry: blog::our-new-opening-hours', detail: '“Our new opening hours”, in Blog', result: 'A draft · not live', ms: 800 },
+                    {
+                        tool: 'statamic.publish_entry',
+                        args: `entry: blog::our-new-opening-hours · date: next Monday ${asked ?? '09:00'}`,
+                        detail: asked ? `On ${when(asked)}` : `On ${day}, at 9:00 unless you say otherwise`,
+                        result: '',
+                        ms: 500,
+                        action: async (ask, goingTo, step) => {
+                            const answer = await ask({
+                                question: asked
+                                    ? `Publish “Our new opening hours” on ${when(asked)}? It’ll go live on the site then.`
+                                    : `Publish “Our new opening hours” on ${day}? You didn’t say a time, so it’s 9:00. Change it if you like.`,
+                                // Without a time asked for, the question has a time to change (see AiChat.vue), and answers with it
+                                time: asked ? undefined : '09:00',
+                                choices: [
+                                    { value: 'schedule', label: 'Schedule it' },
+                                    { value: 'cancel', label: 'Cancel' },
+                                ],
+                            });
+                            const choice = answer?.value ?? answer;
+                            if (choice === 'cancel') return { stop: { text: 'Didn’t schedule it', note: '“Our new opening hours” is still a draft.' }, cancelled: true };
+                            scheduled.time = (answer?.time ?? asked ?? '09:00').replace(/^0(\d)/, '$1');
+                            step.detail = `On ${when(scheduled.time)}`;
+                            step.result = `Goes live on ${when(scheduled.time)}`;
+                        },
+                    },
+                ],
+                done: {
+                    text: 'Scheduled “Our new opening hours”',
+                    get items() {
+                        return [`Goes live on ${when(scheduled.time)}`];
+                    },
+                    note: 'It stays a draft until then. You can change the date on the entry.',
+                },
+            };
+        },
+    },
+    {
+        // 4 · "Which images have no alt text?" A table to review: each image, and the alt text it suggests, to apply one by one or all at once.
+        match: /\balt text\b|\bimages\b/i,
+        plan: () => ({
+            title: 'Find missing alt text',
+            steps: [
+                { tool: 'statamic.get_assets', args: 'container: assets · fields: alt', detail: 'Alt text on 16 images', result: '4 without alt text', ms: 1100 },
+                { tool: 'statamic.describe_images', args: 'assets: 4', detail: 'The 4 images', result: 'Alt text suggested', ms: 1400 },
+            ],
+            done: {
+                text: '4 images have no alt text',
+                images: [
+                    { file: 'golden-retriever.png', src: '/assets/golden-retriever.png', alt: 'A golden retriever standing and looking at the camera' },
+                    { file: 'n64.jpg', src: '/assets/n64.jpg', alt: 'A boxed Nintendo 64 console and controller' },
+                    { file: 'sega-dreamcast.jpg', src: '/assets/sega-dreamcast.jpg', alt: 'A Sega Dreamcast console lit in purple' },
+                    { file: 'fanny-pack.webp', src: '/assets/fanny-pack.webp', alt: 'A bright pink, purple and teal bum bag' },
+                ],
+            },
+        }),
+    },
+    {
+        // 5 · "Translate the About page into French". It makes a French draft, and offers a preview.
+        match: /\btranslat/i,
+        plan: () => ({
+            title: 'Translate a page',
+            steps: [
+                { tool: 'statamic.get_entry', args: 'entry: pages::about · site: default', detail: 'About, in English', result: 'Loaded · 640 words', ms: 900 },
+                { tool: 'statamic.localize_entry', args: 'entry: pages::about · site: french · status: draft', detail: 'Into French', result: '“À propos” saved as a French draft', ms: 1800 },
+            ],
+            done: {
+                text: 'Translated About into French',
+                items: ['“À propos”, on the French site', 'Title, Content and Meta Description'],
+                note: 'It’s a draft, so it isn’t live. The English page is unchanged.',
+                actions: [
+                    { label: 'Preview', url: () => '/', newTab: true },
+                    { label: 'Edit', url: () => cp_url('collections/pages') },
+                ],
+            },
+        }),
+    },
+    {
+        // 6 · "Summarise this week's contact form submissions". Read only: it changes nothing.
+        match: /\bsummari[sz]e\b|\bsubmissions\b/i,
+        plan: () => ({
+            title: 'Summarise submissions',
+            steps: [{ tool: 'statamic.get_submissions', args: 'form: contact_us · since: Monday', detail: 'Contact Us, this week', result: '23 submissions', ms: 1300 }],
+            done: {
+                text: '23 contact form submissions this week',
+                items: ['9 delivery questions, mostly about the garden range', '6 asking about showroom opening times', '4 returns and refunds', '3 trade enquiries', '1 complaint about a late delivery, on Tuesday'],
+                note: 'Nothing was changed.',
+                actions: [{ label: 'View submissions', url: () => cp_url('forms/contact_us') }],
+            },
+        }),
+    },
+    {
+        // 7 · "Add a subtitle field to the blog blueprint". The MCP can read blueprints but not change them, so it says so, shows what's
+        // there, and points you to where you can do it.
+        match: /\bblueprint\b|\badd an? \w+ field\b/i,
+        plan: () => ({
+            title: 'Add a field',
+            ends: 'unable',
+            steps: [{ tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog', detail: 'Blog, in Blog', result: '5 fields loaded', ms: 800 }],
+            done: {
+                text: 'I can’t change blueprints yet',
+                items: ['Title', 'Content', 'Author', 'Featured Image', 'Tags'],
+                note: 'Those are the Blog blueprint’s fields now. You can add a Subtitle field in the blueprint editor.',
+                actions: [{ label: 'Open the Blog blueprint', url: () => cp_url('fields/blueprints/collections/blog/blog/edit') }],
+            },
+        }),
+    },
+];
+
 const scenarios = [
+    ...ideaScenarios,
     {
         // "Tighten up the summer sale entry", "Fix the excerpt"... It changes the entry by filling in its form, and leaves saving to you.
         // If the entry isn't open, it opens it first (the chat stays put across the visit), so you see the changes where they'd be made.
@@ -372,12 +586,13 @@ function ask(run, step, question, onChange) {
         run.status = 'waiting';
         run.waiting = {
             ...question,
-            answer: (value) => {
+            // A question with a time to change (see AiChat.vue) answers with it too: { value, time }
+            answer: (value, time) => {
                 run.waiting = null;
                 step.state = 'running';
                 run.status = 'working';
                 onChange();
-                resolve(value);
+                resolve(time === undefined ? value : { value, time });
             },
         };
         onChange();
@@ -476,7 +691,7 @@ export async function playRun(run, onChange = () => {}) {
             next.pageAt = Date.now();
             onChange();
         };
-        const result = await step.action?.((question) => ask(run, step, question, onChange), goingTo);
+        const result = await step.action?.((question) => ask(run, step, question, onChange), goingTo, step);
         writing.active = false;
         if (result?.stop) {
             run.steps.slice(i).forEach((later) => {
@@ -495,7 +710,8 @@ export async function playRun(run, onChange = () => {}) {
         await wait(250);
     }
 
-    run.status = 'done';
+    // Usually done, but a run can end up unable to do what was asked (see the blueprint idea)
+    run.status = run.ends ?? 'done';
     run.endedAt = Date.now();
     onChange();
 }

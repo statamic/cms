@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
-import { Badge, Icon } from '@ui';
+import { Badge, Button, Icon, Textarea } from '@ui';
+import diffWords from '@/components/ai-suggest/diff-words.js';
 import AiChatDoneIcon from './AiChatDoneIcon.vue';
 import AiChatPageMarker from './AiChatPageMarker.vue';
 
@@ -17,6 +18,8 @@ const badge = computed(() =>
         cancelled: { color: 'default', text: __('Cancelled') },
         // It couldn't carry on, like when saving your changes failed
         stopped: { color: 'default', text: __('Stopped') },
+        // It can't do what was asked (yet), like changing a blueprint
+        unable: { color: 'default', text: __('Not possible yet') },
     })[props.run.status],
 );
 
@@ -33,6 +36,10 @@ const toolLabels = {
     'statamic.get_assets': ['Looking at Assets', 'Looked at Assets'],
     'statamic.create_entry': ['Creating an Entry', 'Created an Entry'],
     'statamic.update_entry': ['Updating the Entry', 'Updated the Entry'],
+    'statamic.publish_entry': ['Scheduling the Entry', 'Scheduled the Entry'],
+    'statamic.localize_entry': ['Translating the Entry', 'Translated the Entry'],
+    'statamic.describe_images': ['Describing the Images', 'Described the Images'],
+    'statamic.get_submissions': ['Reading Submissions', 'Read Submissions'],
     'cp.open_entry': ['Opening the Entry', 'Opened the Entry'],
     'cp.new_entry': ['Opening a New Entry', 'Opened a New Entry'],
     'cp.fill_fields': ['Filling in Fields', 'Filled in Fields'],
@@ -71,6 +78,74 @@ function settle(event) {
     if (event.animationName === 'ai-trail-line-fade') el.style.display = 'none';
 }
 const justNow = (time) => time && Date.now() - time < 1000;
+
+// What it changed, word by word, in the same yellow and red as the suggestions and the Changed by AI badge
+// Where words were swapped, the old one comes first, then the new one
+const diffParts = computed(() => {
+    if (!props.run.done?.diff) return [];
+    const parts = diffWords(props.run.done.diff.before, props.run.done.diff.after);
+    for (let i = 1; i < parts.length; i++) {
+        if (parts[i].type === 'removed' && parts[i - 1].type === 'added') [parts[i - 1], parts[i]] = [parts[i], parts[i - 1]];
+    }
+    return parts;
+});
+const diffClass = (type) => ({
+    'rounded-sm bg-yellow-100 dark:bg-yellow-400/20 dark:text-yellow-100': type === 'added',
+    'rounded-sm bg-red-50 text-red-700 line-through dark:bg-red-400/15 dark:text-red-300': type === 'removed',
+});
+
+// The buttons under an outcome: open a page in the CP, or (for previews) the site in a new tab
+const follow = (action) => (action.newTab ? window.open(action.url(), '_blank') : router.visit(action.url()));
+
+// The alt text review goes one image at a time: a big image, its suggestion in a box to edit, then Apply and next, or Skip. A strip of
+// all the thumbnails under it shows how far you are, and you can click one to go back to it, even once they're all done: an applied one
+// can be edited and updated, or undone, and a skipped one can be applied after all. (Prototype: applying just marks it applied.)
+const images = computed(() => props.run.done?.images ?? []);
+// The one showing. Applying or skipping moves on to the next one not dealt with (or to the end, once they all are).
+const altIndex = ref(0);
+const altImage = computed(() => images.value[altIndex.value]);
+const altFinished = computed(() => images.value.length && images.value.every((image) => image.applied || image.skipped));
+function nextAlt() {
+    const after = images.value.findIndex((image, i) => i > altIndex.value && !image.applied && !image.skipped);
+    const any = images.value.findIndex((image) => !image.applied && !image.skipped);
+    altIndex.value = after >= 0 ? after : any >= 0 ? any : altIndex.value;
+}
+// Once they're all done the review closes up to the strip, and clicking a thumbnail opens it again on that image (and again, or Update, closes it)
+const altOpen = ref(false);
+const showReview = computed(() => !altFinished.value || altOpen.value);
+function pickAlt(i) {
+    if (altFinished.value && altOpen.value && altIndex.value === i) return (altOpen.value = false);
+    altIndex.value = i;
+    altOpen.value = true;
+}
+// After dealing with one: on to the next not dealt with, or, if that was the last, close the review up
+function settleAlt() {
+    if (altFinished.value) altOpen.value = false;
+    else nextAlt();
+}
+const applyAlt = () => ((altImage.value.applied = true), (altImage.value.skipped = false), settleAlt());
+const skipAlt = () => ((altImage.value.skipped = true), settleAlt());
+// Changed your mind about one you applied: skip it after all
+const skipApplied = () => ((altImage.value.applied = false), skipAlt());
+// Accepts the suggestions for all the ones not dealt with yet, as they are (with any edits you've made)
+const acceptAllAlt = () => images.value.forEach((image) => image.applied || image.skipped || (image.applied = true));
+
+// The current thumbnail has a 2px border in the AI colour (so it follows the theme); the others have a 1px grey one. They're borders rather
+// than rings, as a ring is a box-shadow, and the thumbnails have no shadow of any kind.
+const altRing = (i) => (i === altIndex.value ? 'border-2 border-ai' : 'border border-gray-200 dark:border-gray-700');
+
+// An applied thumbnail gets a small white badge with a green tick, top right (15px, with a 9px tick), and its image stays at full strength.
+// Skipped ones are just faded.
+
+// Once they're all done, the review says nothing more: the card's heading changes to say what was added, and the strip of thumbnails stays
+const altApplied = computed(() => images.value.filter((image) => image.applied).length);
+const headline = computed(() => {
+    if (!props.run.done?.images || !altFinished.value) return props.run.done?.text;
+    if (!altApplied.value) return __('No alt text added');
+    return altApplied.value === 1 ? __('Alt text added to 1 image') : __('Alt text added to :count images', { count: altApplied.value });
+});
+
+const altLeft = computed(() => images.value.filter((image) => !image.applied && !image.skipped).length);
 
 const stepTitle = (step) => {
     const labels = toolLabels[step.tool];
@@ -124,7 +199,7 @@ const stepTitle = (step) => {
 
         <!-- The outcome, built like the tool-call cards above it: a tick (or a cross, if it was cancelled or stopped) and the same spacing -->
         <div
-            v-if="['done', 'cancelled', 'stopped'].includes(run.status)"
+            v-if="['done', 'cancelled', 'stopped', 'unable'].includes(run.status)"
             :class="[
                 // In from the line like the cards above, which carries on down beside it, for the page it finished on
                 'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
@@ -139,7 +214,7 @@ const stepTitle = (step) => {
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">
                 <!-- The summary can run to two lines, so it's set tighter than the body text (18px lines rather than 19.5px) -->
-                <p class="text-[0.8125rem]/[1.375] font-semibold text-gray-900 dark:text-gray-200">{{ run.done.text }}</p>
+                <p class="text-[0.8125rem]/[1.375] font-semibold text-gray-900 dark:text-gray-200">{{ headline }}</p>
                 <!-- What it changed, or found (for jobs that check, like a saved legal check). The bullets hang out to the left, in the gap by the tick, so the names line up with the title. -->
                 <ul v-if="run.done.items" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
                     <li v-for="item in run.done.items" :key="item">{{ item }}</li>
@@ -159,11 +234,61 @@ const stepTitle = (step) => {
                         <span v-tooltip="linkTooltip(link)" class="cursor-default text-blue-600 underline decoration-blue-600/50 underline-offset-2 dark:text-blue-400 dark:decoration-blue-400/50">{{ link.text }}</span>
                     </li>
                 </ul>
+                <!-- What it changed, word by word: the field, then the sentence with the change marked -->
+                <div v-if="run.done.diff" class="space-y-0.5 pt-0.5 text-xs/5">
+                    <p class="text-gray-500 dark:text-gray-400">{{ run.done.diff.label }}</p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        <template v-for="(part, i) in diffParts" :key="i"><span :class="diffClass(part.type)">{{ part.text }}</span>{{ ' ' }}</template>
+                    </p>
+                </div>
+                <!-- Images to review, one at a time: each one's image and suggested alt text, which you can edit, to apply or skip -->
+                <!-- It runs the full width of the card, out under the tick (16px, plus the 10px gap), rather than indented like the text -->
+                <div v-if="run.done.images" class="-ms-6.5 space-y-2 pt-1">
+                    <template v-if="showReview">
+                        <img :src="altImage.src" alt="" class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover dark:bg-gray-800" />
+                        <!-- One you've been back to says what happened to it -->
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ altImage.file }}<template v-if="altImage.applied"> · {{ __('Applied') }}</template><template v-else-if="altImage.skipped"> · {{ __('Skipped') }}</template></p>
+                        <!-- Always editable, even once it's applied or skipped -->
+                        <Textarea v-model="altImage.alt" rows="2" resize="none" class="px-2! py-1.5! text-xs!" :aria-label="__('Alt text for :file', { file: altImage.file })" />
+                        <div class="flex gap-1.5">
+                            <!-- One you applied: save your edit, or skip it after all -->
+                            <template v-if="altImage.applied">
+                                <Button size="sm" variant="primary" :text="__('Update')" @click="settleAlt" />
+                                <Button size="sm" variant="ghost" :text="__('Skip')" @click="skipApplied" />
+                            </template>
+                            <!-- One you skipped: apply it after all -->
+                            <Button v-else-if="altImage.skipped" size="sm" variant="primary" :text="__('Apply')" @click="applyAlt" />
+                            <template v-else>
+                                <Button size="sm" variant="primary" :text="__('Apply and next')" @click="applyAlt" />
+                                <Button size="sm" variant="ghost" :text="__('Skip')" @click="skipAlt" />
+                                <!-- At the far end, for when the suggestions look right without going through each -->
+                                <Button v-if="altLeft > 1" size="sm" class="ms-auto" :text="__('Accept all')" @click="acceptAllAlt" />
+                            </template>
+                        </div>
+                    </template>
+                    <!-- All the thumbnails, 40px and 6px apart: this one ringed in the AI colour, applied ones ticked, skipped ones drained of colour. Click one to go
+                         to it. While reviewing, 22px above it (the 8px between rows, and 14px more), so the strip reads as a row of its own under the buttons. -->
+                    <div :class="['flex gap-1.5', altFinished ? '' : 'pt-3.5']">
+                        <button v-for="(image, i) in images" :key="image.file" type="button" :class="['relative size-10 cursor-pointer overflow-hidden rounded-md', altRing(i)]" :aria-label="image.file" @click="pickAlt(i)">
+                            <img :src="image.src" alt="" :class="['size-full object-cover', image.skipped ? 'opacity-60 grayscale' : '']" />
+                            <span v-if="image.applied" class="absolute end-0.5 top-0.5 grid size-[15px] place-items-center rounded-full border border-emerald-700/40 bg-emerald-600">
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.125" stroke-linecap="round" stroke-linejoin="round" class="size-[9px] text-white" aria-hidden="true">
+                                    <path d="m3.5 8.5 3 3 6-6.5" />
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
                 <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
+                <!-- What you might do next, like opening what it made -->
+                <div v-if="run.done.actions" class="flex flex-wrap gap-1.5 pt-0.5">
+                    <Button v-for="action in run.done.actions" :key="action.label" size="sm" :text="__(action.label)" @click="follow(action)" />
+                </div>
                 <!-- Done (or Cancelled, or Stopped) signs it off, under what it did -->
                 <!-- The small size with a little more room either side, and medium weight, so the pill doesn't look cramped -->
                 <!-- Pulled out 1px, as its rounded end makes it look further in than the text above it -->
-                <Badge pill size="sm" v-bind="badge" class="-ms-px px-2 font-medium" />
+                <!-- Not under a review (like the alt text), which isn't done until you've been through it, and says so itself -->
+                <Badge v-if="!run.done.images" pill size="sm" v-bind="badge" class="-ms-px px-2 font-medium" />
             </div>
         </div>
     </div>

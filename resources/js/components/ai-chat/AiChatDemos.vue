@@ -22,6 +22,15 @@ const demos = [
     { label: 'Write a blog post', icon: 'ai-sparks', text: 'Create a blog post about our new garden range' },
     { label: 'Add links to a post', icon: 'link', text: 'Add links throughout the garden range blog post' },
     { label: 'Find content', icon: 'ai-search-spark', text: 'Which entries mention outdoor furniture?' },
+    // The ideas from the research notes (see ideaScenarios in mock-runs.js)
+    { label: 'Fix a typo', icon: 'pencil-line', text: "Fix the typo 'recieve' on the Contact page" },
+    { label: 'Draft a post', icon: 'entry', text: 'Write a blog post about our new opening hours' },
+    { label: 'Schedule publishing', icon: 'calendar', text: 'Publish it next Monday at 9am' },
+    { label: 'Schedule, no time given', icon: 'calendar-date', text: 'Publish it next Monday' },
+    { label: 'Find missing alt text', icon: 'assets', text: 'Which images have no alt text?' },
+    { label: 'Translate a page', icon: 'globe-world-wide-web', text: 'Translate the About page into French' },
+    { label: 'Summarise submissions', icon: 'forms', text: "Summarise this week's contact form submissions" },
+    { label: 'Add a field', icon: 'blueprint-edit', text: 'Add a subtitle field to the blog blueprint' },
 ];
 
 const phaseTwoDemos = [
