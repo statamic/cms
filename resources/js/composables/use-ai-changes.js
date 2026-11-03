@@ -44,12 +44,17 @@ async function fill(values, gap = 350) {
     if (!form) return;
 
     for (const [path, value] of Object.entries(values)) {
-        const k = key(form.name, path);
-        if (!changes.has(k)) changes.set(k, { before: form.values.value[path] ?? null });
-        Object.assign(changes.get(k), { after: value, at: Date.now() });
+        record(form.name, path, form.values.value[path], value);
         form.setFieldValue(path, value);
         await new Promise((resolve) => setTimeout(resolve, gap));
     }
+}
+
+// Remember a change, keeping what the field held before the AI first changed it
+function record(container, path, before, after) {
+    const k = key(container, path);
+    if (!changes.has(k)) changes.set(k, { before: before ?? null });
+    Object.assign(changes.get(k), { after, at: Date.now() });
 }
 
 function forgetAll(container) {
@@ -63,6 +68,8 @@ export default function useAiChanges() {
         currentForm: () => form,
         nextForm,
         fill,
+        // A suggestion picked from a field's suggest button, badged the same as the chat's changes
+        record,
         changeFor: (container, path) => changes.get(key(container, path)),
         // You edited it yourself, so it's yours now. Not straight after the AI filled it in, though: some fields (like Bard) send their
         // value back tidied up as they take it in, which isn't you editing it.

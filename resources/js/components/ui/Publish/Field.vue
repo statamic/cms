@@ -121,6 +121,13 @@ function valueUpdated(value) {
 const aiChanges = useAiChanges();
 const aiChange = computed(() => aiChanges.changeFor(containerName.value, fullPath.value));
 
+// Prototype: a picked suggestion goes in like you typing it, but is badged as the AI's change so you can see (and undo) what it changed
+function suggestionApplied(text) {
+    const before = value.value;
+    valueUpdated(text);
+    aiChanges.record(containerName.value, fullPath.value, before, text);
+}
+
 function metaUpdated(value) {
     setFieldMeta(metaFullPath.value, value);
 }
@@ -361,7 +368,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     :config="config"
                     :value="value"
                     :values="values"
-                    @apply="valueUpdated"
+                    @apply="suggestionApplied"
                 />
             </div>
             <!-- Prototype: what the AI chat changed, under the field, once you open it from the badge -->
