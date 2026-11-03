@@ -166,20 +166,34 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_url_with_a_collection()
+    public function it_gets_the_url_with_a_collection_that_has_a_mount()
     {
         $entry = $this->mock(EntryContract::class);
         $entry->shouldReceive('in')->andReturnSelf();
-        $entry->shouldReceive('uri')->andReturn('/blog');
-        Entry::shouldReceive('find')->with('blog-page')->andReturn($entry);
+        $entry->shouldReceive('uri')->andReturn('/blog-articles');
+        Entry::shouldReceive('find')->with('blog-articles')->andReturn($entry);
 
-        $collection = tap(Collection::make('blog')->mount('blog-page'))->save();
+        $taxonomy = tap((new Taxonomy)->handle('tags'))->save();
+        $collection = tap(Collection::make('blog')->taxonomies(['tags'])->mount('blog-articles'))->save();
 
-        $taxonomy = (new Taxonomy)->handle('tags')->collection($collection);
+        $taxonomy = $taxonomy->collection($collection);
 
-        $this->assertEquals('/blog/tags', $taxonomy->uri());
-        $this->assertEquals('/blog/tags', $taxonomy->url());
-        $this->assertEquals('http://localhost/blog/tags', $taxonomy->absoluteUrl());
+        $this->assertEquals('/blog-articles/tags', $taxonomy->uri());
+        $this->assertEquals('/blog-articles/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/blog-articles/tags', $taxonomy->absoluteUrl());
+    }
+
+    #[Test]
+    public function it_gets_the_url_with_a_collection_that_has_no_mount()
+    {
+        $taxonomy = tap((new Taxonomy)->handle('tags'))->save();
+        $collection = tap(Collection::make('blog_articles')->taxonomies(['tags']))->save();
+
+        $taxonomy = $taxonomy->collection($collection);
+
+        $this->assertEquals('/blog-articles/tags', $taxonomy->uri());
+        $this->assertEquals('/blog-articles/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/blog-articles/tags', $taxonomy->absoluteUrl());
     }
 
     #[Test]
