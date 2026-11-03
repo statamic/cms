@@ -39,6 +39,9 @@ function linksOf(value) {
     return found;
 }
 
+// A field that was empty (like on a new entry) has nothing to compare with, so its badge has no changes to open: it's just a label
+const hadNothing = computed(() => !!change.value && !wordsOf(change.value.before ?? '').trim());
+
 // What changed, word by word, in the same yellow and red as the suggestions. When only links were added (the words are the same), the
 // linked words are marked as added instead.
 const parts = computed(() => {
@@ -63,8 +66,10 @@ const partClass = (type) => ({
     <template v-if="change">
         <!-- Next to the label. Undo is set like the Read Only note (small grey text after an icon), with a hover background as it's a button. -->
         <span v-if="part === 'label'" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
-            <!-- The badge opens and closes the changes, with a chevron that turns over while they're open -->
-            <button type="button" class="group/badge cursor-pointer" :aria-expanded="open" :aria-label="open ? __('Hide changes') : __('Show what the AI changed')" @click="open = !open">
+            <!-- On a field that was empty, there's nothing to compare, so the badge is just a label, with no chevron -->
+            <Badge v-if="hadNothing" size="sm" class="bg-ai/5 border-ai/40 text-ai dark:border dark:bg-gray-800 dark:border-ai/60 dark:text-white" :text="__('Changed by AI')" />
+            <!-- Otherwise it opens and closes the changes, with a chevron that turns over while they're open -->
+            <button v-else type="button" class="group/badge cursor-pointer" :aria-expanded="open" :aria-label="open ? __('Hide changes') : __('Show what the AI changed')" @click="open = !open">
                 <Badge
                     size="sm"
                     icon-append="chevron-down"
@@ -79,7 +84,7 @@ const partClass = (type) => ({
         </span>
 
         <!-- Under the field, while the badge has it open: just the changes, a little smaller than the field's text, with no box -->
-        <p v-else-if="part === 'below' && open" class="mt-1.5 px-1 text-xs/5 text-gray-700 dark:text-gray-300">
+        <p v-else-if="part === 'below' && open && !hadNothing" class="mt-1.5 px-1 text-xs/5 text-gray-700 dark:text-gray-300">
             <span v-for="(p, i) in parts" :key="i" :class="partClass(p.type)">{{ p.text }}</span>
         </p>
     </template>
