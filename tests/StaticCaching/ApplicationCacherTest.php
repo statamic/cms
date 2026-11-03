@@ -16,6 +16,7 @@ use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class ApplicationCacherTest extends TestCase
@@ -407,39 +408,84 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
-    public function invalidating_multiple_urls_matches_invalidating_them_one_at_a_time()
+    #[DataProvider('invalidateMultipleUrlsProvider')]
+    public function invalidating_multiple_urls_matches_invalidating_them_one_at_a_time($invalidate)
     {
-        $urls = [
-            'home' => '/',
-            'a' => '/product/a',
-            'aqs' => '/product/a?ref=1',
-            'ab' => '/product/ab',
-            'b' => '/product/b',
-            'c' => '/category/books?page=2&sort=asc',
-            'cqs' => '/category/books?page=2&sort=asc?x',
-            'd' => '/category/books',
+        $indexes = [
+            'http://example.com' => [
+                'home' => '/',
+                'a' => '/product/a',
+                'avariant' => '/product/a', // e.g. a second response cached for the same url
+                'aqs' => '/product/a?ref=1',
+                'ab' => '/product/ab',
+                'b' => '/product/b',
+                'c' => '/category/books?page=2&sort=asc',
+                'cqs' => '/category/books?page=2&sort=asc?x',
+                'd' => '/category/books',
+            ],
+            'http://other.com' => [
+                'ox' => '/x',
+                'oy' => '/y',
+                'oyqs' => '/y?page=2',
+                'ob' => '/product/b',
+            ],
         ];
-        $invalidate = ['/product/a', '/category/books?page=2&sort=asc', '/not-cached', 'http://other.com/product/b', '/categ*'];
 
-        $batched = new ApplicationCacher($batchedCache = new CacheRepository(new ArrayStore), ['base_url' => 'http://example.com']);
-        $single = new ApplicationCacher($singleCache = new CacheRepository(new ArrayStore), ['base_url' => 'http://example.com']);
+        $run = function (callable $invalidate) use ($indexes) {
+            $cache = new CacheRepository(new ArrayStore);
+            $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
 
-        foreach ([$batchedCache, $singleCache] as $cache) {
-            $cache->forever('static-cache:'.md5('http://example.com').'.urls', $urls);
-            foreach (array_keys($urls) as $key) {
-                $cache->forever('static-cache:responses:'.$key, 'html content');
+            foreach ($indexes as $domain => $urls) {
+                $cache->forever('static-cache:'.md5($domain).'.urls', $urls);
+                foreach (array_keys($urls) as $key) {
+                    $cache->forever('static-cache:responses:'.$key, 'html content');
+                }
             }
-        }
 
-        $batched->invalidateUrls($invalidate);
-        collect($invalidate)->each(fn ($url) => str_contains($url, '*')
-            ? (fn () => $this->invalidateWildcardUrl($url))->call($single)
-            : $single->invalidateUrl($url));
+            $events = [];
+            Event::listen(UrlInvalidated::class, function ($event) use (&$events) {
+                $events[] = $event->url;
+            });
 
-        $this->assertEquals($single->getUrls()->all(), $batched->getUrls()->all());
-        foreach (array_keys($urls) as $key) {
-            $this->assertSame($singleCache->has('static-cache:responses:'.$key), $batchedCache->has('static-cache:responses:'.$key), $key);
-        }
+            $invalidate($cacher);
+
+            Event::forget(UrlInvalidated::class);
+
+            return [
+                'events' => $events,
+                'urls' => collect($indexes)->keys()->mapWithKeys(fn ($domain) => [$domain => $cacher->getUrls($domain)->all()])->all(),
+                'responses' => collect($indexes)->flatMap(fn ($urls) => array_keys($urls))->filter(fn ($key) => $cache->has('static-cache:responses:'.$key))->values()->all(),
+            ];
+        };
+
+        $batched = $run(fn ($cacher) => $cacher->invalidateUrls($invalidate));
+
+        // How invalidateUrls() behaved before it was batched.
+        $single = $run(fn ($cacher) => (function () use ($invalidate) {
+            foreach ($invalidate as $url) {
+                Str::contains($url, '*')
+                    ? $this->invalidateWildcardUrl($url)
+                    : $this->invalidateUrl(...$this->getPathAndDomain($url));
+            }
+        })->call($cacher));
+
+        $this->assertSame($single['urls'], $batched['urls']);
+        $this->assertSame($single['responses'], $batched['responses']);
+        $this->assertSame($single['events'], $batched['events']);
+    }
+
+    public static function invalidateMultipleUrlsProvider()
+    {
+        return [
+            'mixed' => [['/product/a', '/category/books?page=2&sort=asc', '/not-cached', 'http://other.com/product/b', '/categ*']],
+            'duplicates' => [['/product/a', '/product/a', 'http://example.com/product/a', '/not-cached', '/not-cached']],
+            'url then a wildcard covering it' => [['/product/a', '/product/a*']],
+            'wildcard then a url it covered' => [['/product/*', '/product/a']],
+            'wildcard matching a url and its query string versions' => [['/product/a*']],
+            'overlapping wildcards' => [['/product/*', '/product/a*', '/*']],
+            'interleaved domains' => [['http://other.com/x', '/product/b', 'http://other.com/y*', '/', 'http://other.com/y']],
+            'nothing cached' => [['/nope', '/nope*']],
+        ];
     }
 
     #[Test]

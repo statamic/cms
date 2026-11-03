@@ -169,70 +169,90 @@ class ApplicationCacher extends AbstractCacher
      *
      * Invalidating URLs one at a time reads and rewrites the domain's whole URL
      * index for every match, which gets slow when many URLs are invalidated at
-     * once on a site with a large index. Instead, the URLs are grouped by domain
-     * and each domain's index is rewritten once.
+     * once on a site with a large index. Instead, the URLs are walked in order
+     * against an in-memory copy of each domain's index, exactly as invalidating
+     * them one at a time would, and each domain's index is rewritten once.
+     *
+     * The same UrlInvalidated events are dispatched, in the same order, as
+     * invalidating them one at a time. They are dispatched once everything has
+     * been removed, so listeners never see a page that is about to be removed.
      *
      * @param  array  $urls
      * @return void
      */
     public function invalidateUrls($urls)
     {
-        collect($urls)
-            ->flatMap(fn ($url) => Str::contains($url, '*')
-                ? $this->getPathsAndDomainsMatchingWildcard($url)
-                : [$this->getPathAndDomain($url)])
-            ->groupBy(fn ($pathAndDomain) => $pathAndDomain[1])
-            ->each(fn ($pathsAndDomains, $domain) => $this->invalidatePaths(
-                $pathsAndDomains->pluck(0)->unique()->all(),
-                $domain
-            ));
-    }
+        $indexes = [];
+        $removed = [];
+        $events = [];
 
-    private function getPathsAndDomainsMatchingWildcard($wildcard)
-    {
-        [$wildcard, $domain] = $this->getPathAndDomain(substr($wildcard, 0, -1));
+        $invalidate = function ($path, $domain) use (&$indexes, &$removed, &$events) {
+            foreach ($indexes[$domain]['paths'][$path] ?? [] as $key) {
+                $removed[$domain][$key] = true;
+            }
 
-        return $this->getUrls($domain)
-            ->filter(fn ($url) => str_starts_with($url, $wildcard))
-            ->map(fn ($url) => [$url, $domain])
-            ->values()
-            ->all();
-    }
+            $events[] = [$path, $domain];
+        };
 
-    private function invalidatePaths(array $paths, string $domain)
-    {
-        $lookup = array_flip($paths);
+        foreach ($urls as $url) {
+            $wildcard = Str::contains($url, '*');
 
-        // Same matching as invalidateUrl(): the path itself, or any query string version of it.
-        $keys = $this->getUrls($domain)
-            ->filter(function ($value) use ($lookup) {
-                if (isset($lookup[$value])) {
-                    return true;
-                }
+            [$path, $domain] = $this->getPathAndDomain($wildcard ? substr($url, 0, -1) : $url);
 
-                $offset = 0;
+            $indexes[$domain] ??= $this->getUrlIndex($domain);
 
-                while (($position = strpos($value, '?', $offset)) !== false) {
-                    if (isset($lookup[substr($value, 0, $position)])) {
-                        return true;
-                    }
+            if (! $wildcard) {
+                $invalidate($path, $domain);
 
-                    $offset = $position + 1;
-                }
+                continue;
+            }
 
-                return false;
-            })
-            ->keys()
-            ->all();
+            // Match against the index as it stands before this wildcard, like
+            // invalidateWildcardUrl() does, then invalidate each match in turn.
+            $matches = collect($indexes[$domain]['urls'])
+                ->reject(fn ($value, $key) => isset($removed[$domain][$key]))
+                ->filter(fn ($value) => Str::startsWith($value, $path));
 
-        foreach ($keys as $key) {
-            $this->cache->forget($this->normalizeKey('responses:'.$key));
+            foreach ($matches as $match) {
+                $invalidate($match, $domain);
+            }
         }
 
-        $this->forgetUrls($keys, $domain);
+        foreach ($removed as $domain => $keys) {
+            $keys = array_keys($keys);
 
-        foreach ($paths as $path) {
+            foreach ($keys as $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+            }
+
+            $this->forgetUrls($keys, $domain);
+        }
+
+        foreach ($events as [$path, $domain]) {
             UrlInvalidated::dispatch($path, $domain);
         }
+    }
+
+    /**
+     * Get a domain's URLs, along with the keys that invalidateUrl() would remove
+     * for each path: the path itself, or any query string version of it.
+     */
+    private function getUrlIndex($domain)
+    {
+        $urls = $this->getUrls($domain)->all();
+        $paths = [];
+
+        foreach ($urls as $key => $value) {
+            $paths[$value][] = $key;
+
+            $offset = 0;
+
+            while (($position = strpos($value, '?', $offset)) !== false) {
+                $paths[substr($value, 0, $position)][] = $key;
+                $offset = $position + 1;
+            }
+        }
+
+        return ['urls' => $urls, 'paths' => $paths];
     }
 }
