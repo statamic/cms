@@ -29,6 +29,11 @@ watch(floating, (value) => store(floatingKey, value));
 const focusRequests = ref(0);
 // Prototype: a request for the chat to play out, from the demo buttons at the bottom of the nav (see AiChatDemos.vue)
 const demoRequest = ref(null);
+// Prototype: a request to start (or stop) dictating, from ⌘⇧D anywhere (see AiChatButton.vue). The chat picks it up, even as it opens.
+const dictateRequest = ref(false);
+// Prototype: whether phase 2's features (dictating) are showing. They're only for demoing: a phase 2 demo switches them on, and a
+// phase 1 demo (or reloading the page) switches them off again.
+const phaseTwo = ref(false);
 // Where focus was before it moved into the chat, so Esc and the shortcut can hand it back.
 let previousFocus = null;
 
@@ -55,6 +60,8 @@ export default function useAiChat() {
         floating,
         focusRequests,
         demoRequest,
+        dictateRequest,
+        phaseTwo,
         toggle: () => {
             if (!open.value) rememberFocus();
             open.value = !open.value;
@@ -75,12 +82,19 @@ export default function useAiChat() {
                 focusRequests.value++;
             }
         },
-        // Prototype: start a new chat and type the request into it, as if you had (see AiChat.vue)
-        demo: (text) => {
+        // Prototype: open the chat if it's closed, and start dictating into it (or stop, if you already are)
+        dictate: () => {
+            if (!open.value) rememberFocus();
+            open.value = true;
+            dictateRequest.value = true;
+        },
+        // Prototype: start a new chat and type the request into it, as if you had, or dictate it (see AiChat.vue)
+        demo: (text, { dictate = false, phase = 1 } = {}) => {
+            phaseTwo.value = phase === 2;
             if (!open.value) rememberFocus();
             open.value = true;
             messages.value = [];
-            demoRequest.value = { text };
+            demoRequest.value = { text, dictate };
         },
         // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
         shortcut: () => {

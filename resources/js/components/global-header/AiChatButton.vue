@@ -3,12 +3,13 @@ import { onMounted, onUnmounted } from 'vue';
 import { Icon } from '@ui';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, toggle, shortcut, focus } = useAiChat();
+const { open, toggle, shortcut, focus, dictate, phaseTwo } = useAiChat();
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 const modifierLabel = isMac ? '⌘' : 'Ctrl';
 
 let binding = null;
+let dictateBinding = null;
 
 onMounted(() => {
     binding = Statamic.$keys.bindGlobal(['mod+/'], (e) => {
@@ -29,9 +30,22 @@ onMounted(() => {
 
         shortcut();
     });
+
+    // Prototype: ⌘⇧D starts dictating into the chat from anywhere, opening it first if it's closed. Pressed again, it stops.
+    // Not behind a modal, as with ⌘/ (the command palette included, as it doesn't list it).
+    dictateBinding = Statamic.$keys.bindGlobal(['mod+shift+d'], (e) => {
+        // Only while phase 2 is being demoed (see AiChatDemos.vue)
+        if (!phaseTwo.value) return;
+        if (document.querySelector('[role="dialog"][data-state="open"]')) return;
+        e.preventDefault();
+        dictate();
+    });
 });
 
-onUnmounted(() => binding?.destroy());
+onUnmounted(() => {
+    binding?.destroy();
+    dictateBinding?.destroy();
+});
 </script>
 
 <template>
