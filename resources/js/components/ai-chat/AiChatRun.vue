@@ -23,6 +23,10 @@ const badge = computed(() =>
     })[props.run.status],
 );
 
+// A run that was blocked (your role doesn't allow it, like changing a blueprint) has a red × in a ring, the counterpart of the tick in a ring on a run
+// that's done. Its badge and heading stay as they are: the icon is enough to say you've been stopped.
+const blocked = computed(() => props.run.status === 'unable');
+
 // The tooltip on each link it added: the page it goes to, then its URL in grey
 const escape = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const linkTooltip = (link) => ({ content: `${escape(link.to)} <span class="opacity-60">· ${escape(link.url)}</span>`, html: true });
@@ -211,7 +215,11 @@ const stepTitle = (step) => {
             ]"
         >
             <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
-                <Icon v-if="run.status !== 'done'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
+                <svg v-if="blocked" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-red-600 dark:text-red-400" aria-hidden="true">
+                    <circle cx="8" cy="8" r="6.75" />
+                    <path d="m6 6 4 4m0-4-4 4" />
+                </svg>
+                <Icon v-else-if="run.status !== 'done'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
                 <AiChatDoneIcon v-else />
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">
