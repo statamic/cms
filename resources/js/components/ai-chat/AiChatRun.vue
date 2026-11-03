@@ -18,8 +18,8 @@ const badge = computed(() =>
         cancelled: { color: 'default', text: __('Cancelled') },
         // It couldn't carry on, like when saving your changes failed
         stopped: { color: 'default', text: __('Stopped') },
-        // It can't do what was asked (yet), like changing a blueprint
-        unable: { color: 'default', text: __('Not possible yet') },
+        // Your role doesn't allow it, like changing a blueprint
+        unable: { color: 'default', text: __('Not allowed') },
     })[props.run.status],
 );
 
@@ -43,6 +43,8 @@ const toolLabels = {
     'cp.open_entry': ['Opening the Entry', 'Opened the Entry'],
     'cp.new_entry': ['Opening a New Entry', 'Opened a New Entry'],
     'cp.fill_fields': ['Filling in Fields', 'Filled in Fields'],
+    'cp.open_blueprint': ['Opening the Blueprint', 'Opened the Blueprint'],
+    'cp.add_field': ['Adding a Field', 'Added a Field'],
 };
 
 // The cards double as the trail of pages the chat has taken you to. Each knows the page it happened on. A line runs down through the

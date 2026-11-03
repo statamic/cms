@@ -28,6 +28,7 @@
         </ui-panel>
 
         <Tabs
+            ref="tabs"
             class="mt-8"
             :single-tab="!useTabs"
             :initial-tabs="tabs"
@@ -71,6 +72,7 @@ export default {
         tabs() {
             return this.blueprint.tabs;
         },
+
     },
 
     created() {
@@ -90,7 +92,13 @@ export default {
         }
     },
 
+    // Prototype: the AI chat adds fields to the blueprint in this editor (see use-ai-changes.js), so it needs to know when one has opened
+    mounted() {
+        Statamic.$events.$emit('blueprint-builder-created', this);
+    },
+
     beforeUnmount() {
+		Statamic.$events.$emit('blueprint-builder-destroyed', this);
 		Statamic.$config.set('isFormBlueprint', false);
 
         this.$events.$off('root-form-save');
