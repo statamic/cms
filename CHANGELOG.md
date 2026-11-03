@@ -1,5 +1,36 @@
 # Release Notes
 
+## 6.40.0 (2026-11-03)
+
+### What's new
+- Add Heading buttons to the Markdown fieldtype [#15753](https://github.com/statamic/cms/issues/15753) by @jackmcdade
+- Add limit and offset parameters to the nav tag [#15777](https://github.com/statamic/cms/issues/15777) by @mynetx
+
+### What's fixed
+- Keep only one uploaded asset in a link field [#15756](https://github.com/statamic/cms/issues/15756) by @mynetx
+- Fix infinite recursion on self-referencing redirects [#15746](https://github.com/statamic/cms/issues/15746) by @marcorieser
+- Show select option labels for numeric keys in form submissions [#15744](https://github.com/statamic/cms/issues/15744) by @mynetx
+- Use absolute URL in link index column for entries on another site [#15755](https://github.com/statamic/cms/issues/15755) by @edalzell
+- Fix GraphQL and REST API response caches missing keys on invalidation under concurrent requests [#15747](https://github.com/statamic/cms/issues/15747) by @duncanmcclean
+- Only add the required attribute to checkboxes with a single option [#15760](https://github.com/statamic/cms/issues/15760) by @mynetx
+- Fix invalid ARIA in the command palette [#15759](https://github.com/statamic/cms/issues/15759) by @mynetx
+- Fix nocache directory permissions [#15762](https://github.com/statamic/cms/issues/15762) by @duncanmcclean
+- Fix update badge showing "0" when using Redis as cache store [#15767](https://github.com/statamic/cms/issues/15767) by @joshuablum
+- Speed up rendering icons by only importing each one once [#15766](https://github.com/statamic/cms/issues/15766) by @duncanmcclean
+- Remove unused fieldtype meta [#15769](https://github.com/statamic/cms/issues/15769) by @duncanmcclean
+- Speed up permission checks [#15773](https://github.com/statamic/cms/issues/15773) by @duncanmcclean
+- Disable Inertia DevTools in the Control Panel [#15774](https://github.com/statamic/cms/issues/15774) by @duncanmcclean
+- Speed up button groups on large entries [#15765](https://github.com/statamic/cms/issues/15765) by @duncanmcclean
+- Only build common field option defaults once [#15772](https://github.com/statamic/cms/issues/15772) by @duncanmcclean
+- Show a loading indicator while Bard loads [#15770](https://github.com/statamic/cms/issues/15770) by @duncanmcclean
+- Only render Bard toolbar buttons when they're needed [#15768](https://github.com/statamic/cms/issues/15768) by @duncanmcclean
+- Fix toggling Markdown formatting on multi-line selections [#15775](https://github.com/statamic/cms/issues/15775) by @mynetx
+- Fix new entries in structured collections having no URL until the next request [#15776](https://github.com/statamic/cms/issues/15776) by @mynetx
+- Avoid parsing every file when clearing a cold Stache [#15771](https://github.com/statamic/cms/issues/15771) by @duncanmcclean
+- French translations [#15757](https://github.com/statamic/cms/issues/15757) by @ebeauchamps
+
+
+
 ## 6.39.0 (2026-10-29)
 
 ### What's new
