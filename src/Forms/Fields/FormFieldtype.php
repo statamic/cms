@@ -111,9 +111,11 @@ abstract class FormFieldtype implements Arrayable
             return $fallback;
         }
 
-        $config = $this->configFields()->all()
-            ->map->defaultValue()
-            ->merge($this->field->config());
+        $defaults = Blink::once('form-config-field-defaults-'.$this->handle(), function () {
+            return $this->configFields()->all()->map->defaultValue()->all();
+        });
+
+        $config = collect($defaults)->merge($this->field->config());
 
         return $key
             ? ($config->get($key) ?? $fallback)
