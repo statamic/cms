@@ -1,15 +1,17 @@
 <script setup>
-import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Avatar, Button, Icon, Textarea } from '@ui';
 import AiChatExamples from './AiChatExamples.vue';
 import AiChatPrompts from './AiChatPrompts.vue';
 import AiChatShortcuts from './AiChatShortcuts.vue';
 import AiChatRun from './AiChatRun.vue';
+import AiChatDictation from './AiChatDictation.vue';
+import useDictation, { spokenRequest } from './use-dictation.js';
 import { planPromptRun, planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
-const { open, messages, floating, focusRequests, demoRequest, leave, newChat } = useAiChat();
+const { open, messages, floating, focusRequests, demoRequest, dictateRequest, phaseTwo, leave, newChat } = useAiChat();
 // You, for your avatar beside your messages
 const user = Statamic.user;
 
@@ -114,6 +116,12 @@ function onEnter(event) {
 }
 
 async function onKeydown(event) {
+    // Esc while dictating throws it away
+    if (event.key === 'Escape' && dictating.value) {
+        event.stopPropagation();
+        return cancelDictating();
+    }
+
     // Shift+Enter adds a new line natively. Alt+Enter doesn't in a textarea, so do it by hand, and tell the input (and autosize) it changed.
     if (event.key === 'Enter' && event.altKey && !event.shiftKey && !event.metaKey && !event.ctrlKey && event.target.tagName === 'TEXTAREA') {
         event.preventDefault();
@@ -262,8 +270,11 @@ watch(demoRequest, (request) => {
     if (!request) return;
     demoRequest.value = null;
     clearInterval(demoTyping);
+    dictation.cancel();
     prompt.value = '';
     focusInput();
+    // Dictated, after a moment to see the mic
+    if (request.dictate) return setTimeout(() => startDictating(request.text, true), 900);
     let typed = 0;
     demoTyping = setInterval(() => {
         typed = Math.min(request.text.length, typed + 2);
@@ -273,6 +284,71 @@ watch(demoRequest, (request) => {
         setTimeout(() => send(request.text), 350);
     }, 30);
 });
+
+// Prototype: dictating a request. The mic beside send starts it, and pressing it again (or a moment of quiet) stops it. The words go into
+// the box after anything already typed, for you to check before sending. A demo sends them for you.
+let typedBefore = '';
+let dictatingDemo = false;
+const dictation = useDictation({
+    onWords: (words) => {
+        prompt.value = typedBefore ? `${typedBefore} ${words}` : words;
+        shrinkInput();
+    },
+    onDone: (words) => {
+        shrinkInput();
+        if (dictatingDemo && words) setTimeout(() => send(), 700);
+        else focusInput();
+    },
+});
+const dictating = computed(() => !!dictation.state.phase);
+onUnmounted(() => dictation.cancel());
+
+function startDictating(text = spokenRequest, demo = false) {
+    typedBefore = prompt.value.trim();
+    dictatingDemo = demo;
+    showHelp.value = false;
+    dictation.start(text, { quietFor: demo ? 900 : 1600 });
+}
+
+function toggleDictating() {
+    if (dictation.state.phase === 'listening') dictation.stop();
+    else if (!dictating.value) startDictating();
+}
+
+// ⌘⇧D, from anywhere (see AiChatButton.vue). If the chat has only just opened (or moved), it picks this up as it mounts.
+watch(
+    dictateRequest,
+    (requested) => {
+        if (!requested) return;
+        dictateRequest.value = false;
+        focusInput();
+        toggleDictating();
+    },
+    { immediate: true },
+);
+
+// Throwing it away puts back what was typed before
+function cancelDictating() {
+    dictation.cancel();
+    prompt.value = typedBefore;
+    shrinkInput();
+    focusInput();
+}
+
+// The mic is in place of the chat icon in front of the text, which already has room kept for it, so it takes none from what you type.
+// The icon turns into the mic once you're in the chat (focus is in it), and back when you leave, unless you're speaking.
+// Centred where the 16px chat icon is.
+// Centred on the chat icon's spot, it looks a little low (most of the mic's weight is in its base and stand), so it's nudged up 1px
+const micClasses = computed(() => [
+    '-translate-y-px',
+    floating.value ? [messages.value.length ? 'start-[15px]' : 'start-1.5', 'top-[12.5px]'] : 'start-2 top-[22px]',
+    !dictating.value && 'transition-opacity duration-200 opacity-0 pointer-events-none group-focus-within/chat:opacity-100 group-focus-within/chat:pointer-events-auto',
+]);
+
+
+
+
+const hintClasses = computed(() => (floating.value ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'));
 
 // From the help or the command menu: a saved prompt runs, and /clear starts a new chat
 const runCommand = (command) => (command.builtIn ? send('/clear') : runPrompt(command));
@@ -449,18 +525,29 @@ function stopFollowing() {
                     </Button>
                 </div>
             </div>
-            <!-- Like the command palette's search row, an icon in front of the text -->
+            <!-- Like the command palette's search row, an icon in front of the text. While phase 2 is demoed, it turns into the mic once you're in the chat. -->
             <Icon
                 name="ai-chat"
-                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
+                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', phaseTwo && (dictating ? 'opacity-0' : 'transition-opacity duration-200 group-focus-within/chat:opacity-0'), floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
+            />
+            <!-- Prototype: the mic, where the chat icon is. It stays lit while you speak. It comes before the input in the page, as it does on screen,
+                 so Shift+Tab from the input reaches it. Tabbing to it shows it too, as focus is then in the chat. -->
+            <AiChatDictation
+                v-if="phaseTwo"
+                :dictation="dictation.state"
+                :class="['absolute z-(--z-index-above)', micClasses]"
+                @toggle="toggleDictating"
             />
             <Textarea
                 v-model="prompt"
-                :placeholder="floating ? __('Ask anything…') : __('Ask anything...')"
+                :placeholder="dictating ? __('Listening…') : floating ? __('Ask anything…') : __('Ask anything...')"
                 rows="1"
                 resize="none"
                 elastic
-                :class="[inputClasses, floating ? 'ps-8.5!' : 'ps-9.5!']"
+                :class="[
+                    inputClasses,
+                    floating ? 'ps-8.5!' : 'ps-9.5!',
+                ]"
             />
             <!-- The saved prompts as pills above the input, while you're in the chat and until it starts. They sit over the page just above the floating card, lined up with its right edge. Picking one runs it. mousedown.prevent keeps focus in the input, so they stay put. They come after the input in the page, so Tab goes from the input to them, before the controls on the card's edge. Their /command tooltip only shows on hover, not when tabbing through them. -->
             <div
@@ -490,10 +577,10 @@ function stopFollowing() {
             </div>
             <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Clicking it opens the help too. It's left out of the Tab order (/ does the same from the keyboard), and mousedown.prevent keeps focus in the input. -->
             <button
-                v-show="!prompt && !showHelp && !messages.length"
+                v-show="!prompt && !showHelp && !messages.length && !dictating"
                 type="button"
                 tabindex="-1"
-                :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
+                :class="hintClasses"
                 class="pointer-events-none absolute flex h-6.5 cursor-pointer items-center gap-1.5 rounded-md px-1.5 text-xs text-gray-500 opacity-0 transition-opacity group-focus-within/chat:pointer-events-auto group-focus-within/chat:opacity-100 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                 @mousedown.prevent
                 @click="showHelp = true"
@@ -505,15 +592,24 @@ function stopFollowing() {
             <!-- Once a chat has started, a small link to clear it takes the / hint's place, while nothing has been typed. (Typing /clear does the same.) -->
             <button
                 v-if="messages.length"
-                v-show="!prompt"
+                v-show="!prompt && !dictating"
                 type="button"
-                :class="floating ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'"
+                :class="hintClasses"
                 class="absolute flex h-6.5 cursor-pointer items-center rounded-md px-1.5 text-xs text-gray-500 hover:text-gray-900 hover:underline dark:text-gray-400 dark:hover:text-white"
                 @click="newChat"
             >
                 {{ __('Clear') }}
             </button>
+            <!-- While you speak there's nothing to send yet, so send makes way for the voice feedback, in a circle the same size -->
+            <AiChatDictation
+                v-if="dictating"
+                :dictation="dictation.state"
+                feedback
+                :class="['absolute', floating ? 'end-4.75 bottom-[12px]' : 'end-5.25 bottom-5.25']"
+                @toggle="toggleDictating"
+            />
             <Button
+                v-show="!dictating"
                 type="submit"
                 icon="arrow-up"
                 variant="primary"

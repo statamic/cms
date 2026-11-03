@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue';
+import useAiChat from '@/composables/use-ai-chat.js';
 
 const props = defineProps({
     /** Whether there are examples on screen to pick from, here or elsewhere. */
@@ -9,6 +10,7 @@ const props = defineProps({
 // Prototype: the chat's keyboard shortcuts, and the /clear command. (Alt+Enter also adds a new line, but isn't listed.) Each has the keys, then what they do.
 const shortcuts = [
     { keys: ['⌘', '/'], text: 'Open or close' },
+    { keys: ['⌘', 'Shift', 'D'], text: 'Dictate', phaseTwo: true },
     { keys: ['/'], text: 'Show the help' },
     { keys: ['?'], text: 'Show these shortcuts' },
     { keys: ['Enter'], text: 'Send' },
@@ -22,7 +24,11 @@ const shortcuts = [
 ];
 
 // While the examples are showing, up and down choose one. Otherwise they go through the saved prompts.
-const visible = computed(() => shortcuts.filter((shortcut) => shortcut.needsExamples === undefined || shortcut.needsExamples === props.hasExamples));
+// Dictating is phase 2, so it's only listed while that's being demoed
+const { phaseTwo } = useAiChat();
+const visible = computed(() =>
+    shortcuts.filter((shortcut) => (shortcut.needsExamples === undefined || shortcut.needsExamples === props.hasExamples) && (!shortcut.phaseTwo || phaseTwo.value)),
+);
 
 // The arrows and the words sit about 1px above the middle of their key, so push them down. The symbols (⌘ and /) are left alone here, but the slash is drawn about 0.9px low in its key, so it's lifted separately.
 const nudge = (key) => (['⌘', '/'].includes(key) ? '' : 'pt-0.5');
