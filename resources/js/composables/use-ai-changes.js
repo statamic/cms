@@ -1,4 +1,5 @@
 import { reactive, watch } from 'vue';
+import { nanoid } from 'nanoid';
 
 // Prototype: the AI chat changes an entry by filling in its publish form, the same as you typing in it, and leaves saving to you.
 // This remembers which fields it changed, and what they held before, so they can be badged (and undone) until the form is saved.
@@ -15,6 +16,7 @@ const waiting = [];
 function listen() {
     if (listening) return;
     listening = true;
+    listenForBuilder();
 
     Statamic.$events.$on('publish-container-created', (container) => {
         form = container;
@@ -27,8 +29,62 @@ function listen() {
     // Once the form is saved (it's no longer dirty), the changes are yours, so stop marking them.
     watch(
         () => Statamic.$dirty.names(),
-        (names) => [...changes.keys()].forEach((k) => names.includes(k.split(':')[0]) || changes.delete(k)),
+        (names) => {
+            [...changes.keys()].forEach((k) => names.includes(k.split(':')[0]) || changes.delete(k));
+            if (!names.includes('blueprints')) blueprintChanges.clear();
+        },
     );
+}
+
+// The ids of the fields the AI added to the blueprint in the editor, until it's saved (or you edit one), so they can be highlighted (and undone)
+export const blueprintChanges = reactive(new Set());
+// Each gets a Changed by AI badge, with Undo, and opens up with a glow in the AI colour (see RegularField.vue)
+
+// The blueprint editor that's open, the same way: it's where the AI adds fields, as you would, leaving saving to you
+let builder = null;
+const waitingForBuilder = [];
+
+function listenForBuilder() {
+    Statamic.$events.$on('blueprint-builder-created', (instance) => {
+        builder = instance;
+        waitingForBuilder.splice(0).forEach((resolve) => resolve(instance));
+    });
+    Statamic.$events.$on('blueprint-builder-destroyed', (instance) => {
+        if (builder === instance) builder = null;
+        blueprintChanges.clear();
+    });
+}
+
+// The open blueprint editor, or the next one to open (after navigating to a blueprint). Gives up after a few seconds.
+function nextBuilder(timeout = 5000) {
+    return new Promise((resolve) => {
+        waitingForBuilder.push(resolve);
+        setTimeout(() => resolve(null), timeout);
+    });
+}
+
+// Adds a plain field of a type to the blueprint in the editor, in its first section, after the first field, and brings it into view
+function addBlueprintField({ handle, type, display, icon = `fieldtype-${type}` }) {
+    const section = builder?.$refs.tabs?.tabs?.[0]?.sections?.[0];
+    if (!section) return null;
+
+    const field = { _id: nanoid(), handle, type: 'inline', fieldtype: type, icon, config: { type, display, width: 100 } };
+    section.fields.splice(Math.min(1, section.fields.length), 0, field);
+    blueprintChanges.add(field._id);
+    setTimeout(() => document.getElementById(field._id)?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 100);
+
+    return field;
+}
+
+// Takes a field the AI added back out of the blueprint
+function undoBlueprintField(id) {
+    for (const tab of builder?.$refs.tabs?.tabs ?? []) {
+        for (const section of tab.sections) {
+            const i = section.fields.findIndex((field) => field._id === id);
+            if (i >= 0) section.fields.splice(i, 1);
+        }
+    }
+    blueprintChanges.delete(id);
 }
 
 // The open form, or the next one to open (after navigating to an entry). Gives up after a few seconds, e.g. when the unsaved changes warning stopped the visit.
@@ -67,6 +123,12 @@ export default function useAiChanges() {
     return {
         currentForm: () => form,
         nextForm,
+        nextBuilder,
+        addBlueprintField,
+        undoBlueprintField,
+        isBlueprintChange: (id) => blueprintChanges.has(id),
+        // You edited it yourself, so it's yours now
+        forgetBlueprintField: (id) => blueprintChanges.delete(id),
         fill,
         // A suggestion picked from a field's suggest button, badged the same as the chat's changes
         record,

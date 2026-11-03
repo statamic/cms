@@ -104,6 +104,12 @@ const aboutInFrench = {
     ],
 };
 
+// The Blog blueprint's editor, for the idea of adding a field to it
+const blogBlueprint = {
+    title: 'Blog blueprint',
+    url: () => cp_url('fields/blueprints/collections/blog/blog/edit'),
+};
+
 // The ideas from the research notes ("Ideas to mock up next"), each a scenario of its own. They come first, as their requests would
 // otherwise be caught by the broader ones below ("typo" by the edit, "field" by the edit, "post" by the blog post).
 
@@ -310,20 +316,52 @@ const ideaScenarios = [
         }),
     },
     {
-        // 7 · "Add a subtitle field to the blog blueprint". The MCP can read blueprints but not change them, so it says so, shows what's
-        // there, and points you to where you can do it.
+        // 7 · "Add a subtitle field to the blog blueprint". The AI has the signed-in user's permissions and no more. If the user can change
+        // blueprints, it opens the blueprint editor and adds the field there, leaving saving to you. If they can't, neither can it, and it says so.
         match: /\bblueprint\b|\badd an? \w+ field\b/i,
-        plan: () => ({
-            title: 'Add a field',
-            ends: 'unable',
-            steps: [{ tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog', detail: 'Blog, in Blog', result: '5 fields loaded', ms: 800 }],
-            done: {
-                text: 'I can’t change blueprints yet',
-                items: ['Title', 'Content', 'Author', 'Featured Image', 'Tags'],
-                note: 'Those are the Blog blueprint’s fields now. You can add a Subtitle field in the blueprint editor.',
-                actions: [{ label: 'Open the Blog blueprint', url: () => cp_url('fields/blueprints/collections/blog/blog/edit') }],
-            },
-        }),
+        plan: () => {
+            const { nextBuilder, addBlueprintField } = useAiChanges();
+
+            if (!Statamic.$permissions.has('configure fields')) {
+                return {
+                    title: 'Add a field',
+                    ends: 'unable',
+                    steps: [{ tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog', detail: 'Blog, in Blog', result: '5 fields loaded', ms: 800 }],
+                    done: {
+                        text: 'You don’t have permission to change blueprints',
+                        note: 'I can only do what your role allows. An administrator can add a Subtitle field to the Blog blueprint.',
+                    },
+                };
+            }
+
+            return {
+                title: 'Add a field',
+                steps: [
+                    { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog', detail: 'Blog, in Blog', result: '5 fields loaded', ms: 800 },
+                    {
+                        tool: 'cp.open_blueprint',
+                        args: 'collection: blog · blueprint: blog',
+                        detail: 'Blog, in Blog',
+                        result: 'Opened in the editor',
+                        ms: 300,
+                        action: (ask, goingTo) => openEntry(blogBlueprint, ask, nextBuilder, goingTo),
+                    },
+                    {
+                        tool: 'cp.add_field',
+                        args: 'handle: subtitle · type: text · after: title',
+                        detail: 'A Subtitle field (Text), after Title',
+                        result: 'Added in the editor · not saved',
+                        ms: 1200,
+                        action: () => addBlueprintField({ handle: 'subtitle', type: 'text', display: 'Subtitle' }),
+                    },
+                ],
+                done: {
+                    text: 'Added a Subtitle field to the Blog blueprint',
+                    items: ['Subtitle: a Text field, after Title'],
+                    note: 'Nothing’s saved yet. Check it over, then save the blueprint.',
+                },
+            };
+        },
     },
 ];
 
@@ -707,7 +745,7 @@ async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
 export async function playRun(run, onChange = () => {}) {
     for (const [i, step] of run.steps.entries()) {
         // Filling in fields locks the page until they're done
-        writing.active = step.tool === 'cp.fill_fields';
+        writing.active = ['cp.fill_fields', 'cp.add_field'].includes(step.tool);
         step.state = 'running';
         step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back
