@@ -90,3 +90,55 @@ test('heading buttons replace existing levels across selected lines', () => {
 
     expect(editor.codemirror.getValue()).toBe('## First\n  ## Second\n## Plain text\n## ####### Not a heading');
 });
+
+test.each([
+    ['bold', '**'],
+    ['italic', '_'],
+    ['strikethrough', '~~'],
+    ['code', '`'],
+])('the %s button toggles a selection spanning multiple lines', (type, delimiter) => {
+    const codemirror = new CodeMirror.Doc('first line\nsecond line');
+    codemirror.focus = vi.fn();
+    const { toggleInline, getText } = MarkdownFieldtype.methods;
+    const editor = { codemirror, toggleInline, getText };
+
+    codemirror.setSelection({ line: 0, ch: 0 }, { line: 1, ch: 11 });
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe(`${delimiter}first line\nsecond line${delimiter}`);
+
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe('first line\nsecond line');
+});
+
+test.each([
+    ['bold', ' **first line\nsecond line**\n'],
+    ['code', '` first line\nsecond line\n`'],
+])('the %s button handles surrounding whitespace', (type, formatted) => {
+    const codemirror = new CodeMirror.Doc(' first line\nsecond line\n');
+    codemirror.focus = vi.fn();
+    const { toggleInline, getText } = MarkdownFieldtype.methods;
+    const editor = { codemirror, toggleInline, getText };
+
+    codemirror.setSelection({ line: 0, ch: 0 }, { line: 2, ch: 0 });
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe(formatted);
+
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline(type);
+    expect(codemirror.getValue()).toBe(' first line\nsecond line\n');
+});
+
+test('inline buttons wrap a whitespace-only selection as is', () => {
+    const codemirror = new CodeMirror.Doc('before\n\n\nafter');
+    codemirror.focus = vi.fn();
+    const { toggleInline, getText } = MarkdownFieldtype.methods;
+    const editor = { codemirror, toggleInline, getText };
+
+    codemirror.setSelection({ line: 1, ch: 0 }, { line: 2, ch: 0 });
+    editor.selections = codemirror.listSelections();
+    editor.toggleInline('bold');
+    expect(codemirror.getValue()).toBe('before\n**\n**\nafter');
+});
