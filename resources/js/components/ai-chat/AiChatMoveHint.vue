@@ -1,7 +1,7 @@
 <script setup>
 import { ref, useTemplateRef, watch, watchEffect } from 'vue';
 import { Icon } from '@ui';
-import { moving } from './mock-runs.js';
+import { moving, writing } from './mock-runs.js';
 
 // While the chat takes you to another page, the whole page (nav and global header included) dims under a dark wash, and the middle of the
 // header says where it's going, with the page loading bar along the top in the AI colours instead of the usual lime. Once it's there, they stay over the
@@ -31,6 +31,33 @@ watch(
     },
 );
 
+// While the chat fills in the page's fields (and the page is locked), the same place in the header says so, in place of "You're now on…".
+// Once it's done, it finishes the way a move does: the spinner closes into a ring with a tick, the words say it's done, holding still,
+// and it fades after a few seconds.
+const wrote = ref(null);
+let wroteTimer = null;
+watch(
+    () => writing.active,
+    (active) => {
+        clearTimeout(arrivedTimer);
+        clearTimeout(wroteTimer);
+        arrived.value = null;
+        // Whatever's showing ("You're now on…" as it starts, "Writing…" as it ends) becomes the new words in place, the way "Taking you to…"
+        // becomes "You're now on…": its left edge is held where it was, so the icon doesn't move. With nothing showing, the message comes in
+        // centred. (This runs before the page is redrawn, so the old message is still there to measure.)
+        heldLeft.value = message.value ? message.value.getBoundingClientRect().left : null;
+        wrote.value = active ? null : pageTitle();
+        if (wrote.value) wroteTimer = setTimeout(() => (wrote.value = null), 3500);
+    },
+);
+// A move takes over from it straight away
+watch(
+    () => moving.title,
+    (title) => title && (clearTimeout(wroteTimer), (wrote.value = null)),
+);
+
+const pageTitle = () => document.title.split(/ [‹›] /)[0];
+
 // The chat's own loading bar stands in for the usual one while it moves you, so the lime one is hidden (see the styles below)
 watchEffect(() => document.documentElement.toggleAttribute('data-ai-moving', !!moving.title));
 </script>
@@ -53,13 +80,27 @@ watchEffect(() => document.documentElement.toggleAttribute('data-ai-moving', !!m
             leave-to-class="opacity-0"
         >
             <div
-                v-if="moving.title || arrived"
+                v-if="moving.title || arrived || writing.active || wrote"
                 :class="['pointer-events-none fixed inset-x-0 top-0 z-(--z-index-portal) flex h-14 items-center transition-colors duration-300 ease-out', moving.title ? wash : '', heldLeft === null ? 'justify-center' : '']"
             >
                 <!-- The message covers whatever is in the middle of the header (like long breadcrumbs) with the header's own colour, dimmed like the
                      rest of it while the page is, and its sides fade out so it doesn't look like a box -->
                 <p ref="message" role="status" :data-arrived="!moving.title || undefined" :style="heldLeft === null ? {} : { marginInlineStart: `${heldLeft}px` }" class="ai-move-message flex h-full items-center gap-2 px-10 text-sm text-white/75">
-                    <span class="flex items-center gap-2">
+                    <!-- Writing in the page: the same spinner, and why the page is locked. Then, once it's done, the same ring and tick as arriving. -->
+                    <span v-if="(writing.active || wrote) && !moving.title" class="flex items-center gap-2">
+                        <Icon v-if="writing.active" name="loading" class="size-5! shrink-0" />
+                        <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ai-ring-close size-5! shrink-0" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" pathLength="1" transform="rotate(-90 12 12)" />
+                            <path d="m9 12.5 2 2 4-4.5" pathLength="1" class="ai-ring-tick" />
+                        </svg>
+                        <!-- Both sets of words sit in the same space, as wide as the longer, so nothing shifts as one becomes the other. They're about as
+                             long as "You're now on…", so the message doesn't jump in size as one turns into the next. -->
+                        <span class="grid">
+                            <span :class="['col-start-1 row-start-1', writing.active ? '' : 'invisible']">{{ __('Writing your changes…') }}</span>
+                            <span :class="['col-start-1 row-start-1', writing.active ? 'invisible' : '']">{{ __('Done, ready to check') }}</span>
+                        </span>
+                    </span>
+                    <span v-else class="flex items-center gap-2">
                         <!-- A 20px spinner on the way. Once it's there, the spinner's arc closes into a ring of the same size, and a tick draws in, in the same
                              grey and line weight, so it reads as the same icon finishing. -->
                         <Icon v-if="moving.title" name="loading" class="size-5! shrink-0" />

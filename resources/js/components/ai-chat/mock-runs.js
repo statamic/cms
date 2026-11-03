@@ -397,6 +397,10 @@ async function until(check, timeout = 8000) {
 // arrivedAt notes when it got there, so the header message can say you have arrived (see AiChatMoveHint.vue)
 export const moving = reactive({ title: null, arrivedAt: null });
 
+// Whether the chat is filling in the page's fields right now. The page is locked meanwhile, so you can't type over it or save it half
+// written (see PanelLayout.vue), and the global header says so (see AiChatMoveHint.vue).
+export const writing = reactive({ active: false });
+
 // Opens an entry so the chat can fill it in, with the chat staying put across the visit.
 // If the page you're on has unsaved changes, it asks first, in place of the chat's input: save them, leave them, or stop.
 // goingTo puts the new page on the chat's trail as soon as it has opened, so its dot sets off straight away (see AiChatPageMarker.vue).
@@ -455,6 +459,8 @@ async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
 // shownAt and endedAt note when each card first appears, so it only opens up then, not every time the chat is drawn again (see AiChatRun.vue).
 export async function playRun(run, onChange = () => {}) {
     for (const [i, step] of run.steps.entries()) {
+        // Filling in fields locks the page until they're done
+        writing.active = step.tool === 'cp.fill_fields';
         step.state = 'running';
         step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back
@@ -471,6 +477,7 @@ export async function playRun(run, onChange = () => {}) {
             onChange();
         };
         const result = await step.action?.((question) => ask(run, step, question, onChange), goingTo);
+        writing.active = false;
         if (result?.stop) {
             run.steps.slice(i).forEach((later) => {
                 later.shownAt ??= Date.now();

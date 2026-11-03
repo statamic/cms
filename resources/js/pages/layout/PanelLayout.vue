@@ -7,7 +7,7 @@ import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChatCloseControl from '@/components/ai-chat/AiChatCloseControl.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import AiChatMoveHint from '@/components/ai-chat/AiChatMoveHint.vue';
-import { moving } from '@/components/ai-chat/mock-runs.js';
+import { moving, writing } from '@/components/ai-chat/mock-runs.js';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
@@ -29,6 +29,11 @@ const pagePanelLabel = ref(null);
 const { open: chatOpen, floating: chatFloating, messages: chatMessages } = useAiChat();
 // Start keeping track of the open publish form now, before any page's form mounts, so the chat can fill it in
 useAiChanges();
+
+// Prototype: while the AI chat fills in the page's fields, the page (and its side panels, but not the chat) is inert, so it can't be
+// clicked, typed in or tabbed to, and it fades back. The global header says why (see AiChatMoveHint.vue).
+const locked = computed(() => writing.active || undefined);
+const lockedClasses = computed(() => ['transition-opacity duration-300', writing.active ? 'opacity-60' : '']);
 
 // Switching between floating and docked swaps the floating card in or out of the page. That isn't opening or closing the chat, so skip its fade then, or it plays as a distraction while the sidebar appears instantly.
 const switchingLayout = ref(false);
@@ -170,6 +175,8 @@ onUnmounted(() => {
             tabindex="-1"
             style="order: -1"
             class="sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full min-[1000px]:grid mx-auto focus:outline-none pe-2"
+            :class="lockedClasses"
+            :inert="locked"
         ></div>
     </Teleport>
 
@@ -190,7 +197,7 @@ onUnmounted(() => {
                     <TabTrigger name="chat" :text="__('Ask')" />
                 </TabList>
             </Tabs>
-            <div v-show="showPagePanel" id="right-panel-page" class="min-[1000px]:grid flex-1"></div>
+            <div v-show="showPagePanel" id="right-panel-page" class="min-[1000px]:grid flex-1" :class="lockedClasses" :inert="locked"></div>
             <div v-show="showChat" class="layout-panel-content group/chat relative flex flex-1 flex-col min-h-0" :data-mobile-open="chatOpen">
                 <template v-if="!chatFloating">
                     <AiChat />
@@ -227,7 +234,10 @@ onUnmounted(() => {
     </Transition>
 
 
-    <slot />
+    <!-- Prototype: locked while the AI chat fills in the page (see writing) -->
+    <div :inert="locked" :class="lockedClasses">
+        <slot />
+    </div>
 </template>
 
 <style>
