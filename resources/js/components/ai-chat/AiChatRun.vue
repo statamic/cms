@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { Badge, Button, Icon, Textarea } from '@ui';
 import diffWords from '@/components/ai-suggest/diff-words.js';
@@ -121,6 +121,14 @@ function pickAlt(i) {
     altIndex.value = i;
     altOpen.value = true;
 }
+// When the review first appears (the run has just finished), focus lands on Apply and next, so Enter takes the suggestion and moves on.
+// This is only for a run that finishes while you watch, not for a chat that's drawn again. The button has the CP's usual focus ring on any focus (focus-outline),
+// as it only shows for the keyboard otherwise, and not for focus that lands by itself after a click.
+const applyButton = useTemplateRef('applyButton');
+watch(
+    () => props.run.status,
+    (status) => status === 'done' && props.run.done?.images && nextTick(() => applyButton.value?.$el?.focus({ preventScroll: true })),
+);
 // After dealing with one: on to the next not dealt with, or, if that was the last, close the review up
 function settleAlt() {
     if (altFinished.value) altOpen.value = false;
@@ -267,7 +275,7 @@ const stepTitle = (step) => {
                             <!-- One you skipped: apply it after all -->
                             <Button v-else-if="altImage.skipped" size="sm" variant="primary" :text="__('Apply')" @click="applyAlt" />
                             <template v-else>
-                                <Button size="sm" variant="primary" :text="__('Apply and next')" @click="applyAlt" />
+                                <Button ref="applyButton" size="sm" variant="primary" class="focus:focus-outline" :text="__('Apply and next')" @click="applyAlt" />
                                 <Button size="sm" variant="ghost" :text="__('Skip')" @click="skipAlt" />
                                 <!-- At the far end, for when the suggestions look right without going through each -->
                                 <Button v-if="altLeft > 1" size="sm" class="ms-auto" :text="__('Accept all')" @click="acceptAllAlt" />
