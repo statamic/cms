@@ -156,7 +156,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->make(Schedule::class)
             ->call(fn () => app(Radio::class)->ping())
-            ->hourly()
+            ->hourlyAt(crc32(config('app.key') ?: base_path()) % 60)
             ->name('statamic-outpost')
             ->withoutOverlapping();
     }

@@ -28,6 +28,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -405,7 +406,7 @@ class Taxonomy implements Arrayable, ArrayAccess, AugmentableContract, ContainsQ
 
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
-                'terms' => $termQuery = $this->queryTerms()->where('site', $site),
+                'terms' => $termQuery = new Value($this->queryTerms()->where('site', $site->handle())),
                 $this->handle() => $termQuery,
             ])
             ->toResponse($request);

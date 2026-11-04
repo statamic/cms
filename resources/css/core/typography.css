@@ -78,12 +78,24 @@
 
 body {
     @apply font-sans text-base tracking-normal text-gray-900 dark:text-gray-50;
-    font-variant: common-ligatures tabular-nums;
+    /* Proportional figures by default. Tables and dates opt into tabular figures below. */
+    font-variant: common-ligatures;
     font-feature-settings:
         'zero',
         'ss01',
         'calt' off
     ;
+}
+
+@layer base {
+    /* Tabular figures where numbers need to line up. Grid/Table/List/Array fieldtypes are excluded since they hold content. */
+    table:not(.grid-table, .table-contained),
+    input[type='number'],
+    [data-reka-calendar-cell-trigger],
+    [data-reka-date-field-segment],
+    [data-reka-time-field-segment] {
+        font-variant-numeric: tabular-nums;
+    }
 }
 
 @utility prose {

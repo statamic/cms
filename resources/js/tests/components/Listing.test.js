@@ -11,6 +11,8 @@ import { setTranslations } from '@/translations/translator';
 vi.mock('axios', () => ({
     default: {
         get: vi.fn(),
+        // BulkActions fetches the available actions whenever the selections change.
+        post: vi.fn(() => Promise.resolve({ data: [] })),
         isCancel: vi.fn(() => false),
     },
 }));

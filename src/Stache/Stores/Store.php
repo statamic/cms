@@ -132,9 +132,13 @@ abstract class Store
 
         $indexes->push($index);
 
-        $this->usedIndexes = $indexes;
+        // Another process may have recorded usages since this one memoized its
+        // list (e.g. parallel warming), so merge with the cache rather than replace it.
+        $cached = collect(Stache::cacheStore()->get($key = $this->indexUsageCacheKey(), []));
 
-        Stache::cacheStore()->put($this->indexUsageCacheKey(), $indexes->all());
+        $this->usedIndexes = $cached->merge($indexes)->unique()->sort()->values();
+
+        Stache::cacheStore()->put($key, $this->usedIndexes->all());
     }
 
     protected function indexUsageCacheKey()
@@ -344,6 +348,8 @@ abstract class Store
 
         $this->cachePaths($paths);
 
+        Stache::cacheStore()->forever("stache::timestamps::{$this->key()}", $files->all());
+
         $this->keys()->cache();
 
         Stache::duplicates()->cache();
@@ -400,7 +406,9 @@ abstract class Store
 
     public function clear()
     {
-        $this->paths()->keys()->each(function ($key) {
+        $cachedPaths = $this->paths ?? Stache::cacheStore()->get($this->pathsCacheKey(), []);
+
+        collect($cachedPaths)->keys()->each(function ($key) {
             $this->forgetItem($key);
         });
 

@@ -53,6 +53,38 @@ class CreateEntryTest extends TestCase
     }
 
     #[Test]
+    public function the_live_preview_url_keeps_the_parent_of_a_structured_entry()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Collection::make('test')->routes('{parent_uri}/{slug}')->structureContents(['max_depth' => 10])->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.create', ['test', 'en']).'?parent=the-parent')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('localizations.0.livePreviewUrl', cp_route('collections.entries.preview.create', ['test', 'en', 'parent' => 'the-parent']))
+            );
+    }
+
+    #[Test]
+    public function the_live_preview_url_has_no_parent_for_a_collection_without_a_structure()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'create test entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Collection::make('test')->routes('/test/{slug}')->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('collections.entries.create', ['test', 'en']).'?parent=the-parent')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('localizations.0.livePreviewUrl', cp_route('collections.entries.preview.create', ['test', 'en']))
+            );
+    }
+
+    #[Test]
     public function the_publish_state_cannot_be_managed_without_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'create test entries']]);

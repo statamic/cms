@@ -25,6 +25,7 @@ class AugmentedUser extends AbstractAugmented
             ->merge($this->roleHandles())
             ->merge($this->groupHandles())
             ->merge($this->blueprintFields()->keys())
+            ->diff(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'])
             ->unique()->sort()->values()->all();
     }
 

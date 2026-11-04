@@ -3,10 +3,12 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Tests\Factories\EntryFactory;
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Stache\Query\TermQueryBuilder;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -71,6 +73,39 @@ class ViewsTest extends TestCase
         $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
 
         $this->get('/tags')->assertOk()->assertSee('Tags index');
+    }
+
+    #[Test]
+    public function it_queries_the_taxonomy_terms_using_the_current_site_handle()
+    {
+        $this->viewShouldReturnRaw('tags.index', '{{ title }} index');
+
+        // Query builders like the Eloquent driver's use the site as a localization key, so it must be a handle.
+        $builder = Mockery::mock(TermQueryBuilder::class);
+        $builder->shouldReceive('where')->with('taxonomy', 'tags')->andReturnSelf();
+        $builder->shouldReceive('where')->with('site', Mockery::on(fn ($site) => $site === 'fr'))->once()->andReturnSelf();
+
+        $repository = Mockery::mock(Term::getFacadeRoot())->makePartial();
+        $repository->shouldReceive('query')->andReturn($builder);
+        Term::swap($repository);
+
+        $this->get('/fr/tags')->assertOk()->assertSee('Tags index');
+    }
+
+    #[Test]
+    public function it_loops_over_the_taxonomy_terms_in_antlers()
+    {
+        $this->viewShouldReturnRaw('tags.index', '{{ terms }}{{ title }} {{ url }}{{ /terms }} | {{ tags }}{{ title }}{{ /tags }}');
+
+        $this->get('/fr/tags')->assertOk()->assertSee('Le Test /fr/tags/le-test | Le Test');
+    }
+
+    #[Test]
+    public function it_loops_over_the_taxonomy_terms_in_blade()
+    {
+        $this->viewShouldReturnRaw('tags.index', '@foreach ($terms as $term){{ $term->title }} {{ $term->url }}@endforeach | @foreach ($tags as $tag){{ $tag->title }}@endforeach', 'blade.php');
+
+        $this->get('/fr/tags')->assertOk()->assertSee('Le Test /fr/tags/le-test | Le Test');
     }
 
     #[Test]
