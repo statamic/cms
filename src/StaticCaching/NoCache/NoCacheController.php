@@ -26,7 +26,7 @@ class NoCacheController
             $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
         }
 
-        $session = $session->setUrl($url)->restore();
+        $session = $session->setUrl($url)->setPaginationUrl($request->input('url'))->restore();
 
         $replacer = new NoCacheReplacer($session);
 
