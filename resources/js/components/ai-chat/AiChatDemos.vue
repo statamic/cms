@@ -74,6 +74,7 @@ const demos = [
     { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
     { label: 'Field suggestions', run: suggestSubtitle, text: 'Opens the summer sale and clicks the suggest icon on its subtitle' },
     // The AI doesn't answer. Whether you can open Settings → AI decides what the outcome offers (see the "No response" scenario in mock-runs.js).
+    { label: 'Nothing found', text: 'Which entries mention garden gnomes?' },
     { label: 'AI down, can edit AI', text: 'Summarise our returns policy', canEditAi: true },
     { label: 'AI down, can’t edit', text: 'Summarise our returns policy', canEditAi: false },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
