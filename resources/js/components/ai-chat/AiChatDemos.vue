@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useAiChat from '@/composables/use-ai-chat.js';
 import { cp_url } from '@/bootstrap/globals.js';
+import { canEditAi } from './mock-runs.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
 // types the request in, as if you had. What happens is up to the mock runs (see mock-runs.js). Phase 2's are things for later, which
@@ -30,6 +31,7 @@ function play(event, item) {
     const nav = event.currentTarget.closest('.nav-main');
     if (nav) hideScrollbarWhileScrolling(nav);
     lastPlayed.value = item.label;
+    if (item.canEditAi !== undefined) canEditAi.value = item.canEditAi;
     clearTimeout(starting);
     starting = setTimeout(() => (item.run ? runOnPage(item.run) : demo(item.text, { dictate: item.dictate, phase: item.phase })), 2000);
 }
@@ -71,6 +73,9 @@ const demos = [
     { label: 'Add links to a post', text: 'Add links throughout the garden range blog post' },
     { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
     { label: 'Field suggestions', run: suggestSubtitle, text: 'Opens the summer sale and clicks the suggest icon on its subtitle' },
+    // The AI doesn't answer. Whether you can open Settings → AI decides what the outcome offers (see the "No response" scenario in mock-runs.js).
+    { label: 'AI down, can edit AI', text: 'Summarise our returns policy', canEditAi: true },
+    { label: 'AI down, can’t edit', text: 'Summarise our returns policy', canEditAi: false },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
