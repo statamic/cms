@@ -98,6 +98,23 @@ class BasicStoreTest extends TestCase
 
         $this->assertEquals(0, $this->store->madeItemCount);
     }
+
+    #[Test]
+    public function rebuilding_paths_caches_file_timestamps_for_the_watcher()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        touch($this->tempDir.'/foo.yaml', 1234567890);
+
+        $this->store->paths();
+        $this->store->clear();
+        $this->assertFalse(Cache::has('stache::timestamps::test'));
+
+        $this->store->paths();
+
+        $this->assertEquals([$this->tempDir.'/foo.yaml' => 1234567890], Cache::get('stache::timestamps::test'));
+    }
 }
 
 class TestBasicStore extends BasicStore
