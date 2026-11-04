@@ -3,6 +3,7 @@
 namespace Tests\StaticCaching;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\StaticCaching\NoCache\Session;
@@ -80,6 +81,39 @@ class NocacheRouteTest extends TestCase
                     $region->key() => 'Two',
                 ],
             ]);
+    }
+
+    #[Test]
+    #[DataProvider('unnormalizedPaginationUrlProvider')]
+    public function it_paginates_using_the_normalized_url($cachedUrl, $requestedUrl)
+    {
+        Collection::make('posts')->save();
+        EntryFactory::collection('posts')->id('one')->data(['title' => 'One'])->create();
+        EntryFactory::collection('posts')->id('two')->data(['title' => 'Two'])->create();
+
+        $this->createPage('test', ['with' => ['title' => 'Test']]);
+
+        $session = new Session($cachedUrl);
+        $region = $session->pushRegion('{{ collection:posts sort="title" paginate="1" as="posts" }}{{ posts }}{{ title }}{{ /posts }}{{ /collection:posts }}', [], 'antlers.html');
+        $session->write();
+
+        $this
+            ->postJson('/!/nocache', ['url' => $requestedUrl])
+            ->assertOk()
+            ->assertExactJson([
+                'csrf' => csrf_token(),
+                'regions' => [
+                    $region->key() => 'Two',
+                ],
+            ]);
+    }
+
+    public static function unnormalizedPaginationUrlProvider()
+    {
+        return [
+            'unsorted keys' => ['http://localhost/test?page=2&zpage=9', 'http://localhost/test?zpage=9&page=2'],
+            'encoded value' => ['http://localhost/test?page=2', 'http://localhost/test?page=%32'],
+        ];
     }
 
     #[Test]

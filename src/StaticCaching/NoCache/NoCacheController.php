@@ -14,10 +14,6 @@ class NoCacheController
 
         $url = $request->input('url');
 
-        if (config('statamic.static_caching.ignore_query_strings', false)) {
-            $url = explode('?', $url)[0];
-        }
-
         if (Str::endsWith($url, '?')) {
             $url = Str::replaceLast('?', '', $url);
         }
@@ -26,7 +22,13 @@ class NoCacheController
             $url = Str::before($url, '?').'?'.Request::normalizeQueryString(Str::after($url, '?'));
         }
 
-        $session = $session->setUrl($url)->setPaginationUrl($request->input('url'))->restore();
+        $session->setPaginationUrl($url);
+
+        if (config('statamic.static_caching.ignore_query_strings', false)) {
+            $url = explode('?', $url)[0];
+        }
+
+        $session = $session->setUrl($url)->restore();
 
         $replacer = new NoCacheReplacer($session);
 
