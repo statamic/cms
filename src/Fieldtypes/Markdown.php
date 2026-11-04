@@ -53,8 +53,9 @@ class Markdown extends Fieldtype
                 'fields' => [
                     'buttons' => [
                         'display' => __('Buttons'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.buttons'),
                         'type' => 'markdown_buttons_setting',
+                        'full_width_setting' => true,
                         'default' => [
                             'bold',
                             'italic',
@@ -65,7 +66,6 @@ class Markdown extends Fieldtype
                             'image',
                             'table',
                         ],
-                        'width' => 66,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),

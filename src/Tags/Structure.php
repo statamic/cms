@@ -60,6 +60,13 @@ class Structure extends Tags
             'max_depth' => $this->params->get('max_depth'),
         ]);
 
+        if ($tree) {
+            $offset = max(0, $this->params->int('offset'));
+            $limit = max(0, $this->params->int('limit')) ?: null;
+
+            $tree = array_slice($tree, $offset, $limit);
+        }
+
         $value = $this->toArray($tree);
 
         if ($this->parser && ($as = $this->params->get('as'))) {

@@ -121,13 +121,45 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getKeysFromCollectionsWithWhere($collections, $where)
     {
-        $items = collect($collections)->flatMap(function ($collection) use ($where) {
-            return $this->getWhereColumnKeysFromStore($collection, $where);
-        });
+        // A collection can be queried twice (e.g. by a status query), but its keys must only appear once.
+        $collections = collect($collections)->unique()->values();
+
+        if ($keys = $this->getKeysFromCollectionsById($collections, $where)) {
+            return $keys;
+        }
 
         $method = 'filterWhere'.$where['type'];
 
+        // These filters only look at values, so each store's index can be filtered
+        // before its keys are prefixed, instead of prefixing every key first.
+        if (in_array($where['type'], ['Basic', 'In'])) {
+            return $collections->flatMap(function ($collection) use ($where, $method) {
+                $items = $this->store->store($collection)->index($where['column'])->items();
+
+                return $this->{$method}($items, $where)->keys()->map(fn ($key) => "{$collection}::{$key}");
+            })->values();
+        }
+
+        $items = $collections->flatMap(function ($collection) use ($where) {
+            return $this->getWhereColumnKeysFromStore($collection, $where);
+        });
+
         return $this->{$method}($items, $where)->keys();
+    }
+
+    protected function getKeysFromCollectionsById($collections, $where)
+    {
+        if ($where['type'] !== 'Basic' || $where['column'] !== 'id' || $where['operator'] !== '=' || ! is_string($where['value'])) {
+            return null;
+        }
+
+        $keys = $collections
+            ->filter(fn ($collection) => $this->store->store($collection)->paths()->has($where['value']))
+            ->map(fn ($collection) => "{$collection}::{$where['value']}")
+            ->values();
+
+        // Ids are compared case-insensitively, so a miss falls back to filtering.
+        return $keys->isEmpty() ? null : $keys;
     }
 
     protected function getOrderKeyValuesByIndex()

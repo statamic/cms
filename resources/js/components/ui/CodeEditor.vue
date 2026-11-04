@@ -283,6 +283,7 @@ watch(
                 'shadow-ui-sm appearance-none antialiased disabled:shadow-none',
                 themeClass,
                 { 'code-fullscreen': fullScreenMode },
+                readOnly ? 'read-only-field:not-dark:bg-gray-100 read-only-field:not-dark:shadow-none' : '',
             ]"
         >
             <publish-field-fullscreen-header

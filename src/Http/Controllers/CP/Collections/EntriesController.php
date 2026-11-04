@@ -11,7 +11,6 @@ use Statamic\Facades\Action;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Facades\User;
 use Statamic\Hooks\CP\EntriesIndexQuery;
 use Statamic\Http\Controllers\CP\CpController;
@@ -31,7 +30,8 @@ class EntriesController extends CpController
 {
     use ExtractsFromEntryFields,
         Hookable,
-        QueriesFilters;
+        QueriesFilters,
+        ResolvesEntryUri;
 
     public function index(FilteredRequest $request, $collection)
     {
@@ -346,7 +346,7 @@ class EntriesController extends CpController
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
-            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint) {
+            'localizations' => $this->getAuthorizedSitesForCollection($collection)->map(function ($handle) use ($collection, $site, $blueprint, $request) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -354,7 +354,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle, 'blueprint' => $blueprint->handle()]),
-                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
+                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', array_filter([$collection->handle(), $handle, 'parent' => $collection->hasStructure() ? $request->parent : null])) : null,
                 ];
             })->values()->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
@@ -484,38 +484,6 @@ class EntriesController extends CpController
         }
 
         throw ValidationException::withMessages(['slug' => __('statamic::validation.unique_uri')]);
-    }
-
-    private function entryUri($entry, $tree, $parent)
-    {
-        if (! $entry->route()) {
-            return null;
-        }
-
-        if (! $tree) {
-            return app(\Statamic\Contracts\Routing\UrlBuilder::class)
-                ->content($entry)
-                ->merge([
-                    'id' => $entry->id() ?? Stache::generateId(),
-                ])
-                ->build($entry->route());
-        }
-
-        $parent = $parent ? $tree->find($parent) : null;
-
-        if ($parent && $parent->isRoot()) {
-            $parent = null;
-        }
-
-        return app(\Statamic\Contracts\Routing\UrlBuilder::class)
-            ->content($entry)
-            ->merge([
-                'parent_uri' => $parent ? $parent->uri() : null,
-                'slug' => $entry->slug(),
-                'depth' => $parent ? $parent->depth() + 1 : 1,
-                'is_root' => false,
-            ])
-            ->build($entry->route());
     }
 
     protected function getAuthorizedSitesForCollection($collection)

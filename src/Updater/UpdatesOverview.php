@@ -25,7 +25,7 @@ class UpdatesOverview
      */
     public function count()
     {
-        return $this->getCached('updates-overview.count');
+        return (int) $this->getCached('updates-overview.count');
     }
 
     /**

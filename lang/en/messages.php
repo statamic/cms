@@ -78,6 +78,7 @@ return [
     'duplicate_action_warning_localization' => 'This entry is a localization. The origin entry will be duplicated.',
     'duplicate_action_warning_localizations' => 'One or more selected entries are localizations. In those cases, the origin entry will be duplicated instead.',
     'elevated_session_enter_password' => 'Enter your password to continue.',
+    'elevated_session_enter_verification_code' => 'Enter the verification code sent to your email to continue.',
     'elevated_session_reauthenticate' => 'For security, please re-authenticate your account.',
     'elevated_session_required' => 'A password confirmation is required to continue.',
     'elevated_session_verification_code_notification_body' => 'Copy and paste the code shown below to verify your identity. If you didn\'t request this code, you can ignore this email.',
@@ -311,5 +312,6 @@ return [
     'user_wizard_invitation_subject' => 'Activate your new Statamic account on :site',
     'user_wizard_roles_groups_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
     'user_wizard_super_admin_instructions' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
+    'video_fieldtype_cloudflare_manifest' => 'Cloudflare Stream manifest URLs can\'t be embedded. Use the URL from the "Video Link" button in Cloudflare instead.',
     'width_x_height' => ':width × :height',
 ];

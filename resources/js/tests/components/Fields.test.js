@@ -33,12 +33,13 @@ const Probe = defineComponent({
     },
 });
 
-async function mountFields(values, provide = {}) {
+async function mountFields(values, provide = {}, props = {}) {
     const wrapper = mount(Container, {
         props: {
             blueprint: { tabs: [] },
             modelValue: values,
             site: 'default',
+            ...props,
         },
         global: {
             components: { 'hidden-fieldtype': HiddenFieldtype },
@@ -82,4 +83,12 @@ test('a hidden fieldtype does not get a replicator preview', async () => {
     await mountFields({ protected: true, scheme: 'password' }, { showReplicatorFieldPreviews: true });
 
     expect(previews.value).toEqual({});
+});
+
+test('field ids are unique across publish containers', async () => {
+    const outer = await mountFields({ protected: true, scheme: 'password' }, {}, { name: 'outer' });
+    const inner = await mountFields({ protected: true, scheme: 'password' }, {}, { name: 'inner' });
+
+    expect(outer.find('#field_outer_scheme').exists()).toBe(true);
+    expect(inner.find('#field_inner_scheme').exists()).toBe(true);
 });

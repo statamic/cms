@@ -29,6 +29,10 @@ class HandleInertiaRequestsTest extends TestCase
             Route::get('empty-response-test', function () {
                 return response()->noContent(200);
             });
+
+            Route::get('devtools-test', function () {
+                return config('inertia.devtools.enabled') === false ? 'disabled' : 'enabled';
+            });
         });
     }
 
@@ -74,5 +78,16 @@ class HandleInertiaRequestsTest extends TestCase
             ->from('/cp/utilities')
             ->get('/cp/empty-response-test', ['X-Inertia' => 'true'])
             ->assertRedirect('/cp/utilities');
+    }
+
+    #[Test]
+    public function it_disables_inertia_devtools()
+    {
+        config(['inertia.devtools.enabled' => true]);
+
+        $this
+            ->actingAs(User::make()->makeSuper())
+            ->get('/cp/devtools-test')
+            ->assertSee('disabled');
     }
 }

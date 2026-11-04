@@ -42,7 +42,7 @@ let hasSelections = computed(() => {
     return props.selections.length > 0;
 });
 
-watch(props.selections, getActions, { deep: true });
+watch(() => props.selections, getActions, { deep: true });
 
 function getActions() {
     if (!hasSelections.value) {

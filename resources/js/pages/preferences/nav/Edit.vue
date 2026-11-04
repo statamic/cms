@@ -702,7 +702,13 @@ export default {
             this.$axios
                 .delete(this.destroyUrl)
                 .then(() => {
-                    router.reload();
+                    router.reload({
+                        onSuccess: (page) => {
+                            this.initialNav = clone(page.props.nav);
+                            this.setInitialNav(page.props.nav);
+                            this.changed = false;
+                        },
+                    });
                     this.confirmingReset = false;
                 })
                 .catch(() => this.$toast.error(__('Something went wrong')));
