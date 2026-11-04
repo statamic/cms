@@ -337,6 +337,8 @@ abstract class Store
 
         $this->cachePaths($paths);
 
+        Stache::cacheStore()->forever("stache::timestamps::{$this->key()}", $files->all());
+
         $this->keys()->cache();
 
         Stache::duplicates()->cache();
