@@ -1,4 +1,4 @@
-import { nextTick, reactive } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import { cp_url } from '@/bootstrap/globals.js';
@@ -143,7 +143,31 @@ const timeIn = (text) => {
 // The time it was scheduled for, once you've said, for the outcome
 const scheduled = reactive({ time: null });
 
+// Whether the person can open Settings → AI, for the "No response" scenario. The settings page is for super users for now (there's no
+// permission for it yet), but the two demos in the nav set this to show both outcomes (see AiChatDemos.vue).
+export const canEditAi = ref(true);
+
 const ideaScenarios = [
+    {
+        // "Summarise our returns policy". The AI doesn't respond: the first step fails, and the run ends as failed.
+        match: /\breturns policy\b/i,
+        // Someone who can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator.
+        plan: () => {
+            const canSettings = canEditAi.value;
+
+            return {
+                title: 'No response',
+                ends: 'failed',
+                steps: [{ tool: 'statamic.search_entries', args: 'query: "returns policy"', detail: 'For “returns policy”', ms: 2500, fails: true }],
+                done: {
+                    text: 'The AI didn’t respond',
+                    note: canSettings ? 'Nothing was changed. If this keeps happening, check Settings → AI.' : 'Nothing was changed. If this keeps happening, ask an administrator to check the AI settings.',
+                    reason: canSettings ? 'Anthropic · request timed out after 30s' : null,
+                    actions: [{ label: 'Try again', retry: true }, ...(canSettings ? [{ label: 'Open Settings → AI', url: () => cp_url('ai') }] : [])],
+                },
+            };
+        },
+    },
     {
         // 1 · "Fix the typo 'recieve' on the Contact page". It opens the page, then fixes the typo in its form, leaving saving to you (so the
         // live page stays as it is until you publish).
@@ -757,6 +781,17 @@ export async function playRun(run, onChange = () => {}) {
             next.pageAt = Date.now();
             onChange();
         };
+        // The AI never answered (see the "No response" scenario)
+        if (step.fails) {
+            step.state = 'failed';
+            writing.active = false;
+            run.status = 'failed';
+            run.endedAt = Date.now();
+            run.steps.slice(i + 1).forEach((later) => (later.state = 'skipped'));
+            onChange();
+            return;
+        }
+
         const result = await step.action?.((question) => ask(run, step, question, onChange), goingTo, step);
         writing.active = false;
         if (result?.stop) {

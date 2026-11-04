@@ -5,7 +5,7 @@ import { Badge, Button, Icon, Textarea } from '@ui';
 import diffWords from '@/components/ai-suggest/diff-words.js';
 import AiChatDoneIcon from './AiChatDoneIcon.vue';
 import AiChatPageMarker from './AiChatPageMarker.vue';
-import { linkTooltip } from './mock-runs.js';
+import { linkTooltip, playRun } from './mock-runs.js';
 
 const props = defineProps({
     // From mock-runs.js: a title, and a list of tool calls and their state
@@ -21,12 +21,15 @@ const badge = computed(() =>
         stopped: { color: 'default', text: __('Stopped') },
         // Your role doesn't allow it, like changing a blueprint
         unable: { color: 'default', text: __('Not allowed') },
+        // The AI didn't respond
+        failed: { color: 'default', text: __('Failed') },
     })[props.run.status],
 );
 
 // A run that was blocked (your role doesn't allow it, like changing a blueprint) has a red × in a ring, the counterpart of the tick in a ring on a run
 // that's done. Its badge and heading stay as they are: the icon is enough to say you've been stopped.
-const blocked = computed(() => props.run.status === 'unable');
+// A run that failed (the AI didn't respond) has the same red cross.
+const blocked = computed(() => ['unable', 'failed'].includes(props.run.status));
 
 // Each tool call in words: what it's doing while it runs (or waits to), and what it did once it's done. The tool's own name is in the tooltip.
 const toolLabels = {
@@ -98,7 +101,14 @@ const diffClass = (type) => ({
 });
 
 // The buttons under an outcome: open a page in the CP, or (for previews) the site in a new tab
-const follow = (action) => (action.newTab ? window.open(action.url(), '_blank') : router.visit(action.url()));
+// Try again plays the run over (the mock fails every time)
+function retry() {
+    props.run.status = 'working';
+    props.run.endedAt = null;
+    props.run.steps.forEach((step) => ((step.state = 'pending'), (step.shownAt = null)));
+    playRun(props.run);
+}
+const follow = (action) => (action.retry ? retry() : action.newTab ? window.open(action.url(), '_blank') : router.visit(action.url()));
 
 // The alt text review goes one image at a time: a big image, its suggestion in a box to edit, then Apply and next, or Skip. A strip of
 // all the thumbnails under it shows how far you are, and you can click one to go back to it, even once they're all done: an applied one
@@ -193,6 +203,10 @@ const stepTitle = (step) => {
                     <AiChatDoneIcon v-else-if="step.state === 'done'" />
                     <!-- Waiting for you: a dot -->
                     <span v-else-if="step.state === 'waiting'" class="size-2 rounded-full bg-gray-500" />
+                    <svg v-else-if="step.state === 'failed'" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="size-4 text-red-600 dark:text-red-400" aria-hidden="true">
+                        <circle cx="8" cy="8" r="6.75" />
+                        <path d="m6 6 4 4m0-4-4 4" />
+                    </svg>
                     <span v-else class="size-4 rounded-full border border-dashed border-gray-300 dark:border-gray-600" />
                 </div>
 
@@ -203,6 +217,7 @@ const stepTitle = (step) => {
                     <p v-if="step.state === 'done'" class="text-xs font-medium text-emerald-700 dark:text-emerald-400">{{ step.result }}</p>
                     <p v-else-if="step.state === 'running'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Running…') }}</p>
                     <p v-else-if="step.state === 'skipped'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Skipped') }}</p>
+                    <p v-else-if="step.state === 'failed'" class="text-xs font-medium text-red-700 dark:text-red-400">{{ __('No response') }}</p>
                     <p v-else-if="step.state === 'waiting'" class="text-xs text-gray-700 dark:text-gray-300">{{ __('Waiting for you') }}</p>
                 </div>
             </div>
@@ -210,7 +225,7 @@ const stepTitle = (step) => {
 
         <!-- The outcome, built like the tool-call cards above it: a tick (or a cross, if it was cancelled or stopped) and the same spacing -->
         <div
-            v-if="['done', 'cancelled', 'stopped', 'unable'].includes(run.status)"
+            v-if="['done', 'cancelled', 'stopped', 'unable', 'failed'].includes(run.status)"
             :class="[
                 // In from the line like the cards above, which carries on down beside it, for the page it finished on
                 'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
@@ -297,6 +312,8 @@ const stepTitle = (step) => {
                 </div>
                 <p v-if="run.done.note" class="pt-2.5 text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- What you might do next, like opening what it made -->
+                <!-- What went wrong, for whoever can fix it -->
+                <p v-if="run.done.reason" class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-400">{{ run.done.reason }}</p>
                 <div v-if="run.done.actions" class="flex flex-wrap gap-1.5 pt-0.5">
                     <Button v-for="action in run.done.actions" :key="action.label" size="sm" :text="__(action.label)" @click="follow(action)" />
                 </div>
