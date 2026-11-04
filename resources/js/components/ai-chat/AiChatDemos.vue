@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import useAiChat from '@/composables/use-ai-chat.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
@@ -9,6 +10,9 @@ const { demo } = useAiChat();
 // The demos are at the bottom of the nav, so once one is clicked, jump the nav back to the top, so it looks as it normally would.
 // The demo starts a couple of seconds later, so you see the page settle first. Clicking another in the meantime starts that one instead.
 let starting = null;
+
+// The demo played last, marked with a purple dot in the nav so you can see where you are in the list
+const lastPlayed = ref(null);
 
 // Scrolling back up shows the nav's scrollbar, which flashes in and out. So it's hidden for the length of the scroll, and back to normal after.
 function hideScrollbarWhileScrolling(nav) {
@@ -23,6 +27,7 @@ function hideScrollbarWhileScrolling(nav) {
 function play(event, item) {
     const nav = event.currentTarget.closest('.nav-main');
     if (nav) hideScrollbarWhileScrolling(nav);
+    lastPlayed.value = item.label;
     clearTimeout(starting);
     starting = setTimeout(() => demo(item.text, { dictate: item.dictate, phase: item.phase }), 2000);
 }
@@ -64,6 +69,11 @@ const sections = [
                 <li v-for="item in section.demos" :key="item.label">
                     <a href="#" role="button" :title="item.text" @click.prevent="play($event, item)">
                         <span class="min-w-0 truncate">{{ __(item.label) }}</span>
+                        <!-- 6px, in the AI colour, at the end of the link -->
+                        <template v-if="lastPlayed === item.label">
+                            <span class="ms-auto size-1.5 shrink-0 rounded-full bg-ai" aria-hidden="true" />
+                            <span class="sr-only">{{ __('Last run') }}</span>
+                        </template>
                     </a>
                 </li>
             </ul>
