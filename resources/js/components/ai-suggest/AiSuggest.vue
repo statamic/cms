@@ -6,7 +6,7 @@ import { steer, suggestFor } from './mock-suggestions.js';
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
 // Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
 import diffWords from './diff-words.js';
-import { icon, suggestionsFail } from './use-ai-suggest.js';
+import { icon, suggestionsEmpty, suggestionsFail } from './use-ai-suggest.js';
 // Prototype: whether the person can open Settings → AI, set by the demos in the nav
 import { canEditAi } from '@/components/ai-chat/mock-runs.js';
 import { cp_url } from '@/bootstrap/globals.js';
@@ -49,6 +49,14 @@ function generate(rework = null) {
         }
 
         original.value = typeof props.value === 'string' ? props.value : '';
+        // Prototype: the "Suggest empty" demo makes this round come back with nothing
+        if (suggestionsEmpty.value) {
+            result.value = { mode: 'write', suggestions: [] };
+            loading.value = false;
+            retrying.value = false;
+            return;
+        }
+
         const fresh = suggestFor(props.config, props.value, props.values);
         result.value = rework ? rework(fresh) : fresh;
         loading.value = false;
@@ -170,9 +178,12 @@ function hidePreview() {
 
 watch(open, (isOpen) => isOpen || (preview.value = null));
 
+const isEmpty = computed(() => result.value && !result.value.suggestions.length);
+
 const status = computed(() => {
     if (loading.value) return __('Finding suggestions…');
     if (failed.value) return __('Couldn’t get suggestions');
+    if (isEmpty.value) return __('No suggestions');
     if (result.value) return __n(':count suggestion|:count suggestions', result.value.suggestions.length);
     return '';
 });
@@ -254,6 +265,11 @@ function follow(text) {
                             <Button v-if="canEditAi" size="xs" variant="default" :href="cp_url('ai')" :text="__('Open Settings → AI')" />
                         </div>
                     </div>
+
+                    <!-- The AI came back with nothing: one line, which says the text is fine when there is some. The footer's Try again asks for more, which is what's wanted here. -->
+                    <p v-else-if="isEmpty" class="px-3 py-3 text-xs text-pretty text-gray-600 dark:text-gray-400">
+                        {{ original ? __('Nothing to change: the AI thinks this already reads well. Try again, or say what to change.') : __('No suggestions this time. Try again, or say what you’re after.') }}
+                    </p>
 
                     <!-- Picking one puts it in the field, replacing what's there -->
                     <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. The first and last reach to 1px short of the borders above and below the list, so the focus outline (which pokes 1px past the ::after) meets those borders without covering them. The focus outline is drawn on the same ::after so it reaches the lines too, and hides them either side. A focused suggestion sits above a hovered one, so a hovered neighbour's background can't cover its outline. -->
