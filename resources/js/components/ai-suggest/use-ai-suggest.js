@@ -11,3 +11,6 @@ export const suggestionsFail = ref(false);
 
 // Prototype: the "Suggest empty" demo switches this on, so the next suggestions come back with nothing in them
 export const suggestionsEmpty = ref(false);
+
+// Prototype: the "Suggest slow" demo switches this on, so the next suggestions take a long while to come back
+export const suggestionsSlow = ref(false);
