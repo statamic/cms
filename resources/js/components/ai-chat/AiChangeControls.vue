@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import { Badge, Icon } from '@ui';
 import diffWords from '@/components/ai-suggest/diff-words.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
+import { linkDetails, linkTooltip } from './mock-runs.js';
 
 // Prototype: what a field the AI chat changed shows. Next to the label (part="label"), the badge in the theme's AI colour, which shows what
 // changed, word by word, under the field (part="below"), and Undo, which puts back what was there.
@@ -89,7 +90,7 @@ const partClass = (type) => ({
 
         <!-- Under the field, while the badge has it open: just the changes, a little smaller than the field's text, with no box -->
         <p v-else-if="part === 'below' && open && !hadNothing" class="mt-1.5 px-1 text-xs/5 text-gray-700 dark:text-gray-300">
-            <span v-for="(p, i) in parts" :key="i" :class="partClass(p.type)">{{ p.text }}</span>
+            <span v-for="(p, i) in parts" :key="i" v-tooltip="p.type === 'linked' && linkDetails(p.text) ? linkTooltip(linkDetails(p.text)) : null" :class="partClass(p.type)">{{ p.text }}</span>
         </p>
     </template>
 </template>

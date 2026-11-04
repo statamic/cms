@@ -5,6 +5,7 @@ import { Badge, Button, Icon, Textarea } from '@ui';
 import diffWords from '@/components/ai-suggest/diff-words.js';
 import AiChatDoneIcon from './AiChatDoneIcon.vue';
 import AiChatPageMarker from './AiChatPageMarker.vue';
+import { linkTooltip } from './mock-runs.js';
 
 const props = defineProps({
     // From mock-runs.js: a title, and a list of tool calls and their state
@@ -26,10 +27,6 @@ const badge = computed(() =>
 // A run that was blocked (your role doesn't allow it, like changing a blueprint) has a red × in a ring, the counterpart of the tick in a ring on a run
 // that's done. Its badge and heading stay as they are: the icon is enough to say you've been stopped.
 const blocked = computed(() => props.run.status === 'unable');
-
-// The tooltip on each link it added: the page it goes to, then its URL in grey
-const escape = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const linkTooltip = (link) => ({ content: `${escape(link.to)} <span class="opacity-60">· ${escape(link.url)}</span>`, html: true });
 
 // Each tool call in words: what it's doing while it runs (or waits to), and what it did once it's done. The tool's own name is in the tooltip.
 const toolLabels = {
