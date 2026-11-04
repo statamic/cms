@@ -15,7 +15,7 @@
         "composer/semver": "^3.4",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "inertiajs/inertia-laravel": "^2.0.7 || ^3.0",
-        "intervention/image": "^3.9.1 || ^4.0",
+        "intervention/image": "^3.11.9 || ^4.0",
         "james-heinrich/getid3": "^1.9.21",
         "laravel/framework": "^12.40.0 || ^13.0",
         "laravel/prompts": "^0.3.0",
@@ -24,7 +24,7 @@
         "league/glide": "^3.0 || ^4.0",
         "maennchen/zipstream-php": "^3.1",
         "michelf/php-smartypants": "^1.8.1",
-        "nesbot/carbon": "^3.0",
+        "nesbot/carbon": "^3.13.3",
         "pragmarx/google2fa": "^8.0 || ^9.0",
         "rebing/graphql-laravel": "^9.15",
         "rhukster/dom-sanitizer": "^1.0.19",
@@ -50,12 +50,13 @@
         "laravel/pao": "^1.1",
         "laravel/pint": "1.16.0",
         "laravel/socialite": "^5.28",
-        "mockery/mockery": "^1.6.10",
+        "mockery/mockery": "^1.6.13",
         "orchestra/testbench": "^10.8 || ^11.3",
         "pestphp/pest": "^4.7 || ^5.3",
         "phpstan/phpstan": "^2.2",
-        "phpunit/phpunit": "^12.5.43 || ^13.4.5",
-        "spatie/laravel-ray": "^1.43.6"
+        "phpunit/phpunit": "^12.5.23 || ^13.4.5",
+        "spatie/laravel-ray": "^1.43.6",
+        "thecodingmachine/safe": "^3.4"
     },
     "conflict": {
         "algolia/algoliasearch-client-php": "<4.32"
