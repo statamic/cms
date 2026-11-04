@@ -1,11 +1,13 @@
 <script setup>
 import { ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 import useAiChat from '@/composables/use-ai-chat.js';
+import { cp_url } from '@/bootstrap/globals.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
 // types the request in, as if you had. What happens is up to the mock runs (see mock-runs.js). Phase 2's are things for later, which
 // only show in the chat while one of them is being demoed (see phaseTwo in use-ai-chat.js).
-const { demo } = useAiChat();
+const { demo, close } = useAiChat();
 
 // The demos are at the bottom of the nav, so once one is clicked, jump the nav back to the top, so it looks as it normally would.
 // The demo starts a couple of seconds later, so you see the page settle first. Clicking another in the meantime starts that one instead.
@@ -29,7 +31,37 @@ function play(event, item) {
     if (nav) hideScrollbarWhileScrolling(nav);
     lastPlayed.value = item.label;
     clearTimeout(starting);
-    starting = setTimeout(() => demo(item.text, { dictate: item.dictate, phase: item.phase }), 2000);
+    starting = setTimeout(() => (item.run ? runOnPage(item.run) : demo(item.text, { dictate: item.dictate, phase: item.phase })), 2000);
+}
+
+// A demo with a run is not a chat request: it mocks you using the page. The chat is put away, and the run acts on the real page.
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function find(selector, timeout = 8000) {
+    for (let waited = 0; waited < timeout; waited += 100) {
+        const element = document.querySelector(selector);
+        if (element) return element;
+        await wait(100);
+    }
+    return null;
+}
+function runOnPage(run) {
+    close();
+    run({ wait, find });
+}
+
+// Field suggestions: go to the summer sale entry, then click the Subtitle field's suggest icon, as you would
+const summerSaleUrl = cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001');
+async function suggestSubtitle({ wait, find }) {
+    if (!window.location.href.startsWith(summerSaleUrl)) router.visit(summerSaleUrl);
+    // The field's id is on its input, so find that, then the suggest button beside it: the nearest parent that has one
+    const input = await find('[id^="field_"][id$="_subtitle"]');
+    let parent = input;
+    while (parent && !parent.querySelector('button[aria-label="Suggest"]')) parent = parent.parentElement;
+    const button = parent?.querySelector('button[aria-label="Suggest"]');
+    if (!button) return;
+    await wait(1200);
+    button.focus();
+    button.click();
 }
 
 const demos = [
@@ -38,6 +70,7 @@ const demos = [
     { label: 'Write a blog post', text: 'Create a blog post about our new garden range' },
     { label: 'Add links to a post', text: 'Add links throughout the garden range blog post' },
     { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
+    { label: 'Field suggestions', run: suggestSubtitle, text: 'Opens the summer sale and clicks the suggest icon on its subtitle' },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
