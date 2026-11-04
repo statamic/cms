@@ -6,7 +6,7 @@ import { steer, suggestFor } from './mock-suggestions.js';
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
 // Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
 import diffWords from './diff-words.js';
-import { icon, suggestionsEmpty, suggestionsFail } from './use-ai-suggest.js';
+import { icon, suggestionsEmpty, suggestionsFail, suggestionsSlow } from './use-ai-suggest.js';
 // Prototype: whether the person can open Settings → AI, set by the demos in the nav
 import { canEditAi } from '@/components/ai-chat/mock-runs.js';
 import { cp_url } from '@/bootstrap/globals.js';
@@ -33,12 +33,43 @@ const failed = ref(false);
 const original = ref('');
 let timer = null;
 
+// After 4 seconds of waiting it says so, and counts the seconds. (Prototype: the "Suggest slow" demo makes the wait last 15.)
+const slow = ref(false);
+const waited = ref(4);
+let slowTimer = null;
+let tick = null;
+
+function stopWaiting() {
+    clearTimeout(slowTimer);
+    clearInterval(tick);
+    slow.value = false;
+}
+
+function startWaiting() {
+    stopWaiting();
+    waited.value = 4;
+    slowTimer = setTimeout(() => {
+        slow.value = true;
+        tick = setInterval(() => (waited.value += 1), 1000);
+    }, 4000);
+}
+
+function cancel() {
+    clearTimeout(timer);
+    stopWaiting();
+    loading.value = false;
+    retrying.value = false;
+    open.value = false;
+}
+
 // Prototype: "think" for a moment, then show the mock suggestions. rework reshapes them, to follow an instruction from the "Make it…" box.
 function generate(rework = null) {
     loading.value = true;
     failed.value = false;
     clearTimeout(timer);
+    startWaiting();
     timer = setTimeout(() => {
+        stopWaiting();
         // Prototype: the "Suggest down" demos make this round fail
         if (suggestionsFail.value) {
             result.value = null;
@@ -61,7 +92,7 @@ function generate(rework = null) {
         result.value = rework ? rework(fresh) : fresh;
         loading.value = false;
         retrying.value = false;
-    }, rework ? 700 : 900);
+    }, suggestionsSlow.value ? 15000 : rework ? 700 : 900);
 }
 
 function retry() {
@@ -73,6 +104,7 @@ function retry() {
 function toggled(isOpen) {
     open.value = isOpen;
     if (isOpen) generate();
+    else if (loading.value) cancel();
 }
 
 // The suggestions are taller than the loading lines, so the dropdown's body eases to its new height rather than snapping.
@@ -95,7 +127,10 @@ watch(body, (el) => {
     observer.observe(el);
 });
 
-onBeforeUnmount(() => observer?.disconnect());
+onBeforeUnmount(() => {
+    observer?.disconnect();
+    stopWaiting();
+});
 
 // Single-line fields need the dropdown 16px below the button to clear the field's bottom border. In a multi-line field the button sits well inside it, so the dropdown can sit closer.
 const isMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));
@@ -181,7 +216,7 @@ watch(open, (isOpen) => isOpen || (preview.value = null));
 const isEmpty = computed(() => result.value && !result.value.suggestions.length);
 
 const status = computed(() => {
-    if (loading.value) return __('Finding suggestions…');
+    if (loading.value) return slow.value ? __('Still finding suggestions…') : __('Finding suggestions…');
     if (failed.value) return __('Couldn’t get suggestions');
     if (isEmpty.value) return __('No suggestions');
     if (result.value) return __n(':count suggestion|:count suggestions', result.value.suggestions.length);
@@ -249,6 +284,7 @@ function follow(text) {
                             <div class="h-2.5 w-14 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
                             <div class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" :class="['w-full', 'w-4/5', 'w-2/3'][i - 1]" />
                         </div>
+                        <p v-if="slow" class="pt-1 text-xs text-gray-600 tabular-nums dark:text-gray-400">{{ __('Still thinking…') }} {{ waited }}s</p>
                     </div>
 
                     <!-- The AI didn't respond. Whoever can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator (as in the AI chat). -->

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useAiChat from '@/composables/use-ai-chat.js';
 import { cp_url } from '@/bootstrap/globals.js';
-import { suggestionsEmpty, suggestionsFail } from '@/components/ai-suggest/use-ai-suggest.js';
+import { suggestionsEmpty, suggestionsFail, suggestionsSlow } from '@/components/ai-suggest/use-ai-suggest.js';
 import { canEditAi } from './mock-runs.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
@@ -54,7 +54,8 @@ function runOnPage(run) {
 
 // Field suggestions: go to the summer sale entry, then click the Subtitle field's suggest icon, as you would
 const summerSaleUrl = cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001');
-async function suggestSubtitle({ wait, find }, fails = false, empty = false) {
+async function suggestSubtitle({ wait, find }, fails = false, empty = false, slow = false) {
+    suggestionsSlow.value = slow;
     suggestionsFail.value = fails;
     suggestionsEmpty.value = empty;
     if (!window.location.href.startsWith(summerSaleUrl)) router.visit(summerSaleUrl);
@@ -75,6 +76,9 @@ const suggestSubtitleFails = (helpers) => suggestSubtitle(helpers, true);
 // And the same again, but nothing comes back
 const suggestSubtitleEmpty = (helpers) => suggestSubtitle(helpers, false, true);
 
+// And again, but they take a long time
+const suggestSubtitleSlow = (helpers) => suggestSubtitle(helpers, false, false, true);
+
 const demos = [
     { label: 'Update homepage', text: 'How can I update the homepage?' },
     { label: 'Fix summer sale', text: 'Tighten up the summer sale entry' },
@@ -90,6 +94,7 @@ const demos = [
     { label: 'Suggest down, can edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can edit the AI settings', canEditAi: true },
     { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
     { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
+    { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
