@@ -40,7 +40,6 @@ const demos = [
     { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
-    { label: 'Draft a post', text: 'Write a blog post about our new opening hours' },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
     { label: 'Schedule, no time', text: 'Publish it next Monday' },
     { label: 'Find missing alt text', text: 'Which images have no alt text?' },
