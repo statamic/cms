@@ -37,7 +37,7 @@ const demos = [
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Draft a post', text: 'Write a blog post about our new opening hours' },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
-    { label: 'Schedule, no time given', text: 'Publish it next Monday' },
+    { label: 'Schedule, no time', text: 'Publish it next Monday' },
     { label: 'Find missing alt text', text: 'Which images have no alt text?' },
     { label: 'Translate a page', text: 'Translate the About page into French' },
     { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
@@ -63,7 +63,7 @@ const sections = [
             <ul>
                 <li v-for="item in section.demos" :key="item.label">
                     <a href="#" role="button" :title="item.text" @click.prevent="play($event, item)">
-                        <span>{{ __(item.label) }}</span>
+                        <span class="min-w-0 truncate">{{ __(item.label) }}</span>
                     </a>
                 </li>
             </ul>
