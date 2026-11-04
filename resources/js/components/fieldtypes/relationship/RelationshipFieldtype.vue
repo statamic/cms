@@ -20,7 +20,6 @@
         :form-component-props="formComponentProps"
         :form-stack-size="formStackSize"
         :status-icons="statusIcons"
-        :columns="columns"
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
@@ -49,11 +48,15 @@ export default {
 
     computed: {
         maxItems() {
-            return this.config.max_items || Infinity;
-        },
+            if (this.config.max_items) {
+                return this.config.max_items;
+            }
 
-        columns() {
-            return this.meta.columns;
+            if (this.publishContainer?.asConfig && this.handle === 'default') {
+                return Number(this.publishContainer.values?.max_items) || Infinity;
+            }
+
+            return Infinity;
         },
 
         itemComponent() {

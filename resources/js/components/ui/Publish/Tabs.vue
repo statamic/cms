@@ -134,9 +134,10 @@ watch(tabWrapper, (el) => {
     }
 });
 
-watch(visibleMainTabs, () => {
+// Only watch what the tab bar shows; deep-watching the tabs would traverse the whole blueprint.
+watch(() => visibleMainTabs.value.map((tab) => `${tab.handle}:${tab.display}`).join('|'), () => {
     nextTick(checkOverflow);
-}, { deep: true });
+});
 
 onUnmounted(() => {
     overflowTracker.disconnect();

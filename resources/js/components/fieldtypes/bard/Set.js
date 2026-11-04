@@ -38,7 +38,7 @@ export const Set = Node.create({
         return [
             {
                 tag: 'bard-set',
-                getAttrs: (dom) => JSON.parse(dom.innerHTML),
+                getAttrs: (dom) => JSON.parse(dom.textContent),
             },
         ];
     },

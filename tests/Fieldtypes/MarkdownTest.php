@@ -17,6 +17,28 @@ class MarkdownTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     #[Test]
+    public function heading_buttons_are_opt_in()
+    {
+        $buttons = (new Markdown)->configFields()->get('buttons');
+
+        $this->assertSame([
+            'bold', 'italic', 'unorderedlist', 'orderedlist', 'quote', 'link', 'image', 'table',
+        ], $buttons->defaultValue());
+        $this->assertTrue($buttons->get('full_width_setting'));
+    }
+
+    #[Test]
+    public function existing_button_selections_and_order_are_preserved()
+    {
+        foreach ([[], ['table', 'bold'], ['h6', 'h1', 'italic']] as $buttons) {
+            $fieldtype = $this->fieldtype(['buttons' => $buttons]);
+
+            $this->assertSame($buttons, $fieldtype->config('buttons'));
+            $this->assertSame($buttons, $fieldtype->config()['buttons']);
+        }
+    }
+
+    #[Test]
     public function it_augments_to_html()
     {
         $this->assertEqualsTrimmed(

@@ -10,7 +10,6 @@
         :selections-url="selectionsUrl"
         :filters-url="filtersUrl"
         :search="true"
-        :columns="columns"
         :can-create="false"
         :can-reorder="false"
         :max-items="maxItems"
@@ -49,10 +48,6 @@ export default {
                 select_across_sites: this.canSelectAcrossSites,
                 query_scopes: this.queryScopes,
             },
-            columns: [
-                { label: __('Title'), field: 'title' },
-                { label: __('Slug'), field: 'slug' },
-            ],
         };
     },
 

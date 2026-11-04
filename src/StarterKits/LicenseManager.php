@@ -5,6 +5,7 @@ namespace Statamic\StarterKits;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Statamic\Console\NullConsole;
+use Statamic\Statamic;
 
 use function Laravel\Prompts\text;
 
@@ -51,7 +52,7 @@ final class LicenseManager
      */
     public function completeInstall(): void
     {
-        Http::post(self::OUTPOST_ENDPOINT.'installed', [
+        Http::withUserAgent('Statamic/'.Statamic::version())->post(self::OUTPOST_ENDPOINT.'installed', [
             'license' => $this->licenseKey,
             'configured_site_license' => config('statamic.system.license_key'),
             'package' => $this->package,
@@ -107,7 +108,7 @@ final class LicenseManager
      */
     private function outpostGetStarterKitDetails(): self
     {
-        $response = Http::get(self::OUTPOST_ENDPOINT.$this->package);
+        $response = Http::withUserAgent('Statamic/'.Statamic::version())->get(self::OUTPOST_ENDPOINT.$this->package);
 
         if ($response->status() !== 200) {
             return false;
@@ -139,7 +140,7 @@ final class LicenseManager
             return false;
         }
 
-        $response = Http::post(self::OUTPOST_ENDPOINT.'validate', [
+        $response = Http::withUserAgent('Statamic/'.Statamic::version())->post(self::OUTPOST_ENDPOINT.'validate', [
             'license' => $this->licenseKey,
             'configured_site_license' => config('statamic.system.license_key'),
             'package' => $this->package,

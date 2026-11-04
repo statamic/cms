@@ -333,6 +333,7 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
     }
 
+    #[Test]
     public function entries_are_found_using_where_null()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1'])->create();
@@ -802,6 +803,42 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 1'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_by_id_in_any_collection()
+    {
+        Collection::make('posts')->save();
+        Collection::make('pages')->save();
+        EntryFactory::id('post-a')->slug('a')->collection('posts')->data(['title' => 'Post A'])->create();
+        EntryFactory::id('page-a')->slug('a')->collection('pages')->data(['title' => 'Page A'])->create();
+
+        $this->assertSame('page-a', Entry::find('page-a')->id());
+        $this->assertSame('post-a', Entry::query()->where('id', 'post-a')->where('title', 'Post A')->first()->id());
+        $this->assertNull(Entry::query()->where('collection', 'posts')->where('id', 'page-a')->first());
+        $this->assertNull(Entry::query()->where('id', 'post-a')->where('title', 'Page A')->first());
+        $this->assertNull(Entry::find('missing'));
+        $this->assertSame(['page-a', 'post-a'], Entry::query()->where('id', 'page-a')->orWhere('id', 'post-a')->get()->map->id()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function entries_of_a_collection_queried_twice_are_found_once()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame(1, Entry::query()->whereIn('collection', ['posts', 'posts'])->where('title', 'Post 1')->count());
+        $this->assertSame(1, Entry::query()->whereIn('collection', ['posts', 'posts'])->where('id', 'id-1')->count());
+        $this->assertSame(2, Entry::query()->whereIn('collection', ['posts', 'posts'])->whereIn('title', ['Post 1', 'Post 2'])->count());
+    }
+
+    #[Test]
+    public function ids_are_compared_case_insensitively()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::id('Mixed-Case')->slug('a')->collection('posts')->create();
+
+        $this->assertSame('Mixed-Case', Entry::query()->where('id', 'mixed-case')->first()?->id());
+        $this->assertSame('Mixed-Case', Entry::query()->where('id', 'Mixed-Case')->first()?->id());
     }
 
     #[Test]

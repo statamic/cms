@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Entries;
 
+use Closure;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -556,6 +558,35 @@ class UpdateEntryTest extends TestCase
     }
 
     #[Test]
+    public function validation_replacements_are_passed_to_fields_nested_in_a_group()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this->seedBlueprintFields($collection, [
+            'details' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'code', 'field' => ['type' => 'text', 'validate' => 'new \Tests\Feature\Entries\RecordsArgumentsRule({collection}, {id}, {site})']],
+                ],
+            ],
+        ]);
+
+        $entry = EntryFactory::collection($collection)
+            ->slug('existing-entry')
+            ->data(['title' => 'Existing Entry', 'details' => ['code' => 'alpha']])
+            ->create();
+
+        RecordsArgumentsRule::$arguments = null;
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['details' => ['code' => 'alpha']])
+            ->assertOk();
+
+        $this->assertSame(['test', $entry->id(), 'en'], RecordsArgumentsRule::$arguments);
+    }
+
+    #[Test]
     public function published_entry_gets_saved_to_working_copy()
     {
         $this->markTestIncomplete();
@@ -678,5 +709,20 @@ class UpdateEntryTest extends TestCase
         ], $attrs);
 
         return $this->patchJson($entry->updateUrl(), $payload);
+    }
+}
+
+class RecordsArgumentsRule implements ValidationRule
+{
+    public static $arguments;
+
+    public function __construct(...$arguments)
+    {
+        static::$arguments = $arguments;
+    }
+
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        //
     }
 }

@@ -356,18 +356,23 @@ export default {
 
         toggleInline(type) {
             const elements = {
-                bold: { pattern: /^\*{2}(.*)\*{2}$/, delimiter: '**' },
-                code: { pattern: /^\`(.*)\`$/, delimiter: '`' },
-                italic: { pattern: /^\_(.*)\_$/, delimiter: '_' },
-                strikethrough: { pattern: /^\~\~(.*)\~\~$/, delimiter: '~~' },
+                bold: { pattern: /^\*{2}(.*)\*{2}$/s, delimiter: '**' },
+                code: { pattern: /^\`(.*)\`$/s, delimiter: '`' },
+                italic: { pattern: /^\_(.*)\_$/s, delimiter: '_' },
+                strikethrough: { pattern: /^\~\~(.*)\~\~$/s, delimiter: '~~' },
             };
 
             const replacements = this.selections.map(selection => {
-                const text = this.getText(selection);
                 const { delimiter, pattern } = elements[type];
-                return text.match(pattern)
-                    ? this.removeInline(selection, delimiter)
+                const selected = this.getText(selection);
+                // Markdown ignores emphasis delimiters next to whitespace (code spans don't), so keep it outside of them.
+                const [, before, text, after] = type === 'code' || !selected.trim()
+                    ? [null, '', selected, '']
+                    : selected.match(/^(\s*)(.*?)(\s*)$/s);
+                const toggled = text.match(pattern)
+                    ? text.slice(delimiter.length, -delimiter.length)
                     : `${delimiter}${text}${delimiter}`;
+                return before + toggled + after;
             });
 
             this.codemirror.replaceSelections(replacements, 'around');
@@ -390,6 +395,26 @@ export default {
         removeInline(selection, delimiter) {
             const text = this.getText(selection);
             return text.slice(delimiter.length, -delimiter.length);
+        },
+
+        toggleHeading(level) {
+            const startPoint = this.codemirror.getCursor('start');
+            const endPoint = this.codemirror.getCursor('end');
+            const pattern = /^(\s*)(#{1,6})(?:\s+|$)/;
+            const delimiter = '#'.repeat(level);
+            const prefix = delimiter + ' ';
+
+            for (let i = startPoint.line; i <= endPoint.line; i++) {
+                const text = this.codemirror.getLine(i);
+                const heading = text.match(pattern);
+                const newText = heading
+                    ? text.replace(pattern, heading[2] === delimiter ? '$1' : '$1' + prefix)
+                    : text.replace(/^(\s*)/, '$1' + prefix);
+
+                this.codemirror.replaceRange(newText, { line: i, ch: 0 }, { line: i, ch: Infinity });
+            }
+
+            this.codemirror.focus();
         },
 
         toggleLine(type) {

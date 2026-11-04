@@ -7,6 +7,10 @@ export default class Portal {
         this.data = data;
     }
 
+    setDisabled(disabled) {
+        this.portals.setDisabled(this.id, disabled);
+    }
+
     destroy() {
         this.portals.destroy(this.id);
     }

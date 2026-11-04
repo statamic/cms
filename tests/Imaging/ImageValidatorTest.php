@@ -70,6 +70,46 @@ class ImageValidatorTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_ask_the_driver_about_universally_supported_formats()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
+
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertTrue($validator->isValidExtension('jpg'));
+        $this->assertTrue($validator->isValidExtension('JPG'));
+        $this->assertTrue($validator->isValidExtension('jpeg'));
+        $this->assertTrue($validator->isValidExtension('png'));
+        $this->assertTrue($validator->isValidExtension('gif'));
+    }
+
+    #[Test]
+    public function it_rejects_an_empty_extension_without_asking_the_driver()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
+
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertFalse($validator->isValidExtension(''));
+        $this->assertFalse($validator->isValidExtension(null));
+    }
+
+    #[Test]
+    public function it_still_checks_the_mimetype_of_universally_supported_formats()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
+
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertTrue($validator->isValidImage('jpg', 'image/jpeg'));
+        $this->assertFalse($validator->isValidImage('jpg', 'application/x-msdownload'));
+        $this->assertFalse($validator->isValidImage('png', 'image/jpeg'));
+    }
+
+    #[Test]
     public function it_only_asks_the_driver_about_an_extension_once()
     {
         $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);

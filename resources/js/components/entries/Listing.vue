@@ -112,6 +112,10 @@ export default {
             this.items = items;
         },
 
+        refresh() {
+            this.$refs.listing.refresh();
+        },
+
         setSiteFilter(site) {
             this.$refs.listing.setFilter('site', site ? { site } : null);
         },

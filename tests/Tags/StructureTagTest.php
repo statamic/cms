@@ -297,6 +297,23 @@ EOT;
     }
 
     #[Test]
+    public function it_limits_and_offsets_the_top_level_items()
+    {
+        $this->createCollectionAndNav();
+
+        $this->assertEquals('[1][1-1][1-2][2]', $this->parseBasicTemplate('test', 'limit="2"'));
+        $this->assertEquals('[3][3-1][3-2][5][5-1]', $this->parseBasicTemplate('test', 'offset="2"'));
+        $this->assertEquals('[2][3][3-1][3-2]', $this->parseBasicTemplate('test', 'offset="1" limit="2"'));
+        $this->assertEquals('[1][1-1][1-2][2]', $this->parseBasicTemplate('test', 'offset="-1" limit="2"'));
+
+        $this->assertEquals('[2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages', 'offset="1" limit="2"'));
+
+        $this->assertEquals('[2 1 first][3 2 last]', (string) Antlers::parse(
+            '{{ nav:test offset="1" limit="2" }}[{{ entry_id }} {{ count }}{{ if first }} first{{ /if }}{{ if last }} last{{ /if }}]{{ /nav:test }}', [], true
+        ));
+    }
+
+    #[Test]
     public function it_filters_by_published_boolean()
     {
         $this->createCollectionAndNav();

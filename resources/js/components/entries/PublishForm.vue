@@ -476,7 +476,7 @@ export default {
         },
 
         showLivePreviewButton() {
-            return !this.isPreviewing && !this.readOnly && !this.isCreating && this.isBase && this.livePreviewUrl;
+            return !this.isPreviewing && !this.readOnly && this.isBase && this.livePreviewUrl;
         },
 
         showVisitUrlButton() {
