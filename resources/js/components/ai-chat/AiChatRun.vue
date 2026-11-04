@@ -238,10 +238,11 @@ const stepTitle = (step) => {
                         </button>
                     </li>
                 </ul>
-                <!-- The links it added: the words that are now links, in blue and underlined like links, so you can spot them in the field. Hover one to see the page it goes to, and its URL. -->
+                <!-- The links it added: the words that are now links, in blue and underlined like links, so you can spot them in the field. Hover one to see the page it goes to, and its URL, which is also beside it in grey. -->
                 <ul v-if="run.done.links" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
                     <li v-for="link in run.done.links" :key="link.text">
                         <span v-tooltip="linkTooltip(link)" class="cursor-default text-blue-600 underline decoration-blue-600/50 underline-offset-2 dark:text-blue-400 dark:decoration-blue-400/50">{{ link.text }}</span>
+                        <span class="ms-1.5 text-gray-500 dark:text-gray-400">{{ link.url }}</span>
                     </li>
                 </ul>
                 <!-- What it changed, word by word: the field, then the sentence with the change marked -->
