@@ -33,7 +33,7 @@
         "statamic/stringy": "^3.1.2",
         "stillat/blade-parser": "^2.1",
         "symfony/http-foundation": "^7.3.7 || ^8.0",
-        "symfony/lock": "^7.0.3 || ^8.0",
+        "symfony/lock": "^7.4.17 || ^8.1.5",
         "symfony/var-exporter": "^7.0.3 || ^8.0",
         "symfony/yaml": "^7.0.3 || ^8.0",
         "ueberdosis/tiptap-php": "^2.0",
@@ -51,10 +51,10 @@
         "laravel/pint": "1.16.0",
         "laravel/socialite": "^5.28",
         "mockery/mockery": "^1.6.10",
-        "orchestra/testbench": "^10.8 || ^11.0",
-        "pestphp/pest": "^4.7",
+        "orchestra/testbench": "^10.8 || ^11.3",
+        "pestphp/pest": "^4.7 || ^5.3",
         "phpstan/phpstan": "^2.2",
-        "phpunit/phpunit": "^12.5.23",
+        "phpunit/phpunit": "^12.5.43 || ^13.4.5",
         "spatie/laravel-ray": "^1.43.6"
     },
     "conflict": {
