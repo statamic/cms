@@ -239,7 +239,8 @@ const stepTitle = (step) => {
                     <circle cx="8" cy="8" r="6.75" />
                     <path d="m6 6 4 4m0-4-4 4" />
                 </svg>
-                <Icon v-else-if="run.status !== 'done'" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
+                <!-- A search that found nothing gets a grey cross, not a tick, which would suggest it found something -->
+                <Icon v-else-if="run.status !== 'done' || run.done.empty" name="x" class="size-3.5 text-gray-500 dark:text-gray-400" />
                 <AiChatDoneIcon v-else />
             </div>
             <div class="min-w-0 flex-1 space-y-1.5">

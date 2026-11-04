@@ -149,6 +149,15 @@ export const canEditAi = ref(true);
 
 const ideaScenarios = [
     {
+        // "Which entries mention garden gnomes?". The search finds nothing, and says so, with a cross rather than a tick (see AiChatRun.vue).
+        match: /\bgarden gnomes\b/i,
+        plan: () => ({
+            title: 'Search content',
+            steps: [{ tool: 'statamic.search_entries', args: 'query: "garden gnomes"', detail: 'For “garden gnomes”', result: 'No entries found', ms: 1100 }],
+            done: { text: 'No entries mention “garden gnomes”', note: 'Nothing was changed.', empty: true },
+        }),
+    },
+    {
         // "Summarise our returns policy". The AI doesn't respond: the first step fails, and the run ends as failed.
         match: /\breturns policy\b/i,
         // Someone who can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator.
