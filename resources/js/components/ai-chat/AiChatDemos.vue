@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import useAiChat from '@/composables/use-ai-chat.js';
 import { cp_url } from '@/bootstrap/globals.js';
+import { suggestionsFail } from '@/components/ai-suggest/use-ai-suggest.js';
 import { canEditAi } from './mock-runs.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
@@ -53,7 +54,8 @@ function runOnPage(run) {
 
 // Field suggestions: go to the summer sale entry, then click the Subtitle field's suggest icon, as you would
 const summerSaleUrl = cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001');
-async function suggestSubtitle({ wait, find }) {
+async function suggestSubtitle({ wait, find }, fails = false) {
+    suggestionsFail.value = fails;
     if (!window.location.href.startsWith(summerSaleUrl)) router.visit(summerSaleUrl);
     // The field's id is on its input, so find that, then the suggest button beside it: the nearest parent that has one
     const input = await find('[id^="field_"][id$="_subtitle"]');
@@ -66,6 +68,9 @@ async function suggestSubtitle({ wait, find }) {
     button.click();
 }
 
+// The same, but the suggestions come back as a failure
+const suggestSubtitleFails = (helpers) => suggestSubtitle(helpers, true);
+
 const demos = [
     { label: 'Update homepage', text: 'How can I update the homepage?' },
     { label: 'Fix summer sale', text: 'Tighten up the summer sale entry' },
@@ -77,6 +82,9 @@ const demos = [
     { label: 'Nothing found', text: 'Which entries mention garden gnomes?' },
     { label: 'AI down, can edit AI', text: 'Summarise our returns policy', canEditAi: true },
     { label: 'AI down, can’t edit', text: 'Summarise our returns policy', canEditAi: false },
+    // The same, but the AI doesn't respond. Like the AI down demos above, one can open Settings → AI and one can't.
+    { label: 'Suggest down, can edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can edit the AI settings', canEditAi: true },
+    { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
