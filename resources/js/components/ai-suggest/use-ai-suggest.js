@@ -8,3 +8,6 @@ export const icon = 'ai-edit';
 
 // Prototype: the "Suggest down" demos (see AiChatDemos.vue) switches this on, so the next suggestions come back as a failure
 export const suggestionsFail = ref(false);
+
+// Prototype: the "Suggest empty" demo switches this on, so the next suggestions come back with nothing in them
+export const suggestionsEmpty = ref(false);
