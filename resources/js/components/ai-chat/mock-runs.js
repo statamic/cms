@@ -149,6 +149,18 @@ export const canEditAi = ref(true);
 
 const ideaScenarios = [
     {
+        // "Summarise our shipping policy". The search takes a long time (16 seconds), so the slow state shows (see AiChatRun.vue).
+        match: /\bshipping policy\b/i,
+        plan: () => ({
+            title: 'Summarise a page',
+            steps: [
+                { tool: 'statamic.search_entries', args: 'query: "shipping policy"', detail: 'For “shipping policy”', result: '1 entry found', ms: 16000 },
+                { tool: 'statamic.get_entry', args: 'entry: "shipping-policy"', detail: 'The “Shipping policy” page', result: 'Read 420 words', ms: 900 },
+            ],
+            done: { text: 'Orders ship within 2 working days, and arrive in 3–5', note: 'Nothing was changed.' },
+        }),
+    },
+    {
         // "Which entries mention garden gnomes?". The search finds nothing, and says so, with a cross rather than a tick (see AiChatRun.vue).
         match: /\bgarden gnomes\b/i,
         plan: () => ({
