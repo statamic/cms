@@ -114,6 +114,19 @@ const aboutInFrench = {
     ],
 };
 
+// The Contact page, for the typo idea: a demo entry with a Bard field, holding the typo
+const typoBefore = 'We’ll recieve your message and reply within two working days.';
+const typoAfter = typoBefore.replace('recieve', 'receive');
+const contactPage = {
+    title: 'Contact',
+    url: () => cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000004'),
+    paragraphs: [
+        ['Got a question about an order, or want to arrange a visit? Send us a message using the form below.'],
+        [typoBefore],
+        ['If it’s urgent, ring the showroom on 01392 555 0142 and we’ll help straight away.'],
+    ],
+};
+
 // The Blog blueprint's editor, for the idea of adding a field to it
 const blogBlueprint = {
     title: 'Blog blueprint',
@@ -143,21 +156,47 @@ const scheduled = reactive({ time: null });
 
 const ideaScenarios = [
     {
-        // 1 · "Fix the typo 'recieve' on the Contact page". It fixes it in a working copy, so the live page stays as it is until it's published.
+        // 1 · "Fix the typo 'recieve' on the Contact page". It opens the page, then fixes the typo in its form, leaving saving to you (so the
+        // live page stays as it is until you publish).
         match: /\brecieve\b|\btypo\b.*\bcontact\b/i,
-        plan: () => ({
-            title: 'Fix a typo',
-            steps: [
-                { tool: 'statamic.search_entries', args: 'query: "recieve" · collection: pages', detail: 'For “recieve”, in Pages', result: '1 page found · Contact', ms: 900 },
-                { tool: 'statamic.update_entry', args: 'entry: pages::contact · find: "recieve" · replace: "receive"', detail: 'Contact, in Pages', result: 'Working copy created · live unchanged', ms: 1100 },
-            ],
-            done: {
-                text: 'Fixed “recieve” on Contact',
-                diff: { label: 'Content', before: 'We’ll recieve your message and reply within two working days.', after: 'We’ll receive your message and reply within two working days.' },
-                note: 'This is in a working copy. The live page is unchanged until you publish it.',
-                actions: [{ label: 'Review and publish', url: () => cp_url('collections/pages') }],
-            },
-        }),
+        plan: () => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const isOpen = window.location.href.startsWith(contactPage.url());
+            // The page with the typo fixed
+            const fixed = contactPage.paragraphs.map((bits) => bits.map((bit) => bit.replace('recieve', 'receive')));
+
+            return {
+                title: 'Fix a typo',
+                steps: [
+                    ...(isOpen
+                        ? []
+                        : [
+                              { tool: 'statamic.search_entries', args: 'query: "recieve" · collection: pages', detail: 'For “recieve”, in Pages', result: `1 page found · ${contactPage.title}`, ms: 900 },
+                              {
+                                  tool: 'cp.open_entry',
+                                  args: `entry: "${contactPage.title}"`,
+                                  detail: contactPage.title,
+                                  result: 'Opened in the editor',
+                                  ms: 300,
+                                  action: (ask, goingTo) => openEntry(contactPage, ask, nextForm, goingTo),
+                              },
+                          ]),
+                    {
+                        tool: 'cp.fill_fields',
+                        args: 'fields: content · find: "recieve" · replace: "receive"',
+                        detail: 'Content',
+                        result: 'Changed in the form · not saved',
+                        ms: 1100,
+                        action: () => currentForm() && fill({ content: withLinks(fixed) }),
+                    },
+                ],
+                done: {
+                    text: 'Fixed “recieve” on Contact',
+                    diff: { label: 'Content', before: typoBefore, after: typoAfter },
+                    note: 'Nothing’s saved yet. Check it over, then save or publish as usual.',
+                },
+            };
+        },
     },
     {
         // 2 · "Write a blog post about our new opening hours". It opens a new blog post and writes it in the form, so you see the page take
