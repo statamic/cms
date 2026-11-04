@@ -73,14 +73,12 @@ defineExpose({ parameters, refresh });
                     <ToggleItem
                         :value="View.Submissions"
                         icon="layout-list"
-                        :aria-label="__('Submissions')"
-                        v-tooltip="__('Submissions')"
+                        :tooltip="__('Submissions')"
                     />
                     <ToggleItem
                         :value="View.Summary"
                         icon="chart-increase"
-                        :aria-label="__('Summary')"
-                        v-tooltip="__('Summary')"
+                        :tooltip="__('Summary')"
                     />
                 </ToggleGroup>
 
