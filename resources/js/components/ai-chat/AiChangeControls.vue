@@ -42,6 +42,10 @@ function linksOf(value) {
 // A field that was empty (like on a new entry) has nothing to compare with, so its badge has no changes to open: it's just a label
 const hadNothing = computed(() => !!change.value && !wordsOf(change.value.before ?? '').trim());
 
+// A field filled in from nothing is "added", not "changed". Its badge is plain grey with a plus, as a label: the purple one opens a diff, and a
+// purple badge with nothing to open would look like it should.
+const addedBadge = 'bg-gray-50 border-gray-300 text-gray-700 dark:border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300';
+
 // What changed, word by word, in the same yellow and red as the suggestions. When only links were added (the words are the same), the
 // linked words are marked as added instead.
 const parts = computed(() => {
@@ -67,7 +71,7 @@ const partClass = (type) => ({
         <!-- Next to the label. Undo is set like the Read Only note (small grey text after an icon), with a hover background as it's a button. -->
         <span v-if="part === 'label'" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
             <!-- On a field that was empty, there's nothing to compare, so the badge is just a label, with no chevron -->
-            <Badge v-if="hadNothing" size="sm" class="bg-ai/5 border-ai/40 text-ai dark:border dark:bg-gray-800 dark:border-ai/60 dark:text-white" :text="__('Changed by AI')" />
+            <Badge v-if="hadNothing" size="sm" icon="plus" :class="addedBadge" :text="__('Added by AI')" />
             <!-- Otherwise it opens and closes the changes, with a chevron that turns over while they're open -->
             <button v-else type="button" class="group/badge cursor-pointer" :aria-expanded="open" :aria-label="open ? __('Hide changes') : __('Show what the AI changed')" @click="open = !open">
                 <Badge
