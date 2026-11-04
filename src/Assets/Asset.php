@@ -323,7 +323,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             ->when(
                 config('statamic.assets.meta_as_content'),
                 fn ($path) => collect([
-                    Stache::store('assets')->directory(),
+                    rtrim(Stache::store('assets')->directory(), '/'),
                     $this->container()->handle(),
                 ])->concat($path),
                 fn ($path) => $path->push('.meta'),

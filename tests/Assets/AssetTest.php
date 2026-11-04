@@ -732,7 +732,7 @@ class AssetTest extends TestCase
     {
         config()->set('statamic.assets.meta_as_content', true);
         $relativePath = 'foo/test.txt';
-        $metaFilePath = Stache::store('assets')->directory()."/test/{$relativePath}.yaml";
+        $metaFilePath = Stache::store('assets')->directory()."test/{$relativePath}.yaml";
 
         Storage::fake('test');
         Storage::disk('test')->put($relativePath, '');
@@ -1357,7 +1357,7 @@ class AssetTest extends TestCase
         $asset = tap($container->makeAsset('old/asset.txt')->data(['foo' => 'bar']))->save();
         $meta = $asset->meta();
 
-        $metaPath = Stache::store('assets')->directory().'/'.$container->handle();
+        $metaPath = Stache::store('assets')->directory().$container->handle();
 
         $this->assertFileExists("{$metaPath}/old/asset.txt.yaml");
         $this->assertEquals(YAML::dump($asset->meta()), File::get("{$metaPath}/old/asset.txt.yaml"));
