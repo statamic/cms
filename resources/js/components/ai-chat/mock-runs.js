@@ -73,6 +73,16 @@ const gardenRange = {
     ],
 };
 const gardenRangeLinks = gardenRange.paragraphs.flat().filter(Array.isArray);
+
+// The tooltip on a link it added: the page it goes to, then its URL in light grey (solid rather than faded, so it keeps its contrast on the
+// dark tooltip). `link` is { to, url }.
+const escape = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+export const linkTooltip = (link) => ({ content: `${escape(link.to)} <span class="text-gray-300">· ${escape(link.url)}</span>`, html: true });
+// Where the words it linked go. Bard's content only has the link itself, so the page's title and URL come from here.
+export const linkDetails = (text) => {
+    const link = gardenRangeLinks.find((link) => link[0] === text);
+    return link ? { to: link[2], url: link[3] } : null;
+};
 // The paragraphs as Bard's content, with the links in
 const withLinks = (paragraphs) =>
     paragraphs.map((bits) => ({
