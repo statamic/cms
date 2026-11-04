@@ -287,7 +287,7 @@ const stepTitle = (step) => {
                         </button>
                     </div>
                 </div>
-                <p v-if="run.done.note" class="text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
+                <p v-if="run.done.note" class="pt-2.5 text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- What you might do next, like opening what it made -->
                 <div v-if="run.done.actions" class="flex flex-wrap gap-1.5 pt-0.5">
                     <Button v-for="action in run.done.actions" :key="action.label" size="sm" :text="__(action.label)" @click="follow(action)" />
