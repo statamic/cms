@@ -3,7 +3,7 @@
 return [
 
     'cheatsheet' => '
-<p>ماركداون هو تنسيق تعليمات برمجية لتحويل النص إلى HTML للمؤلفين على الويب. يتيح لك ماركداون الكتابة باستخدام تنسيق نصي سهل القراءة وسهل الكتابة يتم تحويله إلى HTML صالح من الناحية الهيكلية.</p>
+<p>Markdown صيغة ترميز نصية تحوّل النص إلى HTML، ومخصصة لمؤلفي محتوى الويب. تتيح لك الكتابة بنص عادي سهل القراءة والكتابة، ثم تحوّله إلى HTML صحيح البنية.</p>
 
 <h3>العناوين</h3>
 <pre class="language-markdown"><code># هذا عنوان h1
@@ -12,46 +12,46 @@ return [
 </code></pre>
 
 <h3>التنسيق العريض والمائل</h3>
-<pre class="language-markdown"><code>يمكنك جعل النص *مائل*، **عريض**، أو _**كلاهما**_.</code></pre>
+<pre class="language-markdown"><code>يمكنك تنسيق النص *بخط مائل* أو **بخط عريض** أو _**بالأسلوبين معًا**_.</code></pre>
 
 <h3>الروابط</h3>
-<pre class="language-markdown"><code>هذا [مثال الرابط](http://example.com).</code></pre>
+<pre class="language-markdown"><code>هذا [مثال على رابط](http://example.com).</code></pre>
 
-<h3>الكود</h3>
+<h3>الشفرة البرمجية</h3>
 <p>
-قم بلف كودك بـ 3 علامات اقتباس متتالية (<code>```</code>) في السطر الذي قبل وبعد الكود.
+أحط الشفرة بثلاث علامات backtick (<code>```</code>) في سطر قبلها وسطر بعدها.
 </p>
 
-<pre class="language-markdown"><code>```
-هذا: بعض من يامل
+<pre class="language-markdown"><code>```yaml
+this: is some YAML
 ```</code></pre>
 
-<p>يمكنك أيضًا إضافة كود داخليًا بلف المحتوى بـ <code>`</code> علامات اقتباس فردية.</p>
+<p>لإدراج الشفرة ضمن السطر، أحطها بعلامة backtick واحدة (<code>`</code>) من كل جانب.</p>
 
-<h3>الاقتباس</h3>
+<h3>الاقتباس الكتلي</h3>
 
-<p>أنشئ اقتباسًا باستخدام <code>> </code> في بداية نصك.</p>
+<p>أنشئ اقتباسًا كتليًا بكتابة <code>> </code> في بداية السطر.</p>
 
-<pre class="language-markdown"><code>> هذا سيكون اقتباسًا.</code></pre>
+<pre class="language-markdown"><code>> سيظهر هذا النص كاقتباس كتلي.</code></pre>
 
 <h3>الصور</h3>
-<pre class="language-markdown"><code>![نص بديل](http://example.com/image.jpg)</code></pre>
+<pre class="language-markdown"><code>![وصف الصورة](http://example.com/image.jpg)</code></pre>
 
 <h3>القائمة غير المرتبة</h3>
-<pre class="language-markdown"><code>- لحم مقدد
-- شريحة لحم
-- مشروب</code></pre>
+<pre class="language-markdown"><code>- خبز
+- جبن
+- شاي</code></pre>
 
 <h3>القائمة المرتبة</h3>
 <pre class="language-markdown"><code>1. تناول الطعام
 2. اشرب
-3. كن سعيدًا</code></pre>
+3. استمتع</code></pre>
 
 <h3>الجداول</h3>
 
 <pre class="language-markdown"><code>العنوان الأول  | العنوان الثاني
 ------------- | -------------
-خانة المحتوى |  خانة المحتوى
-خانة المحتوى |  خانة المحتوى</code></pre>',
+خلية محتوى    | خلية محتوى
+خلية محتوى    | خلية محتوى</code></pre>',
 
 ];
