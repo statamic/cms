@@ -140,6 +140,7 @@ jobs:
           files: |
             **/*.{js,vue,ts}
             package.json
+            package-lock.json
             .github/workflows/tests.yml
 
       - name: Determine whether tests should run
