@@ -95,6 +95,7 @@ const demos = [
     { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
     { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
     { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
+    { label: 'Chat slow', text: 'Summarise our shipping policy' },
     // The ideas from the research notes (see ideaScenarios in mock-runs.js)
     { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
     { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },

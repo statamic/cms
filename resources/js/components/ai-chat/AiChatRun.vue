@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { Badge, Button, Icon, Textarea } from '@ui';
 import diffWords from '@/components/ai-suggest/diff-words.js';
@@ -108,6 +108,13 @@ function retry() {
     props.run.steps.forEach((step) => ((step.state = 'pending'), (step.shownAt = null)));
     playRun(props.run);
 }
+// A step that's been running for 6 seconds or more says it's still going, and for how long. A clock ticks each second to keep it up to date.
+// (Prototype: the "Chat slow" demo has a step that takes 16.)
+const now = ref(Date.now());
+const clock = setInterval(() => (now.value = Date.now()), 1000);
+onBeforeUnmount(() => clearInterval(clock));
+const slowFor = (step) => (step.state === 'running' && step.shownAt && now.value - step.shownAt >= 6000 ? Math.floor((now.value - step.shownAt) / 1000) : 0);
+
 const follow = (action) => (action.retry ? retry() : action.newTab ? window.open(action.url(), '_blank') : router.visit(action.url()));
 
 // The alt text review goes one image at a time: a big image, its suggestion in a box to edit, then Apply and next, or Skip. A strip of
@@ -221,6 +228,7 @@ const stepTitle = (step) => {
                     <!-- What it worked on, in words. The arguments it was really called with are in the tooltip. -->
                     <p class="text-xs text-gray-500 dark:text-gray-400" :title="step.args">{{ step.detail ?? step.args }}</p>
                     <p v-if="step.state === 'done'" class="text-xs font-medium text-emerald-700 dark:text-emerald-400">{{ step.result }}</p>
+                    <p v-else-if="step.state === 'running' && slowFor(step)" class="text-xs text-gray-500 tabular-nums dark:text-gray-400">{{ __('Still running…') }} {{ slowFor(step) }}s</p>
                     <p v-else-if="step.state === 'running'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Running…') }}</p>
                     <p v-else-if="step.state === 'skipped'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Skipped') }}</p>
                     <p v-else-if="step.state === 'failed'" class="text-xs font-medium text-red-700 dark:text-red-400">{{ __('No response') }}</p>
