@@ -9,8 +9,20 @@ const { demo } = useAiChat();
 // The demos are at the bottom of the nav, so once one is clicked, jump the nav back to the top, so it looks as it normally would.
 // The demo starts a couple of seconds later, so you see the page settle first. Clicking another in the meantime starts that one instead.
 let starting = null;
+
+// Scrolling back up shows the nav's scrollbar, which flashes in and out. So it's hidden for the length of the scroll, and back to normal after.
+function hideScrollbarWhileScrolling(nav) {
+    const done = () => nav.classList.remove('ai-demos-scrolling');
+    nav.classList.add('ai-demos-scrolling');
+    nav.addEventListener('scrollend', done, { once: true });
+    setTimeout(done, 1000);
+    nav.scrollTo({ top: 0 });
+    // Already at the top, so there's no scroll to wait for
+    if (nav.scrollTop === 0) done();
+}
 function play(event, item) {
-    event.currentTarget.closest('.nav-main')?.scrollTo({ top: 0 });
+    const nav = event.currentTarget.closest('.nav-main');
+    if (nav) hideScrollbarWhileScrolling(nav);
     clearTimeout(starting);
     starting = setTimeout(() => demo(item.text, { dictate: item.dictate, phase: item.phase }), 2000);
 }
@@ -58,3 +70,12 @@ const sections = [
         </div>
     </div>
 </template>
+
+<style>
+.nav-main.ai-demos-scrolling {
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+</style>
