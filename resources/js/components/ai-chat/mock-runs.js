@@ -92,17 +92,6 @@ const withLinks = (paragraphs) =>
         ),
     }));
 
-// A new blog post for the drafting idea: the demo collection's Blog Post blueprint, which has a Bard field to write into
-const openingHoursPost = {
-    title: 'New blog post',
-    url: () => cp_url('collections/ai_suggestions/entries/create/default?blueprint=blog_post'),
-    paragraphs: [
-        ['From Monday 1 December, our showrooms are open later on weekdays: 9am to 7pm, Monday to Friday. Saturdays stay 9am to 5pm, and we’re still closed on Sundays.'],
-        ['Lots of you told us you can only visit after work, so we’ve moved our hours to suit. The extra two hours each evening mean there’s time to sit on every sofa before you choose.'],
-        ['Our online shop and delivery times aren’t changing. If you’d like a quiet look round, Tuesday and Wednesday evenings are the calmest.'],
-    ],
-};
-
 // The About page in French, for the translating idea: written into a new entry's form (the demo collection's Blog Post blueprint, as for drafting)
 const aboutInFrench = {
     title: 'À propos',
@@ -194,48 +183,6 @@ const ideaScenarios = [
                     text: 'Fixed “recieve” on Contact',
                     diff: { label: 'Content', before: typoBefore, after: typoAfter },
                     note: 'Nothing’s saved yet. Check it over, then save or publish as usual.',
-                },
-            };
-        },
-    },
-    {
-        // 2 · "Write a blog post about our new opening hours". It opens a new blog post and writes it in the form, so you see the page take
-        // shape: the title, then the post a paragraph at a time. Saving it (as a draft, or published) is up to you.
-        match: /\bopening hours\b/i,
-        plan: () => {
-            const { currentForm, nextForm, fill } = useAiChanges();
-            const title = 'Our new opening hours';
-
-            return {
-                title: 'Draft a blog post',
-                steps: [
-                    { tool: 'statamic.get_blueprint', args: 'collection: blog · blueprint: blog_post', detail: 'Blog Post, in Blog', result: '2 fields loaded', ms: 800 },
-                    {
-                        tool: 'cp.new_entry',
-                        args: 'collection: blog · blueprint: blog_post',
-                        detail: 'A Blog Post, in Blog',
-                        result: 'Opened in the editor',
-                        ms: 300,
-                        action: (ask, goingTo) => openEntry(openingHoursPost, ask, nextForm, goingTo),
-                    },
-                    {
-                        tool: 'cp.fill_fields',
-                        args: 'fields: title, content',
-                        detail: 'Title and Content',
-                        result: `Title and ${openingHoursPost.paragraphs.length} paragraphs written · not saved`,
-                        ms: 600,
-                        // The title, then the content growing a paragraph at a time, as if it's being written
-                        action: async () => {
-                            if (!currentForm()) return;
-                            await fill({ title });
-                            for (let i = 1; i <= openingHoursPost.paragraphs.length; i++) await fill({ content: withLinks(openingHoursPost.paragraphs.slice(0, i)) }, 900);
-                        },
-                    },
-                ],
-                done: {
-                    text: `Wrote “${title}”`,
-                    items: ['Title', `Content: ${openingHoursPost.paragraphs.length} paragraphs, on the new hours, why they’ve changed and when they start`],
-                    note: 'Nothing’s saved yet. Check it over, then save it as a draft or publish it.',
                 },
             };
         },
