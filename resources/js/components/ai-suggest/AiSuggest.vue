@@ -6,7 +6,10 @@ import { steer, suggestFor } from './mock-suggestions.js';
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
 // Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
 import diffWords from './diff-words.js';
-import { icon } from './use-ai-suggest.js';
+import { icon, suggestionsFail } from './use-ai-suggest.js';
+// Prototype: whether the person can open Settings → AI, set by the demos in the nav
+import { canEditAi } from '@/components/ai-chat/mock-runs.js';
+import { cp_url } from '@/bootstrap/globals.js';
 
 const props = defineProps({
     // The field's config, its current value, and the values of the fields around it (for context, like the entry's title)
@@ -24,6 +27,8 @@ const loading = ref(false);
 // Whether this round came from Try again, which spins its icon. The first round, and reworks from the "Make it…" box, don't.
 const retrying = ref(false);
 const result = ref(null);
+// Whether the last round failed (see the failure options below)
+const failed = ref(false);
 // What was in the field when the suggestions were made, to show what changed
 const original = ref('');
 let timer = null;
@@ -31,8 +36,18 @@ let timer = null;
 // Prototype: "think" for a moment, then show the mock suggestions. rework reshapes them, to follow an instruction from the "Make it…" box.
 function generate(rework = null) {
     loading.value = true;
+    failed.value = false;
     clearTimeout(timer);
     timer = setTimeout(() => {
+        // Prototype: the "Suggest down" demos make this round fail
+        if (suggestionsFail.value) {
+            result.value = null;
+            failed.value = true;
+            loading.value = false;
+            retrying.value = false;
+            return;
+        }
+
         original.value = typeof props.value === 'string' ? props.value : '';
         const fresh = suggestFor(props.config, props.value, props.values);
         result.value = rework ? rework(fresh) : fresh;
@@ -157,6 +172,7 @@ watch(open, (isOpen) => isOpen || (preview.value = null));
 
 const status = computed(() => {
     if (loading.value) return __('Finding suggestions…');
+    if (failed.value) return __('Couldn’t get suggestions');
     if (result.value) return __n(':count suggestion|:count suggestions', result.value.suggestions.length);
     return '';
 });
@@ -224,6 +240,21 @@ function follow(text) {
                         </div>
                     </div>
 
+                    <!-- The AI didn't respond. Whoever can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator (as in the AI chat). -->
+                    <div v-else-if="failed" class="px-3 py-3">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ __('The AI didn’t respond') }}</p>
+                        <template v-if="canEditAi">
+                            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, check your AI settings.') }}</p>
+                            <p class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-400">Anthropic · request timed out after 30s</p>
+                        </template>
+                        <p v-else class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, ask an administrator to check the AI settings.') }}</p>
+                        <!-- Try again is here, by the message, as the footer's reads as "more suggestions" rather than "try the connection again" -->
+                        <div class="mt-2.5 flex gap-1.5">
+                            <Button size="xs" variant="default" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="focusClicked($event); retry()" />
+                            <Button v-if="canEditAi" size="xs" variant="default" :href="cp_url('ai')" :text="__('Open Settings → AI')" />
+                        </div>
+                    </div>
+
                     <!-- Picking one puts it in the field, replacing what's there -->
                     <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. The first and last reach to 1px short of the borders above and below the list, so the focus outline (which pokes 1px past the ::after) meets those borders without covering them. The focus outline is drawn on the same ::after so it reaches the lines too, and hides them either side. A focused suggestion sits above a hovered one, so a hovered neighbour's background can't cover its outline. -->
                     <div v-else-if="result" data-suggestions class="p-1.5">
@@ -284,7 +315,7 @@ function follow(text) {
                 </div>
             </div>
 
-            <div class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
+            <div v-if="!failed" class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
                 <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it tries again. -->
                 <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': retrying }" @click="focusClicked($event); retry()" />
             </div>
