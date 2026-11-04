@@ -168,6 +168,11 @@ const headline = computed(() => {
 
 const altLeft = computed(() => images.value.filter((image) => !image.applied && !image.skipped).length);
 
+// A search step has a magnifying glass rather than the spinner and tick: blue and pulsing while it runs, green once it's done. It's 18px, as the glass has space around it in its box and would look small at the tick's 16px.
+const isSearch = (step) => step.tool === 'statamic.search_entries';
+const showSearchIcon = (step) => isSearch(step) && ['running', 'done'].includes(step.state);
+const searchIconClass = (step) => (step.state === 'running' ? 'text-blue-500 motion-safe:animate-pulse' : 'text-emerald-700 dark:text-emerald-400');
+
 const stepTitle = (step) => {
     const labels = toolLabels[step.tool];
     return labels ? __(labels[step.state === 'done' ? 1 : 0]) : step.tool;
@@ -199,7 +204,8 @@ const stepTitle = (step) => {
                 ]"
             >
                 <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
-                    <Icon v-if="step.state === 'running'" name="loading" class="size-4 text-blue-500" />
+                    <Icon v-if="showSearchIcon(step)" name="magnifying-glass" class="size-[18px]! shrink-0" :class="searchIconClass(step)" />
+                    <Icon v-else-if="step.state === 'running'" name="loading" class="size-4 text-blue-500" />
                     <AiChatDoneIcon v-else-if="step.state === 'done'" />
                     <!-- Waiting for you: a dot -->
                     <span v-else-if="step.state === 'waiting'" class="size-2 rounded-full bg-gray-500" />
