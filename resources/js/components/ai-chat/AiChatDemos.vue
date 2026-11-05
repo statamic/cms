@@ -110,6 +110,7 @@ const demos = [
     { label: 'Translate a page', text: 'Translate the About page into French' },
     { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
     { label: 'Edit a global', text: 'Update the copyright year in the footer' },
+    { label: 'Edit a term', text: 'Rename the Community topic to Local community' },
     { label: 'Edit navigation', text: 'Add a Returns link to the main navigation' },
     { label: 'Add a field', text: 'Add a subtitle field to the blog blueprint' },
 ];

@@ -43,6 +43,14 @@ const summerSale = {
     labels: { subtitle: 'Subtitle', excerpt: 'Excerpt', meta_description: 'Meta Description' },
 };
 
+// A taxonomy term, for the same idea. Its address ends in the site's handle.
+const communityTerm = {
+    title: 'Community',
+    url: () => cp_url('taxonomies/topics/terms/community/default'),
+    values: { title: 'Local community' },
+    labels: { title: 'Title' },
+};
+
 // The Main navigation, for the navigation idea: suggestions only, as it saves as you change it
 const mainNavigation = {
     title: 'Main navigation',
@@ -215,6 +223,11 @@ const ideaScenarios = [
         // "Update the copyright year in the footer". A global set has a form like an entry's, so it's filled in the same way, and saving is left to you.
         match: /\b(copyright|footer|globals?)\b/i,
         plan: () => editInForm({ ...footerGlobals, tool: 'cp.open_global', args: 'set: footer', read: { tool: 'statamic.get_global_set', args: 'set: footer', detail: 'The Footer global set', result: '2 fields' }, text: 'Updated the copyright year in the Footer', runTitle: 'Edit global set', name: 'Footer' }),
+    },
+    {
+        // "Rename the Community topic to Local community". A taxonomy term has a form too, so the same again.
+        match: /\b(topics?|terms?|taxonom(?:y|ies))\b/i,
+        plan: () => editInForm({ ...communityTerm, tool: 'cp.open_term', args: 'taxonomy: topics · term: community', read: { tool: 'statamic.get_term', args: 'taxonomy: topics · term: community', detail: 'The Community term, in Topics', result: '1 field' }, text: 'Renamed the Community topic', runTitle: 'Edit term', name: 'Community' }),
     },
     {
         // "Add a Returns link to the main navigation". A navigation saves as you change it, with no form to wait in, so like alt text it
