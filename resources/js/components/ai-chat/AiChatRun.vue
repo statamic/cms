@@ -307,14 +307,15 @@ const stepTitle = (step) => {
                 </div>
                 <!-- Images to review, one at a time: each one's image and suggested alt text, which you can edit, to apply or skip -->
                 <!-- It runs the full width of the card, out under the tick (16px, plus the 10px gap), rather than indented like the text -->
-                <div v-if="run.done.images" class="-ms-6.5 space-y-2 pt-1">
+                <div v-if="run.done.images" class="@container -ms-6.5 space-y-2 pt-1">
                     <template v-if="showReview">
                         <img :src="altImage.src" alt="" class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover dark:bg-gray-800" />
                         <!-- One you've been back to says what happened to it -->
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ altImage.file }}<template v-if="altImage.applied"> · {{ __('Applied') }}</template><template v-else-if="altImage.skipped"> · {{ __('Skipped') }}</template></p>
                         <!-- Always editable, even once it's applied or skipped -->
                         <Textarea v-model="altImage.alt" rows="2" resize="none" class="px-2! py-1.5! text-xs!" :aria-label="__('Alt text for :file', { file: altImage.file })" />
-                        <div class="flex gap-1.5">
+                        <!-- The buttons wrap onto a second row when the chat is docked narrow, rather than running out of the card -->
+                        <div class="flex flex-wrap gap-1.5">
                             <!-- One you applied: save your edit, or skip it after all -->
                             <template v-if="altImage.applied">
                                 <Button size="sm" variant="primary" :text="__('Update')" @click="settleAlt" />
@@ -323,7 +324,11 @@ const stepTitle = (step) => {
                             <!-- One you skipped: apply it after all -->
                             <Button v-else-if="altImage.skipped" size="sm" variant="primary" :text="__('Apply')" @click="applyAlt" />
                             <template v-else>
-                                <Button ref="applyButton" size="sm" variant="primary" class="focus:focus-outline" :text="__('Apply and next')" @click="applyAlt" />
+                                <!-- "Apply and next" when the card is wide enough for all three buttons on one row (about 270px), and just "Apply" when it isn't, as when the chat is docked narrow -->
+                                <Button ref="applyButton" size="sm" variant="primary" class="focus:focus-outline" @click="applyAlt">
+                                    <span class="@min-[270px]:hidden">{{ __('Apply') }}</span>
+                                    <span class="hidden @min-[270px]:inline">{{ __('Apply and next') }}</span>
+                                </Button>
                                 <Button size="sm" variant="ghost" :text="__('Skip')" @click="skipAlt" />
                                 <!-- At the far end, for when the suggestions look right without going through each -->
                                 <Button v-if="altLeft > 1" size="sm" class="ms-auto" :text="__('Accept all')" @click="acceptAllAlt" />
@@ -331,8 +336,8 @@ const stepTitle = (step) => {
                         </div>
                     </template>
                     <!-- All the thumbnails, 40px and 6px apart: this one ringed in the AI colour, applied ones ticked, skipped ones drained of colour. Click one to go
-                         to it. While reviewing, 22px above it (the 8px between rows, and 14px more), so the strip reads as a row of its own under the buttons. -->
-                    <div :class="['flex gap-1.5', altFinished ? '' : 'pt-3.5']">
+                         to it. While reviewing, 22px above it (the 8px between rows, and 14px more), so the strip reads as a row of its own under the buttons. They wrap onto more rows when the chat is narrow. -->
+                    <div :class="['flex flex-wrap gap-1.5', altFinished ? '' : 'pt-3.5']">
                         <button v-for="(image, i) in images" :key="image.file" type="button" :class="['relative size-10 cursor-pointer overflow-hidden rounded-md', altRing(i)]" :aria-label="image.file" @click="pickAlt(i)">
                             <img :src="image.src" alt="" :class="['size-full object-cover', image.skipped ? 'opacity-60 grayscale' : '']" />
                             <span v-if="image.applied" class="absolute end-0.5 top-0.5 grid size-[15px] place-items-center rounded-full border border-emerald-700/40 bg-emerald-600">
