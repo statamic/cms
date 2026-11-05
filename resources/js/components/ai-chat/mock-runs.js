@@ -43,6 +43,54 @@ const summerSale = {
     labels: { subtitle: 'Subtitle', excerpt: 'Excerpt', meta_description: 'Meta Description' },
 };
 
+// The Footer global set, for the globals idea: a form like an entry's, with plain text fields
+const footerGlobals = {
+    title: 'Footer',
+    url: () => cp_url('globals/footer'),
+    values: { copyright: '2026 Company Name, LLC' },
+    labels: { copyright: 'Copyright' },
+};
+
+// An edit of something that has a form like an entry's (a global set): open it if it isn't already, then fill in its fields.
+// Saving is left to you.
+function editInForm(target) {
+    const { currentForm, nextForm, fill } = useAiChanges();
+    const isOpen = window.location.href.startsWith(target.url());
+    const fields = Object.keys(target.values);
+
+    return {
+        title: target.runTitle,
+        steps: [
+            ...(isOpen
+                ? []
+                : [
+                      {
+                          tool: target.tool,
+                          args: target.args,
+                          detail: target.name,
+                          result: 'Opened in the editor',
+                          ms: 300,
+                          action: (ask, goingTo) => openEntry(target, ask, nextForm, goingTo),
+                      },
+                  ]),
+            { ...target.read, ms: 800 },
+            {
+                tool: 'cp.fill_fields',
+                args: `fields: ${fields.join(', ')}`,
+                detail: list(fields.map((field) => target.labels[field])),
+                result: 'Changed in the form · not saved',
+                ms: 1100,
+                action: () => currentForm() && fill(target.values),
+            },
+        ],
+        done: {
+            text: target.text,
+            items: fields.map((field) => target.labels[field]),
+            note: 'Nothing’s saved yet. Check it over, then save as usual.',
+        },
+    };
+}
+
 // The homepage, for questions about it: a demo entry standing in for the site's real Home page
 const homepage = {
     title: 'Home',
@@ -151,6 +199,11 @@ const scheduled = reactive({ time: null });
 export const canEditAi = ref(true);
 
 const ideaScenarios = [
+    {
+        // "Update the copyright year in the footer". A global set has a form like an entry's, so it's filled in the same way, and saving is left to you.
+        match: /\b(copyright|footer|globals?)\b/i,
+        plan: () => editInForm({ ...footerGlobals, tool: 'cp.open_global', args: 'set: footer', read: { tool: 'statamic.get_global_set', args: 'set: footer', detail: 'The Footer global set', result: '2 fields' }, text: 'Updated the copyright year in the Footer', runTitle: 'Edit global set', name: 'Footer' }),
+    },
     {
         // "Summarise our shipping policy". The search takes a long time (16 seconds), so the slow state shows (see AiChatRun.vue).
         match: /\bshipping policy\b/i,

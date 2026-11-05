@@ -49,6 +49,8 @@ const toolLabels = {
     'statamic.get_submissions': ['Reading Submissions', 'Read Submissions'],
     'cp.open_entry': ['Opening the Entry', 'Opened the Entry'],
     'cp.new_entry': ['Opening a New Entry', 'Opened a New Entry'],
+    'cp.open_global': ['Opening a Global Set', 'Opened a Global Set'],
+    'statamic.get_global_set': ['Reading the Global Set', 'Read the Global Set'],
     'cp.fill_fields': ['Filling in Fields', 'Filled in Fields'],
     'cp.open_blueprint': ['Opening the Blueprint', 'Opened the Blueprint'],
     'cp.add_field': ['Adding a Field', 'Added a Field'],
@@ -62,7 +64,7 @@ const isHere = (p) => p?.url === inertiaPage.url.split('?')[0];
 // The trail (the line, dots and page names) only shows for a run that takes you somewhere: one that's been on more than one page, or that's
 // going to open a page. On a run that stays put, the cards stand on their own.
 const moves = computed(
-    () => new Set(props.run.steps.filter((step) => step.page).map((step) => step.page.url)).size > 1 || props.run.steps.some((step) => ['cp.open_entry', 'cp.new_entry'].includes(step.tool)),
+    () => new Set(props.run.steps.filter((step) => step.page).map((step) => step.page.url)).size > 1 || props.run.steps.some((step) => ['cp.open_entry', 'cp.new_entry', 'cp.open_global'].includes(step.tool)),
 );
 const pageChangesAt = (i) => i === 0 || props.run.steps[i].page?.url !== props.run.steps[i - 1].page?.url;
 // The latest page in the trail, while the run is still going, so its dot can stay purple until the next page's takes over
