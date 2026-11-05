@@ -85,7 +85,8 @@ onUnmounted(() => {
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div id="main-content" scroll-region class="main-content relative py-0! sm:p-2 h-full flex-1 flex-wrap overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative grid sm:py-2 min-h-full mx-auto">
-                    <div class="content-card">
+                    <!-- Relative so the architectural lines (a ::before filling this card) stay inside it, rather than filling #content-card with its padding -->
+                    <div class="content-card relative">
                         <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                         <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>
                             <!-- Left/right panels (page inspectors and the AI chat) are teleported alongside #content-card. -->
