@@ -15,7 +15,7 @@
                         size="sm"
                         as="button"
                         color="white"
-                        v-text="__('messages.plus_count_more', { count: value.length - 2 })"
+                        :text="__('messages.plus_count_more', { count: value.length - 2 })"
                     />
                 </template>
                 <DropdownMenu>
