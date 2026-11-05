@@ -55,6 +55,9 @@ const newBlogPost = {
     url: () => cp_url('collections/ai_suggestions/entries/create/default'),
 };
 
+// The same for a landing page
+const newLandingPage = { ...newBlogPost, title: 'New landing page' };
+
 // What a search finds: the demo entries, and the line in each that matched (shown in each one's tooltip)
 const searchResults = [
     { title: summerSale.title, url: summerSale.url, text: 'The biggest discounts we have ever done on all of our outdoor furniture ranges this year' },
@@ -580,17 +583,50 @@ const scenarios = [
         },
     },
     {
-        // "Create a landing page for the summer sale"
+        // "Create a landing page for the summer sale". Like the blog post, it opens a new entry's form and writes it there, rather than
+        // saving a draft behind your back. (A real one would open the Pages collection's form, which the test site isn't set up for.)
         match: /\b(landing|page|campaign|sale)\b/i,
-        plan: (text) => ({
-            title: 'Create draft page',
-            steps: [
-                { tool: 'statamic.get_blueprint', args: 'collection: pages · blueprint: landing_page', detail: 'Landing Page, in Pages', result: '9 fields loaded', ms: 800 },
-                { tool: 'statamic.create_entry', args: 'collection: pages · status: draft', detail: 'A draft in Pages', result: `"${subjectOf(text)}" created as a draft`, ms: 1200 },
-                { tool: 'statamic.update_entry', args: `entry: pages::en::${slug(subjectOf(text))}`, detail: `“${subjectOf(text)}” in Pages`, result: '3 blocks added · hero, features, call_to_action', ms: 1500 },
-            ],
-            done: { text: 'Landing page saved as a draft' },
-        }),
+        plan: (text) => {
+            const { currentForm, nextForm, fill } = useAiChanges();
+            const subject = subjectOf(text);
+            const about = subject.toLowerCase();
+            const values = {
+                title: subject,
+                subtitle: `Everything you need to know about ${about}`,
+                excerpt: `${subject}: what’s included, how long it runs, and how to take part.`,
+                meta_description: `${subject}: what’s included, how long it runs and how to take part.`,
+            };
+            const fields = Object.keys(values);
+            const labels = { title: 'Title', ...summerSale.labels };
+
+            return {
+                title: 'Write a landing page',
+                steps: [
+                    { tool: 'statamic.get_blueprint', args: 'collection: pages · blueprint: landing_page', detail: 'Landing Page, in Pages', result: '5 fields loaded', ms: 800 },
+                    {
+                        tool: 'cp.new_entry',
+                        args: 'collection: pages · blueprint: landing_page',
+                        detail: 'A Landing Page, in Pages',
+                        result: 'Opened in the editor',
+                        ms: 300,
+                        action: (ask, goingTo) => openEntry(newLandingPage, ask, nextForm, goingTo),
+                    },
+                    {
+                        tool: 'cp.fill_fields',
+                        args: `fields: ${fields.join(', ')}`,
+                        detail: list(fields.map((field) => labels[field])),
+                        result: 'Written in the form · not saved',
+                        ms: 1600,
+                        action: () => currentForm() && fill(values),
+                    },
+                ],
+                done: {
+                    text: `Wrote “${subject}”`,
+                    items: fields.map((field) => labels[field]),
+                    note: 'Nothing’s saved yet. Check it over, then save it as a draft or publish it.',
+                },
+            };
+        },
     },
     {
         // Anything else is treated as looking something up: "Which entries mention outdoor furniture?"
