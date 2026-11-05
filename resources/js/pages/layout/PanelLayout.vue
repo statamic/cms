@@ -37,6 +37,20 @@ useAiChanges();
 const locked = computed(() => writing.active || undefined);
 const lockedClasses = computed(() => ['transition-opacity duration-300', writing.active ? 'opacity-60' : '']);
 
+// A docked chat is lifted above the screen's dimming while the chat moves you (its messages and input dim themselves, see AiChat.vue). The dimming takes 300ms
+// to fade away once the move is over, so the lift stays for that long too: dropping it at once puts the dimming over the chat, which then dims twice as the two
+// fade together, and flickers.
+const chatLifted = ref(false);
+let liftTimer;
+watch(
+    () => moving.title,
+    (title) => {
+        clearTimeout(liftTimer);
+        if (title) chatLifted.value = true;
+        else liftTimer = setTimeout(() => (chatLifted.value = false), 350);
+    },
+);
+
 // Switching between floating and docked swaps the floating card in or out of the page. That isn't opening or closing the chat, so skip its fade then, or it plays as a distraction while the sidebar appears instantly.
 const switchingLayout = ref(false);
 watch(chatFloating, () => {
@@ -191,7 +205,7 @@ onUnmounted(() => {
             tabindex="-1"
             style="order: 2"
             class="sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-mr-2 mx-auto focus:outline-none ps-2"
-            :class="{ 'z-(--z-index-max)': chatInPanel && moving.title }"
+            :class="{ 'z-(--z-index-max)': chatInPanel && chatLifted }"
         >
             <Tabs v-if="showRightTabs" v-model="rightTab">
                 <TabList class="mx-0! px-3 pt-2">
