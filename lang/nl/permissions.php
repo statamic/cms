@@ -2,10 +2,10 @@
 
 return [
     'super' => 'Superuser',
-    'super_desc' => 'Super admins hebben volledige controle over het Control Panel en kunnen alles wijzigen. Ga hier verstandig mee om.',
-    'group_cp' => 'Control Panel',
-    'access_cp' => 'Toegang tot het Control Panel',
-    'access_cp_desc' => 'Geeft toegang tot het control panel, maar dit betekent niet persé dat ze alles kunnen aanpassen.',
+    'super_desc' => 'Super admins hebben volledige controle over het controlepaneel en kunnen alles wijzigen. Ga hier verstandig mee om.',
+    'group_cp' => 'Controlepaneel',
+    'access_cp' => 'Toegang tot het controlepaneel',
+    'access_cp_desc' => 'Geeft toegang tot het controlepaneel, maar dit betekent niet persé dat ze alles kunnen aanpassen.',
     'configure_sites' => 'Configureer sites',
     'configure_sites_desc' => 'Geeft de mogelijkheid om sites te configureren als multi-site is ingeschakeld.',
     'configure_fields' => 'Configureer velden',
