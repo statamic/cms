@@ -14,6 +14,15 @@
                     v-text="title"
                 />
 
+                <!-- Prototype: a link the AI chat added, until you save or edit it. The same badge and Undo as a blueprint field the AI added. -->
+                <template v-if="aiAdded">
+                    <ui-badge size="sm" icon="plus" class="shrink-0 bg-gray-50 border-gray-300 text-gray-700 dark:border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300" :text="__('Added by AI')" />
+                    <button type="button" class="shrink-0 cursor-pointer rounded-md px-1 py-0.5 text-2xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" @click.stop="undoAi">
+                        <ui-icon name="undo" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
+                        {{ __('Undo') }}
+                    </button>
+                </template>
+
                 <span
                     v-if="showSlugs"
                     class="pt-[2px] font-mono text-2xs text-gray-700 dark:text-gray-500"
@@ -83,6 +92,7 @@
 <script>
 import { Dropdown, DropdownMenu, Icon } from '@/components/ui';
 import { Link } from '@inertiajs/vue3';
+import { aiAddedLinks } from '@/composables/use-ai-navigation.js';
 
 export default {
     components: { Link, Dropdown, DropdownMenu, Icon },
@@ -130,6 +140,11 @@ export default {
             return this.page.title || this.page.entry_title || this.page.url;
         },
 
+        // Prototype: whether the AI chat added this link (see use-ai-navigation.js)
+        aiAdded() {
+            return aiAddedLinks.has(this.page.id);
+        },
+
         slugPath() {
             return this.isRoot ? '/' : '/' + this.page.slug;
         },
@@ -144,6 +159,12 @@ export default {
 
         remove(deleteChildren) {
             this.$emit('removed', this.stat, deleteChildren);
+        },
+
+        // Prototype: puts back what was there, by taking the link the AI added out of the tree
+        undoAi() {
+            aiAddedLinks.delete(this.page.id);
+            this.remove(true);
         },
     },
 };

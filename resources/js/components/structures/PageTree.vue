@@ -59,6 +59,7 @@
                             @removed="pageRemoved"
                             @branch-clicked="$emit('branch-clicked', node)"
                             class="mb-px"
+                            :class="{ 'ai-added': aiAddedLinks.has(node.id) }"
                         >
                             <template #branch-action="props">
                                 <slot name="branch-action" v-bind="{ ...props, stat }" />
@@ -99,6 +100,7 @@ import TreeBranch from './Branch.vue';
 import { PanelHeader, Panel, Icon } from '@/components/ui';
 import { clone } from '@/bootstrap/globals.js';
 import { router } from '@inertiajs/vue3';
+import { aiAddedLinks } from '@/composables/use-ai-navigation.js';
 
 export default {
     components: {
@@ -130,6 +132,8 @@ export default {
             saving: false,
             pages: [],
             treeData: [],
+            // Prototype: links the AI chat added, which glow in
+            aiAddedLinks,
             collapsedState: [],
             discardingChanges: false,
             ready: false,
