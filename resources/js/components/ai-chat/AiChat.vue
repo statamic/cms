@@ -585,10 +585,10 @@ function stopFollowing() {
                 </div>
             </Transition>
             <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted. -->
-            <!-- Its sides line up with the cards above it: the thread's padding (2px on the left, 10px on the right docked, 11px each side floating) -->
+            <!-- Its sides line up with the cards above it: the thread's padding (2px on the left, 10px on the right docked, 11px each side floating). Floating, the gap below is the same 11px as the sides; docked, 10px, as on the right. -->
             <div
                 v-if="askInInput"
-                :class="floating ? 'inset-x-[11px] bottom-1.5' : 'start-0.5 end-2.5 bottom-2.5'"
+                :class="floating ? 'inset-x-[11px] bottom-[11px]' : 'start-0.5 end-2.5 bottom-2.5'"
                 class="absolute z-(--z-index-portal) space-y-2.5 rounded-xl bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
