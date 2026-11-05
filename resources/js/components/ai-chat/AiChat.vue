@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Avatar, Button, Icon, Textarea, TimePicker } from '@ui';
 import { parseTime } from '@internationalized/date';
@@ -20,7 +20,7 @@ const user = Statamic.user;
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it. The empty box is 34px tall (it measured 33.5), so the card's edges and focus ring land on whole pixels and the send button is centred in the ring.
-        'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! pe-12! dark:bg-transparent!'
+        'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! dark:bg-transparent!'
         : 'ai-dock-input focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] data-working:border-transparent data-working:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:data-working:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] data-working:outline-1 data-working:-outline-offset-2 data-working:outline-blue-400 data-working:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)]',
 );
 const prompt = ref('');
@@ -380,6 +380,9 @@ const micClasses = computed(() => [
 
 const hintClasses = computed(() => (floating.value ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'));
 
+// The "/ help" hint or Clear sit at the right, beside send, while nothing's typed, which is when the placeholder shows. A translation can make
+// either longer, so the input's right padding is worked out from how wide the one showing is (rather than a fixed amount that the placeholder
+// could run into), and the placeholder cuts off before it. Once you've typed, the padding only has to clear send.
 // While the chat takes you to another page, the screen dims (see AiChatMoveHint.vue). The floating card sits above the dimming, but a docked chat is part of
 // the page, so its messages dim with the rest of it (matching the dimming's strength and timing), while the input stays clear to type in.
 // The input dims a little, so it's quieter but still reads as live.
@@ -400,6 +403,28 @@ const release = () => {
 };
 watch(working, (now) => !now && release());
 const onInputFocus = () => (clearTimeout(releaseTimer), (released.value = false));
+
+const hintButton = useTemplateRef('hintButton');
+const clearButton = useTemplateRef('clearButton');
+const controlsWidth = ref(0);
+const measureControls = () => (controlsWidth.value = Math.max(hintButton.value?.offsetWidth ?? 0, clearButton.value?.offsetWidth ?? 0));
+// They're hidden (zero wide) until they show, and the panel they're in can be hidden too, so watch their size rather than measuring once
+const controlsObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measureControls);
+const observeControls = () => {
+    controlsObserver?.disconnect();
+    [hintButton.value, clearButton.value].forEach((element) => element && controlsObserver?.observe(element));
+    measureControls();
+};
+onMounted(observeControls);
+onUpdated(observeControls);
+onUnmounted(() => controlsObserver?.disconnect());
+const inputEnd = computed(() => {
+    // How far in from the right the controls start (see hintClasses), then their width, and a little air
+    const beforeControls = floating.value ? 50 : 52;
+    const sendOnly = floating.value ? 48 : 56;
+    return !prompt.value && controlsWidth.value ? beforeControls + controlsWidth.value + 8 : sendOnly;
+});
+
 
 // From the help or the command menu: a saved prompt runs, and /clear starts a new chat
 const runCommand = (command) => (command.builtIn ? send('/clear') : runPrompt(command));
@@ -607,7 +632,10 @@ function stopFollowing() {
                 :class="[
                     inputClasses,
                     floating ? 'ps-8.5!' : 'ps-9.5!',
+                    // A long placeholder cuts off before the controls, rather than wrapping or running under them
+                    'placeholder:overflow-hidden placeholder:whitespace-nowrap',
                 ]"
+                :style="{ paddingInlineEnd: `${inputEnd}px` }"
                 :data-working="holdGlow || undefined"
                 :data-released="(!floating && released) || undefined"
                 @focus="onInputFocus"
@@ -640,6 +668,7 @@ function stopFollowing() {
             </div>
             <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Clicking it opens the help too. It's left out of the Tab order (/ does the same from the keyboard), and mousedown.prevent keeps focus in the input. -->
             <button
+                ref="hintButton"
                 v-show="!prompt && !showHelp && !messages.length && !dictating"
                 type="button"
                 tabindex="-1"
@@ -654,6 +683,7 @@ function stopFollowing() {
             </button>
             <!-- Once a chat has started, a small link to clear it takes the / hint's place, while nothing has been typed. (Typing /clear does the same.) -->
             <button
+                ref="clearButton"
                 v-if="messages.length"
                 v-show="!prompt && !dictating"
                 type="button"
