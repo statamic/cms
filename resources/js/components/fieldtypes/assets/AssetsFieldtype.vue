@@ -281,7 +281,6 @@ export default {
             innerDragging: false,
             displayMode: 'grid',
             lockedDynamicFolder: this.meta.dynamicFolder,
-            errorsById: {},
         };
     },
 
@@ -390,6 +389,25 @@ export default {
          */
         assetIds() {
             return this.assets.map((asset) => asset.id);
+        },
+
+        errorsById() {
+            const prefix = `${this.fieldPathPrefix || this.handle}.`;
+
+            return Object.entries(this.publishContainer.errors || {}).reduce((acc, [key, value]) => {
+                if (!key.startsWith(prefix)) {
+                    return acc;
+                }
+
+                const assetIndex = key.slice(prefix.length).split('.').shift();
+                const assetId = this.assetIds[assetIndex];
+
+                if (assetId) {
+                    acc[assetId] = value;
+                }
+
+                return acc;
+            }, {});
         },
 
         /**
@@ -678,11 +696,7 @@ export default {
         },
 
         errorsForAsset(id) {
-            if (Object.keys(this.errorsById).length === 0 || !this.errorsById.hasOwnProperty(id)) {
-                return [];
-            }
-
-            return this.errorsById[id];
+            return this.errorsById[id] ?? [];
         },
     },
 
@@ -703,29 +717,6 @@ export default {
                     data: [...assets],
                 });
             }
-        },
-
-        'publishContainer.errors': {
-            immediate: true,
-            handler(errors) {
-                this.errorsById = Object.entries(errors).reduce((acc, [key, value]) => {
-                    const prefix = this.fieldPathKeys || this.handle;
-
-                    if (!key.startsWith(prefix)) {
-                        return acc;
-                    }
-
-                    const subKey = key.replace(`${prefix}.`, '');
-                    const assetIndex = subKey.split('.').shift();
-                    const assetId = this.assetIds[assetIndex];
-
-                    if (assetId) {
-                        acc[assetId] = value;
-                    }
-
-                    return acc;
-                }, {});
-            },
         },
 
         loading(loading) {

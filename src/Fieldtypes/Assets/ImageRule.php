@@ -2,54 +2,60 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
-use Stringable;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
 
-class ImageRule implements CastableToValidationString, Stringable, ValidationRule
+class ImageRule implements CastableToValidationString, Rule
 {
-    public $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
+    protected $parameters;
 
-    public function __construct(protected $parameters)
+    public function __construct($parameters = null)
     {
-        if ($this->parameters !== ['image']) {
-            $this->extensions = array_map(strtolower(...), $this->parameters);
-        }
+        $this->parameters = $parameters;
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value)
     {
-        $extension = '';
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
-        if ($value instanceof UploadedFile) {
-            $extension = $value->guessExtension();
-        } elseif ($asset = Asset::find($value)) {
-            $extension = $asset->extension();
-        }
+        return collect(Arr::wrap($value))->every(function ($id) use ($extensions) {
+            if ($id instanceof UploadedFile) {
+                return in_array($id->guessExtension(), $extensions);
+            }
 
-        if (! in_array($extension, $this->extensions)) {
-            $fail($this->message());
-        }
+            if (! $asset = Asset::find($id)) {
+                return false;
+            }
+
+            return $asset->guessedExtensionIsOneOf($extensions);
+        });
     }
 
-    public function message(): string
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
     {
-        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image', ['extensions' => implode(', ', $this->extensions)]);
-    }
-
-    public function __toString()
-    {
-        return 'image:'.implode(',', $this->extensions);
+        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.image');
     }
 
     public function toGqlValidationString(): string
     {
-        return $this->__toString();
+        return 'image:'.implode(',', $this->parameters);
     }
 }

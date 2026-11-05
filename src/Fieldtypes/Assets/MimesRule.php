@@ -2,54 +2,62 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
-use Stringable;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
 
-class MimesRule implements CastableToValidationString, Stringable, ValidationRule
+class MimesRule implements CastableToValidationString, Rule
 {
-    public function __construct(protected $parameters)
+    protected $parameters;
+
+    public function __construct($parameters)
     {
         if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
             $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
         }
 
-        $this->parameters = array_map(strtolower(...), $parameters);
+        $this->parameters = $parameters;
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value)
     {
-        $mime = '';
+        return collect(Arr::wrap($value))->every(function ($id) {
+            if ($id instanceof UploadedFile) {
+                return in_array($id->guessExtension(), $this->parameters);
+            }
 
-        if ($value instanceof UploadedFile) {
-            $mime = $value->guessExtension();
-        } elseif ($asset = Asset::find($value)) {
-            $mime = $asset->extension();
-        }
+            if (! $asset = Asset::find($id)) {
+                return false;
+            }
 
-        if (! in_array($mime, $this->parameters)) {
-            $fail($this->message());
-        }
+            return $asset->guessedExtensionIsOneOf($this->parameters);
+        });
     }
 
-    public function message(): string
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
     {
-        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes', ['values' => implode(', ', $this->parameters)]);
-    }
-
-    public function __toString()
-    {
-        return 'mimes:'.implode(',', $this->parameters);
+        return str_replace(':values', implode(', ', $this->parameters), __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.mimes'));
     }
 
     public function toGqlValidationString(): string
     {
-        return $this->__toString();
+        return 'mimes:'.implode(',', $this->parameters);
     }
 }

@@ -11,6 +11,11 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\SizeBasedRule;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -147,28 +152,21 @@ class Field implements Arrayable
 
     public function rules()
     {
-        $temp_rules = collect($this->addNullableRule(array_merge(
+        $rules = $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
             Validator::explodeRules($this->fieldtype()->fieldRules()),
             Validator::explodeRules($this->fieldtype()->rules())
-        )));
+        ));
 
-        $rules = [];
-        if ($this->type() === 'assets') {
-            $rules = $temp_rules->reduce(function ($result, $rule) {
-                // These rules need to be applied to the field as a whole vs each asset in the field
-                if (Str::of($rule)->before(':')->is(['array', 'required', 'nullable', 'max', 'min'])) {
-                    $result[$this->handle] ??= [];
-                    $result[$this->handle][] = $rule;
-                } else {
-                    $result["{$this->handle}.*"] ??= [];
-                    $result["{$this->handle}.*"][] = $rule;
-                }
+        [$itemRules, $rules] = collect($rules)
+            ->partition(fn ($rule) => $this->type() === 'assets' && $this->isAssetRule($rule))
+            ->map(fn ($rules) => $rules->values()->all());
 
-                return $result;
-            }, []);
-        } else {
-            $rules = [$this->handle => $temp_rules->all()];
+        $rules = [$this->handle => $rules];
+
+        // Asset rules validate each asset, so the error can be shown on the asset that failed.
+        if ($itemRules) {
+            $rules["{$this->handle}.*"] = $itemRules;
         }
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
@@ -176,6 +174,15 @@ class Field implements Arrayable
         })->all();
 
         return array_merge($rules, $extra);
+    }
+
+    private function isAssetRule($rule): bool
+    {
+        return $rule instanceof DimensionsRule
+            || $rule instanceof ImageRule
+            || $rule instanceof MimesRule
+            || $rule instanceof MimetypesRule
+            || $rule instanceof SizeBasedRule;
     }
 
     protected function addNullableRule($rules)

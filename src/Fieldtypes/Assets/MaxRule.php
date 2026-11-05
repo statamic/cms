@@ -2,49 +2,30 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
-use Statamic\Contracts\GraphQL\CastableToValidationString;
-use Statamic\Facades\Asset;
 use Statamic\Statamic;
-use Stringable;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
 
-class MaxRule implements CastableToValidationString, Stringable, ValidationRule
+class MaxRule extends SizeBasedRule
 {
-    public function __construct(protected $parameters)
+    /**
+     * Determine if the the rule passes for the given size.
+     *
+     * @param  int  $size
+     * @return bool
+     */
+    public function sizePasses($size)
     {
+        return $size <= $this->parameters[0];
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
     {
-        $size = 0;
-
-        if ($value instanceof UploadedFile) {
-            $size = $value->getSize() / 1024;
-        } elseif ($asset = Asset::find($value)) {
-            $size = $asset->size() / 1024;
-        }
-
-        if ($size > $this->parameters[0]) {
-            $fail($this->message());
-        }
-    }
-
-    public function message(): string
-    {
-        return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.max.file', ['max' => $this->parameters[0]]);
-    }
-
-    public function __toString(): string
-    {
-        return 'max_filesize:'.$this->parameters[0];
-    }
-
-    public function toGqlValidationString(): string
-    {
-        return $this->__toString();
+        return str_replace(':max', $this->parameters[0], __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.max.file'));
     }
 }

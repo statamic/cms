@@ -2,60 +2,90 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Closure;
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
-use Stringable;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
 
-class DimensionsRule implements CastableToValidationString, Stringable, ValidationRule
+class DimensionsRule implements CastableToValidationString, Rule
 {
-    protected array $raw_parameters;
+    protected $parameters;
 
-    public function __construct(protected $parameters)
+    public function __construct($parameters = null)
     {
-        $this->raw_parameters = $parameters;
-        $this->parameters = array_reduce($parameters, function ($acc, $item) {
-            [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
-            $acc[$key] = $value;
-
-            return $acc;
-        }, []);
+        $this->parameters = $parameters;
     }
 
-    public function validate(string $attribute, mixed $value, Closure $fail): void
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function passes($attribute, $value)
     {
-        $size = [0, 0];
+        return collect(Arr::wrap($value))->every(function ($id) {
+            if ($id instanceof UploadedFile) {
+                if (in_array($id->getMimeType(), ['image/svg+xml', 'image/svg'])) {
+                    return true;
+                }
 
-        if ($value instanceof UploadedFile) {
-            if (in_array($value->getMimeType(), ['image/svg+xml', 'image/svg'])) {
-                return;
+                $size = getimagesize($id->getPathname());
+            } else {
+                if (! $asset = Asset::find($id)) {
+                    return false;
+                }
+
+                if ($asset->isSvg()) {
+                    return true;
+                }
+
+                $size = $asset->dimensions();
             }
 
-            $size = getimagesize($value->getPathname());
-        } elseif ($asset = Asset::find($value)) {
-            if ($asset->isSvg()) {
-                return;
+            [$width, $height] = $size;
+
+            $parameters = $this->parseNamedParameters($this->parameters);
+
+            if ($this->failsBasicDimensionChecks($parameters, $width, $height) ||
+                $this->failsRatioCheck($parameters, $width, $height)) {
+                return false;
             }
 
-            $size = $asset->dimensions();
-        }
-
-        [$width, $height] = $size;
-
-        if ($this->failsBasicDimensionChecks($this->parameters, $width, $height) ||
-            $this->failsRatioCheck($this->parameters, $width, $height)) {
-            $fail($this->message());
-        }
+            return true;
+        });
     }
 
-    public function message(): string
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
     {
         return __((Statamic::isCpRoute() ? 'statamic::' : '').'validation.dimensions');
+    }
+
+    /**
+     * Parse named parameters to $key => $value items.
+     *
+     * @param  array  $parameters
+     * @return array
+     */
+    protected function parseNamedParameters($parameters)
+    {
+        return array_reduce($parameters, function ($result, $item) {
+            [$key, $value] = array_pad(explode('=', $item, 2), 2, null);
+
+            $result[$key] = $value;
+
+            return $result;
+        });
     }
 
     /**
@@ -99,13 +129,8 @@ class DimensionsRule implements CastableToValidationString, Stringable, Validati
         return abs($numerator / $denominator - $width / $height) > $precision;
     }
 
-    public function __toString()
-    {
-        return 'dimensions:'.implode(',', $this->raw_parameters);
-    }
-
     public function toGqlValidationString(): string
     {
-        return $this->__toString();
+        return 'dimensions:'.implode(',', $this->parameters);
     }
 }

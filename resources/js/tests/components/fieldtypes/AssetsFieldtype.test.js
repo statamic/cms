@@ -120,3 +120,29 @@ test('an upload is appended in a single asset field so validation can flag it', 
 
     expect(field.vm.assets).toEqual([{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }]);
 });
+
+test('validation errors are shown on the asset they belong to', async () => {
+    const field = makeField({
+        provide: {
+            [publishContextKey]: {
+                errors: {
+                    'replicator.0.image': ['Field error'],
+                    'replicator.0.image.1': ['Asset error'],
+                    'replicator.0.image_alt.0': ['Other field error'],
+                },
+            },
+        },
+        props: {
+            fieldPathPrefix: 'replicator.0.image',
+            value: ['main::a.jpg', 'main::b.jpg'],
+            meta: {
+                container: { id: 'main', can_view: true, can_upload: true },
+                data: [{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }],
+            },
+        },
+    });
+    await flushPromises();
+
+    expect(field.vm.errorsForAsset('main::a.jpg')).toEqual([]);
+    expect(field.vm.errorsForAsset('main::b.jpg')).toEqual(['Asset error']);
+});

@@ -8,7 +8,10 @@ export default {
     props: {
         asset: Object,
         readOnly: Boolean,
-        errors: Array,
+        errors: {
+            type: Array,
+            default: () => [],
+        },
         showFilename: {
             type: Boolean,
             default: true,
