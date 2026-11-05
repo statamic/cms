@@ -359,12 +359,10 @@ GQL;
                 'form' => [
                     'rules' => [
                         'name' => [
-                            '*' => [
-                                'mimes:image/jpeg,image/png',
-                                'mimetypes:image/jpeg,image/png',
-                                'dimensions:1024',
-                                'image:jpeg',
-                            ],
+                            'mimes:image/jpeg,image/png',
+                            'mimetypes:image/jpeg,image/png',
+                            'dimensions:1024',
+                            'image:jpeg',
                             'size:1000',
                             'thevalidationrule:foo,bar',
                             'Tests\\Feature\\GraphQL\\TestValidationRuleWithoutToString::class',
