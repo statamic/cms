@@ -12,10 +12,13 @@ const props = defineProps({
     run: { type: Object, required: true },
 });
 
+// A search that found nothing: its result is grey rather than green, and the badge says so, as "Done" would sound like it found something
+const isEmptyRun = computed(() => !!props.run.done?.empty);
+
 // How it ended, shown at the bottom of the outcome card, under what it did. There's no badge while it's going: the cards show that.
 const badge = computed(() =>
     ({
-        done: { color: 'emerald', text: __('Done') },
+        done: isEmptyRun.value ? { color: 'default', text: __('Nothing found') } : { color: 'emerald', text: __('Done') },
         cancelled: { color: 'default', text: __('Cancelled') },
         // It couldn't carry on, like when saving your changes failed
         stopped: { color: 'default', text: __('Stopped') },
@@ -227,7 +230,7 @@ const stepTitle = (step) => {
                     <p class="truncate text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200" :title="step.tool">{{ stepTitle(step) }}</p>
                     <!-- What it worked on, in words. The arguments it was really called with are in the tooltip. -->
                     <p class="text-xs text-gray-500 dark:text-gray-400" :title="step.args">{{ step.detail ?? step.args }}</p>
-                    <p v-if="step.state === 'done'" class="text-xs font-medium text-emerald-700 dark:text-emerald-400">{{ step.result }}</p>
+                    <p v-if="step.state === 'done'" class="text-xs font-medium" :class="isEmptyRun ? 'text-gray-500 dark:text-gray-400' : 'text-emerald-700 dark:text-emerald-400'">{{ step.result }}</p>
                     <p v-else-if="step.state === 'running' && slowFor(step)" class="text-xs text-gray-500 tabular-nums dark:text-gray-400">{{ __('Still running…') }} {{ slowFor(step) }}s</p>
                     <p v-else-if="step.state === 'running'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Running…') }}</p>
                     <p v-else-if="step.state === 'skipped'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Skipped') }}</p>
