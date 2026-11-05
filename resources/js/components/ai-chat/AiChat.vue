@@ -21,7 +21,7 @@ const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it. The empty box is 34px tall (it measured 33.5), so the card's edges and focus ring land on whole pixels and the send button is centred in the ring.
         'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! pe-12! dark:bg-transparent!'
-        : 'pe-10 focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)]',
+        : 'ai-dock-input focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] data-working:border-transparent data-working:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:data-working:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] data-working:outline-1 data-working:-outline-offset-2 data-working:outline-blue-400 data-working:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)]',
 );
 const prompt = ref('');
 
@@ -385,6 +385,22 @@ const hintClasses = computed(() => (floating.value ? 'end-12.5 bottom-[12.5px]' 
 // The input dims a little, so it's quieter but still reads as live.
 const dimmed = computed(() => !floating.value && !!moving.title);
 
+// The docked input has an AI glow (the purple-to-blue edge and glow) while focused. Focus leaves it when the chat moves you to another page, which used to take the
+// glow at once. So while a run is working or waiting the glow holds (as the floating card's does, via data-working), and once it stops it fades away over
+// a second (data-released) rather than going. It stays if the input still has focus.
+const working = computed(() => messages.value.some((message) => ['working', 'waiting'].includes(message.run?.status)));
+const holdGlow = computed(() => !floating.value && working.value);
+const released = ref(false);
+let releaseTimer;
+const release = () => {
+    if (floating.value || document.activeElement === form.value?.querySelector('textarea')) return;
+    clearTimeout(releaseTimer);
+    released.value = true;
+    releaseTimer = setTimeout(() => (released.value = false), 1200);
+};
+watch(working, (now) => !now && release());
+const onInputFocus = () => (clearTimeout(releaseTimer), (released.value = false));
+
 // From the help or the command menu: a saved prompt runs, and /clear starts a new chat
 const runCommand = (command) => (command.builtIn ? send('/clear') : runPrompt(command));
 
@@ -592,6 +608,9 @@ function stopFollowing() {
                     inputClasses,
                     floating ? 'ps-8.5!' : 'ps-9.5!',
                 ]"
+                :data-working="holdGlow || undefined"
+                :data-released="(!floating && released) || undefined"
+                @focus="onInputFocus"
             />
             <!-- The saved prompts as pills above the input, while you're in the chat and until it starts. They sit over the page just above the floating card, lined up with its right edge. Picking one runs it. mousedown.prevent keeps focus in the input, so they stay put. They come after the input in the page, so Tab goes from the input to them, before the controls on the card's edge. Their /command tooltip only shows on hover, not when tabbing through them. -->
             <div
@@ -671,6 +690,25 @@ function stopFollowing() {
 </template>
 
 <style>
+/* Once a run stops, the docked input's glow fades over a second to the input's quiet edge, in the same way as the floating card's (see ai-chat-release in
+   PanelLayout.vue, which this borrows). Not while the input is focused, which keeps its glow. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-dock-input[data-released]:not(:focus) {
+        --ai-card-bg: white;
+        --ai-edge-quiet: var(--color-gray-300);
+        border-color: transparent;
+        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
+        outline: 1px solid transparent;
+        outline-offset: -2px;
+        animation: ai-chat-release 1s ease-out both;
+    }
+
+    .dark .ai-dock-input[data-released]:not(:focus) {
+        --ai-card-bg: var(--color-gray-900);
+        --ai-edge-quiet: var(--color-gray-700);
+    }
+}
+
 @property --ai-chat-fade {
     syntax: '<length>';
     inherits: false;
