@@ -11,6 +11,8 @@ import { moving, writing } from '@/components/ai-chat/mock-runs.js';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
 const minWidth = 175;
+// The docked chat needs more room than a page panel: its input holds an icon, the placeholder, a hint or Clear, and send
+const chatMinWidth = 280;
 const maxWidth = 450;
 const paddingOffset = '0.5rem';
 const breakpoints = { narrow: 1250, compact: 1400 };
@@ -72,7 +74,7 @@ watch(chatInPanel, (inPanel) => (rightTab.value = inPanel ? 'chat' : 'page'));
 // The chat has its own default and remembered width, separate from page panels.
 const rightSizes = {
     page: { defaults: [300, 290, 340], storageKey: 'statamic.panels.right-width' },
-    chat: { defaults: [230, 240, 260], storageKey: 'statamic.panels.ai-chat-width' },
+    chat: { defaults: [280, 300, 320], storageKey: 'statamic.panels.ai-chat-width' },
 };
 
 const right = {
@@ -107,7 +109,7 @@ const { makeResizable } = useResizable();
 [left, right].forEach((panel) => {
     makeResizable(panel.ref, panel.active, {
         edge: panel.edge,
-        minWidth,
+        minWidth: panel === right ? () => (showChat.value ? chatMinWidth : minWidth) : minWidth,
         maxWidth,
         defaultWidth: () => getDefaultWidth(panel),
         storageKey: () => panel.storageKey,
@@ -120,7 +122,7 @@ watch(showChat, () => {
     if (!el || !right.active.value) return;
 
     const stored = parseInt(localStorage.getItem(right.storageKey), 10);
-    el.style.width = Number.isFinite(stored) ? `${stored}px` : getDefaultWidth(right);
+    el.style.width = Number.isFinite(stored) ? `${Math.max(stored, showChat.value ? chatMinWidth : minWidth)}px` : getDefaultWidth(right);
 });
 
 function applyBreakpointDefaults() {
