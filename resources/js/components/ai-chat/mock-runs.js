@@ -250,7 +250,7 @@ const ideaScenarios = [
             ],
             done: {
                 text: 'Added a Returns link to the Header navigation',
-                items: ['Returns, linking to /returns'],
+                items: ['Returns, linking to `/returns`'],
                 note: 'Nothing’s saved yet. Check it over, then save as usual.',
             },
         }),

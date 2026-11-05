@@ -15,6 +15,9 @@ const props = defineProps({
 // A search that found nothing: its result is grey rather than green, and the badge says so, as "Done" would sound like it found something
 const isEmptyRun = computed(() => !!props.run.done?.empty);
 
+// A URL in a list of changes is written between backticks (like `/returns`) and shown as a small monospace chip, as it's code rather than a name
+const urlParts = (item) => item.split('`').map((text, i) => ({ text, url: i % 2 === 1 }));
+
 // How it ended, shown at the bottom of the outcome card, under what it did. There's no badge while it's going: the cards show that.
 const badge = computed(() =>
     ({
@@ -273,7 +276,12 @@ const stepTitle = (step) => {
                 <p class="text-[0.8125rem]/[1.375] font-semibold text-gray-900 dark:text-gray-200">{{ headline }}</p>
                 <!-- What it changed, or found (for jobs that check, like a saved legal check). The bullets hang out to the left, in the gap by the tick, so the names line up with the title. -->
                 <ul v-if="run.done.items" class="list-disc space-y-1 ps-0 text-xs/5 text-gray-700 dark:text-gray-300">
-                    <li v-for="item in run.done.items" :key="item">{{ item }}</li>
+                    <li v-for="item in run.done.items" :key="item">
+                        <template v-for="(part, p) in urlParts(item)" :key="p">
+                            <span v-if="part.url" class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-2xs text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ part.text }}</span>
+                            <template v-else>{{ part.text }}</template>
+                        </template>
+                    </li>
                 </ul>
                 <!-- What it found, for searches: each entry's name, a link to open it, with the line that matched in its tooltip -->
                 <ul v-if="run.done.results" class="space-y-1 pt-0.5 text-xs/5">
