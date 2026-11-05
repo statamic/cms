@@ -41,6 +41,7 @@ const waitingRun = computed(() => messages.value.findLast((message) => message.r
 // A question shows in place of the input. Its first choice takes focus, so Enter picks it and Esc picks the last (Cancel).
 const askInInput = computed(() => !!waitingRun.value);
 const askFirst = useTemplateRef('askFirst');
+
 watch(askInInput, (asking) => (asking ? nextTick(() => askFirst.value?.[0]?.$el?.focus()) : focusInput()));
 
 // A question can come with a time to change (like when to publish), which the answer then carries (see ask() in mock-runs.js)
@@ -441,6 +442,10 @@ function stopFollowing() {
 <template>
     <!-- Docked in the sidebar, fill the height. Floating, be only as tall as the content. -->
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
+        <!-- Dims the messages (and the input) behind the question card, which sits above this, so it's the one thing to answer. A light wash: 10%, and 20% in dark mode, where a dim shows less. Floating, it reaches out over the card's padding and edge (10px on the left, 1px elsewhere), so it covers the card's full width. -->
+        <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0" leave-active-class="transition duration-150 ease-out" leave-to-class="opacity-0">
+            <div v-if="askInInput" :class="['pointer-events-none absolute z-(--z-index-above) bg-gray-950/10 dark:bg-black/20', floating ? '-start-2.5 -end-px -top-px -bottom-px rounded-xl' : 'inset-0']" />
+        </Transition>
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
         <!-- While the help is open it dims, so the help stands out in front of it -->
         <!-- The cards' left and right gutters match: the thread's 2px on the left sits after the 9px the floating card or the docked panel already has on that side, so the right padding is the same 11px floating, and 10px docked (the panel's 8px, not 9). -->
@@ -533,9 +538,10 @@ function stopFollowing() {
                 </div>
             </Transition>
             <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted. -->
+            <!-- Its sides line up with the cards above it: the thread's padding (2px on the left, 10px on the right docked, 11px each side floating) -->
             <div
                 v-if="askInInput"
-                :class="floating ? 'inset-x-1.5 bottom-1.5' : 'inset-x-2.5 bottom-2.5'"
+                :class="floating ? 'inset-x-[11px] bottom-1.5' : 'start-0.5 end-2.5 bottom-2.5'"
                 class="absolute z-(--z-index-portal) space-y-2.5 rounded-xl bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
