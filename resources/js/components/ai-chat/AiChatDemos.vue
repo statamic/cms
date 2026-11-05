@@ -28,9 +28,25 @@ function hideScrollbarWhileScrolling(nav) {
     // Already at the top, so there's no scroll to wait for
     if (nav.scrollTop === 0) done();
 }
+// Whether clicking a demo jumps the nav back to the top. A button at the very bottom of the nav turns it off (say, to keep your place in the list while
+// you try one after another), and it's remembered.
+const scrollToTop = ref((() => {
+    try {
+        return localStorage.getItem('ai-demos-scroll-to-top') !== 'off';
+    } catch {
+        return true;
+    }
+})());
+function toggleScrollToTop() {
+    scrollToTop.value = !scrollToTop.value;
+    try {
+        localStorage.setItem('ai-demos-scroll-to-top', scrollToTop.value ? 'on' : 'off');
+    } catch {}
+}
+
 function play(event, item) {
     const nav = event.currentTarget.closest('.nav-main');
-    if (nav) hideScrollbarWhileScrolling(nav);
+    if (nav && scrollToTop.value) hideScrollbarWhileScrolling(nav);
     lastPlayed.value = item.label;
     if (item.canEditAi !== undefined) canEditAi.value = item.canEditAi;
     clearTimeout(starting);
@@ -144,6 +160,18 @@ const sections = [
                 </li>
             </ul>
         </div>
+
+        <!-- The very last thing in the nav: whether clicking a demo jumps the nav back to the top. A small switch at the end of the link shows which way it is. -->
+        <ul>
+            <li>
+                <a href="#" role="switch" :aria-checked="scrollToTop" @click.prevent="toggleScrollToTop">
+                    <span class="min-w-0 truncate">{{ __('Scroll to top after a demo') }}</span>
+                    <span :class="['relative ms-auto h-3.5 w-6 shrink-0 rounded-full transition-colors', scrollToTop ? 'bg-ai' : 'bg-gray-300 dark:bg-gray-600']" aria-hidden="true">
+                        <span :class="['absolute top-0.5 size-2.5 rounded-full bg-white shadow-sm transition-[inset-inline-start]', scrollToTop ? 'start-3' : 'start-0.5']" />
+                    </span>
+                </a>
+            </li>
+        </ul>
     </div>
 </template>
 
