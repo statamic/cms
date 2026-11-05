@@ -58,12 +58,6 @@ const headerNavigation = {
     url: () => cp_url('navigation/header'),
 };
 
-// The assets, for the alt text idea: a page of images, where alt text saves on each straight away
-const assetsPage = {
-    title: 'Assets',
-    url: () => cp_url('assets/browse/assets'),
-};
-
 // The Footer global set, for the globals idea: a form like an entry's, with plain text fields
 const footerGlobals = {
     title: 'Footer',
@@ -394,7 +388,6 @@ const ideaScenarios = [
         plan: () => ({
             title: 'Find missing alt text',
             steps: [
-                ...openPageSteps(assetsPage, 'cp.open_assets', 'container: assets'),
                 { tool: 'statamic.get_assets', args: 'container: assets · fields: alt', detail: 'Alt text on 16 images', result: '4 without alt text', ms: 1100 },
                 { tool: 'statamic.describe_images', args: 'assets: 4', detail: 'The 4 images', result: 'Alt text suggested', ms: 1400 },
             ],
@@ -799,7 +792,7 @@ const promptScenarios = {
         done: {
             text: 'Alt text for 6 images',
             items: ['sale-hero.jpg: “A teak lounger on a sunny patio”', 'dining-set.jpg: “Six-seat outdoor dining set under a parasol”', 'hammock.jpg: “Striped hammock between two trees”', '…and 3 more'],
-            note: 'Nothing was changed, as alt text saves on each image straight away.',
+            note: 'Nothing was changed. Alt text is saved on each image, not with an entry.',
         },
     }),
     'seo-check': (page) => ({
@@ -860,7 +853,7 @@ async function until(check, timeout = 8000) {
     return check();
 }
 
-// A step that takes you to a page with no form to wait for (a navigation, the assets): it's open once the address has changed. Nothing if you're already there.
+// A step that takes you to a page with no form to wait for (a navigation): it's open once the address has changed. Nothing if you're already there.
 const pathOf = (target) => new URL(target.url(), window.location.origin).pathname;
 const openPageSteps = (target, tool, args) =>
     window.location.pathname.startsWith(pathOf(target))
