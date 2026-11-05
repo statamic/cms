@@ -443,8 +443,9 @@ function stopFollowing() {
     <div data-ai-chat :class="['relative flex min-h-0 flex-col', floating ? 'flex-initial' : 'flex-1']" @focusout="onFocusOut">
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
         <!-- While the help is open it dims, so the help stands out in front of it -->
+        <!-- The cards' left and right gutters match: the thread's 2px on the left sits after the 9px the floating card or the docked panel already has on that side, so the right padding is the same 11px floating, and 10px docked (the panel's 8px, not 9). -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's. The same room below the last card as above the first. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 pe-2 py-3.5 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px]' : 'flex-1', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 py-3.5 ai-chat-thread transition-opacity duration-150', floating ? 'flex-initial rounded-t-[11px] pe-[11px]' : 'flex-1 pe-2.5', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
