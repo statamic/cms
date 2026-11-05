@@ -585,11 +585,11 @@ function stopFollowing() {
                 </div>
             </Transition>
             <!-- A question for you (see ask() in mock-runs.js) covers the input, growing upwards. The first choice has focus, so Enter picks it, and Esc picks the last (Cancel). Only Enter is hinted. -->
-            <!-- Its sides line up with the cards above it: the thread's padding (2px on the left, 10px on the right docked, 11px each side floating). Floating, the gap below is the same 11px as the sides; docked, 10px, as on the right. -->
+            <!-- Its sides line up with the cards above it: the thread's padding (2px on the left, 10px on the right docked, 11px each side floating). Floating, the gap below is the same 11px as the sides; docked, 10px, as on the right. Floating, its bottom corners are 8px, as it sits close to the card's own curve. -->
             <div
                 v-if="askInInput"
-                :class="floating ? 'inset-x-[11px] bottom-[11px]' : 'start-0.5 end-2.5 bottom-2.5'"
-                class="absolute z-(--z-index-portal) space-y-2.5 rounded-xl bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
+                :class="floating ? 'inset-x-[11px] bottom-[11px] rounded-t-xl rounded-b-lg' : 'start-0.5 end-2.5 bottom-2.5 rounded-xl'"
+                class="absolute z-(--z-index-portal) space-y-2.5 bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
                 <p class="text-[0.8125rem]/5 text-gray-800 dark:text-gray-200">{{ waitingRun.waiting.question }}</p>
