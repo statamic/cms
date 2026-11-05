@@ -203,8 +203,8 @@ return [
     'time' => 'Dit is geen geldig tijdstip.',
     'asset_current_filename' => 'Dit is de huidige bestandsnaam.',
     'asset_file_exists' => 'Er bestaat al een bestand met deze naam.',
-    'asset_file_exists_same_content' => 'Er bestaat al een bestand met deze naam en dezelfde inhoud. U kunt dit bestand verwijderen in plaats van het te hernoemen.',
-    'asset_file_exists_different_content' => 'Er bestaat al een bestand met deze naam, maar met andere inhoud. U kunt het andere bestand vervangen door dit bestand.',
+    'asset_file_exists_same_content' => 'Er bestaat al een bestand met deze naam en dezelfde inhoud. Je kunt dit bestand verwijderen in plaats van het te hernoemen.',
+    'asset_file_exists_different_content' => 'Er bestaat al een bestand met deze naam, maar met andere inhoud. Je kunt het andere bestand vervangen door dit bestand.',
     'invalid_two_factor_code' => 'De opgegeven tweestapsverificatiecode is ongeldig.',
     'invalid_two_factor_recovery_code' => 'De opgegeven herstelcode voor tweestapsverificatie is ongeldig.',
     'bard_container_required_by_button' => 'Dit veld is vereist door een werkbalkknop.',
@@ -215,7 +215,7 @@ return [
     | Custom Validation Language Lines
     |--------------------------------------------------------------------------
     |
-    | Hier kunt u aangepaste validatieberichten voor attributen opgeven met behulp
+    | Hier kun je aangepaste validatieberichten voor attributen opgeven met behulp
     | van de conventie "attribute.rule" om regels te benoemen. Dit maakt het snel
     | om een specifieke aangepaste taalregel voor een bepaalde attribuutregel in te
     | stellen.
