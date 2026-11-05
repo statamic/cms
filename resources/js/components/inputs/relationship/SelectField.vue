@@ -22,7 +22,7 @@
                 <StatusIndicator v-if="status" :status="status" />
                 <div v-if="create" class="truncate grow">{{ __('Add ":value"', { value: title }) }}</div>
                 <div v-else v-text="title" class="truncate grow" />
-                <ui-badge v-if="hint" size="sm" v-text="hint" />
+                <ui-badge v-if="hint" size="sm" :text="hint" />
             </div>
         </template>
         <template #no-options>

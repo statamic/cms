@@ -50,15 +50,15 @@ function updateIndex(index) {
                         </TableCell>
                         <TableCell>
                             <div v-if="typeof index.searchables === 'string'" class="flex flex-wrap">
-                                <Badge v-text="index.searchables" />
+                                <Badge :text="index.searchables" />
                             </div>
                             <div v-else class="flex flex-wrap gap-1 text-sm text-gray">
-                                <Badge v-for="searchable in index.searchables" :key="searchable" v-text="searchable" />
+                                <Badge v-for="searchable in index.searchables" :key="searchable" :text="searchable" />
                             </div>
                         </TableCell>
                         <TableCell>
                             <div class="flex flex-wrap gap-2">
-                                <Badge v-for="field in index.fields" :key="field" v-text="field" />
+                                <Badge v-for="field in index.fields" :key="field" :text="field" />
                             </div>
                         </TableCell>
                         <TableCell class="text-right rtl:text-left">
