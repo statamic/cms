@@ -11,7 +11,7 @@ import HasActions from '@/components/publish/HasActions';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 import { router } from '@inertiajs/vue3';
-import { aiNavigation } from '@/composables/use-ai-navigation.js';
+import { aiAddedLinks, aiNavigation } from '@/composables/use-ai-navigation.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
@@ -127,6 +127,7 @@ export default {
     watch: {
         changed(changed) {
             this.$dirty.state('page-tree', changed);
+            if (!changed) aiAddedLinks.clear();
         },
     },
 
@@ -142,6 +143,7 @@ export default {
     unmounted() {
         toggleArchitecturalBackground(false);
         aiNavigation.value = null;
+        aiAddedLinks.clear();
     },
 
     methods: {
@@ -207,6 +209,8 @@ export default {
         },
 
         updatePage(values) {
+            // You've edited it yourself, so it's no longer the AI's
+            aiAddedLinks.delete(this.editingPage.page.id);
             this.editingPage.page.url = values.url;
             this.editingPage.page.title = values.title;
             this.editingPage.page.values = values;
@@ -239,6 +243,7 @@ export default {
             this.publishInfo[page.id] = { values: { title, url }, entry: null, new: true };
             this.targetParent = null;
             this.$refs.tree.addPages([page], null);
+            aiAddedLinks.add(page.id);
         },
 
         pageCreated(values) {
