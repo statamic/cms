@@ -109,6 +109,7 @@ const demos = [
     { label: 'Find missing alt text', text: 'Which images have no alt text?' },
     { label: 'Translate a page', text: 'Translate the About page into French' },
     { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
+    { label: 'Edit a global', text: 'Update the copyright year in the footer' },
     { label: 'Add a field', text: 'Add a subtitle field to the blog blueprint' },
 ];
 
