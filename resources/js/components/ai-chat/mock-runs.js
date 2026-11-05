@@ -43,6 +43,12 @@ const summerSale = {
     labels: { subtitle: 'Subtitle', excerpt: 'Excerpt', meta_description: 'Meta Description' },
 };
 
+// The Main navigation, for the navigation idea: suggestions only, as it saves as you change it
+const mainNavigation = {
+    title: 'Main navigation',
+    url: () => cp_url('navigation/main'),
+};
+
 // The Footer global set, for the globals idea: a form like an entry's, with plain text fields
 const footerGlobals = {
     title: 'Footer',
@@ -203,6 +209,26 @@ const ideaScenarios = [
         // "Update the copyright year in the footer". A global set has a form like an entry's, so it's filled in the same way, and saving is left to you.
         match: /\b(copyright|footer|globals?)\b/i,
         plan: () => editInForm({ ...footerGlobals, tool: 'cp.open_global', args: 'set: footer', read: { tool: 'statamic.get_global_set', args: 'set: footer', detail: 'The Footer global set', result: '2 fields' }, text: 'Updated the copyright year in the Footer', runTitle: 'Edit global set', name: 'Footer' }),
+    },
+    {
+        // "Add a Returns link to the main navigation". A navigation saves as you change it, with no form to wait in, so like alt text it
+        // suggests the change rather than making it (see the "Things that save straight away" note). It still takes you to the navigation first,
+        // so you see it where the change would be made.
+        match: /\bnavigation\b|\bnav\b|\bmenu\b/i,
+        plan: () => {
+            return {
+                title: 'Suggest navigation changes',
+                steps: [
+                    ...openPageSteps(mainNavigation, 'cp.open_navigation', 'nav: main'),
+                    { tool: 'statamic.get_navigation', args: 'nav: main', detail: 'The Main navigation', result: '6 links', ms: 900 },
+                ],
+                done: {
+                    text: 'A Returns link for the Main navigation',
+                    items: ['Add “Returns” after “Delivery”, linking to /returns', 'Move “Contact” to the end'],
+                    note: 'Nothing was changed, as navigations save straight away. Make the changes here.',
+                },
+            };
+        },
     },
     {
         // "Summarise our shipping policy". The search takes a long time (16 seconds), so the slow state shows (see AiChatRun.vue).
@@ -807,6 +833,22 @@ async function until(check, timeout = 8000) {
     }
     return check();
 }
+
+// A step that takes you to a page with no form to wait for (a navigation, the assets): it's open once the address has changed. Nothing if you're already there.
+const pathOf = (target) => new URL(target.url(), window.location.origin).pathname;
+const openPageSteps = (target, tool, args) =>
+    window.location.pathname.startsWith(pathOf(target))
+        ? []
+        : [
+              {
+                  tool,
+                  args,
+                  detail: target.title,
+                  result: 'Opened in the editor',
+                  ms: 300,
+                  action: (ask, goingTo) => openEntry(target, ask, () => until(() => window.location.pathname.startsWith(pathOf(target))), goingTo),
+              },
+          ];
 
 // Where the chat is taking you, while the page changes (see AiChatMoveHint.vue)
 // arrivedAt notes when it got there, so the header message can say you have arrived (see AiChatMoveHint.vue)
