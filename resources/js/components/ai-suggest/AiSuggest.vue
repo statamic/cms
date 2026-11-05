@@ -104,7 +104,11 @@ function retry() {
 function toggled(isOpen) {
     open.value = isOpen;
     if (isOpen) generate();
-    else if (loading.value) cancel();
+    else {
+        if (loading.value) cancel();
+        // Prototype: the demos' failure, empty and slow rounds last until the dropdown closes
+        suggestionsFail.value = suggestionsEmpty.value = suggestionsSlow.value = false;
+    }
 }
 
 // The suggestions are taller than the loading lines, so the dropdown's body eases to its new height rather than snapping.

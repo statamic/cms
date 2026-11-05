@@ -55,9 +55,6 @@ function runOnPage(run) {
 // Field suggestions: go to the summer sale entry, then click the Subtitle field's suggest icon, as you would
 const summerSaleUrl = cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001');
 async function suggestSubtitle({ wait, find }, fails = false, empty = false, slow = false) {
-    suggestionsSlow.value = slow;
-    suggestionsFail.value = fails;
-    suggestionsEmpty.value = empty;
     if (!window.location.href.startsWith(summerSaleUrl)) router.visit(summerSaleUrl);
     // The field's id is on its input, so find that, then the suggest button beside it: the nearest parent that has one
     const input = await find('[id^="field_"][id$="_subtitle"]');
@@ -66,6 +63,15 @@ async function suggestSubtitle({ wait, find }, fails = false, empty = false, slo
     const button = parent?.querySelector('button[aria-label="Suggest"]');
     if (!button) return;
     await wait(1200);
+    // Another suggestions demo may have left its dropdown open, and clicking would close it. So close it first, and open it afresh.
+    if (button.getAttribute('aria-expanded') === 'true') {
+        button.click();
+        await wait(400);
+    }
+    // How this round goes. They're put back to normal when the dropdown closes (see AiSuggest.vue), so suggesting by hand afterwards works.
+    suggestionsSlow.value = slow;
+    suggestionsFail.value = fails;
+    suggestionsEmpty.value = empty;
     button.focus();
     button.click();
 }
