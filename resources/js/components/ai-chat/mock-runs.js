@@ -1,5 +1,6 @@
 import { nextTick, reactive, ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
+import { aiNavigation } from '@/composables/use-ai-navigation.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import { cp_url } from '@/bootstrap/globals.js';
 
@@ -51,10 +52,10 @@ const communityTerm = {
     labels: { title: 'Title' },
 };
 
-// The Main navigation, for the navigation idea: suggestions only, as it saves as you change it
-const mainNavigation = {
-    title: 'Main navigation',
-    url: () => cp_url('navigation/main'),
+// The Header navigation, for the navigation idea
+const headerNavigation = {
+    title: 'Header navigation',
+    url: () => cp_url('navigation/header'),
 };
 
 // The assets, for the alt text idea: a page of images, where alt text saves on each straight away
@@ -230,24 +231,29 @@ const ideaScenarios = [
         plan: () => editInForm({ ...communityTerm, tool: 'cp.open_term', args: 'taxonomy: topics · term: community', read: { tool: 'statamic.get_term', args: 'taxonomy: topics · term: community', detail: 'The Community term, in Topics', result: '1 field' }, text: 'Renamed the Community topic', runTitle: 'Edit term', name: 'Community' }),
     },
     {
-        // "Add a Returns link to the main navigation". A navigation saves as you change it, with no form to wait in, so like alt text it
-        // suggests the change rather than making it (see the "Things that save straight away" note). It still takes you to the navigation first,
-        // so you see it where the change would be made.
+        // "Add a Returns link to the header navigation". It takes you to the navigation, then adds the link at the end of its tree, unsaved, for you
+        // to check and save (the tree has its own Save button). See use-ai-navigation.js.
         match: /\bnavigation\b|\bnav\b|\bmenu\b/i,
-        plan: () => {
-            return {
-                title: 'Suggest navigation changes',
-                steps: [
-                    ...openPageSteps(mainNavigation, 'cp.open_navigation', 'nav: main'),
-                    { tool: 'statamic.get_navigation', args: 'nav: main', detail: 'The Main navigation', result: '6 links', ms: 900 },
-                ],
-                done: {
-                    text: 'A Returns link for the Main navigation',
-                    items: ['Add “Returns” after “Delivery”, linking to /returns', 'Move “Contact” to the end'],
-                    note: 'Nothing was changed, as navigations save straight away. Make the changes here.',
+        plan: () => ({
+            title: 'Edit navigation',
+            steps: [
+                ...openPageSteps(headerNavigation, 'cp.open_navigation', 'nav: header'),
+                { tool: 'statamic.get_navigation', args: 'nav: header', detail: 'The Header navigation', result: '3 links', ms: 900 },
+                {
+                    tool: 'cp.add_link',
+                    args: 'nav: header · title: Returns · url: /returns',
+                    detail: 'Returns, at the end',
+                    result: 'Added to the tree · not saved',
+                    ms: 1100,
+                    action: () => aiNavigation.value?.addLink('Returns', '/returns'),
                 },
-            };
-        },
+            ],
+            done: {
+                text: 'Added a Returns link to the Header navigation',
+                items: ['Returns, linking to /returns'],
+                note: 'Nothing’s saved yet. Check it over, then save as usual.',
+            },
+        }),
     },
     {
         // "Summarise our shipping policy". The search takes a long time (16 seconds), so the slow state shows (see AiChatRun.vue).
@@ -937,7 +943,7 @@ async function openEntry(entry, ask, nextForm, goingTo = () => {}) {
 export async function playRun(run, onChange = () => {}) {
     for (const [i, step] of run.steps.entries()) {
         // Filling in fields locks the page until they're done
-        writing.active = ['cp.fill_fields', 'cp.add_field'].includes(step.tool);
+        writing.active = ['cp.fill_fields', 'cp.add_field', 'cp.add_link'].includes(step.tool);
         step.state = 'running';
         step.shownAt = Date.now();
         // The page it happened on, so the cards can show the way you've been taken, and get you back

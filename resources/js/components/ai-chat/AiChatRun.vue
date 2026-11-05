@@ -43,6 +43,7 @@ const toolLabels = {
     'statamic.get_assets': ['Looking at Assets', 'Looked at Assets'],
     'cp.open_assets': ['Opening the Assets', 'Opened the Assets'],
     'cp.open_navigation': ['Opening a Navigation', 'Opened a Navigation'],
+    'cp.add_link': ['Adding a Link', 'Added a Link'],
     'statamic.get_navigation': ['Reading the Navigation', 'Read the Navigation'],
     'statamic.create_entry': ['Creating an Entry', 'Created an Entry'],
     'statamic.update_entry': ['Updating the Entry', 'Updated the Entry'],

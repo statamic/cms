@@ -11,6 +11,7 @@ import HasActions from '@/components/publish/HasActions';
 import { Dropdown, DropdownMenu, DropdownItem, DropdownSeparator, Button, EmptyStateMenu, EmptyStateItem, Header } from '@ui';
 import { toggleArchitecturalBackground } from '@/pages/layout/architectural-background.js';
 import { router } from '@inertiajs/vue3';
+import { aiNavigation } from '@/composables/use-ai-navigation.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
 
 export default {
@@ -133,10 +134,14 @@ export default {
         this.mounted = true;
 
         this.addToCommandPalette();
+
+        // Prototype: lets the AI chat add a link to the tree
+        aiNavigation.value = { addLink: (title, url) => this.addLinkFromAi(title, url) };
     },
 
     unmounted() {
         toggleArchitecturalBackground(false);
+        aiNavigation.value = null;
     },
 
     methods: {
@@ -226,6 +231,14 @@ export default {
 
         closePageCreator() {
             this.creatingPage = false;
+        },
+
+        // Prototype: adds a link at the end of the tree, unsaved, as the AI chat does (see use-ai-navigation.js)
+        addLinkFromAi(title, url) {
+            const page = { id: uniqid(), title, url, status: null, children: [] };
+            this.publishInfo[page.id] = { values: { title, url }, entry: null, new: true };
+            this.targetParent = null;
+            this.$refs.tree.addPages([page], null);
         },
 
         pageCreated(values) {
