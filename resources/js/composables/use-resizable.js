@@ -44,7 +44,8 @@ export default function useResizable() {
                     const resolvedEdge = isRtl ? (edge === 'right' ? 'left' : 'right') : edge;
                     const resolveDefaultWidth = () =>
                         typeof defaultWidth === 'function' ? defaultWidth() : defaultWidth;
-                    const clampWidth = (width) => Math.min(maxWidth, Math.max(minWidth, width));
+                    const resolveMinWidth = () => (typeof minWidth === 'function' ? minWidth() : minWidth);
+                    const clampWidth = (width) => Math.min(maxWidth, Math.max(resolveMinWidth(), width));
                     const applyWidth = (width) => {
                         panel.style.width = typeof width === 'string' ? width : `${clampWidth(width)}px`;
                     };
