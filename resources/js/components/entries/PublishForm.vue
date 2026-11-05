@@ -48,7 +48,7 @@
                         :disabled="!canSave"
                         :variant="!revisionsEnabled ? 'primary' : 'default'"
                         @click.prevent="save"
-                        v-text="saveText"
+                        :text="saveText"
                         v-tooltip="saveAndCloseTooltip"
                     />
                 </save-button-options>
