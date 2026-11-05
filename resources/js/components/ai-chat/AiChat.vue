@@ -488,8 +488,8 @@ function stopFollowing() {
             :class="[
                 'relative',
                 floating ? 'p-2' : 'p-2.5',
-                // Like the command palette's search row, there's a divider above the input. It runs edge to edge, so floating it steps out into the card's left padding
-                messages.length || !floating ? 'border-t border-gray-200/80 dark:border-gray-950' : '',
+                // Like the command palette's search row, there's a divider above the input once a chat has started. It runs edge to edge, so it steps out into the card's left padding. Docked has none: the input is its own box.
+                floating && messages.length ? 'border-t border-gray-200/80 dark:border-gray-950' : '',
                 floating && messages.length ? '-ms-2.25 ps-2.5' : 'ps-0.25',
             ]"
             @submit.prevent="send()"
