@@ -49,6 +49,12 @@ const mainNavigation = {
     url: () => cp_url('navigation/main'),
 };
 
+// The assets, for the alt text idea: a page of images, where alt text saves on each straight away
+const assetsPage = {
+    title: 'Assets',
+    url: () => cp_url('assets/browse/assets'),
+};
+
 // The Footer global set, for the globals idea: a form like an entry's, with plain text fields
 const footerGlobals = {
     title: 'Footer',
@@ -369,6 +375,7 @@ const ideaScenarios = [
         plan: () => ({
             title: 'Find missing alt text',
             steps: [
+                ...openPageSteps(assetsPage, 'cp.open_assets', 'container: assets'),
                 { tool: 'statamic.get_assets', args: 'container: assets · fields: alt', detail: 'Alt text on 16 images', result: '4 without alt text', ms: 1100 },
                 { tool: 'statamic.describe_images', args: 'assets: 4', detail: 'The 4 images', result: 'Alt text suggested', ms: 1400 },
             ],
