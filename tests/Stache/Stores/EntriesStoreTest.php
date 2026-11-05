@@ -7,10 +7,13 @@ use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionProperty;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
+use Statamic\Stache\Indexes\Index;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -360,5 +363,69 @@ class EntriesStoreTest extends TestCase
     public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();
+    }
+
+    #[Test]
+    public function while_an_index_loads_it_hands_out_a_clone_of_the_entry_built_in_this_request_instead_of_the_cached_copy()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+        $this->putInItemCache($store, 'blog-christmas', (clone $inMemory)->set('title', 'From the cache'));
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertNotSame($inMemory, $item);
+        $this->assertEquals('Christmas', $item->get('title'));
+        $this->assertEquals($inMemory->data()->all(), $item->data()->all());
+    }
+
+    #[Test]
+    public function changing_the_clone_does_not_change_the_entry_in_memory()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $item->set('title', 'Changed');
+
+        $this->assertEquals('Christmas', $inMemory->get('title'));
+    }
+
+    #[Test]
+    public function outside_of_index_loading_it_still_reads_the_cached_copy()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+        $this->putInItemCache($store, 'blog-christmas', (clone $inMemory)->set('title', 'From the cache'));
+
+        $item = $store->getItem('blog-christmas');
+
+        $this->assertNotSame($inMemory, $item);
+        $this->assertEquals('From the cache', $item->get('title'));
+    }
+
+    private function putInItemCache($store, $key, $item)
+    {
+        $cacheKey = (fn () => $this->getItemCacheKey($key))->call($store);
+
+        Stache::cacheStore()->forever($cacheKey, $item);
+    }
+
+    private function whileAnIndexLoads(callable $callback)
+    {
+        $stack = new ReflectionProperty(Index::class, 'loadingStack');
+        $stack->setValue(null, ['entries::blog/test']);
+
+        try {
+            return $callback();
+        } finally {
+            $stack->setValue(null, []);
+        }
     }
 }

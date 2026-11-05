@@ -2,7 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
+use Closure;
 use Illuminate\Support\Carbon;
+use Statamic\Entries\Entry as EntryInstance;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -231,15 +233,39 @@ class CollectionEntriesStore extends ChildStore
 
     protected function getCachedItem($key)
     {
-        $cacheKey = $this->getItemCacheKey($key);
-
-        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
+        if (! $entry = $this->getEntryLoadedInThisRequest($key) ?? Stache::cacheStore()->get($this->getItemCacheKey($key))) {
             return null;
         }
 
         if (! Index::isLoading() && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
+
+        return $entry;
+    }
+
+    /**
+     * While indexes are being built, every entry made from its file in this request is
+     * still in memory (makeItemFromFile() blinks it). Hand out a shallow clone of it
+     * rather than unserialising a second full copy from the cache: callers still get
+     * their own object, and its data is only copied if they change it.
+     */
+    private function getEntryLoadedInThisRequest($key): ?EntryInstance
+    {
+        if (! Index::isLoading()) {
+            return null;
+        }
+
+        if (! ($loaded = Blink::store('structure-entries')->get($key)) instanceof EntryInstance) {
+            return null;
+        }
+
+        $entry = clone $loaded;
+
+        // A copy read from the cache doesn't carry these (see Entry::__sleep).
+        Closure::bind(function () {
+            $this->cachedKeys = $this->computedCallbackCache = $this->siteCache = $this->augmentationReferenceKey = null;
+        }, $entry, EntryInstance::class)();
 
         return $entry;
     }
