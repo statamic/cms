@@ -7,6 +7,8 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Field as FieldFacade;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
@@ -794,6 +796,43 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function config_field_default_values_are_only_computed_once_per_request()
+    {
+        FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed = 0;
+
+        (new FieldtypeWithCountedDefaultValue)::register();
+
+        foreach (range(1, 3) as $i) {
+            $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []));
+
+            $this->assertEquals('default!', $fieldtype->config('alfa'));
+            $this->assertEquals(['alfa' => 'default!'], $fieldtype->config());
+        }
+
+        $this->assertSame(1, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+
+        Blink::flush();
+
+        $this->assertEquals('default!', (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []))->config('alfa'));
+        $this->assertSame(2, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+    }
+
+    #[Test]
+    public function computed_config_field_defaults_are_resolved_on_every_read()
+    {
+        $count = 0;
+        FieldFacade::computedDefault('counted', function () use (&$count) {
+            return 'computed '.++$count;
+        });
+
+        $fieldtype = (new TestFieldtypeWithComputedConfigField)->setField(new Field('test', []));
+
+        $this->assertEquals('computed 1', $fieldtype->config('alfa'));
+        $this->assertEquals('computed 2', $fieldtype->config('alfa'));
+        $this->assertEquals(['alfa' => 'computed 3'], $fieldtype->config());
+    }
+
+    #[Test]
     #[Group('graphql')]
     public function it_gets_the_graphql_type_of_string_by_default()
     {
@@ -998,6 +1037,16 @@ class TestFieldtypeWithCountedConfigField extends Fieldtype
     protected $configFields = [
         'alfa' => [
             'type' => 'counted_default',
+        ],
+    ];
+}
+
+class TestFieldtypeWithComputedConfigField extends Fieldtype
+{
+    protected $configFields = [
+        'alfa' => [
+            'type' => 'text',
+            'default' => 'computed:counted',
         ],
     ];
 }
