@@ -364,22 +364,3 @@ const stepTitle = (step) => {
         </div>
     </div>
 </template>
-
-<style>
-/* The cards open up from nothing, pushing what's below down smoothly rather than appearing all at once. Reduced motion skips it. */
-@media (prefers-reduced-motion: no-preference) {
-    .ai-card-in {
-        interpolate-size: allow-keywords;
-        animation: ai-card-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-}
-
-@keyframes ai-card-in {
-    from {
-        opacity: 0;
-        height: 0;
-        padding-block: 0;
-        overflow: clip;
-    }
-}
-</style>

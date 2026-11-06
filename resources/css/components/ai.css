@@ -1,0 +1,278 @@
+/* GROUP AI / CHAT EDGE
+=================================================== */
+/* Once a run finishes, the floating chat's focused look (see chatCardClasses in PanelLayout.vue) fades away over a second: the edge from purple and blue to
+   its quiet grey, with the blue line and glow. The edge's two colours are registered so they can fade, which a gradient can't on its own.
+   Not while the chat is focused, which keeps its look. Reduced motion lets go at once. */
+@property --ai-edge-a {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+@property --ai-edge-b {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .ai-chat-card[data-released]:not(:focus-within) {
+        --ai-card-bg: white;
+        --ai-edge-quiet: var(--color-gray-200);
+        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
+        outline: 1px solid transparent;
+        outline-offset: -2px;
+        animation: ai-chat-release 1s ease-out both;
+    }
+
+    .dark .ai-chat-card[data-released]:not(:focus-within) {
+        --ai-card-bg: var(--color-gray-900);
+        --ai-edge-quiet: var(--color-gray-700);
+    }
+}
+
+@keyframes ai-chat-release {
+    from {
+        --ai-edge-a: var(--color-ai);
+        --ai-edge-b: var(--color-ai-end);
+        outline-color: var(--color-blue-400);
+        box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--color-ai) 45%, transparent);
+    }
+    to {
+        --ai-edge-a: var(--ai-edge-quiet);
+        --ai-edge-b: var(--ai-edge-quiet);
+        outline-color: transparent;
+        box-shadow: 0 10px 40px -10px transparent;
+    }
+}
+
+/* Once a run stops, the docked input's glow fades over a second to the input's quiet edge, in the same way as the floating card's (see ai-chat-release above, which this borrows). Not while the input is focused, which keeps its glow. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-dock-input[data-released]:not(:focus) {
+        --ai-card-bg: white;
+        --ai-edge-quiet: var(--color-gray-300);
+        border-color: transparent;
+        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
+        outline: 1px solid transparent;
+        outline-offset: -2px;
+        animation: ai-chat-release 1s ease-out both;
+    }
+
+    .dark .ai-dock-input[data-released]:not(:focus) {
+        --ai-card-bg: var(--color-gray-900);
+        --ai-edge-quiet: var(--color-gray-700);
+    }
+}
+
+/* GROUP AI / CHAT THREAD
+=================================================== */
+@property --ai-chat-fade {
+    syntax: '<length>';
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes ai-chat-thread-fade {
+    to { --ai-chat-fade: 50px; }
+}
+
+/* The fade grows from nothing to 50px over the first 50px of scrolling */
+.ai-chat-thread {
+    mask-image: linear-gradient(to bottom, transparent, black var(--ai-chat-fade));
+    animation: ai-chat-thread-fade linear both;
+    animation-timeline: scroll(self);
+    animation-range: 0 50px;
+}
+
+/* GROUP AI / NEW ITEMS
+=================================================== */
+/* The cards open up from nothing, pushing what's below down smoothly rather than appearing all at once. Reduced motion skips it. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-card-in {
+        interpolate-size: allow-keywords;
+        animation: ai-card-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+}
+
+@keyframes ai-card-in {
+    from {
+        opacity: 0;
+        height: 0;
+        padding-block: 0;
+        overflow: clip;
+    }
+}
+
+/* A field the AI chat just added opens up (the same movement as the chat's cards) and glows in the AI colour. The glow settles into whatever
+   shadow the card normally has, rather than fading to nothing first, so it doesn't jump when it ends. It has no end keyframe for that
+   reason: the browser animates back to the card's own box-shadow. Reduced motion skips both. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-bp {
+        interpolate-size: allow-keywords;
+        animation:
+            ai-bp-open 450ms cubic-bezier(0.22, 1, 0.36, 1),
+            ai-bp-glow 4s ease-out;
+    }
+}
+
+@keyframes ai-bp-glow {
+    from {
+        box-shadow:
+            0 0 0 1px color-mix(in oklab, var(--color-ai) 60%, transparent),
+            0 0 18px 2px color-mix(in oklab, var(--color-ai) 45%, transparent);
+    }
+}
+
+@keyframes ai-bp-open {
+    from {
+        opacity: 0;
+        height: 0;
+        padding-block: 0;
+        overflow: clip;
+    }
+}
+
+/* A link the AI chat just added opens up and glows in the AI colour, as a blueprint field does (see RegularField.vue). The glow settles into the
+   shadow the row normally has, as it has no end keyframe. Reduced motion skips both. */
+@media (prefers-reduced-motion: no-preference) {
+    .page-tree-branch.ai-added {
+        interpolate-size: allow-keywords;
+        animation:
+            ai-added-open 450ms cubic-bezier(0.22, 1, 0.36, 1),
+            ai-added-glow 4s ease-out;
+    }
+}
+
+@keyframes ai-added-glow {
+    from {
+        box-shadow:
+            0 0 0 1px color-mix(in oklab, var(--color-ai) 60%, transparent),
+            0 0 18px 2px color-mix(in oklab, var(--color-ai) 45%, transparent);
+    }
+}
+
+@keyframes ai-added-open {
+    from {
+        opacity: 0;
+        height: 0;
+        padding-block: 0;
+        overflow: clip;
+    }
+}
+
+/* GROUP AI / PAGE TRAIL
+=================================================== */
+/* The dot comes down the line from above, each on its own layer so it moves smoothly. Reduced motion skips it. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-trail-drop {
+        will-change: transform;
+        animation: ai-trail-drop 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .ai-trail-line {
+        transform-origin: top;
+        will-change: transform, opacity;
+        animation: ai-trail-line 1200ms cubic-bezier(0.22, 1, 0.36, 1) both, ai-trail-line-fade 800ms ease-out 1200ms both;
+    }
+}
+
+/* Without motion, there's no line to draw */
+@media (prefers-reduced-motion: reduce) {
+    .ai-trail-line {
+        display: none;
+    }
+}
+
+@keyframes ai-trail-drop {
+    from {
+        transform: translateY(var(--trail-from));
+    }
+}
+
+@keyframes ai-trail-line {
+    from {
+        transform: scaleY(0);
+    }
+}
+
+@keyframes ai-trail-line-fade {
+    to {
+        opacity: 0;
+    }
+}
+
+/* GROUP AI / MOVING BETWEEN PAGES
+=================================================== */
+.ai-move-message {
+    background: linear-gradient(rgb(from var(--color-gray-950) r g b / 0.3), rgb(from var(--color-gray-950) r g b / 0.3)), var(--color-global-header-bg);
+    mask-image: linear-gradient(90deg, transparent, black 2rem, black calc(100% - 2rem), transparent);
+}
+
+
+/* The spinner's arc closes into a full ring, then the tick draws in. Reduced motion shows them straight away. */
+@media (prefers-reduced-motion: no-preference) {
+    .ai-ring-close circle {
+        stroke-dasharray: 1;
+        animation: ai-ring-close 350ms ease-out both;
+    }
+    .ai-ring-close .ai-ring-tick {
+        stroke-dasharray: 1;
+        animation: ai-tick-draw 350ms cubic-bezier(0.65, 0, 0.35, 1) 300ms both;
+    }
+}
+@keyframes ai-ring-close {
+    from {
+        stroke-dashoffset: 0.25;
+    }
+}
+@keyframes ai-tick-draw {
+    from {
+        stroke-dashoffset: 1;
+    }
+}
+
+/* Once you're there and the page has lifted, it's the header's own colour */
+.ai-move-message {
+    transition: background 300ms ease-out;
+}
+.ai-move-message[data-arrived] {
+    background: var(--color-global-header-bg);
+}
+
+/* Like nprogress: it creeps towards the end while it waits, then fills the rest and fades out. Reduced motion skips the creep. */
+.ai-move-bar {
+    width: 85%;
+    background: linear-gradient(90deg, var(--color-ai), var(--color-ai-end));
+    animation: ai-move-bar 1.2s cubic-bezier(0.1, 0.6, 0.3, 1) both;
+}
+
+.ai-move-bar-done {
+    animation: ai-move-bar-done 400ms ease-out both;
+}
+
+@keyframes ai-move-bar {
+    from {
+        width: 0;
+    }
+}
+
+@keyframes ai-move-bar-done {
+    60% {
+        width: 100%;
+        opacity: 1;
+    }
+    to {
+        width: 100%;
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-move-bar {
+        animation: none;
+    }
+}
+
+[data-ai-moving] #nprogress {
+    display: none;
+}
