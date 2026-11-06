@@ -351,7 +351,7 @@ const stepTitle = (step) => {
                 <p v-if="run.done.note" class="pt-2.5 text-xs text-gray-500 dark:text-gray-400">{{ run.done.note }}</p>
                 <!-- What you might do next, like opening what it made -->
                 <!-- What went wrong, for whoever can fix it -->
-                <p v-if="run.done.reason" class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-400">{{ run.done.reason }}</p>
+                <p v-if="run.done.reason" class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-300/80">{{ run.done.reason }}</p>
                 <div v-if="run.done.actions" class="flex flex-wrap gap-1.5 pt-0.5">
                     <Button v-for="action in run.done.actions" :key="action.label" size="sm" :text="__(action.label)" @click="follow(action)" />
                 </div>
