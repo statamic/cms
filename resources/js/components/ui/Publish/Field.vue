@@ -364,7 +364,7 @@ const fieldtypeComponentEvents = computed(() => ({
                 <!-- Prototype: the suggest button floats in the field's top right corner -->
                 <AiSuggest
                     v-if="canSuggest"
-                    :button-class="['absolute! end-1.5 top-[7px] z-[calc(var(--z-index-above)+1)]', !isSuggestMultiline && 'bg-white! shadow-[-6px_0_6px_white]! rtl:shadow-[6px_0_6px_white]! dark:bg-gray-900! dark:shadow-[-6px_0_6px_var(--color-gray-900)]! rtl:dark:shadow-[6px_0_6px_var(--color-gray-900)]!']"
+                    :button-class="['absolute! end-1.5 top-[7px] z-[calc(var(--z-index-above)+1)]', !isSuggestMultiline && 'bg-white! shadow-[-4px_0_4px_white]! rtl:shadow-[4px_0_4px_white]! dark:bg-gray-900! dark:shadow-[-4px_0_4px_var(--color-gray-900)]! rtl:dark:shadow-[4px_0_4px_var(--color-gray-900)]!']"
                     :config="config"
                     :value="value"
                     :values="values"
