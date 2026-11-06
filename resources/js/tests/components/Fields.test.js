@@ -15,8 +15,8 @@ window.Statamic = {
     $config: {
         get: (key) => (key === 'sites' ? [{ handle: 'default', direction: 'ltr' }] : undefined),
     },
-    $dirty: { has: () => false, add: () => {}, remove: () => {} },
-    $events: { $emit: () => {} },
+    $dirty: { has: () => false, add: () => {}, remove: () => {}, names: () => [] },
+    $events: { $emit: () => {}, $on: () => {} },
 };
 
 const fields = [
