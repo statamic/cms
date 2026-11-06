@@ -214,7 +214,7 @@ const stepTitle = (step) => {
             />
             <div
                 :class="[
-                    'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
+                    'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-(--ai-trail-line) before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                     // Waiting is faded like the steps still to come, as the question itself is in the input
                     ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
                     line(step),
@@ -255,7 +255,7 @@ const stepTitle = (step) => {
             v-if="['done', 'cancelled', 'stopped', 'unable', 'failed'].includes(run.status)"
             :class="[
                 // In from the line like the cards above, which carries on down beside it, for the page it finished on
-                'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-[21.5px] before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
+                'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-(--ai-trail-line) before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
                 line(run.steps.findLast((step) => step.page) ?? {}),
                 // And the outcome comes in the same way once it's done
                 justNow(run.endedAt) ? 'ai-card-in' : '',

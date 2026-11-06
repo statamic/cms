@@ -4,7 +4,7 @@ import { router, usePage } from '@inertiajs/vue3';
 import { Icon } from '@ui';
 
 // Marks, on the line through the ticks of the chat's step cards, the page the cards below it happened on: a dot, with the page's name in line with the card titles.
-// The line sits 21.5px in, so its 1px width is centred on the ticks (the cards' 14px padding plus half a 16px tick).
+// The line sits --ai-trail-line in (see components/ai.css), so its 1px width is centred on the ticks.
 // The page you're on has a filled AI-coloured dot with a soft ring round it (none in dark mode, where a faint one blurs into the card and the purple alone is clear enough), which is enough to mark it. Any other is a link back to it.
 // The purple dot's soft ring takes up some of the room before the page's icon, so a grey dot (with no ring) has its icon 4px further left
 // to look the same distance away.
@@ -70,16 +70,16 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
         <!-- The line joins up through the dot: from the cards above, and on down to the cards below. It sits under the travelling dot.
              It stops 4px short of the dot (9px from its middle: its 5px radius and a 4px gap), rather than the dot having a ring to cut it off,
              as a ring would need to match whatever the chat sits on (white floating, the page's grey docked). -->
-        <span v-if="previous" :class="['absolute -z-20 start-[21.5px] -top-6 bottom-[calc(50%+9px)]', line(previous)]" />
-        <span :class="['absolute -z-20 start-[21.5px] top-[calc(50%+9px)] bottom-0', line(page)]" />
+        <span v-if="previous" :class="['absolute -z-20 start-(--ai-trail-line) -top-6 bottom-[calc(50%+9px)]', line(previous)]" />
+        <span :class="['absolute -z-20 start-(--ai-trail-line) top-[calc(50%+9px)] bottom-0', line(page)]" />
         <!-- The purple line drawn down behind the dot as it travels (under the cards, like the dot), which then fades. It starts at the edge of the last page's dot rather than its middle, so it doesn't cross it. -->
-        <span v-if="travels" class="ai-trail-line absolute -z-10 start-[21px] top-1/2 w-0.5 rounded-full bg-ai" :style="{ height: `${distance - 5}px`, marginTop: `${5 - distance}px` }" />
+        <span v-if="travels" class="ai-trail-line absolute -z-10 start-[calc(var(--ai-trail-line)-0.5px)] top-1/2 w-0.5 rounded-full bg-ai" :style="{ height: `${distance - 5}px`, marginTop: `${5 - distance}px` }" />
         <!-- The dot comes down the line into place as the page arrives, passing under the cards on the way, like the line, so it's only seen in the gaps between them.
              Layers, bottom up: the line (-z-20), the dots resting on it (-z-15), the travelling dot and the line it draws (-z-10), then the cards. So the travelling dot waits on top of the
              last page's dot, and never crosses over a card. -->
         <span
             data-trail-dot
-            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full', purple ? 'bg-ai outline-4 outline-ai/20 dark:outline-0' : 'border border-gray-400 dark:border-gray-500']"
+            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[calc(var(--ai-trail-line)-4.5px)] size-2.5 rounded-full', purple ? 'bg-ai outline-4 outline-ai/20 dark:outline-0' : 'border border-gray-400 dark:border-gray-500']"
         />
         <!-- Every page's name is the same quiet grey, so the purple dot alone marks where you are. The pages you've left are links back. -->
         <span v-if="here" class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
