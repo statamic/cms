@@ -613,7 +613,7 @@ function stopFollowing() {
             <!-- Like the command palette's search row, an icon in front of the text. While phase 2 is demoed, it turns into the mic once you're in the chat. -->
             <Icon
                 name="ai-chat"
-                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400', phaseTwo && (dictating ? 'opacity-0' : ['group-focus-within/chat:opacity-0', !iconsSettling && 'transition-opacity duration-200']), floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
+                :class="['pointer-events-none absolute z-(--z-index-above) size-4 text-gray-400 dark:text-gray-500', phaseTwo && (dictating ? 'opacity-0' : ['group-focus-within/chat:opacity-0', !iconsSettling && 'transition-opacity duration-200']), floating ? (messages.length ? 'start-[19px]' : 'start-2.5') + ' top-[16.5px]' : 'start-3 top-[26px]']"
             />
             <!-- Prototype: the mic, where the chat icon is. It stays lit while you speak. It comes before the input in the page, as it does on screen,
                  so Shift+Tab from the input reaches it. Tabbing to it shows it too, as focus is then in the chat. -->

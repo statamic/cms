@@ -29,8 +29,8 @@ const classes = computed(() => {
     if (props.feedback) return 'grid size-6 place-items-center rounded-full bg-ai/10 text-ai dark:bg-ai/25 dark:text-white';
     // While you speak, the mic stays grey, with a red recording dot. (No `relative` for the dot: AiChat.vue places the button absolutely,
     // which positions the dot just the same.)
-    if (listening.value) return 'grid size-6 place-items-center rounded-full text-gray-400 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white';
-    return 'grid size-6 place-items-center rounded-full text-gray-400 hover:bg-gray-200/70 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white';
+    if (listening.value) return 'grid size-6 place-items-center rounded-full text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-white';
+    return 'grid size-6 place-items-center rounded-full text-gray-400 hover:bg-gray-200/70 hover:text-gray-900 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-white';
 });
 </script>
 
