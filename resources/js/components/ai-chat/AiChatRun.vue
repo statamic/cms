@@ -109,8 +109,8 @@ const diffParts = computed(() => {
     return parts;
 });
 const diffClass = (type) => ({
-    'rounded-sm bg-yellow-100 dark:bg-yellow-400/20 dark:text-yellow-100': type === 'added',
-    'rounded-sm bg-red-50 text-red-700 line-through dark:bg-red-400/15 dark:text-red-300': type === 'removed',
+    'rounded-sm bg-yellow-100 dark:bg-transparent dark:text-yellow-300': type === 'added',
+    'rounded-sm bg-red-50 text-red-700 line-through dark:bg-transparent dark:text-red-400': type === 'removed',
 });
 
 // The buttons under an outcome: open a page in the CP, or (for previews) the site in a new tab

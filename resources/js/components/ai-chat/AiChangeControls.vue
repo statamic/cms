@@ -61,9 +61,9 @@ const parts = computed(() => {
 });
 
 const partClass = (type) => ({
-    'rounded-sm bg-yellow-100 dark:bg-yellow-400/20 dark:text-yellow-100': ['added', 'linked'].includes(type),
+    'rounded-sm bg-yellow-100 dark:bg-transparent dark:text-yellow-300': ['added', 'linked'].includes(type),
     'underline underline-offset-2': type === 'linked',
-    'rounded-sm bg-red-50 text-red-700 line-through dark:bg-red-400/15 dark:text-red-300': type === 'removed',
+    'rounded-sm bg-red-50 text-red-700 line-through dark:bg-transparent dark:text-red-400': type === 'removed',
 });
 </script>
 

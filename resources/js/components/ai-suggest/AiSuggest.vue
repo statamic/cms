@@ -332,8 +332,8 @@ function follow(text) {
                                 <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
                                     <span
                                         :class="{
-                                            'rounded-sm bg-yellow-100 text-gray-900 dark:bg-yellow-400/20 dark:text-yellow-100': part.type === 'added',
-                                            'rounded-sm bg-red-50 text-red-700 line-through dark:bg-red-400/15 dark:text-red-300': part.type === 'removed',
+                                            'rounded-sm bg-yellow-100 text-gray-900 dark:bg-transparent dark:text-yellow-300': part.type === 'added',
+                                            'rounded-sm bg-red-50 text-red-700 line-through dark:bg-transparent dark:text-red-400': part.type === 'removed',
                                         }"
                                         >{{ part.text }}</span
                                     >{{ ' ' }}
