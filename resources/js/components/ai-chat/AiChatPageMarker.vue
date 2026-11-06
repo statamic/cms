@@ -5,7 +5,7 @@ import { Icon } from '@ui';
 
 // Marks, on the line through the ticks of the chat's step cards, the page the cards below it happened on: a dot, with the page's name in line with the card titles.
 // The line sits 21.5px in, so its 1px width is centred on the ticks (the cards' 14px padding plus half a 16px tick).
-// The page you're on has a filled AI-coloured dot with a soft ring round it, which is enough to mark it. Any other is a link back to it.
+// The page you're on has a filled AI-coloured dot with a soft ring round it (none in dark mode, where a faint one blurs into the card and the purple alone is clear enough), which is enough to mark it. Any other is a link back to it.
 // The purple dot's soft ring takes up some of the room before the page's icon, so a grey dot (with no ring) has its icon 4px further left
 // to look the same distance away.
 // Each page after the first has more room above it (24px rather than the cards' 12px; margins between siblings overlap, so mt-6 is the whole gap), so each page's cards read as a group.
@@ -79,7 +79,7 @@ const travelStyle = computed(() => ({ '--trail-from': `${-distance.value}px` }))
              last page's dot, and never crosses over a card. -->
         <span
             data-trail-dot
-            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full', purple ? 'bg-ai outline-4 outline-ai/20' : 'border border-gray-400 dark:border-gray-500']"
+            :class="[travels ? 'ai-trail-drop -z-10' : '-z-15', 'absolute start-[17px] size-2.5 rounded-full', purple ? 'bg-ai outline-4 outline-ai/20 dark:outline-0' : 'border border-gray-400 dark:border-gray-500']"
         />
         <!-- Every page's name is the same quiet grey, so the purple dot alone marks where you are. The pages you've left are links back. -->
         <span v-if="here" class="flex items-center gap-1.5 text-gray-600 dark:text-gray-300">
