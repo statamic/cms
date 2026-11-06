@@ -58,12 +58,6 @@ watch(chatFloating, () => {
     setTimeout(() => (switchingLayout.value = false), 100);
 }, { flush: 'sync' });
 
-// A quiet card until the input is focused: a plain grey 1px edge. Focusing it brings in the purple-to-blue gradient edge, a 1px blue line just inside it (so 2px in all, like a focused field's outline), and a purple glow. The outline is drawn over the edge, so nothing moves. While a run is working, or waiting for you, it keeps the same focused look (data-working), even once focus has moved to the page.
-const chatCardClasses = 'rounded-xl border border-transparent ps-2.25 focus-within:outline-1 focus-within:-outline-offset-2 focus-within:outline-blue-400 focus-within:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] [background:linear-gradient(white,white)_padding-box,linear-gradient(var(--color-gray-200),var(--color-gray-200))_border-box] dark:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(var(--color-gray-700),var(--color-gray-700))_border-box] focus-within:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus-within:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] data-working:outline-1 data-working:-outline-offset-2 data-working:outline-blue-400 data-working:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] data-working:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:data-working:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box]';
-
-// Once a chat has started, hovering the floating chat (while it isn't focused, which has its own stronger glow) brings in a softer version of the focus glow, at about half its strength. It eases in slowly, over 700ms, and out quicker. Before then it's just an input, so it stays quiet.
-const chatCardHoverClasses = computed(() => (chatMessages.value.length ? '[&:hover:not(:focus-within)]:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_22%,transparent)]' : ''));
-
 // While a run is working, or waiting for you, the floating chat keeps its focused look, even once focus has moved to the page
 const chatWorking = computed(() => chatMessages.value.some((message) => ['working', 'waiting'].includes(message.run?.status)));
 
@@ -238,10 +232,10 @@ onUnmounted(() => {
         <div
             v-if="chatFloating"
             v-show="chatOpen"
-            :class="[chatCardClasses, chatCardHoverClasses]"
+            :data-started="chatMessages.length ? '' : undefined"
             :data-working="chatWorking || undefined"
             :data-released="chatReleased || undefined"
-            class="ai-chat-card transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+            class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatCloseControl />

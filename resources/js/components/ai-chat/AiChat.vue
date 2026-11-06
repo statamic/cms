@@ -16,12 +16,12 @@ const { open, messages, floating, focusRequests, demoRequest, dictateRequest, ph
 // You, for your avatar beside your messages
 const user = Statamic.user;
 
-// Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card: the purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field) and a purple glow.
+// Floating, the input sits straight on the card with no box of its own (the card carries the focus edge). Docked, it keeps its usual white box, which gets the same focused decoration as the floating card (see components/ai.css).
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it. The empty box is 34px tall (it measured 33.5), so the card's edges and focus ring land on whole pixels and the send button is centred in the ring.
         'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! dark:bg-transparent!'
-        : 'ai-dock-input focus:border-transparent focus:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:focus:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] focus:outline-1 focus:-outline-offset-2 focus:outline-blue-400 focus:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)] data-working:border-transparent data-working:[background:linear-gradient(white,white)_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] dark:data-working:[background:linear-gradient(var(--color-gray-900),var(--color-gray-900))_padding-box,linear-gradient(135deg,var(--color-ai),var(--color-ai-end))_border-box] data-working:outline-1 data-working:-outline-offset-2 data-working:outline-blue-400 data-working:shadow-[0_10px_40px_-10px_color-mix(in_oklab,var(--color-ai)_45%,transparent)]',
+        : 'ai-dock-input',
 );
 const prompt = ref('');
 

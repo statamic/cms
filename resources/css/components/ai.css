@@ -5,9 +5,49 @@
 
 /* GROUP AI / CHAT EDGE
 =================================================== */
-/* Once a run finishes, the floating chat's focused look (see chatCardClasses in PanelLayout.vue) fades away over a second: the edge from purple and blue to
-   its quiet grey, with the blue line and glow. The edge's two colours are registered so they can fade, which a gradient can't on its own.
-   Not while the chat is focused, which keeps its look. Reduced motion lets go at once. */
+/* The floating card and the docked input share a look. At rest, the card has a plain grey 1px edge, and the input is a normal field. Focused, or while a run
+   is working or waiting for you, they get a purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field's outline) and a
+   purple glow. The outline is drawn over the edge, so nothing moves. */
+.ai-chat-card,
+.ai-dock-input {
+    --ai-card-bg: white;
+    --ai-edge-quiet: var(--color-gray-200);
+    --ai-edge-fill: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box;
+}
+
+.ai-dock-input {
+    --ai-edge-quiet: var(--color-gray-300);
+}
+
+.dark .ai-chat-card,
+.dark .ai-dock-input {
+    --ai-card-bg: var(--color-gray-900);
+    --ai-edge-quiet: var(--color-gray-700);
+}
+
+.ai-chat-card {
+    background: var(--ai-edge-fill), linear-gradient(var(--ai-edge-quiet), var(--ai-edge-quiet)) border-box;
+}
+
+.ai-chat-card:focus-within,
+.ai-chat-card[data-working],
+.ai-dock-input:focus,
+.ai-dock-input[data-working] {
+    border-color: transparent;
+    background: var(--ai-edge-fill), linear-gradient(135deg, var(--color-ai), var(--color-ai-end)) border-box;
+    outline: 1px solid var(--color-blue-400);
+    outline-offset: -2px;
+    box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--color-ai) 45%, transparent);
+}
+
+/* Once a chat has started, hovering the floating card brings in a softer version of the glow, at about half its strength. Before then it's just an input,
+   so it stays quiet. */
+.ai-chat-card[data-started]:not(:focus-within, [data-working]):hover {
+    box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--color-ai) 22%, transparent);
+}
+
+/* Once a run stops, that look fades away over a second to the quiet edge, rather than going at once. The edge's two colours are registered so they can fade,
+   which a gradient can't on its own. Not while it's focused, which keeps its look. Reduced motion lets go at once. */
 @property --ai-edge-a {
     syntax: '<color>';
     inherits: false;
@@ -21,18 +61,16 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .ai-chat-card[data-released]:not(:focus-within) {
-        --ai-card-bg: white;
-        --ai-edge-quiet: var(--color-gray-200);
-        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
+    .ai-chat-card[data-released]:not(:focus-within),
+    .ai-dock-input[data-released]:not(:focus) {
+        background: var(--ai-edge-fill), linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
         outline: 1px solid transparent;
         outline-offset: -2px;
         animation: ai-chat-release 1s ease-out both;
     }
 
-    .dark .ai-chat-card[data-released]:not(:focus-within) {
-        --ai-card-bg: var(--color-gray-900);
-        --ai-edge-quiet: var(--color-gray-700);
+    .ai-dock-input[data-released]:not(:focus) {
+        border-color: transparent;
     }
 }
 
@@ -48,24 +86,6 @@
         --ai-edge-b: var(--ai-edge-quiet);
         outline-color: transparent;
         box-shadow: 0 10px 40px -10px transparent;
-    }
-}
-
-/* Once a run stops, the docked input's glow fades over a second to the input's quiet edge, in the same way as the floating card's (see ai-chat-release above, which this borrows). Not while the input is focused, which keeps its glow. */
-@media (prefers-reduced-motion: no-preference) {
-    .ai-dock-input[data-released]:not(:focus) {
-        --ai-card-bg: white;
-        --ai-edge-quiet: var(--color-gray-300);
-        border-color: transparent;
-        background: linear-gradient(var(--ai-card-bg), var(--ai-card-bg)) padding-box, linear-gradient(135deg, var(--ai-edge-a), var(--ai-edge-b)) border-box;
-        outline: 1px solid transparent;
-        outline-offset: -2px;
-        animation: ai-chat-release 1s ease-out both;
-    }
-
-    .dark .ai-dock-input[data-released]:not(:focus) {
-        --ai-card-bg: var(--color-gray-900);
-        --ai-edge-quiet: var(--color-gray-700);
     }
 }
 
