@@ -103,7 +103,7 @@ export default {
 
         // It opens up as it comes in, and glows in the AI colour, which settles back into the card's own shadow
         aiRowClasses() {
-            return this.aiChanged ? 'ai-bp' : '';
+            return this.aiChanged ? 'ai-added' : '';
         },
 
         tooltipText() {
