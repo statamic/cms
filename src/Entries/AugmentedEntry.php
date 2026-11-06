@@ -16,11 +16,17 @@ class AugmentedEntry extends AbstractAugmented
             return $this->cachedKeys;
         }
 
-        return $this->cachedKeys = $this->data->keys()
-            ->merge($this->data->supplements()->keys())
-            ->merge($this->commonKeys())
-            ->merge($this->blueprintFields()->keys())
-            ->unique()->sort()->values()->all();
+        $keys = array_merge(
+            collect($this->data->keys())->all(),
+            array_keys(collect($this->data->supplements())->all()),
+            $this->commonKeys(),
+            array_keys($this->blueprintFields()->all()),
+        );
+
+        $keys = array_unique($keys, SORT_REGULAR);
+        asort($keys, SORT_REGULAR);
+
+        return $this->cachedKeys = array_values($keys);
     }
 
     private function commonKeys()

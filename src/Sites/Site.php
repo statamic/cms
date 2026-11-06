@@ -14,6 +14,7 @@ use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
+use WeakMap;
 
 class Site implements Augmentable, QueryableValue
 {
@@ -23,6 +24,12 @@ class Site implements Augmentable, QueryableValue
     protected $config;
     protected $rawConfig;
     protected $isDefault;
+
+    /**
+     * The absolute URLs of sites with relative URLs, kept per request and keyed
+     * on everything that goes into them.
+     */
+    private static ?WeakMap $absoluteUrls = null;
 
     public function __construct($handle, $config, $isDefault = false)
     {
@@ -79,7 +86,27 @@ class Site implements Augmentable, QueryableValue
 
     public function absoluteUrl()
     {
-        return URL::makeAbsolute($this->url());
+        $configUrl = $this->config['url'] ?? null;
+
+        // Only a relative site URL depends on the request.
+        if (! is_string($configUrl) || $configUrl === '' || preg_match('#^(//|[a-z][a-z0-9+.\-]*:)#i', $configUrl)) {
+            return URL::makeAbsolute($this->url());
+        }
+
+        $request = app('request');
+        $key = $configUrl."\0".(URL::isEnforcingTrailingSlashes() ? '1' : '0')."\0".url()->to('/')."\0".$request->getScriptName();
+
+        self::$absoluteUrls ??= new WeakMap;
+        $memo = self::$absoluteUrls[$request] ?? [];
+
+        if (isset($memo[$key])) {
+            return $memo[$key];
+        }
+
+        $memo[$key] = $absolute = URL::makeAbsolute($this->url());
+        self::$absoluteUrls[$request] = $memo;
+
+        return $absolute;
     }
 
     public function relativePath($url)

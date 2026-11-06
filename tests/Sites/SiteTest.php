@@ -183,6 +183,27 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function the_absolute_url_of_a_relative_site_follows_the_request()
+    {
+        $site = new Site('en', ['url' => '/fr/']);
+
+        $this->assertEquals('http://absolute-url-resolved-from-request.com/fr', $site->absoluteUrl());
+
+        $this->get('https://another-host.com/something');
+        $this->assertEquals('https://another-host.com/fr', $site->absoluteUrl());
+
+        url()->forceRootUrl('https://forced-root.com');
+        $this->assertEquals('https://forced-root.com/fr', $site->absoluteUrl());
+
+        url()->forceRootUrl(null);
+        $this->assertEquals('https://another-host.com/fr', $site->absoluteUrl());
+
+        \Statamic\Facades\URL::enforceTrailingSlashes();
+        $this->assertEquals('https://another-host.com/fr/', $site->absoluteUrl());
+        \Statamic\Facades\URL::enforceTrailingSlashes(false);
+    }
+
+    #[Test]
     public function gets_path()
     {
         tap(new Site('en', ['url' => 'http://test.com/']), function ($site) {

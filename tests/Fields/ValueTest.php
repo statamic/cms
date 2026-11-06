@@ -450,4 +450,53 @@ class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
             'title' => 'Title for '.$this->id,
         ];
     }
+
+    #[Test]
+    public function it_remembers_the_augmented_value_of_fieldtypes_that_only_depend_on_the_raw_value()
+    {
+        $fieldtype = new class extends \Statamic\Fieldtypes\Text
+        {
+            public $augmented = 0;
+
+            public function augment($value)
+            {
+                $this->augmented++;
+
+                return strtoupper($value);
+            }
+        };
+
+        // A subclass could do anything when augmenting, so it isn't remembered.
+        $value = new Value('foo', 'test', $fieldtype);
+        $this->assertEquals('FOO', $value->value());
+        $this->assertEquals('FOO', $value->value());
+        $this->assertSame(2, $fieldtype->augmented);
+
+        $select = (new \Statamic\Fieldtypes\Select)->setField(new Field('test', ['type' => 'select', 'options' => ['a' => 'Alfa']]));
+        $value = new Value('a', 'test', $select);
+        $this->assertSame($value->value(), $value->value());
+        $this->assertEquals('Alfa', $value->value()->label());
+
+        $value->setFieldtype((new \Statamic\Fieldtypes\Select)->setField(new Field('test', ['type' => 'select', 'options' => ['a' => 'Changed']])));
+        $this->assertEquals('Changed', $value->value()->label());
+    }
+
+    #[Test]
+    public function it_augments_other_fieldtypes_on_every_read()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            public $augmented = 0;
+
+            public function augment($value)
+            {
+                return $value.' '.++$this->augmented;
+            }
+        };
+
+        $value = new Value('foo', 'test', $fieldtype);
+
+        $this->assertEquals('foo 1', $value->value());
+        $this->assertEquals('foo 2', $value->value());
+    }
 }
