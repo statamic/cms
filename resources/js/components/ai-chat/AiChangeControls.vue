@@ -75,10 +75,11 @@ const partClass = (type) => ({
             <Badge v-if="hadNothing" size="sm" icon="plus" :class="addedBadge" :text="__('Added by AI')" />
             <!-- Otherwise it opens and closes the changes, with a chevron that turns over while they're open -->
             <button v-else type="button" class="group/badge cursor-pointer" :aria-expanded="open" :aria-label="open ? __('Hide changes') : __('Show what the AI changed')" @click="open = !open">
+                <!-- Dark mode is a purple tint rather than the grey the other Badge colours have, as the grey lost the purple: a 20% fill of the theme's AI colour, with text mixed from it (in oklch, which keeps the colour as it lightens). -->
                 <Badge
                     size="sm"
                     icon-append="chevron-down"
-                    :class="['bg-ai/5 border-ai/40 text-ai group-hover/badge:bg-ai/10 dark:border dark:bg-gray-800 dark:border-ai/60 dark:text-white [&_svg]:transition-transform', open ? '[&_svg]:rotate-180' : '']"
+                    :class="['bg-ai/5 border-ai/40 text-ai group-hover/badge:bg-ai/10 dark:bg-ai/20 dark:text-[color-mix(in_oklch,var(--color-ai),white_62%)] dark:group-hover/badge:bg-ai/30 [&_svg]:transition-transform', open ? '[&_svg]:rotate-180' : '']"
                     :text="__('Changed by AI')"
                 />
             </button>
