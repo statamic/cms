@@ -26,6 +26,18 @@ class CollectionEntriesStore extends ChildStore
     protected $collection;
     private bool $shouldBlinkEntryUris = true;
 
+    public function handleFileChanges()
+    {
+        // Entries get their uris, parents and order from the collection trees, so a tree file that
+        // changed on disk has to be picked up before this store's indexes are used. (Each store
+        // only checks once per request, so this can't loop.)
+        if (Stache::isWatcherEnabled() && ! $this->fileChangesHandled && $this->collection()?->hasStructure()) {
+            Stache::store('collection-trees')?->handleFileChanges();
+        }
+
+        parent::handleFileChanges();
+    }
+
     protected function collection()
     {
         return $this->collection ?? Collection::findByHandle($this->childKey);
