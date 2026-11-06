@@ -217,32 +217,41 @@ abstract class Store
             return $existingTimestamp < $timestamp;
         });
 
-        // Get all the deleted files.
+        // Get all the deleted files, with the key each one had.
         // This would be any paths that exist in the cached array that aren't there anymore.
         $keys = $this->paths()->flip();
         $deleted = $existing->keys()
-            ->map(fn ($path) => $keys->get($path))
-            ->diff($files->keys()->map(fn ($path) => $keys->get($path)))
-            ->values();
+            ->diff($files->keys())
+            ->mapWithKeys(fn ($path) => [$path => $keys->get($path)])
+            ->filter();
 
         // If there are no modified or deleted files, there's nothing to update.
         if ($modified->isEmpty() && $deleted->isEmpty()) {
             return;
         }
 
-        // Flush cached instances of deleted items.
-        $deleted->each(function ($path) {
-            collect($this->getKeyFromPath($path))->each(function ($key) use ($path) {
-                $this->forgetItem($key);
-                $this->forgetPath($key);
-                $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
-                $this->handleDeletedItem($path, $key);
-            });
-        });
-
         // Get items from every file that was modified.
         $modified = $modified->flatMap(function ($timestamp, $path) {
             return Arr::wrap($this->getItemFromModifiedPath($path));
+        });
+
+        // A file that was renamed or moved shows up as a deleted path plus a modified one with
+        // the same key. That item still exists, so only its old path is released here. It'll be
+        // re-added under its new path along with the other modified items below.
+        $modifiedKeys = $modified->map(fn ($item) => $this->getItemKey($item))->flip();
+
+        $deleted->each(function ($key, $path) use ($modifiedKeys) {
+            if ($modifiedKeys->has($key)) {
+                $this->keys()->forget($key);
+
+                return;
+            }
+
+            // Flush cached instances of deleted items.
+            $this->forgetItem($key);
+            $this->forgetPath($key);
+            $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
+            $this->handleDeletedItem($path, $key);
         });
 
         // Remove items with duplicate IDs/keys
@@ -279,6 +288,10 @@ abstract class Store
                 $index->updateItem($item);
             });
         });
+
+        // The paths were memoized before the changes above were applied to the path index,
+        // so drop them; the next call reads the updated ones (with added and renamed files).
+        $this->paths = null;
 
         $this->modified = $modified;
     }
