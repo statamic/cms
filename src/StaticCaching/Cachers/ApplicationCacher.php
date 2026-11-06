@@ -7,6 +7,7 @@ use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Page;
+use Statamic\Support\Str;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -161,5 +162,97 @@ class ApplicationCacher extends AbstractCacher
             });
 
         UrlInvalidated::dispatch($url, $domain);
+    }
+
+    /**
+     * Invalidate multiple URLs.
+     *
+     * Invalidating URLs one at a time reads and rewrites the domain's whole URL
+     * index for every match, which gets slow when many URLs are invalidated at
+     * once on a site with a large index. Instead, the URLs are walked in order
+     * against an in-memory copy of each domain's index, exactly as invalidating
+     * them one at a time would, and each domain's index is rewritten once.
+     *
+     * The same UrlInvalidated events are dispatched, in the same order, as
+     * invalidating them one at a time. They are dispatched once everything has
+     * been removed, so listeners never see a page that is about to be removed.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function invalidateUrls($urls)
+    {
+        $indexes = [];
+        $removed = [];
+        $events = [];
+
+        $invalidate = function ($path, $domain) use (&$indexes, &$removed, &$events) {
+            foreach ($indexes[$domain]['paths'][$path] ?? [] as $key) {
+                $removed[$domain][$key] = true;
+            }
+
+            $events[] = [$path, $domain];
+        };
+
+        foreach ($urls as $url) {
+            $wildcard = Str::contains($url, '*');
+
+            [$path, $domain] = $this->getPathAndDomain($wildcard ? substr($url, 0, -1) : $url);
+
+            $indexes[$domain] ??= $this->getUrlIndex($domain);
+
+            if (! $wildcard) {
+                $invalidate($path, $domain);
+
+                continue;
+            }
+
+            // Match against the index as it stands before this wildcard, like
+            // invalidateWildcardUrl() does, then invalidate each match in turn.
+            $matches = collect($indexes[$domain]['urls'])
+                ->reject(fn ($value, $key) => isset($removed[$domain][$key]))
+                ->filter(fn ($value) => Str::startsWith($value, $path));
+
+            foreach ($matches as $match) {
+                $invalidate($match, $domain);
+            }
+        }
+
+        foreach ($removed as $domain => $keys) {
+            $keys = array_keys($keys);
+
+            foreach ($keys as $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+            }
+
+            $this->forgetUrls($keys, $domain);
+        }
+
+        foreach ($events as [$path, $domain]) {
+            UrlInvalidated::dispatch($path, $domain);
+        }
+    }
+
+    /**
+     * Get a domain's URLs, along with the keys that invalidateUrl() would remove
+     * for each path: the path itself, or any query string version of it.
+     */
+    private function getUrlIndex($domain)
+    {
+        $urls = $this->getUrls($domain)->all();
+        $paths = [];
+
+        foreach ($urls as $key => $value) {
+            $paths[$value][] = $key;
+
+            $offset = 0;
+
+            while (($position = strpos($value, '?', $offset)) !== false) {
+                $paths[substr($value, 0, $position)][] = $key;
+                $offset = $position + 1;
+            }
+        }
+
+        return ['urls' => $urls, 'paths' => $paths];
     }
 }
