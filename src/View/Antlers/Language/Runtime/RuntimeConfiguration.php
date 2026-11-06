@@ -134,13 +134,65 @@ class RuntimeConfiguration
     public $allowMethodsInUserContent = false;
 
     /**
+     * @internal
+     *
+     * @var bool
+     */
+    public $annotateHtmlContext = false;
+
+    /**
      * Registers a new Antlers preparser callback.
      *
      * @param  callable  $callable  The preparser callback.
      */
     public function preparse(callable $callable)
     {
+        if (in_array($callable, $this->preparsers, true)) {
+            return;
+        }
+
         $this->preparsers[] = $callable;
+    }
+
+    /**
+     * @internal
+     *
+     * @return void
+     */
+    public function removePreparser(callable $callable)
+    {
+        $this->preparsers = array_values(array_filter(
+            $this->preparsers,
+            fn ($preparser) => $preparser !== $callable
+        ));
+    }
+
+    /**
+     * @internal
+     *
+     * @param  callable|null  $previous
+     * @param  callable|null  $replacement
+     * @return void
+     */
+    public function replacePreparser($previous, $replacement)
+    {
+        $index = $previous === null ? false : array_search($previous, $this->preparsers, true);
+
+        if ($index === false) {
+            if ($replacement !== null) {
+                $this->preparse($replacement);
+            }
+
+            return;
+        }
+
+        if ($replacement === null || in_array($replacement, $this->preparsers, true)) {
+            array_splice($this->preparsers, $index, 1);
+
+            return;
+        }
+
+        $this->preparsers[$index] = $replacement;
     }
 
     /**
@@ -154,13 +206,68 @@ class RuntimeConfiguration
     }
 
     /**
+     * @internal
+     *
+     * @return bool
+     */
+    public function hasRegisteredTracers()
+    {
+        if ($this->traceManager === null) {
+            return false;
+        }
+
+        if ($this->traceManager->tracers() !== []) {
+            return true;
+        }
+
+        return $this->traceManager->spanTracers() !== [];
+    }
+
+    /**
+     * @internal
+     *
+     * @return TraceManager
+     */
+    public function enableTracing()
+    {
+        if ($this->traceManager === null) {
+            $this->traceManager = new TraceManager();
+        }
+
+        $this->isTracingEnabled = true;
+
+        return $this->traceManager;
+    }
+
+    /**
      * Registers a new NodeVisitorContract instance.
      *
      * @param  NodeVisitorContract  $visitor  The visitor.
      */
     public function addVisitor(NodeVisitorContract $visitor)
     {
+        if (in_array($visitor, $this->visitors, true)) {
+            return;
+        }
+
         $this->visitors[] = $visitor;
+    }
+
+    /**
+     * @internal
+     *
+     * @return void
+     */
+    public function removeVisitor(NodeVisitorContract $visitor)
+    {
+        if (! in_array($visitor, $this->visitors, true)) {
+            return;
+        }
+
+        $this->visitors = array_values(array_filter(
+            $this->visitors,
+            fn ($registered) => $registered !== $visitor
+        ));
     }
 
     /**

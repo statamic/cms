@@ -2,7 +2,9 @@
 
 namespace Statamic\View\Antlers;
 
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Instrumentation\InstrumentationState;
 
 class AntlersLoop extends AntlersString
 {
@@ -12,6 +14,8 @@ class AntlersLoop extends AntlersString
     protected $supplement;
     protected $context;
     protected $trusted;
+    protected $suppressesInstrumentation;
+    protected $tagBody;
 
     public function __construct($parser, $string, $variables, $supplement, $context, $trusted = false)
     {
@@ -21,15 +25,35 @@ class AntlersLoop extends AntlersString
         $this->supplement = $supplement;
         $this->context = $context;
         $this->trusted = $trusted;
+        $this->suppressesInstrumentation = InstrumentationState::suppressed();
+        $this->tagBody = InstrumentationState::activeTagBody();
     }
 
     public function __toString()
+    {
+        return $this->render()[0];
+    }
+
+    /** @internal */
+    public function instrumented()
+    {
+        return $this->render()[1];
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function render()
     {
         $previousIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = ! $this->trusted;
 
         try {
-            return $this->renderLoopContent();
+            $render = fn () => InstrumentationState::withTagBody($this->tagBody, fn () => $this->renderLoopContent());
+
+            if ($this->suppressesInstrumentation) {
+                return InstrumentationState::withoutInstrumentation($render);
+            }
+
+            return $render();
         } finally {
             GlobalRuntimeState::$isEvaluatingUserData = $previousIsEvaluatingUserData;
         }
@@ -39,8 +63,9 @@ class AntlersLoop extends AntlersString
     {
         $total = count($this->variables);
         $i = 0;
+        $hasInstrumentation = false;
 
-        $contents = collect($this->variables)->reduce(function ($carry, $item) use (&$i, $total) {
+        $instrumented = collect($this->variables)->reduce(function ($carry, $item) use (&$i, &$hasInstrumentation, $total) {
             if ($this->supplement) {
                 $item = array_merge($item, [
                     'index' => $i,
@@ -57,11 +82,23 @@ class AntlersLoop extends AntlersString
                 ->parse($this->string, array_merge($this->context, $item))
                 ->withoutExtractions();
 
+            if ($parsed instanceof AntlersString && $parsed->hasInstrumentation()) {
+                $hasInstrumentation = true;
+
+                return $carry.$parsed->instrumented();
+            }
+
             return $carry.$parsed;
         }, '');
 
-        $string = new AntlersString($contents, $this->parser);
+        if ($this->injectExtractions) {
+            $instrumented = $this->parser->injectNoparse($instrumented);
+        }
 
-        return (string) ($this->injectExtractions ? $string : $string->withoutExtractions());
+        if (! $hasInstrumentation) {
+            return [$instrumented, $instrumented];
+        }
+
+        return [Runtime::removeMarkers($instrumented), $instrumented];
     }
 }

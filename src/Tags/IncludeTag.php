@@ -83,7 +83,7 @@ class IncludeTag extends Tags
 
         $cascade = Cascade::toArray();
 
-        $scope = array_merge(
+        $scope = $this->withInstrumentedSlot(array_merge(
             $this->params->bool('cascade') ? $cascade : [],
             $data,
             $this->resolveSlots($parameters, $data, $isBlade),
@@ -92,7 +92,7 @@ class IncludeTag extends Tags
                 '__frontmatter' => $data,
             ],
             $isBlade ? [self::CONTEXT_KEY => true] : []
-        );
+        ));
 
         $hadViews = array_key_exists('views', $cascade);
         $viewsState = $cascade['views'] ?? null;

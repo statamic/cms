@@ -1906,6 +1906,12 @@ class LanguageParser
                     $newNodes[] = $node;
                 }
             } elseif ($node instanceof ImplicitArrayBegin && $newNodeCount > 0) {
+                if (($i + 1) >= $tokenCount) {
+                    $newNodes[] = $node;
+
+                    continue;
+                }
+
                 $left = $newNodes[$newNodeCount - 1];
                 $right = $tokens[$i + 1];
 

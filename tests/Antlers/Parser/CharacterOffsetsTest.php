@@ -73,6 +73,19 @@ class CharacterOffsetsTest extends TestCase
         $this->assertSame([10 => 41], CharacterOffsets::toCharacters(self::MIXED, [10], true, 6, 40));
     }
 
+    public function test_normalized_offsets_map_back_to_source_bytes_and_characters()
+    {
+        [$bytes, $characters] = CharacterOffsets::normalizedToBytesAndCharacters("a\r\nb\u{00E9}\r\nc", [0, 1, 2, 3, 4, 5, 6]);
+
+        $this->assertSame([0 => 0, 1 => 1, 2 => 3, 3 => 4, 4 => 6, 5 => 8, 6 => 9], $bytes);
+        $this->assertSame([0 => 0, 1 => 1, 3 => 3, 4 => 4, 6 => 5, 8 => 7, 9 => 8], $characters);
+
+        [$bytes, $characters] = CharacterOffsets::normalizedToBytesAndCharacters('plain', [0, 3, 9]);
+
+        $this->assertSame([0 => 0, 3 => 3, 9 => 5], $bytes);
+        $this->assertSame([0 => 0, 3 => 3, 5 => 5], $characters);
+    }
+
     public function test_conversions_round_trip_on_mixed_content()
     {
         $source = str_repeat("plain ascii line\n", 40).str_repeat("\u{65E5}\u{672C}\u{8A9E} \u{1F389} caf\u{00E9}\n", 40);

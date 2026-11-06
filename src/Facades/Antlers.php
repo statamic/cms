@@ -10,6 +10,7 @@ use Statamic\View\Antlers\AntlersString;
  * @method static Parser parser()
  * @method static mixed usingParser(Parser $parser, \Closure $callback)
  * @method static AntlersString parse(string $str, array $variables = [], bool $trusted = false)
+ * @method static AntlersString parseWithoutInstrumentation(string $str, array $variables = [], bool $trusted = false)
  * @method static string parseLoop(string $content, array $data, bool $supplement = true, array $context = [], bool $trusted = false)
  * @method static array identifiers(string $content)
  *

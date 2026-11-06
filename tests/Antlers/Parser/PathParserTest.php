@@ -2,6 +2,8 @@
 
 namespace Tests\Antlers\Parser;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\Paths\PathNode;
 use Statamic\View\Antlers\Language\Nodes\Paths\VariableReference;
 use Tests\Antlers\ParserTestCase;
@@ -104,5 +106,22 @@ class PathParserTest extends ParserTestCase
         $result = $this->renderString('{{ values[value] }}', $data);
 
         $this->assertSame('', $result);
+    }
+
+    #[DataProvider('unclosedAccessorProvider')]
+    public function test_unclosed_accessors_throw_instead_of_looping($path)
+    {
+        $this->expectException(SyntaxErrorException::class);
+
+        $this->parsePath($path);
+    }
+
+    public static function unclosedAccessorProvider()
+    {
+        return [
+            'missing outer bracket' => ['values[keys[0]'],
+            'ends on an opening bracket' => ['values[keys['],
+            'ends on an opening quote' => ['values["'],
+        ];
     }
 }

@@ -38,7 +38,7 @@ class ConditionProcessor
             if ($branch->head->name->name == 'else') {
                 // For consistency.
                 if ($this->processor->isTracingEnabled()) {
-                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head);
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head, $this->processor);
                 }
 
                 if (GlobalDebugManager::$isConnected && GlobalDebugManager::$activeSessionLocator != null) {
@@ -66,7 +66,7 @@ class ConditionProcessor
                 $interpolationReplacements = [];
 
                 if ($this->processor->isTracingEnabled()) {
-                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head);
+                    $this->processor->getRuntimeConfiguration()->traceManager->traceOnEnter($branch->head, $this->processor);
                 }
 
                 if (GlobalDebugManager::$isConnected && GlobalDebugManager::$activeSessionLocator != null) {

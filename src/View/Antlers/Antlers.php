@@ -6,6 +6,7 @@ use Closure;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\View\Antlers\Language\Parser\IdentifierFinder;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
+use Statamic\View\Instrumentation\InstrumentationState;
 
 class Antlers
 {
@@ -29,15 +30,22 @@ class Antlers
 
     public function parse($str, $variables = [], $trusted = false)
     {
-        $parser = $this->parser();
         $previousState = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = ! $trusted;
 
         try {
-            return $parser->parse($str, $variables);
+            return $this->parser()->parse($str, $variables);
         } finally {
             GlobalRuntimeState::$isEvaluatingUserData = $previousState;
         }
+    }
+
+    /** @internal */
+    public function parseWithoutInstrumentation($str, $variables = [], $trusted = false)
+    {
+        return InstrumentationState::withoutInstrumentation(
+            fn () => $this->parse($str, $variables, $trusted)
+        );
     }
 
     /**
