@@ -9,7 +9,7 @@ import { moving, writing } from './mock-runs.js';
 // still deepening as the new page arrives and the two read as one movement. It lifts quickly, so the move never feels held up.
 // The page's layer sits at the same level as the floating chat but comes before it, so the chat stays clear. The global header is above the
 // whole page area, so it gets a layer of its own, sent to the end of the body so it can sit over the header.
-const wash = 'bg-gray-950/30 dark:bg-black/50';
+const wash = 'bg-gray-950/30';
 
 // Once it's there, the message stays as the dimming lifts, and turns into "You're now on…", so it's clear you've moved. It then fades
 // after a few seconds. A new move takes over straight away.
@@ -166,10 +166,6 @@ watchEffect(() => document.documentElement.toggleAttribute('data-ai-moving', !!m
 }
 .ai-move-message[data-arrived] {
     background: var(--color-global-header-bg);
-}
-
-.dark .ai-move-message:not([data-arrived]) {
-    background: linear-gradient(rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.5)), var(--color-global-header-bg);
 }
 
 /* Like nprogress: it creeps towards the end while it waits, then fills the rest and fades out. Reduced motion skips the creep. */

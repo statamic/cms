@@ -496,7 +496,7 @@ function stopFollowing() {
         <!-- While the help is open it dims, so the help stands out in front of it -->
         <!-- The cards' left and right gutters match: the thread's 2px on the left sits after the 9px the floating card or the docked panel already has on that side, so the right padding is the same 11px floating, and 10px docked (the panel's 8px, not 9). -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's. The same room below the last card as above the first. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 py-3.5 ai-chat-thread transition-[opacity,filter]', floating ? 'flex-initial rounded-t-[11px] pe-[11px]' : 'flex-1 pe-2.5', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '', dimmed ? '[transition-duration:150ms,500ms] ease-[cubic-bezier(0.4,0,0.2,1)] brightness-70 dark:brightness-50' : '[transition-duration:150ms,300ms] ease-out']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 py-3.5 ai-chat-thread transition-[opacity,filter]', floating ? 'flex-initial rounded-t-[11px] pe-[11px]' : 'flex-1 pe-2.5', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '', dimmed ? '[transition-duration:150ms,500ms] ease-[cubic-bezier(0.4,0,0.2,1)] brightness-70' : '[transition-duration:150ms,300ms] ease-out']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
@@ -538,7 +538,7 @@ function stopFollowing() {
             ref="form"
             :class="[
                 'relative transition-[filter] duration-500',
-                dimmed ? 'brightness-85 dark:brightness-75' : '',
+                dimmed ? 'brightness-85' : '',
                 floating ? 'p-2' : 'p-2.5',
                 // Like the command palette's search row, there's a divider above the input once a chat has started. It runs edge to edge, so it steps out into the card's left padding. Docked has none: the input is its own box.
                 floating && messages.length ? 'border-t border-gray-200/80 dark:border-gray-950' : '',
