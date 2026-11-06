@@ -589,7 +589,7 @@ function stopFollowing() {
             <div
                 v-if="askInInput"
                 :class="floating ? 'inset-x-[11px] bottom-[11px] rounded-t-xl rounded-b-lg' : 'start-0.5 end-2.5 bottom-2.5 rounded-xl'"
-                class="absolute z-(--z-index-portal) space-y-2.5 bg-white px-2.5 py-3 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
+                class="absolute z-(--z-index-portal) space-y-2.5 bg-white p-4 shadow-ui-lg ring ring-gray-300 dark:bg-gray-900 dark:ring-gray-600"
                 @keydown.esc.stop.prevent="answer(waitingRun.waiting.choices.at(-1).value)"
             >
                 <p class="text-[0.8125rem]/5 text-gray-800 dark:text-gray-200">{{ waitingRun.waiting.question }}</p>
@@ -631,6 +631,8 @@ function stopFollowing() {
                 elastic
                 :class="[
                     inputClasses,
+                    // Docked, it's hidden behind the question card, so its squarer corners don't show past the card's
+                    !floating && askInInput ? 'opacity-0' : '',
                     floating ? 'ps-8.5!' : 'ps-9.5!',
                     // A long placeholder cuts off before the controls, rather than wrapping or running under them
                     'placeholder:overflow-hidden placeholder:whitespace-nowrap',
