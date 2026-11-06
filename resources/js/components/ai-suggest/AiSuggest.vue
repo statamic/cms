@@ -271,7 +271,7 @@ function follow(text) {
         <div ref="panel" @keydown="onArrowKey">
             <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
                 <!-- The ! is needed for the size, as Icon sets its own. In dark mode the AI purple is too dark against the panel, so it's lightened. -->
-                <Icon :name="icon" class="size-3.5! text-ai dark:text-[color-mix(in_oklch,var(--color-ai),white_55%)]" />
+                <Icon :name="icon" class="size-3.5! text-ai dark:text-ai-light" />
                 <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                     {{ __('Suggestions') }}
                 </span>

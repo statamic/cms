@@ -34,6 +34,8 @@
     --color-ai: var(--theme-color-ai);
     --color-ai-hover: color-mix(in oklch, var(--color-ai) 100%, black 30%);
     --color-ai-end: var(--theme-color-ai-end);
+    /* The AI colour lightened, for text and icons on dark backgrounds, where the colour itself is too dark to read */
+    --color-ai-light: color-mix(in oklch, var(--color-ai), white 62%);
 
     /* Custom color shades for all Tailwind color families */
     --color-slate-150: oklch(0.9485 0.01 251.702);
