@@ -183,8 +183,7 @@ onUnmounted(() => {
             ref="leftPanel"
             id="left-panel"
             tabindex="-1"
-            style="order: -1"
-            class="sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full min-[1000px]:grid mx-auto focus:outline-none pe-2"
+            class="-order-1 sticky top-0 overflow-y-scroll overscroll-y-contain overflow-x-clip h-full min-[1000px]:grid mx-auto focus:outline-none pe-2"
             :class="lockedClasses"
             :inert="locked"
         ></div>
@@ -197,8 +196,7 @@ onUnmounted(() => {
             ref="rightPanel"
             id="right-panel"
             tabindex="-1"
-            style="order: 2"
-            class="sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-me-2 mx-auto focus:outline-none ps-2"
+            class="order-2 sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-me-2 mx-auto focus:outline-none ps-2"
             :class="{ 'z-(--z-index-max)': chatInPanel && chatLifted }"
         >
             <Tabs v-if="showRightTabs" v-model="rightTab">

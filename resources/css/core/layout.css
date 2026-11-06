@@ -146,7 +146,7 @@ main.nav-closed {
     @apply lg:ps-0;
 }
 
-/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
+/* GROUP THREE PANEL STATES
 =================================================== */
 /* Three panels exist */
 [data-panels-showing] {
@@ -156,7 +156,7 @@ main.nav-closed {
         flex: 1;
     }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 999px) {
         [data-max-width-wrapper] {
             display: grid;
             grid-template-columns: auto 1fr auto;
