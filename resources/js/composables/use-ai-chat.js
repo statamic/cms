@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const floatingKey = 'statamic.ai-chat.floating';
 
@@ -21,9 +21,17 @@ function store(key, value) {
 const open = ref(false);
 const messages = ref([]);
 // Prototype: float the chat in the bottom right corner instead of docking it in the right sidebar.
-const floating = ref(getStored(floatingKey, true));
+// Under 1000px there's no room for the right sidebar, so it always floats there. The choice is kept, for when the window is wider again.
+const prefersFloating = ref(getStored(floatingKey, true));
+const narrowQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 999px)') : null;
+const narrow = ref(narrowQuery?.matches ?? false);
+narrowQuery?.addEventListener('change', (event) => (narrow.value = event.matches));
+const floating = computed({
+    get: () => prefersFloating.value || narrow.value,
+    set: (value) => (prefersFloating.value = value),
+});
 
-watch(floating, (value) => store(floatingKey, value));
+watch(prefersFloating, (value) => store(floatingKey, value));
 
 // Bumped to ask the chat to focus its input when it's already open.
 const focusRequests = ref(0);
