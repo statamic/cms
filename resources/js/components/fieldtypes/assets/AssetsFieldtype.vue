@@ -139,6 +139,7 @@
                                 v-for="asset in assets"
                                 :key="asset.id"
                                 :asset="asset"
+                                :errors="errorsForAsset(asset.id)"
                                 :siblings="assets"
                                 :read-only="isReadOnly"
                                 :show-filename="config.show_filename"
@@ -180,6 +181,7 @@
                                         v-for="asset in assets"
                                         :key="asset.id"
                                         :asset="asset"
+                                        :errors="errorsForAsset(asset.id)"
                                         :siblings="assets"
                                         :read-only="isReadOnly"
                                         :show-filename="config.show_filename"
@@ -387,6 +389,25 @@ export default {
          */
         assetIds() {
             return this.assets.map((asset) => asset.id);
+        },
+
+        errorsById() {
+            const prefix = `${this.fieldPathPrefix || this.handle}.`;
+
+            return Object.entries(this.publishContainer.errors || {}).reduce((acc, [key, value]) => {
+                if (!key.startsWith(prefix)) {
+                    return acc;
+                }
+
+                const assetIndex = key.slice(prefix.length).split('.').shift();
+                const assetId = this.assetIds[assetIndex];
+
+                if (assetId) {
+                    acc[assetId] = value;
+                }
+
+                return acc;
+            }, {});
         },
 
         /**
@@ -672,6 +693,10 @@ export default {
             } else {
                 this.loadAssets([...this.value, id]);
             }
+        },
+
+        errorsForAsset(id) {
+            return this.errorsById[id] ?? [];
         },
     },
 

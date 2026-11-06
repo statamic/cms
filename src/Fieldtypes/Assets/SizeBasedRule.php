@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes\Assets;
 use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class SizeBasedRule implements CastableToValidationString, Rule
@@ -25,7 +26,7 @@ abstract class SizeBasedRule implements CastableToValidationString, Rule
      */
     public function passes($attribute, $value)
     {
-        return collect($value)->every(function ($id) {
+        return collect(Arr::wrap($value))->every(function ($id) {
             if (($size = $this->getFileSize($id)) === false) {
                 return false;
             }

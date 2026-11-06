@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
@@ -30,7 +31,7 @@ class ImageRule implements CastableToValidationString, Rule
     {
         $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'avif'];
 
-        return collect($value)->every(function ($id) use ($extensions) {
+        return collect(Arr::wrap($value))->every(function ($id) use ($extensions) {
             if ($id instanceof UploadedFile) {
                 return in_array($id->guessExtension(), $extensions);
             }

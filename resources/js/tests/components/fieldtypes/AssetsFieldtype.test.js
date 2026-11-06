@@ -3,6 +3,7 @@ import { expect, test, vi } from 'vitest';
 import * as Globals from '@/bootstrap/globals';
 import { preferences } from '@api';
 import AssetsFieldtype from '@/components/fieldtypes/assets/AssetsFieldtype.vue';
+import { publishContextKey } from '@/components/ui';
 
 // Register the global helper functions (data_get, clone, etc.) onto the window
 // like the control panel bootstrap does, so the component can use them.
@@ -25,7 +26,10 @@ const makeField = ({ axiosPost = vi.fn(() => Promise.resolve({ data: [] })), pro
             ...props,
         },
         global: {
-            provide,
+            provide: {
+                [publishContextKey]: { errors: {} },
+                ...provide,
+            },
             mocks: {
                 $axios: { post: axiosPost },
                 $progress: { loading: () => {} },
@@ -115,4 +119,30 @@ test('an upload is appended in a single asset field so validation can flag it', 
     field.vm.uploadComplete({ id: 'main::b.jpg' });
 
     expect(field.vm.assets).toEqual([{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }]);
+});
+
+test('validation errors are shown on the asset they belong to', async () => {
+    const field = makeField({
+        provide: {
+            [publishContextKey]: {
+                errors: {
+                    'replicator.0.image': ['Field error'],
+                    'replicator.0.image.1': ['Asset error'],
+                    'replicator.0.image_alt.0': ['Other field error'],
+                },
+            },
+        },
+        props: {
+            fieldPathPrefix: 'replicator.0.image',
+            value: ['main::a.jpg', 'main::b.jpg'],
+            meta: {
+                container: { id: 'main', can_view: true, can_upload: true },
+                data: [{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }],
+            },
+        },
+    });
+    await flushPromises();
+
+    expect(field.vm.errorsForAsset('main::a.jpg')).toEqual([]);
+    expect(field.vm.errorsForAsset('main::b.jpg')).toEqual(['Asset error']);
 });

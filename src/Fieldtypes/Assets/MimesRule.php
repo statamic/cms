@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\Asset;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use function Statamic\trans as __;
@@ -32,7 +33,7 @@ class MimesRule implements CastableToValidationString, Rule
      */
     public function passes($attribute, $value)
     {
-        return collect($value)->every(function ($id) {
+        return collect(Arr::wrap($value))->every(function ($id) {
             if ($id instanceof UploadedFile) {
                 return in_array($id->guessExtension(), $this->parameters);
             }
