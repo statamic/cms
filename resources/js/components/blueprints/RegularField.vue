@@ -15,7 +15,7 @@
                         <span v-if="isReferenceField" class="shrink-0 text-gray-500 font-mono text-2xs cursor-help @max-2xs:hidden" v-text="__('Field')" v-tooltip="referenceTooltipText" />
                         <!-- Prototype: a field the AI chat added, until you save -->
                         <template v-if="aiChanged">
-                            <ui-badge size="sm" icon="plus" class="shrink-0 bg-gray-50 border-gray-300 text-gray-700 dark:border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300" :text="__('Added by AI')" />
+                            <ui-badge size="sm" icon="plus" class="shrink-0 bg-gray-100 border-gray-400 text-gray-800 dark:border dark:bg-gray-700 dark:border-gray-500 dark:text-gray-100" :text="__('Added by AI')" />
                             <button type="button" class="shrink-0 cursor-pointer rounded-md px-1 py-0.5 text-2xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" @click="aiUndo">
                                 <ui-icon name="undo" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
                                 {{ __('Undo') }}
