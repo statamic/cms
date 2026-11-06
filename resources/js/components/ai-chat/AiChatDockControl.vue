@@ -28,7 +28,8 @@ function measure() {
     const panelRect = panel.getBoundingClientRect();
     const formRect = form.getBoundingClientRect();
     // Centred on the corner: half the button's 28px either side of the line and the divider. The line is the edge of the page's card, 9px before the panel starts (its padding and the gap).
-    position.value = { left: panelRect.left - 9 - 14, top: formRect.top - 14 };
+    const rtl = document.documentElement.dir === 'rtl';
+    position.value = { left: (rtl ? panelRect.right + 9 : panelRect.left - 9) - 14, top: formRect.top - 14 };
 }
 
 function observe() {

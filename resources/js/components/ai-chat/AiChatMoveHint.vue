@@ -16,16 +16,22 @@ const wash = 'bg-gray-950/30';
 const arrived = ref(null);
 let arrivedTimer = null;
 
-// The message stays where it is as it turns into "You're now on…": its left edge is held where the "Taking you to…" one was, so the icon
+// The message stays where it is as it turns into "You're now on…": its starting edge is held where the "Taking you to…" one was, so the icon
 // doesn't move however long the new words are. (Centred, a shorter or longer message would shift it.)
 const message = useTemplateRef('message');
-const heldLeft = ref(null);
+const heldStart = ref(null);
+// How far the message's starting edge is from that side of the screen: the left, or the right in a right-to-left language
+function startOf(element) {
+    if (!element) return null;
+    const { left, right } = element.getBoundingClientRect();
+    return document.documentElement.dir === 'rtl' ? window.innerWidth - right : left;
+}
 watch(
     () => moving.title,
     (title, was) => {
         clearTimeout(arrivedTimer);
         // (This runs before the page is redrawn, so the message is still "Taking you to…")
-        heldLeft.value = !title && was ? message.value?.getBoundingClientRect().left ?? null : null;
+        heldStart.value = !title && was ? startOf(message.value) : null;
         arrived.value = !title && was && Date.now() - (moving.arrivedAt ?? 0) < 3000 ? was : null;
         if (arrived.value) arrivedTimer = setTimeout(() => (arrived.value = null), 3500);
     },
@@ -43,9 +49,9 @@ watch(
         clearTimeout(wroteTimer);
         arrived.value = null;
         // Whatever's showing ("You're now on…" as it starts, "Writing…" as it ends) becomes the new words in place, the way "Taking you to…"
-        // becomes "You're now on…": its left edge is held where it was, so the icon doesn't move. With nothing showing, the message comes in
+        // becomes "You're now on…": its starting edge is held where it was, so the icon doesn't move. With nothing showing, the message comes in
         // centred. (This runs before the page is redrawn, so the old message is still there to measure.)
-        heldLeft.value = message.value ? message.value.getBoundingClientRect().left : null;
+        heldStart.value = startOf(message.value);
         wrote.value = active ? null : pageTitle();
         if (wrote.value) wroteTimer = setTimeout(() => (wrote.value = null), 3500);
     },
@@ -81,11 +87,11 @@ watchEffect(() => document.documentElement.toggleAttribute('data-ai-moving', !!m
         >
             <div
                 v-if="moving.title || arrived || writing.active || wrote"
-                :class="['pointer-events-none fixed inset-x-0 top-0 z-(--z-index-portal) flex h-14 items-center transition-colors duration-300 ease-out', moving.title ? wash : '', heldLeft === null ? 'justify-center' : '']"
+                :class="['pointer-events-none fixed inset-x-0 top-0 z-(--z-index-portal) flex h-14 items-center transition-colors duration-300 ease-out', moving.title ? wash : '', heldStart === null ? 'justify-center' : '']"
             >
                 <!-- The message covers whatever is in the middle of the header (like long breadcrumbs) with the header's own colour, dimmed like the
                      rest of it while the page is, and its sides fade out so it doesn't look like a box -->
-                <p ref="message" role="status" :data-arrived="!moving.title || undefined" :style="heldLeft === null ? {} : { marginInlineStart: `${heldLeft}px` }" class="ai-move-message flex h-full items-center gap-2 px-10 text-sm text-white/75">
+                <p ref="message" role="status" :data-arrived="!moving.title || undefined" :style="heldStart === null ? {} : { marginInlineStart: `${heldStart}px` }" class="ai-move-message flex h-full items-center gap-2 px-10 text-sm text-white/75">
                     <!-- Writing in the page: the same spinner, and why the page is locked. Then, once it's done, the same ring and tick as arriving. -->
                     <span v-if="(writing.active || wrote) && !moving.title" class="flex items-center gap-2">
                         <Icon v-if="writing.active" name="loading" class="size-5! shrink-0" />

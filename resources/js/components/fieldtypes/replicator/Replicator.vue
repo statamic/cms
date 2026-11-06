@@ -59,7 +59,7 @@
                                     <template v-slot:picker>
                                         <!-- Prototype: with insert_between off, sets are only added at the end (like the rules on a form's Logic page), so between them there's just the dashed line that joins them -->
                                         <div v-if="config.insert_between === false" aria-hidden="true" :class="['relative', index === 0 ? 'h-2' : 'h-6']">
-                                            <div v-if="index > 0" class="absolute inset-y-0 left-3.5 border-l-1 border-dashed border-gray-400 dark:border-gray-600" />
+                                            <div v-if="index > 0" class="absolute inset-y-0 start-3.5 border-s border-dashed border-gray-400 dark:border-gray-600" />
                                         </div>
                                         <add-set-button
                                             v-else
