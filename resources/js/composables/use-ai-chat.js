@@ -33,6 +33,21 @@ const floating = computed({
 
 watch(prefersFloating, (value) => store(floatingKey, value));
 
+// On a phone, the on-screen keyboard covers the page without resizing it, so the floating chat (fixed to the bottom of a page that's now partly hidden) ends up behind it.
+// So keep track of how much of the page the keyboard covers, for the chat and Ask to sit above it (see PanelLayout.vue). Pinch zooming also shrinks what's visible, but that's not a keyboard.
+const visible = typeof window !== 'undefined' ? window.visualViewport : null;
+function measureKeyboard() {
+    const zoomed = visible.scale > 1.01;
+    const covered = zoomed ? 0 : Math.max(0, window.innerHeight - visible.height - visible.offsetTop);
+    document.documentElement.style.setProperty('--ai-keyboard', `${Math.round(covered)}px`);
+    document.documentElement.style.setProperty('--ai-visible-height', covered ? `${Math.round(visible.height)}px` : '100dvh');
+}
+if (visible) {
+    visible.addEventListener('resize', measureKeyboard);
+    visible.addEventListener('scroll', measureKeyboard);
+    measureKeyboard();
+}
+
 // Bumped to ask the chat to focus its input when it's already open.
 const focusRequests = ref(0);
 // Prototype: a request for the chat to play out, from the demo buttons at the bottom of the nav (see AiChatDemos.vue)

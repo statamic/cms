@@ -236,7 +236,7 @@ onUnmounted(() => {
             :data-started="chatMessages.length ? '' : undefined"
             :data-working="chatWorking || undefined"
             :data-released="chatReleased || undefined"
-            class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-[999px]:bottom-16 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+            class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-[calc(1.25rem+var(--ai-keyboard,0px))] max-[999px]:bottom-[calc(4rem+var(--ai-keyboard,0px))] max-h-[calc(var(--ai-visible-height,100dvh)-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatDockControl />
@@ -250,7 +250,7 @@ onUnmounted(() => {
         icon="ai-chat"
         :text="__('Ask')"
         :aria-pressed="chatOpen"
-        class="fixed end-4.75 bottom-5 z-(--z-index-modal) min-[1000px]:hidden"
+        class="fixed end-4.75 bottom-[calc(1.25rem+var(--ai-keyboard,0px))] z-(--z-index-modal) min-[1000px]:hidden"
         @click="toggleChat"
     />
 
