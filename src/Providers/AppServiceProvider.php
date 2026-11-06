@@ -25,6 +25,7 @@ use Statamic\Fields\FieldsetRecursionStack;
 use Statamic\Http\Middleware\PingOutpost;
 use Statamic\Icons\IconManager;
 use Statamic\Jobs\HandleEntrySchedule;
+use Statamic\Jobs\HandleRevisionSchedule;
 use Statamic\Licensing\Radio;
 use Statamic\Notifications\ElevatedSessionVerificationCode;
 use Statamic\Sites\Sites;
@@ -152,6 +153,10 @@ class AppServiceProvider extends ServiceProvider
 
         if (config('statamic.system.handle_scheduled_entries')) {
             $this->app->make(Schedule::class)->job(HandleEntrySchedule::class)->everyMinute();
+
+            if (config('statamic.revisions.enabled')) {
+                $this->app->make(Schedule::class)->job(HandleRevisionSchedule::class)->everyMinute();
+            }
         }
 
         $this->app->make(Schedule::class)
