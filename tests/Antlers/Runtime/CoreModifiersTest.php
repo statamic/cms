@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
 use Tests\Antlers\ParserTestCase;
 
 class CoreModifiersTest extends ParserTestCase
@@ -602,6 +603,25 @@ EOT;
             $this->assertSame('', $this->renderString("{{ bare | {$modifiers} }}", $data, true), $modifiers);
             $this->assertSame('', $this->renderString("{{ wrapped | {$modifiers} }}", $data, true), $modifiers);
         }
+    }
+
+    public function test_bool_string_outputs_false_for_null()
+    {
+        $data = [
+            'bare' => null,
+            'wrapped' => new Value(null),
+            'empty_field' => new Value(null, 'empty_field', new Text),
+            'filled_field' => new Value('yes', 'filled_field', new Text),
+        ];
+
+        $this->assertSame('false', $this->renderString('{{ null | bool_string }}', $data, true));
+        $this->assertSame('false', $this->renderString('{{ bare | bool_string }}', $data, true));
+        $this->assertSame('false', $this->renderString('{{ missing | bool_string }}', $data, true));
+        $this->assertSame('false', $this->renderString('{{ wrapped | bool_string }}', $data, true));
+        $this->assertSame('false', $this->renderString('{{ empty_field | bool_string }}', $data, true));
+        $this->assertSame('false', $this->renderString('{{ empty_field | bool_string() }}', $data, true));
+        $this->assertSame('FALSE', $this->renderString('{{ empty_field | bool_string | upper }}', $data, true));
+        $this->assertSame('true', $this->renderString('{{ filled_field | bool_string }}', $data, true));
     }
 }
 
