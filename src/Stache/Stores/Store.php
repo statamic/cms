@@ -217,13 +217,14 @@ abstract class Store
             return $existingTimestamp < $timestamp;
         });
 
-        // Get all the deleted files, with the key each one had.
+        // Get all the deleted files, with the keys each one had.
         // This would be any paths that exist in the cached array that aren't there anymore.
-        $keys = $this->paths()->flip();
+        // One file can hold several items (e.g. a term and its localizations), so a path maps to a list of keys.
+        $keys = $this->paths()->mapToGroups(fn ($path, $key) => [$path => $key]);
         $deleted = $existing->keys()
             ->diff($files->keys())
-            ->mapWithKeys(fn ($path) => [$path => $keys->get($path)])
-            ->filter();
+            ->flatMap(fn ($path) => $keys->get($path, collect())->map(fn ($key) => [$path, $key]))
+            ->values();
 
         // If there are no modified or deleted files, there's nothing to update.
         if ($modified->isEmpty() && $deleted->isEmpty()) {
@@ -240,7 +241,8 @@ abstract class Store
         // re-added under its new path along with the other modified items below.
         $modifiedKeys = $modified->map(fn ($item) => $this->getItemKey($item))->flip();
 
-        $deleted->each(function ($key, $path) use ($modifiedKeys) {
+        $deleted->each(function ($deletion) use ($modifiedKeys) {
+            [$path, $key] = $deletion;
             if ($modifiedKeys->has($key)) {
                 $this->keys()->forget($key);
 
