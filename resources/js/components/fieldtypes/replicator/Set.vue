@@ -239,13 +239,14 @@ function onSetDropdownClosed() {
                         :tabindex="moving ? 0 : -1"
                         :aria-label="__('messages.keyboard_item_reorder_instructions')"
                     />
-                    <Switch
-                        size="xs"
-                        :model-value="enabled"
-                        :label="switchLabels[0]"
-                        @update:model-value="toggleEnabledState"
-                        v-tooltip="enabled ? switchLabels[0] : switchLabels[1]"
-                    />
+                    <div class="flex items-center" v-tooltip="enabled ? switchLabels[0] : switchLabels[1]">
+                        <Switch
+                            size="xs"
+                            :model-value="enabled"
+                            :label="switchLabels[0]"
+                            @update:model-value="toggleEnabledState"
+                        />
+                    </div>
                     <Dropdown @closed="onSetDropdownClosed">
                         <template #trigger>
                             <Button icon="dots" variant="ghost" size="xs" :aria-label="__('Open dropdown menu')" />

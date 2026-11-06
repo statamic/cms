@@ -3,8 +3,11 @@
 namespace Tests\Auth;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Auth\AugmentedUser;
+use Statamic\Auth\TwoFactor\EnableTwoFactorAuthentication;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\Data\AugmentedTestCase;
@@ -88,5 +91,30 @@ class AugmentedUserTest extends AugmentedTestCase
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
+    }
+
+    #[Test]
+    #[DataProvider('twoFactorKeysProvider')]
+    public function it_doesnt_augment_two_factor_keys(string $key)
+    {
+        $user = tap(User::make()->email('john@example.com'))->save();
+
+        app(EnableTwoFactorAuthentication::class)($user);
+        $user->set('two_factor_confirmed_at', now()->timestamp);
+
+        $augmented = new AugmentedUser($user);
+
+        $this->assertNotContains($key, $augmented->keys());
+        $this->assertNotContains($key, $augmented->select()->keys()->all());
+        $this->assertSame('', (string) Antlers::parse("{{ current_user:{$key} }}", ['current_user' => $user], true));
+    }
+
+    public static function twoFactorKeysProvider(): array
+    {
+        return [
+            'secret' => ['two_factor_secret'],
+            'recovery codes' => ['two_factor_recovery_codes'],
+            'confirmed at' => ['two_factor_confirmed_at'],
+        ];
     }
 }

@@ -1,7 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils';
 import { expect, test, vi } from 'vitest';
 import Icon from '@/components/ui/Icon/Icon.vue';
-import { registerIconSetFromStrings } from '@/components/ui/Icon/registry.js';
+import { preloadIcons, registerIconSet, registerIconSetFromStrings } from '@/components/ui/Icon/registry.js';
 
 registerIconSetFromStrings('icon-test-alternate', {
     foo: '<svg><title>Alternate Foo</title></svg>',
@@ -39,4 +39,22 @@ test('the icon set from the name takes precedence over the set prop', async () =
     expect(warn).toHaveBeenCalledWith('Icon name [icon-test-alternate::foo] includes set [icon-test-alternate], ignoring set prop [icon-test-ignored]');
 
     warn.mockRestore();
+});
+
+test('preloaded icons are rendered straight away', () => {
+    registerIconSet('icon-test-glob', {
+        '/icons/foo.svg': () => Promise.resolve('<svg><title>Lazy Foo</title></svg>'),
+    });
+
+    preloadIcons('icon-test-glob', {
+        '/icons/foo.svg': '<svg><title>Preloaded Foo</title></svg>',
+    });
+
+    const wrapper = mount(Icon, {
+        props: {
+            name: 'icon-test-glob::foo',
+        },
+    });
+
+    expect(wrapper.find('title').text()).toBe('Preloaded Foo');
 });

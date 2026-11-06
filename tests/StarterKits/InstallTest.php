@@ -673,6 +673,32 @@ EOT;
     }
 
     #[Test]
+    public function it_sends_the_statamic_user_agent_to_the_outpost()
+    {
+        Config::set('statamic.system.license_key', 'site-key');
+
+        $this->installCoolRunnings([], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
+                'valid' => true,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $outpostRequests = Http::recorded(fn ($request) => str_contains($request->url(), 'outpost.statamic.com'));
+
+        $this->assertCount(3, $outpostRequests);
+
+        $outpostRequests->each(function ($pair) {
+            $this->assertEquals(['Statamic/3.0.0-testing'], $pair[0]->header('User-Agent'));
+        });
+    }
+
+    #[Test]
     public function it_doesnt_install_paid_starter_kit_with_invalid_license_key()
     {
         Config::set('statamic.system.license_key', 'site-key');

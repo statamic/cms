@@ -134,7 +134,8 @@ class StoreAssetTest extends TestCase
                 'file' => UploadedFile::fake()->image('tEsT.jpg'),
             ])
             ->assertStatus(409)
-            ->assertInvalid(['path' => 'A file already exists with this name.']);
+            ->assertInvalid(['path' => 'A file already exists with this name.'])
+            ->assertJson(['message' => 'The given data was invalid.', 'existing' => 'test_container::path/to/test.jpg']);
     }
 
     #[Test]

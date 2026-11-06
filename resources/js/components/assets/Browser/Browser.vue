@@ -198,10 +198,12 @@
         <AssetEditor
             v-if="showAssetEditor"
             :id="editedAssetId"
+            :redirect-after-crop="!autoselectUploads"
             @previous="editPreviousAsset"
             @next="editNextAsset"
             @closed="closeAssetEditor"
             @saved="assetSaved"
+            @created="assetCreated"
             @action-started="actionStarted"
             @action-completed="actionCompleted"
         />
@@ -635,6 +637,12 @@ export default {
             this.loadAssets();
         },
 
+        assetCreated(id) {
+            this.closeAssetEditor();
+            this.autoselect(id);
+            this.loadAssets();
+        },
+
         clearShift() {
             this.shifting = false;
         },
@@ -740,10 +748,7 @@ export default {
         },
 
         existingUploadSelected(upload) {
-            const path = `${this.folder.path}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.id}::${path}`;
-
-            this.selectedAssets.push(id);
+            this.selectedAssets.push(upload.existingId);
             this.$emit('selections-updated', this.selectedAssets);
         },
 
@@ -948,19 +953,23 @@ export default {
 
         uploadCompleted(asset) {
             if (this.autoselectUploads) {
-                this.sortColumn = 'last_modified';
-                this.sortDirection = 'desc';
-
-                if (this.maxFiles === 1) {
-                    this.selectedAssets.splice(0, this.selectedAssets.length, asset.id);
-                } else if (!this.reachedSelectionLimit) {
-                    this.selectedAssets.push(asset.id);
-                }
-                this.$emit('selections-updated', this.selectedAssets);
+                this.autoselect(asset.id);
             }
 
             this.loadAssets();
             this.$toast.success(__(':file uploaded', { file: asset.basename }));
+        },
+
+        autoselect(id) {
+            this.sortColumn = 'last_modified';
+            this.sortDirection = 'desc';
+
+            if (this.maxFiles === 1) {
+                this.selectedAssets.splice(0, this.selectedAssets.length, id);
+            } else if (!this.reachedSelectionLimit) {
+                this.selectedAssets.push(id);
+            }
+            this.$emit('selections-updated', this.selectedAssets);
         },
 
         uploadError(upload, uploads) {

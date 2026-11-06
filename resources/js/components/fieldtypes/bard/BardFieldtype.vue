@@ -34,8 +34,8 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
+                    <div class="bard-fixed-toolbar" v-if="editor && !readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed && toolbarIsNearViewport">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -116,6 +116,12 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
+                        <div v-else-if="!editor" class="bard-loading">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <ui-icon name="loading" class="size-4" />
+                                {{ __('Loading') }}
+                            </div>
+                        </div>
                         <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
@@ -181,6 +187,15 @@ import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
 import { useContentDirection } from '@/composables/content-direction';
+import { preloadIcons } from '@/components/ui/Icon/registry.js';
+
+preloadIcons(
+    'default',
+    import.meta.glob(
+        '../../../../svg/icons/{h1,h2,h3,h4,h5,h6,text-bold,text-italic,text-underline,text-strike-through,text-small,list-ul,list-ol,eraser,quote,superscript,subscript,insert-link,add-table,insert-image,code-inline,code-block,hr,paragraph-align-left,paragraph-align-center,paragraph-align-right,paragraph-align-justified}.svg',
+        { query: '?raw', import: 'default', eager: true },
+    ),
+);
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -218,6 +233,8 @@ export default {
             buttons: [],
             collapsed: this.meta.collapsed,
             mounted: false,
+            toolbarIsNearViewport: false,
+            toolbarObserver: null,
             initError: null,
             pageHeader: null,
             escBinding: null,
@@ -407,6 +424,8 @@ export default {
 
 		this.$nextTick(() => this.mounted = true);
 
+        this.observeToolbarVisibility();
+
         this.pageHeader = document.querySelector('.global-header');
 
         if (!commandPaletteCallbackRegistered) {
@@ -431,6 +450,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.toolbarObserver?.disconnect();
         this.editor?.destroy();
         this.escBinding?.destroy();
     },
@@ -452,10 +472,13 @@ export default {
             }
         },
 
-        value(value) {
+        value(value, oldValue) {
             if (!this.editor) return;
 
             if (this.valueMatchesEditor(value)) return;
+
+            // A repeat of the old value would undo typing that's still debounced.
+            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
 
             const oldContent = this.editor.getJSON();
 
@@ -472,7 +495,7 @@ export default {
             }
 
             this.editor.commands.clearContent(false);
-            this.editor.commands.setContent(this.valueToContent(value), true);
+            this.editor.commands.setContent(this.valueToContent(clone(value)), true);
         },
 
         readOnly(readOnly) {
@@ -837,6 +860,25 @@ export default {
             this.buttons = buttons;
         },
 
+        // Rendering every toolbar button adds up on entries with lots of Bard fields, so they're
+        // only rendered once the editor is close to being scrolled into view, or its set is expanded.
+        observeToolbarVisibility() {
+            this.toolbarObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting) return;
+
+                    this.toolbarIsNearViewport = true;
+                    this.toolbarObserver.disconnect();
+                },
+                {
+                    root: this.$refs.container.closest('[scroll-region]'),
+                    rootMargin: '500px',
+                },
+            );
+
+            this.toolbarObserver.observe(this.$refs.container);
+        },
+
         buttonIsActive(button) {
             if (button.hasOwnProperty('active')) {
                 return button.active(this.editor, button.args);
@@ -1002,6 +1044,13 @@ export default {
             tr.setSelection(TextSelection.between(tr.selection.$from, tr.selection.$from, -1));
 
             this.editor.view.dispatch(tr);
+        },
+
+        // Set field edits are already in the container. Emitting them back would hand each field a copy of its own value.
+        update(value) {
+            if (this.editor && this.valueMatchesEditor(this.value) && this.valueMatchesEditor(value)) return;
+
+            this.$emit('update:value', value);
         },
 
         // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.

@@ -406,8 +406,11 @@ export default {
             }, 1);
         },
 
-        collapsed(collapsed) {
-            this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+        collapsed: {
+            deep: true,
+            handler(collapsed) {
+                this.updateMeta({ ...this.meta, collapsed: clone(collapsed) });
+            },
         },
 
         loadingSet(loading) {
