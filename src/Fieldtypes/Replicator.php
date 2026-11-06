@@ -28,6 +28,12 @@ class Replicator extends Fieldtype
     protected $rules = ['array'];
     protected ?string $flattenedSetsConfigBlinkKey = null;
 
+    /**
+     * When a field has this many existing sets (or more), start them collapsed
+     * even if the collapse config is off — unlocks deferred field-body mounting.
+     */
+    private const AUTO_COLLAPSE_SET_THRESHOLD = 10;
+
     public function setField(Field $field)
     {
         $this->flattenedSetsConfigBlinkKey = null;
@@ -268,8 +274,25 @@ class Replicator extends Fieldtype
             'existing' => $existing,
             'new' => $new ?? null,
             'defaults' => $defaults ?? null,
-            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
+            'collapsed' => $this->initialCollapsedSetIds($existing),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $existing
+     * @return list<string>
+     */
+    protected function initialCollapsedSetIds(array $existing): array
+    {
+        if ($this->config('collapse')) {
+            return array_keys($existing);
+        }
+
+        if (count($existing) >= self::AUTO_COLLAPSE_SET_THRESHOLD) {
+            return array_keys($existing);
+        }
+
+        return [];
     }
 
     private function shouldProcessNewValues(): bool
