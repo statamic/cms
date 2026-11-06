@@ -33,7 +33,7 @@ const visible = computed(() =>
 // The arrows and the words sit about 1px above the middle of their key, so push them down. The symbols (⌘ and /) are left alone here, but the slash is drawn about 0.9px low in its key, so it's lifted separately.
 const nudge = (key) => (['⌘', '/'].includes(key) ? '' : 'pt-0.5');
 
-const keyClasses = 'inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700';
+const keyClasses = 'inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700';
 </script>
 
 <template>

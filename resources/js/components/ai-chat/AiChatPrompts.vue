@@ -94,7 +94,7 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
                     <span v-if="prompt.instructions" class="block truncate text-xs/5 text-gray-500 dark:text-gray-400">{{ prompt.instructions }}</span>
                 </span>
                 <!-- The command in a key, like the keyboard shortcuts, as it's something you type -->
-                <span class="inline-flex h-5 shrink-0 items-center rounded-md bg-gray-100 px-1.5 text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ prompt.command }}</span>
+                <span class="inline-flex h-5 shrink-0 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ prompt.command }}</span>
             </button>
         </div>
     </div>

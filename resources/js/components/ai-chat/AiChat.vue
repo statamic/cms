@@ -20,7 +20,7 @@ const user = Statamic.user;
 const inputClasses = computed(() =>
     floating.value
         ? // The middle of the lowercase letters sits about 1.4px below the middle of the capitals, so even padding looks low unless we nudge it. The empty box is 34px tall (it measured 33.5), so the card's edges and focus ring land on whole pixels and the send button is centred in the ring.
-        'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden ps-1! dark:bg-transparent!'
+        'border-0 min-h-[34px] pt-[3.5px]! pb-[6px]! placeholder:text-gray-500 shadow-none! outline-hidden dark:bg-transparent!'
         : 'ai-dock-input',
 );
 const prompt = ref('');
@@ -526,7 +526,7 @@ function stopFollowing() {
                         >
                             {{ message.text }}
                             <!-- A saved prompt also shows its command, so you learn to type it -->
-                            <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
+                            <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
                         </div>
                         <!-- 20px, 6px from the bubble, level with its top -->
                         <Avatar v-if="message.role === 'user'" :user="user" class="ms-1.5 size-5 shrink-0 text-[0.5rem]" />
@@ -578,7 +578,7 @@ function stopFollowing() {
                             @click="helpView = 'shortcuts'"
                         >
                             {{ __('Press') }}
-                            <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-[0.6875rem] font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">?</kbd>
+                            <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">?</kbd>
                             {{ __('for keyboard shortcuts') }}
                         </button>
                     </template>
