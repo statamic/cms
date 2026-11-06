@@ -33,6 +33,17 @@ class SubmissionQueryBuilder extends Builder implements QueryBuilderContract
         return parent::whereIn($column, $values, $boolean);
     }
 
+    public function whereStatus(string $status)
+    {
+        return match ($status) {
+            'any' => $this,
+            'finalized' => $this->where('_partial', '!=', true)->whereNull('_marked_spam_at'),
+            'partial' => $this->where('_partial', true)->whereNull('_marked_spam_at'),
+            'spam' => $this->whereNotNull('_marked_spam_at'),
+            default => throw new \Exception("Invalid status [$status]"),
+        };
+    }
+
     public function orderBy($column, $direction = 'asc')
     {
         if ($column === 'datestamp') {

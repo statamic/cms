@@ -673,12 +673,12 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_asset_field_x_model()
+    public function it_dynamically_renders_upload_field_x_model()
     {
         $config = [
             'handle' => 'cat_selfie',
             'field' => [
-                'type' => 'assets',
+                'type' => 'upload',
                 'display' => 'Cat Selfie',
                 'max_files' => 1,
             ],

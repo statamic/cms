@@ -28,12 +28,14 @@ let clickListenerActive = false;
 let navigateEventListener = null;
 let clickOutsideEnableTimer = null;
 
-function toggle() {
+function toggle({ persist = true } = {}) {
     isOpen.value = !isOpen.value;
     // Reset viewport flag since user is explicitly toggling, so we should respect their preference
     // even when viewport size changes (don't auto-expand if user manually closed it)
     collapsedByViewport.value = false;
-    localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+    if (persist) {
+        localStorage.setItem(localStorageKey, isOpen.value ? 'open' : 'closed');
+    }
 }
 
 setCpNavToggleHandler(toggle);
@@ -42,34 +44,36 @@ onUnmounted(() => {
     clearCpNavToggleHandler(toggle);
 });
 
-watch(
-    isOpen,
-    (open) => {
-        const el = document.getElementById('main');
-        el?.classList.toggle('nav-closed', !open);
-        el?.classList.toggle('nav-open', open);
+function applyOpenState(open) {
+    const el = document.getElementById('main');
+    el?.classList.toggle('nav-closed', !open);
+    el?.classList.toggle('nav-open', open);
 
-        if (clickOutsideEnableTimer !== null) {
-            clearTimeout(clickOutsideEnableTimer);
+    if (clickOutsideEnableTimer !== null) {
+        clearTimeout(clickOutsideEnableTimer);
+        clickOutsideEnableTimer = null;
+    }
+
+    // Delay enabling the click-outside listener to avoid catching the toggle click.
+    // Clear any pending timer so a fast close cannot leave clickListenerActive stuck true.
+    if (open) {
+        clickListenerActive = false;
+        clickOutsideEnableTimer = setTimeout(() => {
             clickOutsideEnableTimer = null;
-        }
+            clickListenerActive = true;
+        }, 100);
+    } else {
+        clickListenerActive = false;
+    }
+}
 
-        // Delay enabling the click-outside listener to avoid catching the toggle click.
-        // Clear any pending timer so a fast close cannot leave clickListenerActive stuck true.
-        if (open) {
-            clickListenerActive = false;
-            clickOutsideEnableTimer = setTimeout(() => {
-                clickOutsideEnableTimer = null;
-                clickListenerActive = true;
-            }, 100);
-        } else {
-            clickListenerActive = false;
-        }
-    },
-    { flush: 'post', immediate: true },
-);
+watch(isOpen, applyOpenState, { flush: 'post' });
 
 onMounted(() => {
+    // #main isn't in the document until the layout finishes mounting, so an immediate
+    // watcher run would silently miss it and leave the DOM out of sync with isOpen.
+    applyOpenState(isOpen.value);
+
     const keyBinding = Statamic.$keys.bind(['command+\\', ['[']], (e) => {
         e.preventDefault();
         toggle();
@@ -98,22 +102,12 @@ onMounted(() => {
             collapsedByViewport.value = false;
         }
     };
-    
-    mediaQuery.addEventListener('change', handleMediaChange);
 
-    // Mark page as fully loaded after all resources are loaded
-    const onWindowLoad = () => {
-        document.documentElement.classList.add('page-fully-loaded');
-    };
-    if (document.readyState === 'complete') {
-        onWindowLoad();
-    } else {
-        window.addEventListener('load', onWindowLoad);
-    }
+    mediaQuery.addEventListener('change', handleMediaChange);
 
     // Close nav when clicking outside (only on mobile)
     document.addEventListener('click', handleClickOutside);
-    
+
     // Close nav on mobile when navigating to a different page
     navigateEventListener = router.on('navigate', () => {
         if (isMobile.value && isOpen.value) {
@@ -121,13 +115,10 @@ onMounted(() => {
             localStorage.setItem(localStorageKey, 'closed');
         }
     });
-    
+
     onUnmounted(() => {
         document.removeEventListener('click', handleClickOutside);
         mediaQuery.removeEventListener('change', handleMediaChange);
-        if (document.readyState !== 'complete') {
-            window.removeEventListener('load', onWindowLoad);
-        }
         if (navigateEventListener) {
             navigateEventListener();
         }
@@ -153,7 +144,7 @@ function handleClickOutside(event) {
 }
 
 function handleParentClick(event, item) {
-	if (event.defaultPrevented) return;
+    if (event.defaultPrevented) return;
 
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
@@ -168,7 +159,7 @@ function handleParentClick(event, item) {
 }
 
 function handleChildClick(event, item, child) {
-	if (event.defaultPrevented) return;
+    if (event.defaultPrevented) return;
 
     // Prevent opening in a new tab from updating the active state.
     if (event.ctrlKey || event.metaKey || event.which === 2) return;
@@ -193,6 +184,15 @@ function shouldRenderAsInertiaLink(item) {
     return isUrlWithinControlPanel(item.url);
 }
 
+Statamic.$events.$on('nav.open', (options) => {
+    if (isOpen.value) return;
+    toggle(options);
+});
+
+Statamic.$events.$on('nav.close', (options) => {
+    if (!isOpen.value) return;
+    toggle(options);
+});
 </script>
 
 <template>

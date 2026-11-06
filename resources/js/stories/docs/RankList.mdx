@@ -1,0 +1,21 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as RankListStories from '../RankList.stories';
+
+<Meta of={RankListStories} />
+
+# RankList
+An ordered list of items that can be rearranged by dragging, or by typing a position into each item's rank input.
+
+The value is an array of option values in their ranked order. When it's empty, or missing some of the options, the list falls back to the order the options were given in.
+<Canvas of={RankListStories._DocsIntro} sourceState={'shown'} />
+
+## Existing order
+Pass an order to start from. The drag handles highlight once the list differs from the original order.
+<Canvas of={RankListStories._ExistingOrder} sourceState={'shown'} />
+
+## Disabled
+A disabled list can't be reordered. The rank inputs are replaced with plain numbers.
+<Canvas of={RankListStories._Disabled} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={RankListStories} />

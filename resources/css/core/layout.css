@@ -6,10 +6,11 @@
     @apply h-[calc(100dvh-3.5rem)];
     @apply overflow-y-auto fixed top-14 start-0 w-48;
     @apply [&_svg]:text-gray-500 dark:[&_svg]:text-gray-500/85;
-    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    .page-fully-loaded & {
+    /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    body:has([data-cp-global-nav-toggle]:hover) & {
         /* Only certain properties because we don't want to inadvertently transition the color when we switch between light/dark mode */
         transition: inset 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        will-change: inset, box-shadow;
     }
     /* On mobile, hide by default and overlay on top */
     z-index: var(--z-index-draggable);
@@ -108,9 +109,6 @@
     }
 }
 
-
-
-
 /* Mobile nav behavior */
 @media (width < theme(--breakpoint-lg)) {
     .nav-main {
@@ -126,13 +124,13 @@
     }
 }
 
-
 main {
     @apply ps-0 lg:ps-46;
-    /* Wait for the full page to load before allowing this transition otherwise you see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
-    .page-fully-loaded & {
+    /* Only allow a transition when we're interacting with the nav otherwise we'll see the Sidebar animate in/out on load in Firefox (and sometimes Safari) */
+    body:has([data-cp-global-nav-toggle]:hover) & {
         /* Only padding because we don't wand to transition the color when we switch between light/dark mode */
         transition: padding 0.3s ease-in-out;
+        will-change: padding;
     }
 }
 
@@ -145,6 +143,240 @@ main.nav-closed {
     @apply ps-0;
     @apply lg:ps-0;
 }
+
+/* GROUP THE MAIN NAV (LEFT SIDEBAR) / THREE PANEL STATES
+=================================================== */
+/* Three panels exist */
+[data-panels-showing] {
+    display: flex;
+
+    #content-card {
+        flex: 1;
+    }
+
+    @media (max-width: 1000px) {
+        [data-max-width-wrapper] {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+        }
+    }
+
+    &:has([data-fieldset-label]) [data-ui-panel] {
+        /* UI panels should be slightly narrower on mobile, less fieldset indicators will hang off the edge of the screen */
+        @apply max-sm:w-[96%];
+    }
+}
+
+[data-left-panel]:empty,
+[data-right-panel]:empty {
+    display: none;
+}
+
+[data-left-panel] {
+    [data-resize-handle] {
+        @apply dark:border-e dark:border-content-border;
+    }
+}
+[data-right-panel] {
+    @apply dark:border-s dark:border-content-border;
+}
+
+/* We need this CSS when transitioning the left panel to reveal the sidebar nav. Technically this border should only exist when we have three panels and the nav closes, but querying that is too slow and causes a 1px border layout shift - so instead we just always apply it and hope no one notices the 1px discrepancy when the nav is closed. */
+.main-content {
+    border-inline-start: 1px solid transparent;
+    transition:
+        /* Delay the shadow to so it doesn't flash in as we switch modes. This also improves performance. */
+        box-shadow 0s ease-out 0.3s,
+        border-inline-start 0s ease-out 0.3s
+    ;
+}
+
+/* If the left panel exists with content and the nav opens */
+#main.nav-open:has([data-left-panel]:not(:empty)) {
+    /* Add separation between the nav and the left panel, when the nav is open */
+    .main-content {
+        @apply border-s border-content-border;
+        /* If the left panel exists with content and the nav opens, delay the border a touch so it doesn't flash in as we switch modes. */
+        transition: border-inline-start 0s ease-out 0.1s;
+        @apply shadow-xl dark:rounded-none;
+    }
+}
+
+/* GROUP THREE PANEL STATES / GLOBAL HEADER NAV (TOP MENU) / ACTIVE STATES
+=================================================== */
+.global-header-slot {
+    position: relative;
+    background: var(--color-gray-950);
+    @apply rounded-lg dark:bg-gray-925;
+
+    /* When .global-header-slot has stuff */
+    header:has(&:not(:empty)) {
+        /* [1] Hide the breadcrumbs at lower MQs */
+        [data-global-header-breadcrumbs] {
+            @apply max-[1350px]:hidden;
+        }
+        /* [2] Make the search bar small */
+        [data-global-header-search] {
+            width: calc(var(--spacing) * 9);
+            overflow: clip;
+            /* Hide everything except the search icon */
+            > *:not(svg) {
+                display: none;
+            }
+        }
+    }
+}
+
+/* Used for three panel layouts */
+.global-header-nav {
+    --item-padding: calc(var(--spacing) * 4);
+    ul {
+        display: flex;
+    }
+    li {
+        padding: 0.75rem var(--item-padding);
+        @apply text-xs;
+    }
+    a {
+        position: relative;
+        color: var(--color-gray-400);
+        &.active {
+            color: white;
+            anchor-name: --active;
+        }
+    }
+    @supports not (anchor-name: --my-anchor) {
+        a.active {
+            background: var(--theme-color-global-header-bg);
+        }
+    }
+
+    @supports (anchor-name: --my-anchor) {
+        ul:has(.active) {
+            &::before {
+                --height-increase: calc(var(--spacing) * 4.5);
+                content: '';
+                position: absolute;
+                width: calc(anchor-size(width) + var(--item-padding) * 1.5);
+                height: calc(anchor-size(height) + var(--height-increase));
+                background: var(--theme-color-global-header-bg);
+                border-radius: 5px;
+                border-block-start: 1px solid var(--color-gray-600);
+                position-anchor: --active;
+                left: calc(anchor(left) - var(--item-padding) * 1.5 / 2);
+                top: calc(anchor(top) - var(--height-increase) / 2);
+                transition-property: top, left;
+                transition-duration: 0.5s;
+                transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+            }
+        }
+    }
+}
+/* GROUP THREE PANEL STATES / GLOBAL HEADER NAV (TOP MENU) / MOBILE POPOVER
+=================================================== */
+/* Mobile popover for .global-header-nav (forms tabs in header slot) */
+.global-header-nav-popover {
+    #anchor-global-header-nav {
+        anchor-name: --anchor-global-header-nav;
+    }
+
+    .global-header-nav-popover__menu {
+        position-anchor: --anchor-global-header-nav;
+        top: calc(anchor(bottom) + 6px);
+        left: anchor(left);
+        min-width: max(anchor-size(width), 11rem);
+        max-width: 22rem;
+        @apply p-1 bg-white dark:bg-gray-925 border border-gray-200 dark:border-gray-700 shadow-2xl rounded-xl;
+
+        /* Popover styling - This is not strictly needed but it smooths out the popover opening */
+        opacity: 0;
+        transition: opacity 0.2s;
+        &:popover-open {
+            opacity: 1;
+
+            @starting-style {
+                opacity: 0;
+            }
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+
+            a {
+                text-decoration: none;
+
+                @apply flex px-2.5 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-400/15 hover:text-gray-925 dark:hover:text-gray-200;
+
+                &.active,
+                &[aria-current='page'] {
+                    @apply bg-gray-400/15 text-gray-925 dark:bg-gray-800 dark:text-white font-semibold;
+                }
+            }
+        }
+    }
+}
+
+.global-header-nav-actions {
+    opacity: 0;
+    transition: opacity 0.075s ease-in;
+    &:has(button) {
+        opacity: 1;
+    }
+}
+
+/* GROUP THREE PANEL STATES / SIDE PANELS
+=================================================== */
+@media (max-width: 999px) {
+    #left-panel,
+    #right-panel {
+        position: fixed;
+        top: 3.5rem;
+        bottom: 0;
+        z-index: var(--z-index-modal);
+        transition: transform 0.3s ease;
+        background: var(--theme-color-body-bg);
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+    }
+
+    #left-panel {
+        left: 0;
+        width: max(11rem, 33.33%);
+        transform: translateX(-100%);
+        @apply border-r border-gray-200 dark:border-gray-700;
+    }
+
+    #right-panel {
+        right: 0;
+        width: max(18rem, 33.33%);
+        transform: translateX(100%);
+        @apply border-l border-gray-200 dark:border-gray-700;
+    }
+
+    /* Slide in when open */
+    #left-panel:has([data-mobile-open="true"]),
+    #right-panel:has([data-mobile-open="true"]) {
+        transform: translateX(0);
+        @apply shadow-2xl;
+    }
+}
+
+/* Backdrop for mobile panel click-outside-to-close */
+.mobile-panel-backdrop {
+    @apply hidden;
+}
+
+@media (max-width: 999px) {
+    .mobile-panel-backdrop[data-visible="true"] {
+        @apply block fixed inset-0 cursor-pointer;
+        top: 3.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: calc(var(--z-index-modal) - 1);
+    }
+}
+
 
 /* ==========================================================================
    DRAGGABLE MIRRORS
@@ -163,3 +395,4 @@ main.nav-closed {
 body > .draggable-mirror {
     z-index: var(--z-index-draggable);
 }
+

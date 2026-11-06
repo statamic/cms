@@ -1,0 +1,25 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HorizontalLollipopChartStories from '../HorizontalLollipopChart.stories';
+
+<Meta of={HorizontalLollipopChartStories} />
+
+# HorizontalLollipopChart
+A ranked comparison chart. Use the marker and endpoint slots to add field-specific symbols without changing the chart structure.
+<Canvas of={HorizontalLollipopChartStories._DocsIntro} sourceState={'shown'} />
+
+Items use the shared `label`, `percent`, and `count` shape. Ranks default to their position in the array.
+
+## Response counts
+Set `metric` to `count` when absolute totals are more useful than percentages.
+<Canvas of={HorizontalLollipopChartStories._Counts} sourceState={'shown'} />
+
+## Custom endpoints
+Use `endpoint` for flags, avatars, or another symbol at the end of each line. Set `showMarker` to `false` when that endpoint provides enough visual distinction.
+<Canvas of={HorizontalLollipopChartStories._CustomEndpoints} sourceState={'shown'} />
+
+## Continuing ranks
+Provide an explicit `rank` for paginated data or rankings that do not start at one.
+<Canvas of={HorizontalLollipopChartStories._ContinuingRanks} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={HorizontalLollipopChartStories} />
