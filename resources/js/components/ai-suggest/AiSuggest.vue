@@ -327,7 +327,7 @@ function follow(text) {
                             @focus="showPreview(suggestion.text)"
                             @blur="hidePreview"
                         >
-                            <span v-if="suggestion.label" class="mb-1 block text-2xs font-medium text-gray-500 group-hover:text-gray-600 dark:text-gray-400">{{ __(suggestion.label) }}</span>
+                            <span v-if="suggestion.label" class="mb-1 block text-2xs font-medium text-gray-500 group-hover:text-gray-600 dark:text-gray-300 dark:group-hover:text-white">{{ __(suggestion.label) }}</span>
                             <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
                                 <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
                                     <span
