@@ -362,7 +362,7 @@ function follow(text) {
                         v-for="saved in fieldPrompts"
                         :key="saved.command"
                         type="button"
-                        class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/10 dark:text-gray-300 dark:hover:bg-white/5"
+                        class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/17 dark:text-gray-300 dark:hover:bg-white/8"
                         :aria-disabled="loading"
                         v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs' }"
                         @click="focusClicked($event); !loading && follow(saved.name)"
