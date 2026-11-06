@@ -62,6 +62,22 @@ class AssetContainersStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_only_gets_yaml_files_in_the_root_when_meta_is_stored_as_content()
+    {
+        config(['statamic.assets.meta_as_content' => true]);
+
+        touch($this->tempDir.'/main.yaml', 1234567890);
+        mkdir($this->tempDir.'/main/photos', 0755, true);
+        touch($this->tempDir.'/main/photos/cat.jpg.yaml', 1234567890);
+
+        $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
+
+        $this->assertEquals([
+            Path::tidy($this->tempDir).'/main.yaml' => 1234567890,
+        ], $files->all());
+    }
+
+    #[Test]
     public function it_makes_asset_container_instances_from_files()
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
