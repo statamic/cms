@@ -45,7 +45,7 @@ const hadNothing = computed(() => !!change.value && !wordsOf(change.value.before
 
 // A field filled in from nothing is "added", not "changed". Its badge is plain grey with a plus, as a label: the purple one opens a diff, and a
 // purple badge with nothing to open would look like it should.
-const addedBadge = 'bg-gray-50 border-gray-300 text-gray-700 dark:border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300';
+const addedBadge = 'bg-gray-100 border-gray-400 text-gray-800 dark:border dark:bg-gray-700 dark:border-gray-500 dark:text-gray-100';
 
 // What changed, word by word, in the same yellow and red as the suggestions. When only links were added (the words are the same), the
 // linked words are marked as added instead.

@@ -16,7 +16,7 @@
 
                 <!-- Prototype: a link the AI chat added, until you save or edit it. The same badge and Undo as a blueprint field the AI added. -->
                 <template v-if="aiAdded">
-                    <ui-badge size="sm" icon="plus" class="shrink-0 bg-gray-50 border-gray-300 text-gray-700 dark:border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300" :text="__('Added by AI')" />
+                    <ui-badge size="sm" icon="plus" class="shrink-0 bg-gray-100 border-gray-400 text-gray-800 dark:border dark:bg-gray-700 dark:border-gray-500 dark:text-gray-100" :text="__('Added by AI')" />
                     <button type="button" class="shrink-0 cursor-pointer rounded-md px-1 py-0.5 text-2xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" @click.stop="undoAi">
                         <ui-icon name="undo" class="inline size-3! -mt-0.5 me-0.5 align-middle" />
                         {{ __('Undo') }}
