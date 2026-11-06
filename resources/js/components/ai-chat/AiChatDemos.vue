@@ -101,34 +101,57 @@ const suggestSubtitleEmpty = (helpers) => suggestSubtitle(helpers, false, true);
 // And again, but they take a long time
 const suggestSubtitleSlow = (helpers) => suggestSubtitle(helpers, false, false, true);
 
-const demos = [
-    { label: 'Update homepage', text: 'How can I update the homepage?' },
-    { label: 'Fix summer sale', text: 'Tighten up the summer sale entry' },
-    { label: 'Write a blog post', text: 'Create a blog post about our new garden range' },
-    { label: 'Add links to a post', text: 'Add links throughout the garden range blog post' },
-    { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
-    { label: 'Field suggestions', run: suggestSubtitle, text: 'Opens the summer sale and clicks the suggest icon on its subtitle' },
-    // The AI doesn't answer. Whether you can open Settings → AI decides what the outcome offers (see the "No response" scenario in mock-runs.js).
-    { label: 'Nothing found', text: 'Which entries mention garden gnomes?' },
-    { label: 'AI down, can edit AI', text: 'Summarise our returns policy', canEditAi: true },
-    { label: 'AI down, can’t edit', text: 'Summarise our returns policy', canEditAi: false },
-    // The same, but the AI doesn't respond. Like the AI down demos above, one can open Settings → AI and one can't.
-    { label: 'Suggest down, can edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can edit the AI settings', canEditAi: true },
-    { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
-    { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
-    { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
-    { label: 'Chat slow', text: 'Summarise our shipping policy' },
-    // The ideas from the research notes (see ideaScenarios in mock-runs.js)
-    { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
-    { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
-    { label: 'Schedule, no time', text: 'Publish it next Monday' },
-    { label: 'Find missing alt text', text: 'Which images have no alt text?' },
-    { label: 'Translate a page', text: 'Translate the About page into French' },
-    { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
-    { label: 'Edit a global', text: 'Update the copyright year in the footer' },
-    { label: 'Edit a term', text: 'Rename the Community topic to Local community' },
-    { label: 'Edit navigation', text: 'Add a Returns link to the header navigation' },
-    { label: 'Add a field', text: 'Add a subtitle field to the blog blueprint' },
+// Grouped, as the list got long. Each group's demos keep their order from before.
+const groups = [
+    {
+        // The chat answers, and changes nothing
+        title: 'Ask a question',
+        demos: [
+            { label: 'Update homepage', text: 'How can I update the homepage?' },
+            { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
+            // The ideas from the research notes (see ideaScenarios in mock-runs.js)
+            { label: 'Find missing alt text', text: 'Which images have no alt text?' },
+            { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
+        ],
+    },
+    {
+        // The chat changes something, and leaves saving to you
+        title: 'Make a change',
+        demos: [
+            { label: 'Fix summer sale', text: 'Tighten up the summer sale entry' },
+            { label: 'Write a blog post', text: 'Create a blog post about our new garden range' },
+            { label: 'Add links to a post', text: 'Add links throughout the garden range blog post' },
+            { label: 'Add a field', text: 'Add a subtitle field to the blog blueprint' },
+            { label: 'Fix a typo', text: "Fix the typo 'recieve' on the Contact page" },
+            { label: 'Schedule publishing', text: 'Publish it next Monday at 9am' },
+            { label: 'Schedule, no time', text: 'Publish it next Monday' },
+            { label: 'Translate a page', text: 'Translate the About page into French' },
+            { label: 'Edit a global', text: 'Update the copyright year in the footer' },
+            { label: 'Edit a term', text: 'Rename the Community topic to Local community' },
+            { label: 'Edit navigation', text: 'Add a Returns link to the header navigation' },
+        ],
+    },
+    {
+        title: 'Suggest a value',
+        demos: [
+            { label: 'Field suggestions', run: suggestSubtitle, text: 'Opens the summer sale and clicks the suggest icon on its subtitle' },
+            // The same, but the AI doesn't respond. Like the AI down demos below, one can open Settings → AI and one can't.
+            { label: 'Suggest down, can edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can edit the AI settings', canEditAi: true },
+            { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
+            { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
+            { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
+        ],
+    },
+    {
+        title: 'When it goes wrong',
+        demos: [
+            // The AI doesn't answer. Whether you can open Settings → AI decides what the outcome offers (see the "No response" scenario in mock-runs.js).
+            { label: 'Nothing found', text: 'Which entries mention garden gnomes?' },
+            { label: 'AI down, can edit AI', text: 'Summarise our returns policy', canEditAi: true },
+            { label: 'AI down, can’t edit', text: 'Summarise our returns policy', canEditAi: false },
+            { label: 'Chat slow', text: 'Summarise our shipping policy' },
+        ],
+    },
 ];
 
 const phaseTwoDemos = [
@@ -136,10 +159,8 @@ const phaseTwoDemos = [
     { label: 'Dictate a request', text: 'Find all the entries that mention outdoor furniture', dictate: true, phase: 2 },
 ];
 
-const sections = [
-    { title: 'AI Demos', demos },
-    { title: 'AI Demos / Phase 2', demos: phaseTwoDemos },
-];
+// Each group is a section of its own in the nav, with Phase 2 last
+const sections = [...groups, { title: 'Coming later', demos: phaseTwoDemos }];
 </script>
 
 <template>
