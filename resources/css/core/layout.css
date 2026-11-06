@@ -220,17 +220,25 @@ main.nav-closed {
     }
 
     #left-panel {
-        left: 0;
+        inset-inline-start: 0;
         width: max(11rem, 33.33%);
         transform: translateX(-100%);
-        @apply border-r border-gray-200 dark:border-gray-700;
+        @apply border-e border-gray-200 dark:border-gray-700;
+
+        [dir='rtl'] & {
+            transform: translateX(100%);
+        }
     }
 
     #right-panel {
-        right: 0;
+        inset-inline-end: 0;
         width: max(18rem, 33.33%);
         transform: translateX(100%);
-        @apply border-l border-gray-200 dark:border-gray-700;
+        @apply border-s border-gray-200 dark:border-gray-700;
+
+        [dir='rtl'] & {
+            transform: translateX(-100%);
+        }
     }
 
     /* Slide in when open */

@@ -198,7 +198,7 @@ onUnmounted(() => {
             id="right-panel"
             tabindex="-1"
             style="order: 2"
-            class="sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-mr-2 mx-auto focus:outline-none ps-2"
+            class="sticky top-0 flex flex-col overflow-y-scroll overscroll-y-contain h-full min-[1000px]:-me-2 mx-auto focus:outline-none ps-2"
             :class="{ 'z-(--z-index-max)': chatInPanel && chatLifted }"
         >
             <Tabs v-if="showRightTabs" v-model="rightTab">
