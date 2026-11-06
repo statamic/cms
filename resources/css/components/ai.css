@@ -150,6 +150,11 @@
 
 /* GROUP AI / PAGE TRAIL
 =================================================== */
+/* The line through the ticks of the step cards: their 14px padding plus half a 16px tick, less half its own 1px width */
+.ai-chat-thread {
+    --ai-trail-line: 21.5px;
+}
+
 /* The dot comes down the line from above, each on its own layer so it moves smoothly. Reduced motion skips it. */
 @media (prefers-reduced-motion: no-preference) {
     .ai-trail-drop {
@@ -191,11 +196,17 @@
 
 /* GROUP AI / MOVING BETWEEN PAGES
 =================================================== */
+/* It covers whatever is in the middle of the header, in the header's colour under the dimming. Once you're there and the page has lifted, it's the header's
+   own colour. */
 .ai-move-message {
     background: linear-gradient(rgb(from var(--color-gray-950) r g b / 0.3), rgb(from var(--color-gray-950) r g b / 0.3)), var(--color-global-header-bg);
     mask-image: linear-gradient(90deg, transparent, black 2rem, black calc(100% - 2rem), transparent);
+    transition: background 300ms ease-out;
 }
 
+.ai-move-message[data-arrived] {
+    background: var(--color-global-header-bg);
+}
 
 /* The spinner's arc closes into a full ring, then the tick draws in. Reduced motion shows them straight away. */
 @media (prefers-reduced-motion: no-preference) {
@@ -217,14 +228,6 @@
     from {
         stroke-dashoffset: 1;
     }
-}
-
-/* Once you're there and the page has lifted, it's the header's own colour */
-.ai-move-message {
-    transition: background 300ms ease-out;
-}
-.ai-move-message[data-arrived] {
-    background: var(--color-global-header-bg);
 }
 
 /* Like nprogress: it creeps towards the end while it waits, then fills the rest and fades out. Reduced motion skips the creep. */
