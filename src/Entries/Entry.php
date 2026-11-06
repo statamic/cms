@@ -452,11 +452,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $this->flushDescendantsCache($previousOrigin);
         }
 
-        if ($isNew && $this->collection()->orderable()) {
+        if ($isNew && $this->collection()->hasStructure()) {
             // The entry only gets appended to the tree when it's read, so anything that
             // read it before now would have cached a version without this entry in it.
             $this->collection()->structure()->flushCache($this->locale());
-            $this->collection()->updateEntryOrder([$this->id()]);
+
+            if ($this->collection()->orderable()) {
+                $this->collection()->updateEntryOrder([$this->id()]);
+            }
         }
 
         $stack = InitiatorStack::entry($this)->push();
@@ -1044,6 +1047,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function uri()
     {
+        if (! $this->id() && $uri = $this->getSupplement('live_preview_uri')) {
+            return $uri;
+        }
+
         if ($this->id() && Blink::store('entry-uris')->has($this->id())) {
             return Blink::store('entry-uris')->get($this->id());
         }

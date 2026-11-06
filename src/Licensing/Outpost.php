@@ -85,7 +85,10 @@ class Outpost
         }
 
         $response = $this->client->request('POST', self::ENDPOINT, [
-            'headers' => ['accept' => 'application/json'],
+            'headers' => [
+                'accept' => 'application/json',
+                'user-agent' => 'Statamic/'.Statamic::version(),
+            ],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
         ]);

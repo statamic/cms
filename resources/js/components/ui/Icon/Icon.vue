@@ -53,7 +53,7 @@ const loadIcon = async () => {
     if (iconSet.type === 'strings') {
         rawSvg = loadFromStringSet(iconSet.data, name);
     } else if (iconSet.type === 'glob') {
-        rawSvg = await loadFromGlobSet(iconSet.data, name);
+        rawSvg = loadFromStringSet(iconSet.preloaded, name) ?? await loadFromGlobSet(iconSet.data, name);
     }
 
     if (!rawSvg) {

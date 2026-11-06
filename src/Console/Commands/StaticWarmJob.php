@@ -42,7 +42,7 @@ class StaticWarmJob implements ShouldBeUnique, ShouldQueue
                     ]);
                 })
                 ->each(fn (string $uri) => StaticWarmJob::dispatch(
-                    new Request('GET', $uri),
+                    new Request('GET', $uri, $this->request->getHeaders()),
                     $this->clientConfig
                 ));
         }

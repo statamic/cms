@@ -307,6 +307,7 @@ export default {
 
             upload.errorMessage = msg;
             upload.errorStatus = status;
+            upload.existingId = response?.existing;
             this.$emit('error', upload, this.uploads);
             this.processUploadQueue();
         },

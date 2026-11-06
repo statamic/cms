@@ -176,6 +176,8 @@ class TaxonomyTermsStore extends ChildStore
 
         $this->cachePaths($paths);
 
+        Stache::cacheStore()->forever("stache::timestamps::{$this->key()}", $files->all());
+
         return $paths;
     }
 

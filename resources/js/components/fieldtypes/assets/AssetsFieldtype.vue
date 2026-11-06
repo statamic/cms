@@ -580,7 +580,12 @@ export default {
          * When the uploader component has finished uploading a file.
          */
         uploadComplete(asset) {
-            this.assets.push(asset);
+            // A link field has no validation to flag extra assets, so replace instead of appending.
+            if (this.isInLinkField && this.maxFiles === 1) {
+                this.assets = [asset];
+            } else {
+                this.assets.push(asset);
+            }
 
             this.lockDynamicFolder();
         },
@@ -656,8 +661,7 @@ export default {
         },
 
         uploadSelected(upload) {
-            const path = `${this.folder}/${upload.basename}`.replace(/^\/+/, '');
-            const id = `${this.container.id}::${path}`;
+            const id = upload.existingId;
 
             this.uploads.splice(this.uploads.indexOf(upload), 1);
 

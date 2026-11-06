@@ -3,6 +3,7 @@ import Head from '@/pages/layout/Head.vue';
 import { Header, CommandPaletteItem, Button, PublishContainer, DocsCallout } from '@ui';
 import { computed, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { Pipeline, Request } from '@ui/Publish/SavePipeline.js';
+import { clone } from '@/bootstrap/globals.js';
 
 const props = defineProps({
     blueprint: Object,
@@ -12,7 +13,7 @@ const props = defineProps({
 });
 
 const container = useTemplateRef('container');
-const values = ref(props.initialValues);
+const values = ref(clone(props.initialValues));
 const errors = ref({});
 const saving = ref(false);
 

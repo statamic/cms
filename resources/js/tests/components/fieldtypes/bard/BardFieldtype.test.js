@@ -6,6 +6,8 @@ import { closeHistory } from '@tiptap/pm/history';
 import { hideOthers } from 'aria-hidden';
 import * as Globals from '@/bootstrap/globals';
 import BardFieldtype from '@/components/fieldtypes/bard/BardFieldtype.vue';
+import { availableButtons } from '@/components/fieldtypes/bard/buttons.js';
+import { getIconSet } from '@/components/ui/Icon/registry.js';
 import Provider from '@/components/portals/Provider.vue';
 import { containerContextKey } from '@/components/ui/Publish/Container.vue';
 import { UPDATE_DEBOUNCE_MS } from '@/components/fieldtypes/constants.js';
@@ -30,7 +32,16 @@ function listItem(text) {
 }
 
 async function mountField(config = {}, initialValue = value, container = {}) {
-    const wrapper = mount(BardFieldtype, {
+    const wrapper = mountFieldWithoutWaiting(config, initialValue, container);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await wrapper.vm.$nextTick();
+
+    return wrapper;
+}
+
+function mountFieldWithoutWaiting(config = {}, initialValue = value, container = {}) {
+    return mount(BardFieldtype, {
         props: {
             value: initialValue,
             handle: 'content',
@@ -64,11 +75,6 @@ async function mountField(config = {}, initialValue = value, container = {}) {
             },
         },
     });
-
-    await vi.waitUntil(() => wrapper.vm.editor);
-    await wrapper.vm.$nextTick();
-
-    return wrapper;
 }
 
 async function mountFieldInContainer(config, initialValue) {
@@ -98,6 +104,8 @@ function focusEditor(wrapper) {
     vi.spyOn(document, 'activeElement', 'get').mockReturnValue(wrapper.vm.editor.view.dom);
 }
 
+let intersect;
+
 beforeEach(() => {
     window.Statamic = {
         $components: { has: () => true, register: () => {} },
@@ -105,9 +113,49 @@ beforeEach(() => {
         $commandPalette: { preventIf: () => {}, add: () => {} },
         $config: { get: () => null },
     };
+
+    window.IntersectionObserver = class {
+        constructor(callback) {
+            intersect = () => callback([{ isIntersecting: true }]);
+        }
+        observe() {}
+        disconnect() {}
+    };
 });
 
 afterEach(() => vi.restoreAllMocks());
+
+test('every toolbar button icon is preloaded', () => {
+    const preloaded = Object.keys(getIconSet('default').preloaded);
+    const icons = availableButtons().map((button) => button.svg);
+
+    expect(preloaded.toSorted()).toEqual(icons.toSorted());
+});
+
+test('a loading indicator is shown in place of the editor and toolbar until the editor has been created', async () => {
+    const wrapper = mountFieldWithoutWaiting({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(false);
+
+    await vi.waitUntil(() => wrapper.vm.editor);
+    await nextTick();
+
+    expect(wrapper.find('.bard-loading').exists()).toBe(false);
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+});
+
+test('toolbar buttons are rendered once the editor is near the viewport', async () => {
+    const wrapper = await mountField({ toolbar_mode: 'fixed' });
+
+    expect(wrapper.find('.bard-fixed-toolbar').exists()).toBe(true);
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(false);
+
+    intersect();
+    await nextTick();
+
+    expect(wrapper.find('.bard-fixed-toolbar button').exists()).toBe(true);
+});
 
 // Serializing the whole document is expensive, and the reading time is the only thing that needs it.
 test('the document is not serialized to html on mount when reading time is disabled', async () => {
@@ -213,6 +261,17 @@ test('the editor is left alone when the value only differs by omitted attribute 
     expect(wrapper.vm.editor.state.doc).toBe(doc);
 });
 
+test('typing still waiting for the debounced update is kept when the same value arrives again', async () => {
+    const wrapper = await mountField();
+
+    await type(wrapper, 'Zero. ');
+    await wrapper.setProps({ value: clone(value) });
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getText()).toBe('Zero. One two three four five.');
+    expect(wrapper.emitted('update:value')?.at(-1)).toEqual([wrapper.vm.editor.getJSON().content]);
+});
+
 // With remove_empty_nodes, a save strips empty nodes. Deleting them in place keeps the set fields alive.
 test('empty nodes the value no longer has are deleted in place', async () => {
     const text = { type: 'paragraph', content: [{ type: 'text', text: 'Text' }] };
@@ -275,6 +334,52 @@ test('set field edits made while an update is debounced are kept', async () => {
 
     expect(values.value.content[1].attrs.values.label).toBe('ABC');
     expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('ABC');
+});
+
+test('set field edits are not emitted back into the container', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        // As saved, without attribute defaults.
+        { type: 'set', attrs: { id: 'set-a', values: { type: 'card', label: 'A' } } },
+    ]);
+
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(wrapper.vm.editor.getJSON().content[1].attrs.values.label).toBe('AB');
+    expect(wrapper.emitted('update:value')).toBeUndefined();
+});
+
+test('set attributes changed in the editor are still emitted', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+    const editor = wrapper.vm.editor;
+
+    editor.view.dispatch(editor.state.tr.setNodeAttribute(editor.state.doc.child(0).nodeSize, 'enabled', false));
+    await waitForDebounce();
+
+    expect(values.value.content[1].attrs.enabled).toBe(false);
+});
+
+test('set field edits made after the editor was rebuilt are kept', async () => {
+    const { wrapper, values } = await mountFieldInContainer({ sets }, [
+        { type: 'paragraph', content: [{ type: 'text', text: 'One' }] },
+        set('set-a', 'A'),
+    ]);
+
+    data_set(values.value, 'content', [{ type: 'paragraph', content: [{ type: 'text', text: 'Two' }] }, set('set-a', 'A')]);
+    await wrapper.setProps({ value: values.value.content });
+    await waitForDebounce();
+
+    wrapper.vm.editor.commands.insertContentAt(1, 'Then ');
+    await nextTick();
+    await editSetLabel(values, 'AB');
+    await waitForDebounce();
+
+    expect(values.value.content[0].content[0].text).toBe('Then Two');
+    expect(values.value.content[1].attrs.values.label).toBe('AB');
 });
 
 test('each set field edit can be undone', async () => {

@@ -87,7 +87,6 @@
                     :filters-url="filtersUrl"
                     :selections-url="selectionsUrl"
                     :site="site"
-                    :initial-columns="columns"
                     :initial-sort-column="initialSortColumn"
                     :initial-sort-direction="initialSortDirection"
                     :initial-selections="value"
@@ -135,7 +134,6 @@ export default {
         canCreate: { type: Boolean },
         canEdit: { type: Boolean },
         canReorder: { type: Boolean },
-        columns: { type: Array, default: () => [] },
         config: { type: Object },
         creatables: { type: Array },
         data: { type: Array },

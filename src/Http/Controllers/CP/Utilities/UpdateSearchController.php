@@ -18,14 +18,13 @@ class UpdateSearchController extends CpController
             'indexes' => 'required',
         ])['indexes']);
 
-        $indexes->each(function ($index) {
-            [$name, $locale] = explode('::', $index);
+        $availableIndexes = Search::indexes();
 
-            if ($locale) {
-                $name = Str::before($name, '_'.$locale);
-            }
+        $indexes->each(function ($index) use ($availableIndexes) {
+            $name = Str::before($index, '::');
 
-            $index = Search::index($name, $locale ?: null);
+            $index = $availableIndexes->get($name) ?? throw new \InvalidArgumentException("Search index [{$name}] is not defined.");
+
             $index->update();
 
             SearchIndexUpdated::dispatch($index);

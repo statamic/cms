@@ -3,6 +3,7 @@
 namespace Tests\Stache;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -71,10 +72,55 @@ class BasicStoreTest extends TestCase
     {
         $this->markTestIncomplete();
     }
+
+    #[Test]
+    public function clearing_forgets_cached_items()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        $this->store->getItem('foo');
+        $this->assertTrue(Cache::has('stache::items::test::foo'));
+
+        $this->store->clear();
+
+        $this->assertFalse(Cache::has('stache::items::test::foo'));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/10295
+     */
+    #[Test]
+    public function clearing_a_cold_store_does_not_read_any_files()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+
+        $this->store->clear();
+
+        $this->assertEquals(0, $this->store->madeItemCount);
+    }
+
+    #[Test]
+    public function rebuilding_paths_caches_file_timestamps_for_the_watcher()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        touch($this->tempDir.'/foo.yaml', 1234567890);
+
+        $this->store->paths();
+        $this->store->clear();
+        $this->assertFalse(Cache::has('stache::timestamps::test'));
+
+        $this->store->paths();
+
+        $this->assertEquals([$this->tempDir.'/foo.yaml' => 1234567890], Cache::get('stache::timestamps::test'));
+    }
 }
 
 class TestBasicStore extends BasicStore
 {
+    public $madeItemCount = 0;
+
     public function key()
     {
         return 'test';
@@ -82,6 +128,8 @@ class TestBasicStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
+        $this->madeItemCount++;
+
         $data = YAML::parse($contents);
         $id = Str::after($path, Path::tidy(__DIR__.'/tmp/'));
         $id = Str::before($id, '.yaml');

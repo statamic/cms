@@ -1,9 +1,9 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
+import { Deferred, router } from '@inertiajs/vue3';
 import Head from '@/pages/layout/Head.vue';
 import {
 	Header, Button, Panel, PanelHeader, Heading, Card, Description, Badge, DocsCallout, CommandPaletteItem,
-	Dropdown, DropdownMenu, DropdownItem, Textarea, ErrorMessage, Modal, ModalClose
+	Dropdown, DropdownMenu, DropdownItem, Textarea, ErrorMessage, Modal, ModalClose, Icon
 } from '@ui';
 import { ref } from 'vue';
 
@@ -217,8 +217,16 @@ function invalidateStaticUrls() {
                 <Card class="flex-1">
                     <Description>{{ __('statamic::messages.cache_utility_image_cache_description') }}</Description>
                     <div class="flex flex-wrap gap-2 mt-3">
-                        <Badge :prepend="__('Cached images')">{{ images.count }}</Badge>
-                        <Badge :prepend="__('Size')">{{ images.size }}</Badge>
+                        <Deferred data="images">
+                            <template #fallback>
+                                <div class="flex h-6 items-center gap-2 text-sm text-gray-500">
+                                    <Icon name="loading" class="size-4" />
+                                    {{ __('Loading') }}
+                                </div>
+                            </template>
+                            <Badge :prepend="__('Cached images')">{{ images.count }}</Badge>
+                            <Badge :prepend="__('Size')">{{ images.size }}</Badge>
+                        </Deferred>
                     </div>
                 </Card>
             </Panel>
