@@ -49,12 +49,13 @@ onUnmounted(() => {
 </script>
 
 <template>
+    <!-- Under 1000px, it's a floating control in the bottom right instead (see PanelLayout.vue) -->
     <button
         type="button"
         :aria-label="__('Ask')"
         :aria-pressed="open"
         :aria-keyshortcuts="'Control+/ Meta+/'"
-        class="group relative inline-flex items-center justify-center gap-x-1.5 shrink-0 cursor-pointer h-8 min-w-8 sm:px-1.5 sm:pe-[8.5px] whitespace-nowrap rounded-xl text-xs text-white/60 hover:text-white/70 bg-black/40 ring-1 ring-white/10 hover:bg-black/45"
+        class="group relative max-[999px]:hidden inline-flex items-center justify-center gap-x-1.5 shrink-0 cursor-pointer h-8 min-w-8 sm:px-1.5 sm:pe-[8.5px] whitespace-nowrap rounded-xl text-xs text-white/60 hover:text-white/70 bg-black/40 ring-1 ring-white/10 hover:bg-black/45"
         @click="toggle"
     >
         <!-- Sized and coloured like the icon in the Ask or Search box -->

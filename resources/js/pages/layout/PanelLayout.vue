@@ -7,6 +7,8 @@ import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChatCloseControl from '@/components/ai-chat/AiChatCloseControl.vue';
 import AiChatDockControl from '@/components/ai-chat/AiChatDockControl.vue';
 import AiChatMoveHint from '@/components/ai-chat/AiChatMoveHint.vue';
+import AiChatPill from '@/components/ai-chat/AiChatPill.vue';
+import { permissions } from '@api';
 import { moving, writing } from '@/components/ai-chat/mock-runs.js';
 import { Tabs, TabList, TabTrigger } from '@ui';
 
@@ -28,7 +30,8 @@ const left = {
 // The right panel is shared by the page (e.g. an inspector) and the AI chat. When both want it, they become tabs.
 const pagePanelActive = ref(false);
 const pagePanelLabel = ref(null);
-const { open: chatOpen, floating: chatFloating, messages: chatMessages } = useAiChat();
+const { open: chatOpen, floating: chatFloating, messages: chatMessages, toggle: toggleChat } = useAiChat();
+const canUseChat = permissions.has('use ai');
 // Start keeping track of the open publish form now, before any page's form mounts, so the chat can fill it in
 useAiChanges();
 
@@ -233,7 +236,7 @@ onUnmounted(() => {
             :data-started="chatMessages.length ? '' : undefined"
             :data-working="chatWorking || undefined"
             :data-released="chatReleased || undefined"
-            class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
+            class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-5 max-[999px]:bottom-16 max-h-[calc(100dvh-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
             <AiChatCloseControl />
@@ -241,6 +244,16 @@ onUnmounted(() => {
         </div>
     </Transition>
 
+
+    <!-- Under 1000px, Ask is here rather than in the global header: always in the corner, with the chat opening above it -->
+    <AiChatPill
+        v-if="canUseChat"
+        icon="ai-chat"
+        :text="__('Ask')"
+        :aria-pressed="chatOpen"
+        class="fixed end-4.75 bottom-5 z-(--z-index-modal) min-[1000px]:hidden"
+        @click="toggleChat"
+    />
 
     <!-- Prototype: locked while the AI chat fills in the page (see writing) -->
     <div :inert="locked" :class="lockedClasses">
