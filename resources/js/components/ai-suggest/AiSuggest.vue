@@ -297,7 +297,7 @@ function follow(text) {
                         <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ __('The AI didn’t respond') }}</p>
                         <template v-if="canEditAi">
                             <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, check your AI settings.') }}</p>
-                            <p class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-400">Anthropic · request timed out after 30s</p>
+                            <p class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-300/80">Anthropic · request timed out after 30s</p>
                         </template>
                         <p v-else class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, ask an administrator to check the AI settings.') }}</p>
                         <!-- Try again is here, by the message, as the footer's reads as "more suggestions" rather than "try the connection again" -->
