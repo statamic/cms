@@ -217,34 +217,3 @@ export default {
     },
 };
 </script>
-
-<style>
-/* A field the AI chat just added opens up (the same movement as the chat's cards) and glows in the AI colour. The glow settles into whatever
-   shadow the card normally has, rather than fading to nothing first, so it doesn't jump when it ends. It has no end keyframe for that
-   reason: the browser animates back to the card's own box-shadow. Reduced motion skips both. */
-@media (prefers-reduced-motion: no-preference) {
-    .ai-bp {
-        interpolate-size: allow-keywords;
-        animation:
-            ai-bp-open 450ms cubic-bezier(0.22, 1, 0.36, 1),
-            ai-bp-glow 4s ease-out;
-    }
-}
-
-@keyframes ai-bp-glow {
-    from {
-        box-shadow:
-            0 0 0 1px color-mix(in oklab, var(--color-ai) 60%, transparent),
-            0 0 18px 2px color-mix(in oklab, var(--color-ai) 45%, transparent);
-    }
-}
-
-@keyframes ai-bp-open {
-    from {
-        opacity: 0;
-        height: 0;
-        padding-block: 0;
-        overflow: clip;
-    }
-}
-</style>

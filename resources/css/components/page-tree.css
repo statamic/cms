@@ -98,33 +98,3 @@
         @apply pt-1 rounded-t-2xl;
     }
 }
-
-/* GROUP PAGE TREE / AI ADDED LINK
-=================================================== */
-/* A link the AI chat just added opens up and glows in the AI colour, as a blueprint field does (see RegularField.vue). The glow settles into the
-   shadow the row normally has, as it has no end keyframe. Reduced motion skips both. */
-@media (prefers-reduced-motion: no-preference) {
-    .page-tree-branch.ai-added {
-        interpolate-size: allow-keywords;
-        animation:
-            ai-added-open 450ms cubic-bezier(0.22, 1, 0.36, 1),
-            ai-added-glow 4s ease-out;
-    }
-}
-
-@keyframes ai-added-glow {
-    from {
-        box-shadow:
-            0 0 0 1px color-mix(in oklab, var(--color-ai) 60%, transparent),
-            0 0 18px 2px color-mix(in oklab, var(--color-ai) 45%, transparent);
-    }
-}
-
-@keyframes ai-added-open {
-    from {
-        opacity: 0;
-        height: 0;
-        padding-block: 0;
-        overflow: clip;
-    }
-}
