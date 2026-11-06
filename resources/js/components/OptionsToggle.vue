@@ -33,6 +33,8 @@ model.value = read(props.storageKey, model.value);
 if (!remaining.value.includes(model.value)) model.value = remaining.value[0];
 
 const labelFor = (i) => `${remaining.value.indexOf(i) + 1}/${remaining.value.length} · ${props.options[i]}${skipped.value.length ? ` (#${i + 1})` : ''}`;
+// The longest each label could ever be, skipped options included, so the box stays the same width and × never moves
+const widest = (i) => `${props.options.length}/${props.options.length} · ${props.options[i]} (#${i + 1})`;
 
 function next() {
     model.value = remaining.value[(remaining.value.indexOf(model.value) + 1) % remaining.value.length];
@@ -57,7 +59,8 @@ watch(skipped, (value) => write(`${props.storageKey}-skipped`, value));
             @mousedown.prevent
             @click="next"
         >
-            <span v-for="i in remaining" :key="i" :class="['col-start-1 row-start-1 text-start', i === model ? '' : 'invisible']">{{ labelFor(i) }}</span>
+            <span v-for="(option, i) in options" :key="`widest-${i}`" class="invisible col-start-1 row-start-1" aria-hidden="true">{{ widest(i) }}</span>
+            <span class="col-start-1 row-start-1 text-start">{{ labelFor(model) }}</span>
         </button>
         <button
             v-if="remaining.length > 1"
