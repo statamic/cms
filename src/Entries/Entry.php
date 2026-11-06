@@ -97,6 +97,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function id($id = null)
     {
+        if (func_num_args() === 0) {
+            return $this->id;
+        }
+
         return $this->fluentlyGetOrSet('id')->args(func_get_args());
     }
 
@@ -113,6 +117,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function locale($locale = null)
     {
+        if (func_num_args() === 0) {
+            return $this->locale ?? Site::default()->handle();
+        }
+
         return $this
             ->fluentlyGetOrSet('locale')
             ->setter(function ($locale) {
@@ -186,6 +194,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function blueprint($blueprint = null)
     {
         $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
+
+        if (func_num_args() === 0 && ($cached = Blink::get($key)) !== null) {
+            return $cached;
+        }
 
         return $this
             ->fluentlyGetOrSet('blueprint')
