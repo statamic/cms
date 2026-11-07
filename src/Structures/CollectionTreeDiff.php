@@ -8,6 +8,7 @@ class CollectionTreeDiff
     protected $removed = [];
     protected $moved = [];
     protected $ancestryChanged = [];
+    protected $orderChanged = [];
     protected $expectsRoot = false;
     private $positions;
 
@@ -25,6 +26,7 @@ class CollectionTreeDiff
         $this->removed = $old->keys()->diff($new->keys())->values()->all();
         $this->moved = $this->analyzeMoved();
         $this->ancestryChanged = $this->analyzeAncestryChanges();
+        $this->orderChanged = $this->analyzeOrderChanges($old, $new);
 
         return $this;
     }
@@ -105,6 +107,15 @@ class CollectionTreeDiff
         return $this->ancestryChanged;
     }
 
+    /**
+     * Items whose position in the flattened tree, and so their "order", has changed.
+     * Unlike moved(), this includes items shifted by changes elsewhere in the tree.
+     */
+    public function orderChanged()
+    {
+        return $this->orderChanged;
+    }
+
     private function preparePositions($old, $new)
     {
         $positions = [];
@@ -136,5 +147,12 @@ class CollectionTreeDiff
         return $this->positions->filter(function ($item) {
             return $item[0]['path'] !== $item[1]['path'];
         })->keys()->all();
+    }
+
+    private function analyzeOrderChanges($old, $new)
+    {
+        $oldOrder = $old->keys()->flip();
+
+        return $new->keys()->filter(fn ($id, $i) => $oldOrder->get($id) !== $i)->values()->all();
     }
 }

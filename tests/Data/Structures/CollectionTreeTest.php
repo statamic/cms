@@ -3,6 +3,7 @@
 namespace Tests\Data\Structures;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\CollectionTreeEntriesMovedOrRemoved;
@@ -318,6 +319,61 @@ class CollectionTreeTest extends TestCase
             'bravo' => 1,
             'charlie' => 2,
         ], $this->cachedOrderIndex('pages'));
+    }
+
+    #[Test]
+    public function entries_shifted_by_a_tree_change_keep_their_order_index_in_sync()
+    {
+        $collection = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => false]))->save();
+
+        foreach (['alfa', 'a1', 'a2', 'bravo', 'b1'] as $id) {
+            EntryFactory::collection('pages')->id($id)->slug($id)->data(['title' => $id])->create();
+        }
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'alfa', 'children' => [
+                ['entry' => 'a1'],
+            ]],
+            ['entry' => 'bravo', 'children' => [
+                ['entry' => 'b1'],
+            ]],
+        ])->save();
+
+        // Adding "a2" shifts "bravo" and "b1" without changing their parent or index.
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'alfa', 'children' => [
+                ['entry' => 'a1'],
+                ['entry' => 'a2'],
+            ]],
+            ['entry' => 'bravo', 'children' => [
+                ['entry' => 'b1'],
+            ]],
+        ])->save();
+
+        $this->assertEquals([
+            'alfa' => 1,
+            'a1' => 2,
+            'a2' => 3,
+            'bravo' => 4,
+            'b1' => 5,
+        ], $this->cachedOrderIndex('pages'));
+
+        // Removing "a2" shifts them back, with nothing moved or added.
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'alfa', 'children' => [
+                ['entry' => 'a1'],
+            ]],
+            ['entry' => 'bravo', 'children' => [
+                ['entry' => 'b1'],
+            ]],
+        ])->save();
+
+        $this->assertEquals([
+            'alfa' => 1,
+            'a1' => 2,
+            'bravo' => 3,
+            'b1' => 4,
+        ], Arr::except($this->cachedOrderIndex('pages'), 'a2'));
     }
 
     private function cachedOrderIndex(string $collection): array
