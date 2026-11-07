@@ -55,19 +55,20 @@ EOT;
     {
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('default', '{{ link to="/pages/{slug}" }}{{ if "{slug}" == "home" }} yes{{ /if }}');
+        $this->viewShouldReturnRaw('default', '{{ link to="/pages/{slug}" }} {{ num | add:{num} }}');
 
         $this->createPage('home', [
             'with' => [
                 'title' => 'Home Page',
+                'num' => 3,
                 'template' => 'default',
             ],
         ]);
 
-        $this->assertSame('/pages/home yes', $this->getResponseContent('/home'));
+        $this->assertSame('/pages/home 6', $this->getResponseContent('/home'));
         $this->assertSame([], GlobalRuntimeState::$interpolatedVariables);
 
-        $this->assertSame('/pages/home yes', $this->getResponseContent('/home'));
+        $this->assertSame('/pages/home 6', $this->getResponseContent('/home'));
         $this->assertSame([], GlobalRuntimeState::$interpolatedVariables);
     }
 
