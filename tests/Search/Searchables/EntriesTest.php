@@ -217,19 +217,35 @@ class EntriesTest extends TestCase
         $this->assertFalse($provider->contains($c));
     }
 
-    private function makeProvider($locale, $config)
+    #[Test]
+    public function it_includes_unpublished_entries_in_the_cp_index()
     {
-        $index = $this->makeIndex($locale, $config);
+        Collection::make('blog')->save();
+        $a = EntryFactory::collection('blog')->id('a')->create();
+        $b = EntryFactory::collection('blog')->id('b')->published(false)->create();
+
+        $provider = $this->makeProvider(null, ['searchables' => 'content'], 'cp');
+
+        $this->assertEquals(['entry::a', 'entry::b'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a));
+        $this->assertTrue($provider->contains($b));
+    }
+
+    private function makeProvider($locale, $config, $handle = 'default')
+    {
+        $index = $this->makeIndex($locale, $config, $handle);
 
         $keys = $this->normalizeSearchableKeys($config['searchables'] ?? null);
 
         return (new Entries)->setIndex($index)->setKeys($keys);
     }
 
-    private function makeIndex($locale, $config)
+    private function makeIndex($locale, $config, $handle)
     {
         $index = $this->mock(\Statamic\Search\Index::class);
 
+        $index->shouldReceive('handle')->andReturn($handle);
         $index->shouldReceive('config')->andReturn($config);
         $index->shouldReceive('locale')->andReturn($locale);
 
