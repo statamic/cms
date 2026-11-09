@@ -45,6 +45,7 @@ const makeField = ({
             mocks: {
                 $axios: { post: axiosPost },
                 $progress: { loading: () => {} },
+                $toast: { error: vi.fn() },
             },
         },
     });
@@ -297,6 +298,74 @@ test('compact uploads stay inline and hide the plus button until they finish', a
     expect(field.findComponent(AssetUpload).attributes()).toMatchObject({ basename: 'new.jpg', percent: '45' });
     expect(field.findComponent(Uploads).exists()).toBe(false);
     expect(field.findComponent({ ref: 'uploader' }).attributes('style')).toContain('display: none');
+});
+
+test.each([
+    { option: 'overwrite' },
+    { option: 'timestamp' },
+    { option: 'rename', filename: 'renamed' },
+])('compact fields can retry a queued conflict with %o after reaching the file limit', async (options) => {
+    const field = compactField({
+        config: { allow_uploads: true },
+        stubs: { Uploader: false },
+    });
+    await flushPromises();
+
+    const uploader = field.findComponent(Uploader);
+    const firstAsset = { id: 'main::a.jpg' };
+    const secondAsset = { id: 'main::b.jpg' };
+    const conflictFile = new File(['b'], 'b.jpg', { type: 'image/jpeg' });
+    const responses = [
+        { status: 200, data: JSON.stringify({ data: firstAsset }) },
+        {
+            status: 409,
+            data: JSON.stringify({
+                message: 'File already exists.',
+                errors: { file: ['File already exists.'] },
+                existing: secondAsset.id,
+            }),
+        },
+        { status: 200, data: JSON.stringify({ data: secondAsset }) },
+    ];
+    const makeUpload = vi.spyOn(uploader.vm, 'makeUpload').mockImplementation((id, file) => {
+        const upload = {
+            state: 'new',
+            form: new Map([['file', file]]),
+            upload() {
+                upload.state = 'started';
+
+                return Promise.resolve(responses.shift()).then((response) => {
+                    upload.state = 'done';
+
+                    return response;
+                });
+            },
+        };
+
+        return upload;
+    });
+
+    uploader.vm.addFile(new File(['a'], 'a.jpg', { type: 'image/jpeg' }));
+    uploader.vm.addFile(conflictFile);
+    await flushPromises();
+
+    expect(field.vm.assets).toEqual([firstAsset]);
+    expect(uploader.props('enabled')).toBe(false);
+    expect(field.vm.uploads[0].errorStatus).toBe(409);
+
+    uploader.vm.addFile(new File(['c'], 'c.jpg', { type: 'image/jpeg' }));
+
+    expect(makeUpload).toHaveBeenCalledTimes(2);
+
+    field.findComponent(AssetUpload).vm.$emit('retry', options);
+    await flushPromises();
+
+    expect(makeUpload).toHaveBeenLastCalledWith(expect.any(String), conflictFile, options);
+    expect(field.vm.uploads).toEqual([]);
+    expect(field.emitted('update:value')).toEqual([
+        [[firstAsset.id]],
+        [[firstAsset.id, secondAsset.id]],
+    ]);
 });
 
 test('a full compact field does not allow drops that would replace its selection', async () => {
