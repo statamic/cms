@@ -11,13 +11,13 @@ use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Forms\Connectors\Email as EmailConnector;
 use Statamic\Forms\Email;
-use Statamic\Forms\FakeSubmissionGenerator;
+use Statamic\Forms\PreviewSubmission;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
 class EmailConnectionPreviewController extends CpController
 {
-    public function __invoke(Request $request, $form, EmailConnector $connector, FakeSubmissionGenerator $generator)
+    public function __invoke(Request $request, $form, EmailConnector $connector)
     {
         $connector->setForm($form);
 
@@ -25,7 +25,7 @@ class EmailConnectionPreviewController extends CpController
 
         $config = $connector->process([$request->all()])[0];
         $latest = $this->latestSubmission($form);
-        $submission = $latest ?? $this->sampleSubmission($form, $generator);
+        $submission = $latest ?? $this->sampleSubmission($form);
         $email = new Email($submission, $config, $submission->site());
 
         try {
@@ -63,10 +63,10 @@ class EmailConnectionPreviewController extends CpController
         return $form->querySubmissions()->whereStatus('finalized')->orderBy('date', 'desc')->first();
     }
 
-    private function sampleSubmission(Form $form, FakeSubmissionGenerator $generator): Submission
+    private function sampleSubmission(Form $form): Submission
     {
         $submission = $form->makeSubmission()->site(Site::selected());
-        $submission->data($form->blueprint()->fields()->addValues($generator->generate($form))->process()->values());
+        $submission->data($form->blueprint()->fields()->addValues((new PreviewSubmission)->values($form))->process()->values());
 
         return $submission;
     }
