@@ -46,6 +46,19 @@ class PleaseTest extends TestCase
         $this->please('statamic:stache:clear');
     }
 
+    #[Test]
+    public function it_can_run_a_please_command_registered_on_the_application_kernel()
+    {
+        $kernel = $this->app[Kernel::class];
+
+        $kernel->command('please-test:hello', function () {
+            $this->info('Hello from please.');
+        });
+
+        $this->assertSame(0, $kernel->call('please-test:hello'));
+        $this->assertStringContainsString('Hello from please.', $kernel->output());
+    }
+
     public function please($command, $parameters = [])
     {
         return $this->app[Kernel::class]->call($command, $parameters);
