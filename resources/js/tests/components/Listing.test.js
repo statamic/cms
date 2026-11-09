@@ -103,6 +103,30 @@ test('exposes select-all-matching helpers on the listing context', () => {
     expect(typeof listing.selectAllMatching).toBe('function');
 });
 
+test('keeps the columns prop when the response has no columns', async () => {
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1', email: 'foo@example.com' }],
+            meta: { last_page: 1, total: 1, per_page: 50 },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/subscribers',
+        items: undefined,
+        columns: [{ field: 'email', label: 'Email', sortable: true, visible: true }],
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.setSortColumn('email');
+
+    expect(listing.columns.value.map((column) => column.field)).toEqual(['email']);
+    expect(listing.sortColumn.value).toBe('email');
+});
+
 test('canSelectAllMatching can be disabled via allowSelectAllMatching', async () => {
     axios.get.mockResolvedValue({
         data: {
