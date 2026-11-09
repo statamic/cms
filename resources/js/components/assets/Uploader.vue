@@ -187,6 +187,10 @@ export default {
         addFile(file, data = {}) {
             if (!this.enabled) return;
 
+            this.queueFile(file, data);
+        },
+
+        queueFile(file, data = {}) {
             const id = uniqid();
             const upload = this.makeUpload(id, file, data);
 
@@ -317,8 +321,9 @@ export default {
         },
 
         retry(id, args) {
-            let file = this.findUpload(id).instance.form.get('file');
-            this.addFile(file, args);
+            const file = this.findUpload(id).instance.form.get('file');
+
+            this.queueFile(file, args);
             this.uploads.splice(this.findUploadIndex(id), 1);
         },
     },
