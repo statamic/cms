@@ -40,6 +40,30 @@ useAiChanges();
 const locked = computed(() => writing.active || undefined);
 const lockedClasses = computed(() => ['transition-opacity duration-300', writing.active ? 'opacity-60' : '']);
 
+// Locking the page takes focus off whatever had it there (like the Title a new entry focuses as it opens), leaving nothing focused. So put it
+// back as the page unlocks, with its outline, unless you've gone on to focus something else (like the chat) meanwhile.
+let focusedBeforeLock = null;
+watch(
+    () => writing.active,
+    (active) => {
+        if (active) {
+            const focused = document.activeElement;
+            focusedBeforeLock = focused && focused !== document.body && !focused.closest('[data-ai-chat]') ? focused : null;
+            return;
+        }
+        const element = focusedBeforeLock;
+        focusedBeforeLock = null;
+        if (!element?.isConnected || ![document.body, element, null].includes(document.activeElement)) return;
+        // After the inert attribute has come off, or it can't take focus. A browser that kept focus on it through the lock (rather than dropping
+        // it) can still have lost its outline, so it's focused afresh.
+        requestAnimationFrame(() => {
+            if (document.activeElement === element) element.blur();
+            element.focus({ preventScroll: true, focusVisible: true });
+        });
+    },
+    { flush: 'sync' },
+);
+
 // A docked chat is lifted above the screen's dimming while the chat moves you (its messages and input dim themselves, see AiChat.vue). The dimming takes 300ms
 // to fade away once the move is over, so the lift stays for that long too: dropping it at once puts the dimming over the chat, which then dims twice as the two
 // fade together, and flickers.
