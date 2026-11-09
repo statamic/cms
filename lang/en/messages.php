@@ -88,6 +88,7 @@ return [
     'email_utility_description' => 'Check email configuration settings and send test emails.',
     'entry_count' => ':count entry|:count entries',
     'entry_origin_instructions' => 'The new localization will inherit values from the entry in the selected site.',
+    'entry_version_conflict' => 'This entry was changed after you opened it. Saving now overwrites those changes. To see them instead, reload the page, which discards your unsaved changes.',
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_always_save_instructions' => 'Always save field value, even if the field is hidden.',
     'field_conditions_field_instructions' => 'You may enter any field handle. You are not limited to the options in the dropdown.',

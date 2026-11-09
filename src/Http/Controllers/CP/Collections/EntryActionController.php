@@ -9,7 +9,7 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntryActionController extends ActionController
 {
-    use ExtractsFromEntryFields;
+    use ChecksEntryVersions, ExtractsFromEntryFields;
 
     protected function getSelectedItems($items, $context)
     {
@@ -24,10 +24,10 @@ class EntryActionController extends ActionController
 
         $blueprint = $entry->blueprint();
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values] = $this->extractFromFields($entry->fromWorkingCopy(), $blueprint);
 
         return array_merge((new EntryResource($entry))->resolve()['data'], [
-            'values' => $values,
+            'values' => [...$values, '_version' => $this->entryVersion($entry)],
             'itemActions' => Action::for($entry, $context),
         ]);
     }
