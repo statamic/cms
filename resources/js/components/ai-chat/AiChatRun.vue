@@ -193,6 +193,23 @@ const isSearch = (step) => step.tool === 'statamic.search_entries';
 const showSearchIcon = (step) => isSearch(step) && ['running', 'done'].includes(step.state);
 const searchIconClass = (step) => (step.state === 'running' ? 'text-blue-500 motion-safe:animate-pulse' : 'text-emerald-700 dark:text-emerald-400');
 
+// A step card is two lines: the title, and how it's going under it. Clicking it opens it out to three, adding what it worked on (which is
+// otherwise in the title's tooltip), and clicking again folds it back. There's no chevron to say so, as one on every card was too busy.
+const expanded = ref([]);
+const toggleExpanded = (step) => {
+    expanded.value = expanded.value.includes(step.tool) ? expanded.value.filter((tool) => tool !== step.tool) : [...expanded.value, step.tool];
+};
+// The line under the title: what it found once it's done, how it's going otherwise, and what it's working on while it runs.
+// What it found is grey, like the rest of the card, so the outcome's Done is the one green thing in a run.
+const stepNote = (step) => {
+    if (step.state === 'done') return { text: step.result, class: 'text-gray-500 dark:text-gray-400' };
+    if (step.state === 'running' && slowFor(step)) return { text: `${__('Still running…')} ${slowFor(step)}s`, class: 'text-gray-500 tabular-nums dark:text-gray-400' };
+    if (step.state === 'skipped') return { text: __('Skipped'), class: 'text-gray-500 dark:text-gray-400' };
+    if (step.state === 'failed') return { text: __('No response'), class: 'font-medium text-red-700 dark:text-red-400' };
+    if (step.state === 'waiting') return { text: __('Waiting for you'), class: 'text-gray-700 dark:text-gray-300' };
+    return { text: step.detail ?? step.args, class: 'text-gray-500 dark:text-gray-400' };
+};
+
 const stepTitle = (step) => {
     const labels = toolLabels[step.tool];
     return labels ? __(labels[step.state === 'done' ? 1 : 0]) : step.tool;
@@ -214,7 +231,7 @@ const stepTitle = (step) => {
             />
             <div
                 :class="[
-                    'relative flex items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 before:absolute before:-z-20 before:start-(--ai-trail-line) before:-top-3 before:h-3 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80',
+                    'relative flex cursor-pointer items-start gap-2.5 rounded-xl bg-white p-3.5 shadow-ui-sm ring ring-gray-200 select-none before:absolute before:-z-20 before:start-(--ai-trail-line) before:-top-3 before:h-3 hover:ring-gray-300 dark:bg-gray-850 dark:shadow-ui-md dark:ring-gray-700/80 dark:hover:ring-gray-600',
                     // Waiting is faded like the steps still to come, as the question itself is in the input
                     ['pending', 'waiting', 'skipped'].includes(step.state) ? 'opacity-60' : '',
                     line(step),
@@ -222,6 +239,12 @@ const stepTitle = (step) => {
                     justNow(step.shownAt) ? 'ai-card-in' : '',
                     step.state === 'pending' ? 'hidden' : '',
                 ]"
+                role="button"
+                tabindex="0"
+                :aria-expanded="expanded.includes(step.tool)"
+                @click="toggleExpanded(step)"
+                @keydown.enter.prevent="toggleExpanded(step)"
+                @keydown.space.prevent="toggleExpanded(step)"
             >
                 <div class="mt-0.5 flex size-4 shrink-0 items-center justify-center">
                     <Icon v-if="showSearchIcon(step)" name="magnifying-glass" class="size-[18px]! shrink-0" :class="searchIconClass(step)" />
@@ -236,11 +259,16 @@ const stepTitle = (step) => {
                     <span v-else class="size-4 rounded-full border border-dashed border-gray-300 dark:border-gray-600" />
                 </div>
 
-                <div class="min-w-0 flex-1 space-y-1">
+                <div v-if="!expanded.includes(step.tool)" class="min-w-0 flex-1 space-y-0.5">
+                    <p class="truncate text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200" :title="step.detail ?? step.args">{{ stepTitle(step) }}</p>
+                    <p class="truncate text-xs" :class="stepNote(step).class" :title="step.args">{{ stepNote(step).text }}</p>
+                </div>
+                <!-- Opened out -->
+                <div v-else class="min-w-0 flex-1 space-y-1">
                     <p class="truncate text-[0.8125rem] font-semibold text-gray-900 dark:text-gray-200" :title="step.tool">{{ stepTitle(step) }}</p>
                     <!-- What it worked on, in words. The arguments it was really called with are in the tooltip. -->
                     <p class="text-xs text-gray-500 dark:text-gray-400" :title="step.args">{{ step.detail ?? step.args }}</p>
-                    <p v-if="step.state === 'done'" class="text-xs font-medium" :class="isEmptyRun ? 'text-gray-500 dark:text-gray-400' : 'text-emerald-700 dark:text-emerald-400'">{{ step.result }}</p>
+                    <p v-if="step.state === 'done'" class="text-xs text-gray-500 dark:text-gray-400">{{ step.result }}</p>
                     <p v-else-if="step.state === 'running' && slowFor(step)" class="text-xs text-gray-500 tabular-nums dark:text-gray-400">{{ __('Still running…') }} {{ slowFor(step) }}s</p>
                     <p v-else-if="step.state === 'running'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Running…') }}</p>
                     <p v-else-if="step.state === 'skipped'" class="text-xs text-gray-500 dark:text-gray-400">{{ __('Skipped') }}</p>
