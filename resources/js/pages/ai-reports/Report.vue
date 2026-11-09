@@ -93,11 +93,10 @@ const percent = computed(() => (found.value ? Math.round((done.value / found.val
 
         <!-- A panel for each kind of problem, each row ticked off once it's fixed -->
         <Panel v-for="section in sections" :key="section.heading" :heading="`${section.heading} · ${section.items.length}`">
-            <!-- How to use the tick boxes, on the right of each list's header. Kinds the AI can fix also get a way to ask it to. -->
+            <!-- On the right of each list's header: Fix with AI for the kinds the AI can fix, otherwise how to use the tick boxes -->
             <template #header-actions>
                 <Button v-if="section.fix" size="xs" icon="ai-edit" :text="__('Fix with AI')" @click="fix(section)" />
-                <!-- A panel header with a button in it drops its right padding to 4px (for a button at the end), so the note puts the other 14px back -->
-                <span class="text-xs text-gray-500" :class="{ 'pe-3.5': section.fix }">{{ section.fix ? __('or tick each one off as you fix it') : __('Tick each one off as you fix it') }}</span>
+                <span v-else class="text-xs text-gray-500">{{ __('Tick each one off as you fix it') }}</span>
             </template>
             <Card class="py-0!">
                 <Table>
