@@ -463,6 +463,14 @@ function scrollToBottom() {
     nextTick(() => {
         const el = thread.value;
         if (!el) return;
+        // Each new card opens up to its own height, measured here without the animation (which then starts again from nothing). Opening to
+        // auto relies on interpolate-size, which Safari doesn't have, so the card would jump to full height halfway through instead.
+        el.querySelectorAll('.ai-card-in:not([data-open-height])').forEach((card) => {
+            card.classList.remove('ai-card-in');
+            card.style.setProperty('--ai-open-height', `${card.offsetHeight}px`);
+            card.dataset.openHeight = '';
+            card.classList.add('ai-card-in');
+        });
         if (el.scrollHeight - el.clientHeight - el.scrollTop > el.clientHeight / 2) el.scrollTop = el.scrollHeight;
         cancelAnimationFrame(following);
         followingBottom.value = true;

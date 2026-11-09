@@ -113,15 +113,15 @@
 =================================================== */
 /* A step card, and a field or nav link the AI chat just added, open up from nothing, pushing what's below down smoothly rather than appearing all at once.
    The field and link also glow in the AI colour, which settles into whatever shadow they normally have, rather than fading to nothing first, so it
-   doesn't jump when it ends. It has no end keyframe for that reason: the browser animates back to their own box-shadow. Reduced motion skips both. */
+   doesn't jump when it ends. It has no end keyframe for that reason: the browser animates back to their own box-shadow. Reduced motion skips both.
+   A step card opens to the height measured as it arrives (--ai-open-height, set in scrollToBottom in AiChat.vue), as Safari can't animate to auto. */
 @media (prefers-reduced-motion: no-preference) {
-    .ai-card-in,
     .ai-added {
         interpolate-size: allow-keywords;
     }
 
     .ai-card-in {
-        animation: ai-open 450ms var(--ai-ease-out) both;
+        animation: ai-card-open 450ms var(--ai-ease-out) both;
     }
 
     .ai-added {
@@ -137,6 +137,20 @@
         height: 0;
         padding-block: 0;
         overflow: clip;
+    }
+}
+
+@keyframes ai-card-open {
+    from {
+        opacity: 0;
+        height: 0;
+        padding-block: 0;
+        overflow: clip;
+    }
+    /* Not clipped at the end, so the clip comes off early on (as overflow can't animate, it switches halfway). The line up to the card above
+       sits outside it (its ::before), so it shows as the card opens, rather than popping in once it's open. */
+    to {
+        height: var(--ai-open-height, auto);
     }
 }
 
