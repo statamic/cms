@@ -20,6 +20,11 @@ class ThumbnailExtractor
         );
     }
 
+    public static function available()
+    {
+        return static::enabled() && app(Ffmpeg::class)->available();
+    }
+
     public static function cachePath()
     {
         return config(
@@ -28,11 +33,15 @@ class ThumbnailExtractor
         );
     }
 
+    public static function getFileName(Asset $asset)
+    {
+        return 'thumb_'.md5($asset->id()).'.jpg';
+    }
+
     public static function getCachePath(Asset $asset)
     {
-        $fileName = 'thumb_'.md5($asset->id()).'.jpg';
         $cacheDirectory = static::cachePath();
-        $finalPath = Path::tidy($cacheDirectory.'/'.$fileName);
+        $finalPath = Path::tidy($cacheDirectory.'/'.static::getFileName($asset));
 
         if (! file_exists($cacheDirectory)) {
             mkdir($cacheDirectory, 0755, true);

@@ -139,7 +139,7 @@ class Term implements ContainsQueryableValues, TermContract
     {
         return app()->makeWith(LocalizedTerm::class, [
             'term' => $this,
-            'locale' => $site,
+            'locale' => $site instanceof \Statamic\Sites\Site ? $site->handle() : $site,
         ]);
     }
 

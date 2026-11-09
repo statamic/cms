@@ -88,7 +88,7 @@ function setDropdownItemActive(breadcrumbIndex, linkIndex, breadcrumb) {
                     <ui-button
                         variant="ghost"
                         icon="chevron-vertical"
-                        class="[&_svg]:size-3! h-8! w-4! hover:bg-gray-300/5! -ml-3 mr-1 animate-in fade-in duration-500"
+                        class="[&_svg]:size-3! h-8! w-6! hover:bg-gray-300/5! -ml-4 animate-in fade-in duration-500"
                         :aria-label="`${__('Options for')} ${__(breadcrumb.display)}`"
                         aria-haspopup
                         :aria-expanded="false"

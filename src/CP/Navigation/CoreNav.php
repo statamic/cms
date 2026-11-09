@@ -25,6 +25,9 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
 use Statamic\Statamic;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CoreNav
 {
     /**
@@ -111,11 +114,11 @@ class CoreNav
                 return NavAPI::all()->sortBy->title()
                     ->filter(function ($nav) {
                         return User::current()->can('configure navs')
-                            || $nav->sites()->contains(Site::selected()->handle());
+                            || $nav->existsIn(Site::selected()->handle());
                     })
                     ->map(function ($nav) {
                         $availableInSelectedSite = Site::hasMultiple()
-                            ? $nav->sites()->contains(Site::selected()->handle())
+                            ? $nav->existsIn(Site::selected()->handle())
                             : true;
 
                         return Nav::item($nav->title())

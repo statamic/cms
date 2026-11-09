@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useAttrs, useSlots } from 'vue';
+import { Comment, Text, computed, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import Icon from './Icon/Icon.vue';
@@ -35,6 +35,9 @@ const props = defineProps({
 const attrs = useAttrs();
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
+
+// Plain text in the slot gets wrapped so it can be trimmed like the `text` prop
+const slotIsText = () => slots.default().every((node) => node.type === Text || node.type === Comment);
 const tag = computed(() => {
     if (props.href) {
         return props.target === '_blank' ? 'a' : Link;
@@ -44,19 +47,19 @@ const tag = computed(() => {
 
 const badgeClasses = computed(() => {
     const classes = cva({
-        base: 'relative inline-flex items-center justify-center gap-1 border dark:border-none dark:pb-0.25 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
+        base: 'relative inline-flex items-center justify-center gap-1 border dark:border-none dark:not-supports-[text-box:ex_alphabetic]:pb-0.25 font-normal antialiased whitespace-nowrap no-underline not-prose [button]:cursor-pointer group [&_svg]:opacity-60 [&_svg]:group-hover:opacity-80 dark:[&_svg]:group-hover:opacity-70',
         variants: {
             size: {
-                sm: 'text-2xs leading-normal px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
-                default: 'text-xs leading-5.5 px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
-                lg: 'font-medium text-sm leading-7 px-2.5 rounded-lg [&_svg]:size-4 gap-2',
+                sm: 'text-2xs leading-normal min-h-[calc(1.5em+2px)] px-1.25 rounded-[0.1875rem] [&_svg]:size-2.5',
+                default: 'text-xs leading-5.5 min-h-[calc(1.375rem+2px)] px-2.25 rounded-sm [&_svg]:size-3.5 gap-2',
+                lg: 'font-medium text-sm leading-7 min-h-[calc(1.75rem+2px)] px-2.5 rounded-lg [&_svg]:size-4 gap-2',
             },
             color: {
-                amber: 'bg-amber-50 dark:bg-gray-800 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 [a]:hover:bg-amber-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-amber-200 dark:[button]:hover:bg-gray-700',
+                amber: 'bg-amber-50 dark:bg-gray-800 border-amber-400 dark:border-amber-700 text-amber-700 dark:text-amber-300 [a]:hover:bg-amber-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-amber-100 dark:[button]:hover:bg-gray-700',
                 black: 'bg-gray-900 dark:bg-black border-black dark:border-gray-700 text-white dark:text-gray-300 [a]:hover:bg-gray-800 dark:[a]:hover:bg-gray-800 [button]:hover:bg-gray-800 dark:[button]:hover:bg-gray-800',
                 blue: 'bg-blue-50 dark:bg-gray-800 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 [a]:hover:bg-blue-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-blue-100 dark:[button]:hover:bg-gray-700',
                 cyan: 'bg-cyan-50 dark:bg-gray-800 border-cyan-400 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300 [a]:hover:bg-cyan-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-cyan-100 dark:[button]:hover:bg-gray-700',
-                default: 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-200 dark:[button]:hover:bg-gray-700',
+                default: 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-700 dark:text-gray-100 text-gray-700 [a]:hover:bg-gray-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-gray-100 dark:[button]:hover:bg-gray-700',
                 emerald: 'bg-emerald-50 border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:bg-gray-800 dark:text-emerald-300 [a]:hover:bg-emerald-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-emerald-100 dark:[button]:hover:bg-gray-700',
                 fuchsia: 'bg-fuchsia-50 dark:bg-gray-800 border-fuchsia-300 dark:border-fuchsia-700 text-fuchsia-700 dark:text-fuchsia-300 [a]:hover:bg-fuchsia-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-fuchsia-100 dark:[button]:hover:bg-gray-700',
                 green: 'bg-green-50 border-green-400 dark:border-green-700 text-green-700 dark:bg-gray-800 dark:text-green-300 [a]:hover:bg-green-100 dark:[a]:hover:bg-gray-700 [button]:hover:bg-green-100 dark:[button]:hover:bg-gray-700',
@@ -92,11 +95,12 @@ const restAttrs = computed(() => {
 
 <template>
     <component :is="tag" v-bind="restAttrs" :class="badgeClasses" :href="props.href" :target="target" data-ui-badge>
-        <span v-if="props.prepend" class="font-medium border-e border-inherit ps-0.5 pe-1.5">{{ prepend }}</span>
+        <span v-if="props.prepend" class="self-stretch flex items-center font-medium border-e border-inherit ps-0.5 pe-1.5"><span class="st-text-trim-optical-cap">{{ prepend }}</span></span>
         <Icon v-if="icon" :name="icon" />
-        <slot v-if="hasDefaultSlot" />
-        <template v-else><span :class="{ 'st-text-trim-cap': prepend || append }">{{ text }}</span></template>
+        <span v-if="hasDefaultSlot && slotIsText()" class="st-text-trim-optical-cap"><slot /></span>
+        <slot v-else-if="hasDefaultSlot" />
+        <span v-else class="st-text-trim-optical-cap">{{ text }}</span>
         <Icon v-if="iconAppend" :name="iconAppend" />
-        <span v-if="props.append" class="font-medium border-s border-inherit ps-1.5 pe-0.5">{{ append }}</span>
+        <span v-if="props.append" class="self-stretch flex items-center font-medium border-s border-inherit ps-1.5 pe-0.5"><span class="st-text-trim-optical-cap">{{ append }}</span></span>
     </component>
 </template>

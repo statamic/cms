@@ -60,13 +60,15 @@ class Entries extends Provider
             return false;
         }
 
-        if ($filter = $this->filter()) {
-            return $filter($searchable);
+        if (($filter = $this->filter()) && ! $filter($searchable)) {
+            return false;
         }
 
-        $query = Entry::query()
-            ->whereStatus('published')
-            ->where('id', $searchable->id());
+        $query = Entry::query()->where('id', $searchable->id());
+
+        if (! $filter) {
+            $query->whereStatus('published');
+        }
 
         $this->applyQueryScope($query);
 

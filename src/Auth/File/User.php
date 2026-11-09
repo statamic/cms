@@ -105,6 +105,12 @@ class User extends BaseUser
 
     public function path()
     {
+        $email = (string) $this->email();
+
+        if ($email === '.' || $email === '..' || basename($email) !== $email || preg_match('/[\\\\\0]/', $email)) {
+            throw new \InvalidArgumentException('Invalid email address for a user file path.');
+        }
+
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('users')->directory(), '/'),
             $this->email(),
@@ -140,7 +146,7 @@ class User extends BaseUser
     /**
      * Set the token value for the "remember me" session.
      *
-     * @param  string  $value
+     * @param  string  $token
      * @return void
      */
     public function setRememberToken($token)

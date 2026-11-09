@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
@@ -31,6 +32,7 @@ class StaticWarm extends Command
 {
     use EnhancesCommands;
     use Hookable;
+    use NormalizesPaginationHeader;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -131,14 +133,18 @@ class StaticWarm extends Command
             return $url;
         });
 
-        $requests = $urls->map(fn (string $url) => new Request('GET', $url))->all();
+        $headers = $this->parseHeaders($this->option('header'));
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url, $headers))->all();
 
         $pool = new Pool($this->client(), $requests, [
             'concurrency' => $this->concurrency(),
             'fulfilled' => function (Response $response, $index) use ($urls) {
                 $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
             },
-            'rejected' => [$this, 'outputFailureLine'],
+            'rejected' => function ($exception, $index) use ($urls) {
+                $this->outputFailureLineFor($urls->get($index), $exception);
+            },
         ]);
 
         $promise = $pool->promise();
@@ -155,7 +161,7 @@ class StaticWarm extends Command
 
     private function client(): Client
     {
-        return new Client($this->clientConfig());
+        return app(Client::class, ['config' => $this->clientConfig()]);
     }
 
     private function clientConfig(): array
@@ -173,7 +179,7 @@ class StaticWarm extends Command
         $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
 
         if ($response->hasHeader('X-Statamic-Pagination')) {
-            [$currentPage, $totalPages, $pageName] = $response->getHeader('X-Statamic-Pagination');
+            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
 
             $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
         }
@@ -181,7 +187,12 @@ class StaticWarm extends Command
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($this->uris()->get($index));
+        $this->outputFailureLineFor($this->uris()->get($index), $exception);
+    }
+
+    private function outputFailureLineFor(string $url, $exception): void
+    {
+        $uri = $this->getRelativeUri($url);
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();

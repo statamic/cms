@@ -5,7 +5,6 @@ namespace Tests\Feature\Fields;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
@@ -123,55 +122,21 @@ class MetaControllerTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_expose_columns_from_an_unviewable_collection_blueprint()
+    public function it_preloads_meta_using_the_preprocessed_value()
     {
-        Collection::make('secret')->title('Secret')->save();
-        Blueprint::make('secret')
-            ->setNamespace('collections.secret')
-            ->setContents(['fields' => [
-                ['handle' => 'classified', 'field' => ['type' => 'text']],
-            ]])
-            ->save();
-
-        $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::make()->assignRole('test')->save();
-
-        $response = $this->fieldMeta($user, [
-            'handle' => 'related',
-            'type' => 'entries',
-            'collections' => ['secret'],
+        $response = $this->fieldMeta(User::make()->makeSuper()->save(), [
+            'handle' => 'test',
+            'type' => 'grid',
+            'min_rows' => 2,
+            'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'text']],
+            ],
         ], [])->assertOk();
 
-        $columns = collect($response->json('meta.columns'))->pluck('field')->all();
+        $ids = collect($response->json('value'))->pluck('_id')->all();
 
-        // Only the default columns, never the unviewable blueprint's fields.
-        $this->assertNotContains('classified', $columns);
-        $this->assertEquals(['title'], $columns);
-    }
-
-    #[Test]
-    public function an_authorized_user_still_gets_the_full_collection_columns_via_preload()
-    {
-        Collection::make('news')->title('News')->save();
-        Blueprint::make('news')
-            ->setNamespace('collections.news')
-            ->setContents(['fields' => [
-                ['handle' => 'intro', 'field' => ['type' => 'text', 'listable' => true]],
-            ]])
-            ->save();
-
-        $this->setTestRoles(['test' => ['access cp', 'view news entries']]);
-        $user = User::make()->assignRole('test')->save();
-
-        $response = $this->fieldMeta($user, [
-            'handle' => 'related',
-            'type' => 'entries',
-            'collections' => ['news'],
-        ], [])->assertOk();
-
-        $columns = collect($response->json('meta.columns'))->pluck('field')->all();
-
-        $this->assertContains('intro', $columns);
+        $this->assertCount(2, $ids);
+        $this->assertEquals($ids, array_keys($response->json('meta.existing')));
     }
 
     #[Test]

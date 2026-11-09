@@ -7,7 +7,7 @@
                     :status="item.status"
                     class="h-1"
                 />
-                <span v-text="item.title" />
+                <span class="st-text-trim-optical-cap" v-text="item.title" />
             </Badge>
             <Dropdown v-if="hasMore && !showingAll">
                 <template #trigger>
@@ -15,7 +15,7 @@
                         size="sm"
                         as="button"
                         color="white"
-                        v-text="__('messages.plus_count_more', { count: value.length - 2 })"
+                        :text="__('messages.plus_count_more', { count: value.length - 2 })"
                     />
                 </template>
                 <DropdownMenu>

@@ -14,13 +14,13 @@ class MetaController extends CpController
 
         $field = (new Field($config['handle'], $config))->setValue($request->value);
 
-        $fieldtype = $field->fieldtype();
+        $value = $field->fieldtype()->preProcess($request->value);
 
-        $value = $fieldtype->preProcess($request->value);
+        $field->setValue($value);
 
         return [
             'value' => $value,
-            'meta' => $fieldtype->preload(),
+            'meta' => $field->fieldtype()->preload(),
         ];
     }
 }

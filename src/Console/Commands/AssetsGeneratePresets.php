@@ -3,7 +3,6 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Log;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
@@ -113,9 +112,7 @@ class AssetsGeneratePresets extends Command
                     $counts[$preset] = ($counts[$preset] ?? 0) + 1;
                     $progress->label("Generating $preset for {$asset->basename()}...");
 
-                    $dispatchMethod = $this->shouldQueue
-                        ? 'dispatch'
-                        : (method_exists(Dispatcher::class, 'dispatchSync') ? 'dispatchSync' : 'dispatchNow');
+                    $dispatchMethod = $this->shouldQueue ? 'dispatch' : 'dispatchSync';
 
                     try {
                         GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);

@@ -453,6 +453,39 @@ class GridTest extends TestCase
     }
 
     #[Test]
+    public function it_preloads_new_row_meta_using_the_default_values()
+    {
+        $this->partialMock(RowId::class, function (MockInterface $mock) {
+            $mock->shouldReceive('generate')->twice()->andReturn('random-string-1', 'random-string-2');
+        });
+
+        $field = (new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'nested', 'field' => [
+                    'type' => 'grid',
+                    'min_rows' => 2,
+                    'fields' => [
+                        ['handle' => 'words', 'field' => ['type' => 'text']],
+                    ],
+                ]],
+            ],
+        ]));
+
+        $preloaded = $field->fieldtype()->preload();
+
+        $this->assertEquals(
+            ['random-string-1', 'random-string-2'],
+            collect($preloaded['defaults']['nested'])->pluck('_id')->all()
+        );
+
+        $this->assertEquals(
+            ['random-string-1', 'random-string-2'],
+            array_keys($preloaded['new']['nested']['existing'])
+        );
+    }
+
+    #[Test]
     public function it_augments()
     {
         (new class extends Fieldtype
@@ -519,6 +552,17 @@ class GridTest extends TestCase
             ['_id' => null, 'id' => '8 (augmented)', 'words' => 'two (augmented)'],
             ['_id' => '3', 'id' => ' (augmented)', 'words' => 'three (augmented)'],
         ], collect($augmented)->toArray());
+    }
+
+    #[Test]
+    public function it_has_add_row_config()
+    {
+        $configFields = collect((new \ReflectionMethod(Grid::class, 'configFieldItems'))->invoke(new Grid))
+            ->flatMap(fn ($section) => $section['fields']);
+
+        $this->assertSame('text', $configFields['add_row']['type']);
+        $this->assertSame('Add Row Label', $configFields['add_row']['display']);
+        $this->assertSame('Add Row', $configFields['add_row']['placeholder']);
     }
 
     #[Test]

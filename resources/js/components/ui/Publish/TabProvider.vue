@@ -5,6 +5,8 @@ export const [injectTabContext, provideTabContext] = createContext('PublishTab')
 </script>
 
 <script setup>
+import { toRef } from 'vue';
+
 const props = defineProps({
     tab: {
         type: Object,
@@ -12,7 +14,7 @@ const props = defineProps({
     },
 });
 
-provideTabContext(props.tab);
+provideTabContext(toRef(() => props.tab));
 </script>
 
 <template>

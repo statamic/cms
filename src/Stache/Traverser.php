@@ -37,8 +37,10 @@ class Traverser
 
     public function filter($filter)
     {
-        $this->filter = $filter;
+        $clone = clone $this;
 
-        return $this;
+        $clone->filter = $filter;
+
+        return $clone;
     }
 }

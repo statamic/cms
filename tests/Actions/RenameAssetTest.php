@@ -73,6 +73,15 @@ class RenameAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_404s_when_the_selected_asset_does_not_exist()
+    {
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->rename('does-not-exist.jpg', 'bravo')
+            ->assertNotFound();
+    }
+
+    #[Test]
     public function it_fails_validation_if_provided_with_the_current_filename()
     {
         $this->createAsset('alfa.jpg', 'The alfa alt text');

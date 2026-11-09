@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import Head from '@/pages/layout/Head.vue';
-import { Header, Dropdown, DropdownMenu, DropdownItem, Button, Modal, RadioGroup, Radio, CommandPaletteItem } from '@ui';
+import { Header, Dropdown, DropdownMenu, DropdownItem, Button, CommandPaletteItem } from '@ui';
 import ResourceDeleter from '@/components/ResourceDeleter.vue';
 import FormSubmissionListing from '@/components/forms/SubmissionListing.vue';
+import ExportSubmissionsModal from '@/components/forms/ExportSubmissionsModal.vue';
 
 const props = defineProps([
     'form',
@@ -11,57 +12,26 @@ const props = defineProps([
     'filters',
     'actionUrl',
     'exporters',
+    'exportColumns',
     'redirectUrl',
 ]);
 
 const deleter = ref(null);
 const submissionListing = ref(null);
 const exportModalOpen = ref(false);
-const exportFormat = ref(null);
-const exportScope = ref('all');
 const listingParameters = ref({});
-
-const hasFilteredScope = computed(() => {
-    const params = listingParameters.value;
-    const hasSortOverride = (params.sort && params.sort !== 'datestamp') || (params.order && params.order !== 'desc');
-    return !!(params.search || params.filters || hasSortOverride);
-});
 
 function openExportModal() {
     listingParameters.value = submissionListing.value?.parameters ?? {};
-    exportFormat.value = props.exporters[0]?.handle ?? null;
-    exportScope.value = 'all';
     exportModalOpen.value = true;
-}
-
-function exportSubmissions() {
-    const exporter = props.exporters.find((e) => e.handle === exportFormat.value);
-    if (!exporter) return;
-
-    let url = exporter.downloadUrl;
-
-    if (exportScope.value === 'filtered') {
-        const params = listingParameters.value;
-        const query = new URLSearchParams();
-        if (params.search) query.set('search', params.search);
-        if (params.sort) query.set('sort', params.sort);
-        if (params.order) query.set('order', params.order);
-        if (params.filters) query.set('filters', params.filters);
-
-        const separator = url.includes('?') ? '&' : '?';
-        url += separator + query.toString();
-    }
-
-    window.open(url, '_blank');
-    exportModalOpen.value = false;
 }
 </script>
 
 <template>
     <div class="max-w-5xl 3xl:max-w-6xl mx-auto" data-max-width-wrapper>
-        <Head :title="[form.title, __('Forms')]" />
+        <Head :title="[__(form.title), __('Forms')]" />
 
-        <Header :title="form.title" icon="forms">
+        <Header :title="__(form.title)" icon="forms">
             <Dropdown v-if="form.canEdit || form.canDelete" placement="left-start" class="me-2">
                 <DropdownMenu>
                     <DropdownItem v-if="form.canEdit" :text="__('Configure Form')" icon="cog" :href="form.editUrl" />
@@ -132,29 +102,12 @@ function exportSubmissions() {
             :filters="filters"
         />
 
-        <Modal :open="exportModalOpen" @update:open="exportModalOpen = $event" :title="__('Export Submissions')">
-            <div class="space-y-4">
-                <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Format') }}</label>
-                    <RadioGroup v-model="exportFormat" inline>
-                        <Radio v-for="format in exporters" :key="format.handle" :value="format.handle" :label="format.title" />
-                    </RadioGroup>
-                </div>
-
-                <div>
-                    <label class="text-sm font-medium mb-1.5 block">{{ __('Submissions') }}</label>
-                    <RadioGroup v-model="exportScope">
-                        <Radio value="all" :label="__('All Submissions')" />
-                        <Radio value="filtered" :label="__('Filtered Submissions')" :description="__('statamic::messages.form_export_filtered_description')" :disabled="!hasFilteredScope" />
-                    </RadioGroup>
-                </div>
-            </div>
-
-            <template #footer>
-                <div class="flex justify-end p-2">
-                    <Button variant="primary" :text="__('Export')" @click="exportSubmissions" />
-                </div>
-            </template>
-        </Modal>
+        <ExportSubmissionsModal
+            v-if="exportModalOpen"
+            :exporters
+            :columns="exportColumns"
+            :listing-parameters
+            @close="exportModalOpen = false"
+        />
     </div>
 </template>

@@ -89,6 +89,21 @@ class NavTest extends StructureTestCase
     }
 
     #[Test]
+    public function exists_in_is_bounded_to_currently_registered_sites()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+        ]);
+
+        $structure = $this->structure('test');
+
+        // Simulates an orphaned tree file left behind for a site that's since been removed.
+        NavTreeRepository::shouldReceive('find')->with('test', 'de')->andReturn($structure->makeTree('de'));
+
+        $this->assertFalse($structure->existsIn('de'));
+    }
+
+    #[Test]
     public function it_gets_and_sets_the_title()
     {
         $structure = $this->structure('test');

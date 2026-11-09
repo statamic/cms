@@ -2,7 +2,9 @@
 
 namespace Tests\CP\Navigation;
 
+use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Facades;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\User;
@@ -141,6 +143,30 @@ class CoreNavTest extends TestCase
     }
 
     #[Test]
+    public function it_only_checks_the_selected_site_tree_when_building_navigation_children()
+    {
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US', 'name' => 'English'],
+            'fr' => ['url' => '/', 'locale' => 'fr_FR', 'name' => 'French'],
+            'de' => ['url' => '/', 'locale' => 'de_DE', 'name' => 'German'],
+        ]);
+
+        $nav = tap(Facades\Nav::make()->handle('main'))->save();
+        $nav->makeTree('en')->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $trees = Mockery::mock(app(NavTreeRepository::class))->makePartial();
+        $trees->shouldNotReceive('find')->with('main', 'fr');
+        $trees->shouldNotReceive('find')->with('main', 'de');
+        $this->app->instance(NavTreeRepository::class, $trees);
+
+        $children = $this->build()->get('Content')->keyBy->display()->get('Navigation')->children();
+
+        $this->assertEquals([$nav->showUrl()], $children->map->url()->all());
+    }
+
+    #[Test]
     public function it_doesnt_build_taxonomy_children_from_sites_that_the_user_is_not_authorized_to_see()
     {
         $this->setSites([
@@ -219,6 +245,18 @@ class CoreNavTest extends TestCase
         ];
 
         $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
+    #[Test]
+    public function it_builds_the_nav_when_a_form_has_no_title()
+    {
+        Facades\Form::make('contact_us')->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $forms = $this->build()->get('Tools')->keyBy->display()->get('Forms');
+
+        $this->assertEquals(['Contact_us'], $forms->children()->map->display()->all());
     }
 
     protected function build()

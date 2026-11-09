@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, ButtonGroup} from '@ui';
-import {computed} from 'vue';
+import {Button, ButtonGroup} from '@statamic/cms/ui';
 import {icons} from './icons';
 
 const meta = {
@@ -67,21 +66,17 @@ export const Variants: Story = {
     render: (args) => ({
         components: { Button },
         setup() {
-            const sharedProps = computed(() => {
-                const { variant, text, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-2">
-                <Button variant="default" text="Default" v-bind="sharedProps" />
-                <Button variant="primary" text="Primary" v-bind="sharedProps" />
-                <Button variant="danger" text="Danger" v-bind="sharedProps" />
-                <Button variant="filled" text="Filled" v-bind="sharedProps" />
-                <Button variant="ghost" text="Ghost" v-bind="sharedProps" />
-                <Button variant="subtle" text="Subtle" v-bind="sharedProps" />
-                <Button variant="pressed" text="Pressed" v-bind="sharedProps" />
+                <Button v-bind="args" variant="default" text="Default" />
+                <Button v-bind="args" variant="primary" text="Primary" />
+                <Button v-bind="args" variant="danger" text="Danger" />
+                <Button v-bind="args" variant="filled" text="Filled" />
+                <Button v-bind="args" variant="ghost" text="Ghost" />
+                <Button v-bind="args" variant="subtle" text="Subtle" />
+                <Button v-bind="args" variant="pressed" text="Pressed" />
             </div>
         `,
     }),
@@ -107,18 +102,14 @@ export const Sizes: Story = {
     render: (args) => ({
         components: { Button },
         setup() {
-            const sharedProps = computed(() => {
-                const { size, text, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-2 items-center">
-                <Button size="lg" text="Large" v-bind="sharedProps" />
-                <Button size="base" text="Base" v-bind="sharedProps" />
-                <Button size="sm" text="Small" v-bind="sharedProps" />
-                <Button size="xs" text="Extra Small" v-bind="sharedProps" />
+                <Button v-bind="args" size="lg" text="Large" />
+                <Button v-bind="args" size="base" text="Base" />
+                <Button v-bind="args" size="sm" text="Small" />
+                <Button v-bind="args" size="xs" text="Extra Small" />
             </div>
         `,
     }),
@@ -146,18 +137,14 @@ export const Icons: Story = {
     render: (args) => ({
         components: { Button },
         setup() {
-            const sharedProps = computed(() => {
-                const { size, text, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-2 items-center">
-                <Button icon="arrow-left" text="Prepend" v-bind="sharedProps" />
-                <Button icon-append="arrow-right" text="Append" v-bind="sharedProps" />
-                <Button icon="arrow-left" icon-append="arrow-right" text="Both" v-bind="sharedProps" />
-                <Button icon="cog" icon-only v-bind="sharedProps" />
+                <Button v-bind="args" icon="arrow-left" text="Prepend" />
+                <Button v-bind="args" icon-append="arrow-right" text="Append" />
+                <Button v-bind="args" icon="arrow-left" icon-append="arrow-right" text="Both" />
+                <Button v-bind="args" icon="cog" icon-only />
             </div>
         `,
     }),
@@ -183,17 +170,13 @@ export const Round: Story = {
     render: (args) => ({
         components: { Button },
         setup() {
-            const sharedProps = computed(() => {
-                const { round, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap gap-2 items-center">
-                <Button round icon="plus" v-bind="sharedProps" />
-                <Button round icon="plus" text="Add" v-bind="sharedProps" />
-                <Button round text="Add" v-bind="sharedProps" />
+                <Button v-bind="args" round icon="plus" />
+                <Button v-bind="args" round icon="plus" text="Add" />
+                <Button v-bind="args" round text="Add" />
             </div>
         `,
     }),
@@ -257,16 +240,12 @@ export const Inset: Story = {
     render: (args) => ({
         components: { Button },
         setup() {
-            const sharedProps = computed(() => {
-                const { inset, variant, icon, ...rest } = args;
-                return rest;
-            });
-            return { sharedProps };
+            return { args };
         },
         template: `
             <div class="flex flex-wrap items-center">
-                <Button inset variant="ghost" icon="x" v-bind="sharedProps" />
-                <Button inset variant="ghost" icon="checkmark" v-bind="sharedProps" />
+                <Button v-bind="args" inset variant="ghost" icon="x" />
+                <Button v-bind="args" inset variant="ghost" icon="checkmark" />
             </div>
         `,
     }),

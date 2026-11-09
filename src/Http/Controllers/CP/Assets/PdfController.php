@@ -17,9 +17,9 @@ class PdfController extends Controller
     {
         $asset = $this->asset($encodedAssetId);
 
-        abort_if(! $contents = $asset->contents(), 500);
-
         $this->authorize('view', $asset);
+
+        abort_if(! $contents = $asset->contents(), 500);
 
         return response($contents)->header('Content-Type', 'application/pdf');
     }

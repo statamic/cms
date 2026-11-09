@@ -94,8 +94,7 @@ class NoCacheReplacer implements Replacer
         $contents = $response->getContent();
 
         if ($cacher->shouldOutputJs()) {
-            $js = $cacher->getNocacheJs();
-            $contents = str_replace('</body>', '<script>'.$js.'</script></body>', $contents);
+            $contents = str_replace('</body>', $cacher->getNocacheScript().'</body>', $contents);
         }
 
         $contents = str_replace('NOCACHE_PLACEHOLDER', $cacher->getNocachePlaceholder(), $contents);

@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Support\Fluent;
+use Statamic\Imaging\ThumbnailExtractor;
 use Statamic\Support\Traits\Hookable;
 
 trait HasThumbnails
@@ -13,7 +14,7 @@ trait HasThumbnails
     {
         $data = match (true) {
             $this->isImage() || $this->isSvg() => $this->getImageThumbnail(),
-            $this->isVideo() && config('statamic.assets.video_thumbnails', true) => $this->getVideoThumbnail(),
+            $this->isVideo() && ThumbnailExtractor::available() => $this->getVideoThumbnail(),
             default => ['thumbnail' => null],
         };
 

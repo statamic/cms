@@ -52,10 +52,35 @@ class EditGlobalVariablesTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('globals/Edit')
+                ->where('asConfig', false)
                 ->has('values', fn (Assert $page) => $page
                     ->where('foo', 'bar')
                     ->where('unused', null)
                 )
+            );
+    }
+
+    #[Test]
+    public function it_passes_as_config_when_the_global_set_uses_multi_column_layout()
+    {
+        $blueprint = Blueprint::make()->setContents(['fields' => [
+            ['handle' => 'foo', 'field' => ['type' => 'text']],
+        ]]);
+        Blueprint::partialMock();
+        Blueprint::shouldReceive('find')->with('globals.test')->andReturn($blueprint);
+        $this->setTestRoles(['test' => ['access cp', 'edit test globals']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $global = GlobalSet::make('test')->layoutMode('multi_column')->save();
+        $global->in('en')->data(['foo' => 'bar'])->save();
+
+        $this
+            ->actingAs($user)
+            ->get($global->in('en')->editUrl())
+            ->assertSuccessful()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('globals/Edit')
+                ->where('asConfig', true)
             );
     }
 

@@ -298,4 +298,11 @@ class LocalizedTermTest extends TestCase
 
         Event::assertDispatched(LocalizedTermDeleted::class, fn ($event) => $event->term === $localized);
     }
+
+    #[Test]
+    public function it_gets_the_site_handle_as_the_queryable_site_value()
+    {
+        $this->assertSame('en', (new LocalizedTerm(new Term, 'en'))->getQueryableValue('site'));
+        $this->assertSame('removed', (new LocalizedTerm(new Term, 'removed'))->getQueryableValue('site'));
+    }
 }

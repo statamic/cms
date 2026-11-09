@@ -5,6 +5,7 @@ namespace Tests\Antlers\Components;
 use Illuminate\Support\Facades\Blade;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\Fixtures\Components\Card;
+use Tests\Antlers\Fixtures\Components\KebabProp;
 use Tests\Antlers\ParserTestCase;
 
 class BladeComponentsTest extends ParserTestCase
@@ -123,6 +124,58 @@ EXPECTED;
         $this->assertSame(
             StringUtilities::normalizeLineEndings($expected),
             StringUtilities::normalizeLineEndings(Blade::render($template))
+        );
+    }
+
+    public function test_kebab_cased_attributes_bind_props_on_anonymous_blade_components()
+    {
+        $template = <<<'EOT'
+{{ foo = 'Test' }}<x-kebab_prop :some-prop="foo" />
+EOT;
+
+        $this->assertSame(
+            '<div data-test="Test"></div>',
+            trim($this->renderString($template))
+        );
+    }
+
+    public function test_kebab_cased_attributes_bind_props_on_class_blade_components()
+    {
+        Blade::component(KebabProp::class);
+
+        $template = <<<'EOT'
+{{ foo = 'Test' }}<x-kebab_prop_class :some-prop="foo" />
+EOT;
+
+        $this->assertSame(
+            'Test',
+            trim($this->renderString($template))
+        );
+    }
+
+    public function test_camel_cased_attributes_still_bind_props_on_anonymous_blade_components()
+    {
+        $template = <<<'EOT'
+{{ foo = 'Test' }}<x-kebab_prop :someProp="foo" />
+EOT;
+
+        $this->assertSame(
+            '<div data-test="Test"></div>',
+            trim($this->renderString($template))
+        );
+    }
+
+    public function test_camel_cased_attributes_still_bind_props_on_class_blade_components()
+    {
+        Blade::component(KebabProp::class);
+
+        $template = <<<'EOT'
+{{ foo = 'Test' }}<x-kebab_prop_class :someProp="foo" />
+EOT;
+
+        $this->assertSame(
+            'Test',
+            trim($this->renderString($template))
         );
     }
 

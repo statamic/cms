@@ -2,10 +2,12 @@
 
 namespace Statamic\Tags;
 
-use Illuminate\Support\HtmlString;
+use Statamic\Tags\Concerns\RendersViews;
 
 class Partial extends Tags
 {
+    use RendersViews;
+
     public function wildcard($tag)
     {
         // We pass the original non-studly case value in as
@@ -21,7 +23,9 @@ class Partial extends Tags
             return;
         }
 
-        $variables = array_merge($this->context->all(), $this->params->all(), [
+        $context = array_diff_key($this->context->all(), array_flip(IncludeTag::VIEW_DATA_KEYS));
+
+        $variables = array_merge($context, $this->params->all(), [
             '__frontmatter' => $this->params->all(),
             'slot' => $this->isPair ? $this->getSlotContent() : null,
         ]);
@@ -29,89 +33,5 @@ class Partial extends Tags
         return view($this->viewName($partial), $variables)
             ->withoutExtractions()
             ->render();
-    }
-
-    private function getSlotContent()
-    {
-        $content = trim($this->parse());
-
-        if ($this->isAntlersBladeComponent()) {
-            return new HtmlString($content);
-        }
-
-        return $content;
-    }
-
-    protected function shouldRender(): bool
-    {
-        if ($this->params->has('when')) {
-            return $this->params->bool('when');
-        }
-
-        if ($this->params->has('unless')) {
-            return ! $this->params->bool('unless');
-        }
-
-        return true;
-    }
-
-    protected function viewName($partial)
-    {
-        $partial = str_replace('/', '.', $partial);
-
-        if (view()->exists($underscored = $this->underscoredViewName($partial))) {
-            return $underscored;
-        }
-
-        if (view()->exists($subdirectoried = 'partials.'.$partial)) {
-            return $subdirectoried;
-        }
-
-        if (view()->exists($underscored_subdirectoried = 'partials.'.$this->underscoredViewName($partial))) {
-            return $underscored_subdirectoried;
-        }
-
-        return $partial;
-    }
-
-    protected function underscoredViewName($partial)
-    {
-        $bits = collect(explode('.', $partial));
-
-        $last = $bits->pull($bits->count() - 1);
-
-        return $bits->implode('.').'._'.$last;
-    }
-
-    /**
-     * The {{ partial:exists }} tag.
-     *
-     * Returns true if the partial exists, false otherwise.
-     * If the src parameter is omitted, it acts like the user is trying to use a partial named "exists".
-     */
-    public function exists()
-    {
-        if (! $partial = $this->params->get('src')) {
-            return $this->wildcard('exists');
-        }
-
-        return view()->exists($this->viewName($partial));
-    }
-
-    /**
-     * The {{ partial:if_exists }} tag.
-     *
-     * Returns true if the partial exists, false otherwise.
-     * If the src parameter is omitted, it acts like the user is trying to use a partial named "if_exists".
-     */
-    public function ifExists()
-    {
-        if (! $partial = $this->params->get('src')) {
-            return $this->wildcard('if_exists');
-        }
-
-        if (view()->exists($this->viewName($partial))) {
-            return $this->render($partial);
-        }
     }
 }

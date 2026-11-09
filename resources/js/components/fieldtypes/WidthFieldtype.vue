@@ -2,6 +2,7 @@
     <width-selector
         :name="name"
         :model-value="value"
+        :read-only="isReadOnly"
         @update:model-value="updateDebounced"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

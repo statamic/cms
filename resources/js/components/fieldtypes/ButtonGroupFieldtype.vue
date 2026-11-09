@@ -3,10 +3,9 @@
         <Button
             v-for="(option, $index) in options"
             ref="button"
-            :disabled="config.disabled"
+            :disabled="config.disabled || isReadOnly"
             :key="$index"
             :name="name"
-            :read-only="isReadOnly"
             :text="option.label || option.value"
             :value="option.value"
             :variant="value == option.value ? 'pressed' : 'default'"
@@ -42,6 +41,7 @@ export default {
 
     methods: {
         updateSelectedOption(newValue) {
+            if (this.isReadOnly) return;
             this.update(this.value == newValue && this.config.clearable ? null : newValue);
         },
 

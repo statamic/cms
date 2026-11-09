@@ -16,10 +16,15 @@ const sortIcon = computed(() => {
     if (!isCurrentSortColumn.value) return null;
     return sortDirection.value === 'asc' ? 'sort-asc' : 'sort-desc';
 });
+const ariaSort = computed(() => {
+    if (!props.column.sortable) return null;
+    if (!isCurrentSortColumn.value) return 'none';
+    return sortDirection.value === 'asc' ? 'ascending' : 'descending';
+});
 </script>
 
 <template>
-    <th scope="col">
+    <th scope="col" :aria-sort="ariaSort">
         <span v-if="!column.sortable" v-text="__(column.label)" />
         <Button
             v-else

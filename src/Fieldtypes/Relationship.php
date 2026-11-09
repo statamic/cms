@@ -31,6 +31,14 @@ abstract class Relationship extends Fieldtype
         '_' => '_', // forces an object in js
     ];
     protected $formStackSize;
+    protected array $itemCache = [];
+
+    public function __clone()
+    {
+        // The fieldtype repository hands out clones of a single instance per handle,
+        // so without this the cache would be inherited by unrelated fields.
+        $this->itemCache = [];
+    }
 
     protected function configFieldItems(): array
     {
@@ -130,7 +138,6 @@ abstract class Relationship extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value())->all(),
-            'columns' => $this->getColumns(),
             'itemDataUrl' => $this->getItemDataUrl(),
             'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
@@ -366,7 +373,12 @@ abstract class Relationship extends Fieldtype
 
     protected function applyIndexQueryScopes($query, $params)
     {
-        collect(Arr::wrap($this->config('query_scopes')))
+        $handles = Arr::wrap($this->config('query_scopes'));
+
+        // Pass the active handles along so an aliased scope knows which is in effect.
+        $params = array_merge($params, ['queryScopes' => $handles]);
+
+        collect($handles)
             ->map(fn ($handle) => Scope::find($handle))
             ->filter()
             ->each(fn ($scope) => $scope->apply($query, $params));

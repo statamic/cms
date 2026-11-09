@@ -94,6 +94,7 @@ class NestedFieldsTest extends TestCase
                 'required' => true,
                 'read_only' => false, // deprecated
                 'always_save' => false,
+                'reserve_space_when_hidden' => false,
             ],
         ], $actual);
     }

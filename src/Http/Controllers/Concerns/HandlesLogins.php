@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\Concerns;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Timebox;
 use Illuminate\Validation\ValidationException;
 use Statamic\Auth\ThrottlesLogins;
 use Statamic\Contracts\Auth\User;
@@ -22,23 +23,27 @@ trait HandlesLogins
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
 
-            return $this->sendLockoutResponse($request);
+            $this->sendLockoutResponse($request);
         }
     }
 
     protected function validateCredentials($request)
     {
-        $provider = $this->guard()->getProvider();
+        return (new Timebox)->call(function ($timebox) use ($request) {
+            $provider = $this->guard()->getProvider();
 
-        return tap($provider->retrieveByCredentials($request->only($this->username(), 'password')), function ($user) use ($provider, $request) {
-            if (! $user || ! $provider->validateCredentials($user, ['password' => $request->password])) {
-                $this->failAuthentication($request, $user);
-            }
+            return tap($provider->retrieveByCredentials($request->only($this->username(), 'password')), function ($user) use ($provider, $request, $timebox) {
+                if (! $user || ! $provider->validateCredentials($user, ['password' => $request->password])) {
+                    $this->failAuthentication($request, $user);
+                }
 
-            if (config('hashing.rehash_on_login', true) && method_exists($provider, 'rehashPasswordIfRequired')) {
-                $provider->rehashPasswordIfRequired($user, ['password' => $request->password]);
-            }
-        });
+                $timebox->returnEarly();
+
+                if (config('hashing.rehash_on_login', true) && method_exists($provider, 'rehashPasswordIfRequired')) {
+                    $provider->rehashPasswordIfRequired($user, ['password' => $request->password]);
+                }
+            });
+        }, 200000);
     }
 
     protected function guard()

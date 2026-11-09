@@ -33,11 +33,16 @@ trait HasOrigin
 
     public function values()
     {
+        return $this->getValues(false);
+    }
+
+    public function getValues($wrapComputed)
+    {
         $originFallbackValues = method_exists($this, 'getOriginFallbackValues') ? $this->getOriginFallbackValues() : collect();
 
         $originValues = $this->hasOrigin() ? $this->origin()->values() : collect();
 
-        $computedData = method_exists($this, 'computedData') ? $this->computedData() : [];
+        $computedData = method_exists($this, 'getComputedData') ? $this->getComputedData($wrapComputed) : [];
 
         return collect()
             ->merge($originFallbackValues)

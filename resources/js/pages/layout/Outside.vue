@@ -44,6 +44,14 @@ onMounted(() => {
             </div>
         </div>
         <slot />
-	    <PortalTargets />
+        <PortalTargets />
+
+        <Component
+            v-for="component in $root.appendedComponents"
+            :key="component.id"
+            :is="component.name"
+            v-bind="component.props"
+            v-on="component.events"
+        />
     </div>
 </template>

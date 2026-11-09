@@ -5,6 +5,9 @@ namespace Statamic\CP;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Column
 {
     use FluentlyGetsAndSets;

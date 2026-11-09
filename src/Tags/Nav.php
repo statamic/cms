@@ -23,6 +23,7 @@ class Nav extends Structure
 
         if (! $this->params->bool('include_home', true)) {
             array_shift($segments);
+            $segments = array_values(array_filter($segments, fn ($segment) => $segment !== ''));
         }
 
         $crumbs = collect($segments)->map(function () use (&$segments) {

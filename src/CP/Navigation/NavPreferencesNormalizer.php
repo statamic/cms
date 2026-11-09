@@ -6,6 +6,9 @@ use Illuminate\Support\Collection;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class NavPreferencesNormalizer
 {
     protected $preferences;

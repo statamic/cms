@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use Statamic\Events\CollectionTreeSaved;
+use Statamic\Structures\CollectionTree;
 
 class UpdateStructuredEntryOrderAndParent
 {
@@ -12,13 +13,31 @@ class UpdateStructuredEntryOrderAndParent
         $collection = $tree->collection();
         $diff = $tree->diff();
 
-        $ids = array_merge($diff->moved(), $diff->added());
+        $moved = $diff->moved();
+        $ids = array_merge($moved, $diff->added());
 
         if (empty($ids)) {
             return;
         }
 
-        $collection->updateEntryOrder($ids);
         $collection->updateEntryParent($ids);
+        $collection->updateEntryOrder($this->idsWithDescendants($tree, $moved, $ids));
+    }
+
+    private function idsWithDescendants(CollectionTree $tree, array $moved, array $ids): array
+    {
+        return collect($moved)
+            ->flatMap(function ($id) use ($tree) {
+                if (! $page = $tree->find($id)) {
+                    return [];
+                }
+
+                return $page->flattenedPages()->map->reference()->all();
+            })
+            ->merge($ids)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

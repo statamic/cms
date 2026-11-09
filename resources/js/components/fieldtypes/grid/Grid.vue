@@ -15,7 +15,16 @@
                     <ui-error-message v-if="hasExcessRows" :text="__('Max Rows') + ': ' + maxRows" />
                     <ui-error-message v-else-if="hasNotEnoughRows" :text="__('Min Rows') + ': ' + minRows" />
 
+                    <div
+                        v-if="isReadOnly && (!value || value.length === 0)"
+                        class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-center text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-400"
+                        data-grid-readonly-empty
+                    >
+                        {{ __('None') }}
+                    </div>
+
                     <component
+                        v-if="(value && value.length > 0) || !isReadOnly"
                         :is="component"
                         :fields="fields"
                         :rows="value"
@@ -32,6 +41,7 @@
                         @removed="removed"
                         @duplicate="duplicate"
                         @sorted="sorted"
+                        @moved="moved"
                         @focus="focused = true"
                         @blur="blurred"
                     />
@@ -59,6 +69,7 @@ import { nanoid as uniqid } from 'nanoid';
 import GridTable from './Table.vue';
 import GridStacked from './Stacked.vue';
 import ManagesRowMeta from './ManagesRowMeta';
+import { arrayMove } from '../../sortable/Sortable';
 
 export default {
     mixins: [Fieldtype, ManagesRowMeta],
@@ -86,7 +97,8 @@ export default {
 
     computed: {
         component() {
-            const isNarrow = this.fields.length > 1 && this.containerWidth < 550;
+            const stackAt = this.config.stack_at ?? 550;
+            const isNarrow = this.fields.length > 1 && this.containerWidth < stackAt;
 
             return this.config.mode === 'stacked' || isNarrow ? 'GridStacked' : 'GridTable';
         },
@@ -216,17 +228,22 @@ export default {
         },
 
         duplicate(index) {
-            const row = clone(this.value[index]);
-            const old_id = row._id;
-            row._id = uniqid();
+            const original = this.value[index];
+            const { values: row, meta } = this.duplicateValues(original, this.meta.existing[original._id]);
 
-            this.updateRowMeta(row._id, this.meta.existing[old_id]);
+            this.updateRowMeta(row._id, meta);
 
             this.update([...this.value, row]);
         },
 
         sorted(rows) {
             this.update(rows);
+        },
+
+        moved(from, to) {
+            if (from === to || to < 0 || to >= this.value.length) return;
+
+            this.update(arrayMove(this.value, from, to));
         },
 
         focus() {

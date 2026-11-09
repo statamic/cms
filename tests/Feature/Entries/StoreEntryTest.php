@@ -178,6 +178,70 @@ class StoreEntryTest extends TestCase
     }
 
     #[Test]
+    public function submitted_title_is_ignored_when_generating_the_slug_from_a_title_format()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('Auto {foo}')->save();
+        $this->seedBlueprintFields($collection, ['foo' => ['type' => 'text']]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Auto stale',
+                'slug' => '',
+                'foo' => 'bar',
+            ])->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('Auto bar', $entry->value('title'));
+        $this->assertEquals('auto-bar', $entry->slug());
+    }
+
+    #[Test]
+    public function submitted_slug_is_ignored_when_it_is_still_being_auto_generated()
+    {
+        // The browser generates the slug asynchronously, so what it submits can lag
+        // behind the values it was generated from. We regenerate it here instead.
+
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Michael Aerni',
+                'slug' => 'michael',
+                '_auto_slug' => true,
+            ])->assertOk();
+
+        $this->assertEquals('michael-aerni', Entry::all()->first()->slug());
+    }
+
+    #[Test]
+    public function submitted_title_and_slug_are_ignored_when_using_title_format_and_the_slug_is_still_being_auto_generated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+        $collection->titleFormats('{first_name} {last_name}')->save();
+        $this->seedBlueprintFields($collection, [
+            'first_name' => ['type' => 'text'],
+            'last_name' => ['type' => 'text'],
+        ]);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, [
+                'title' => 'Michael',
+                'slug' => 'michael',
+                'first_name' => 'Michael',
+                'last_name' => 'Aerni',
+                '_auto_slug' => true,
+            ])->assertOk();
+
+        $entry = Entry::all()->first();
+        $this->assertEquals('Michael Aerni', $entry->value('title'));
+        $this->assertEquals('michael-aerni', $entry->slug());
+    }
+
+    #[Test]
     public function slug_and_auto_title_get_generated_after_save()
     {
         // We want addons to be able to add/modify data that the auto title could rely on.

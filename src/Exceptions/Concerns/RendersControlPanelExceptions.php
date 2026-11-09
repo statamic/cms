@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Statamic\Facades\URL;
+use Statamic\Http\Middleware\CP\HandleInertiaRequests;
 use Statamic\Statamic;
 
 trait RendersControlPanelExceptions
@@ -23,6 +24,7 @@ trait RendersControlPanelExceptions
             Statamic::$isRenderingCpException = true;
 
             return Inertia::render('errors/Error', ['status' => $response->getStatusCode()])
+                ->rootView(HandleInertiaRequests::ROOT_VIEW)
                 ->toResponse($request)
                 ->setStatusCode($response->getStatusCode());
         }

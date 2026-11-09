@@ -79,5 +79,86 @@ class FormRepositoryTest extends TestCase
                 ],
             ],
         ], $this->repo->extraConfigFor('another_form'));
+
+        $this->assertEquals([], $this->repo->extraConfigPositionsFor('test_form'));
+    }
+
+    #[Test]
+    public function it_registers_config_with_before_section_position()
+    {
+        $this->repo->appendConfigFields('*', 'Spam', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], beforeSection: 'fields');
+
+        $this->assertEquals([
+            'spam' => [
+                'display' => 'Spam',
+                'fields' => [
+                    'recaptcha' => ['type' => 'toggle'],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => 'fields',
+                'afterSection' => null,
+            ],
+        ], $this->repo->extraConfigPositionsFor('test_form'));
+    }
+
+    #[Test]
+    public function it_registers_config_with_after_section_position()
+    {
+        $this->repo->appendConfigFields('*', 'Spam', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], afterSection: 'fields');
+
+        $this->assertEquals([
+            'spam' => [
+                'display' => 'Spam',
+                'fields' => [
+                    'recaptcha' => ['type' => 'toggle'],
+                ],
+            ],
+        ], $this->repo->extraConfigFor('test_form'));
+
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => null,
+                'afterSection' => 'fields',
+            ],
+        ], $this->repo->extraConfigPositionsFor('test_form'));
+    }
+
+    #[Test]
+    public function a_later_unpositioned_registration_clears_an_earlier_position()
+    {
+        $this->repo->appendConfigFields('*', 'Spam', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], afterSection: 'name');
+
+        $this->repo->appendConfigFields('test_form', 'Spam', [
+            'turnstile' => ['type' => 'toggle'],
+        ]);
+
+        $this->assertEquals([], $this->repo->extraConfigPositionsFor('test_form'));
+        $this->assertEquals([
+            'spam' => [
+                'beforeSection' => null,
+                'afterSection' => 'name',
+            ],
+        ], $this->repo->extraConfigPositionsFor('another_form'));
+    }
+
+    #[Test]
+    public function it_throws_when_both_before_and_after_are_provided()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Pass only beforeSection or afterSection, not both.');
+
+        $this->repo->appendConfigFields('*', 'Spam', [
+            'recaptcha' => ['type' => 'toggle'],
+        ], beforeSection: 'fields', afterSection: 'name');
     }
 }

@@ -5,6 +5,9 @@ namespace Statamic\Forms\Uploaders;
 use Statamic\Assets\FileUploader;
 use Statamic\Support\Arr;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FilesUploader
 {
     protected $config;

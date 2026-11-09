@@ -14,8 +14,10 @@ use Webauthn\AuthenticatorAssertionResponse;
 use Webauthn\AuthenticatorAssertionResponseValidator;
 use Webauthn\AuthenticatorAttestationResponseValidator;
 use Webauthn\AuthenticatorData;
+use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\CollectedClientData;
 use Webauthn\PublicKeyCredential;
+use Webauthn\PublicKeyCredentialCreationOptions;
 use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialSource;
@@ -58,6 +60,23 @@ class WebAuthnTest extends TestCase
         $this->assertNotNull(session('webauthn.challenge'));
         $this->assertEquals(32, strlen(base64_decode(session('webauthn.challenge'))));
         $this->assertEquals(PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED, $options->userVerification);
+    }
+
+    #[Test]
+    public function it_prepares_attestation_with_discoverable_credentials()
+    {
+        session()->forget('webauthn.challenge');
+
+        $user = \Statamic\Facades\User::make()->id('test-user')->email('test@example.com');
+
+        $options = $this->webauthn->prepareAttestation($user);
+
+        $this->assertInstanceOf(PublicKeyCredentialCreationOptions::class, $options);
+        $this->assertNotNull(session('webauthn.challenge'));
+        $this->assertEquals(16, strlen(base64_decode(session('webauthn.challenge'))));
+        $this->assertEquals(AuthenticatorSelectionCriteria::RESIDENT_KEY_REQUIREMENT_REQUIRED, $options->authenticatorSelection->residentKey);
+        $this->assertTrue($options->authenticatorSelection->requireResidentKey);
+        $this->assertEquals(AuthenticatorSelectionCriteria::USER_VERIFICATION_REQUIREMENT_REQUIRED, $options->authenticatorSelection->userVerification);
     }
 
     #[Test]

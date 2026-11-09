@@ -22,7 +22,7 @@ defineProps(['isLoggedIn', 'loginUrl', 'logoutUrl']);
                 variant="primary"
                 :href="isLoggedIn ? logoutUrl : loginUrl"
                 class="w-full"
-                v-text="isLoggedIn ? __('Log out') : __('Log in')"
+                :text="isLoggedIn ? __('Log out') : __('Log in')"
             />
         </div>
     </AuthCard>

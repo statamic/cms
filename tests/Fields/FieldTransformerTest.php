@@ -116,6 +116,35 @@ class FieldTransformerTest extends TestCase
     }
 
     #[Test]
+    public function a_fieldtype_can_have_an_icon_config_field()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected static $handle = 'test';
+
+            public function configFieldItems(): array
+            {
+                return [
+                    'icon' => ['type' => 'text', 'default' => 'default-icon'],
+                ];
+            }
+        };
+        $fieldtype::register();
+
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'test',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => [
+                'icon' => 'chosen-icon',
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertEquals(['icon' => 'chosen-icon', 'foo' => 'bar'], $fromVue['field']);
+    }
+
+    #[Test]
     public function it_removes_full_width_from_field_config()
     {
         $fromVue = FieldTransformer::fromVue([

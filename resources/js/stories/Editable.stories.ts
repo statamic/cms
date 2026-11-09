@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Editable} from '@ui';
+import {Editable} from '@statamic/cms/ui';
 import {ref} from 'vue';
 
 const meta = {

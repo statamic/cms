@@ -26,9 +26,12 @@ export default class Toasts {
 
         router.on('success', (event) => {
             const toasts = event.detail.page.props._toasts;
-            if (toasts && Array.isArray(toasts)) {
-                this.#displayToasts(toasts);
-            }
+
+            if (!Array.isArray(toasts) || !toasts.length) return;
+
+            delete event.detail.page.props._toasts;
+
+            this.#displayToasts(toasts);
         });
     }
 

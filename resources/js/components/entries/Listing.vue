@@ -112,6 +112,10 @@ export default {
             this.items = items;
         },
 
+        refresh() {
+            this.$refs.listing.refresh();
+        },
+
         setSiteFilter(site) {
             this.$refs.listing.setFilter('site', site ? { site } : null);
         },
@@ -139,7 +143,7 @@ export default {
                     this.$toast.success(__('Entries successfully reordered'));
                 })
                 .catch((e) => {
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 });
         },
     },

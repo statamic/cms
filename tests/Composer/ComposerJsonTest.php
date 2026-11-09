@@ -34,6 +34,10 @@ class ComposerJsonTest extends TestCase
     {
         $this->restore();
 
+        unset($_ENV['COMPOSER']);
+
+        $this->files->delete(base_path('composer.testing.json'));
+
         parent::tearDown();
     }
 
@@ -52,6 +56,64 @@ class ComposerJsonTest extends TestCase
         ]));
 
         $this->assertFalse(Json::isMissingPreUpdateCmd());
+    }
+
+    #[Test]
+    public function it_reads_the_composer_json_named_by_the_composer_env_var()
+    {
+        $_ENV['COMPOSER'] = 'composer.testing.json';
+
+        $this->assertEquals(base_path('composer.testing.json'), Json::path());
+        $this->assertTrue(Json::isMissingPreUpdateCmd());
+
+        $this->files->put(base_path('composer.testing.json'), json_encode([
+            'scripts' => [
+                'pre-update-cmd' => [
+                    Scripts::class.'::preUpdateCmd',
+                ],
+            ],
+        ]));
+
+        $this->assertFalse(Json::isMissingPreUpdateCmd());
+    }
+
+    #[Test]
+    public function it_adds_pre_update_cmd_to_the_composer_json_named_by_the_composer_env_var()
+    {
+        $_ENV['COMPOSER'] = 'composer.testing.json';
+
+        $original = $this->files->get($this->path);
+
+        $this->files->put(base_path('composer.testing.json'), <<<'EOT'
+{
+    "scripts": {
+        "post-autoload-dump": [
+            "@php artisan package:discover --ansi"
+        ]
+    }
+}
+EOT
+        );
+
+        Json::addPreUpdateCmd();
+
+        $this->assertFalse(Json::isMissingPreUpdateCmd());
+        $this->assertEquals($original, $this->files->get($this->path));
+
+        $expected = <<<'EOT'
+{
+    "scripts": {
+        "pre-update-cmd": [
+            "Statamic\\Console\\Composer\\Scripts::preUpdateCmd"
+        ],
+        "post-autoload-dump": [
+            "@php artisan package:discover --ansi"
+        ]
+    }
+}
+EOT;
+
+        $this->assertEquals($expected, $this->files->get(base_path('composer.testing.json')));
     }
 
     #[Test]

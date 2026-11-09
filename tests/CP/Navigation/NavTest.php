@@ -27,9 +27,6 @@ class NavTest extends TestCase
 
         Route::any('wordpress-importer', ['as' => 'statamic.cp.wordpress-importer.index']);
         Route::any('security-droids', ['as' => 'statamic.cp.security-droids.index']);
-
-        // TODO: Other tests are leaving behind forms without titles that are causing failures here?
-        Facades\Form::shouldReceive('all')->andReturn(collect());
     }
 
     #[Test]
@@ -67,6 +64,26 @@ class NavTest extends TestCase
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('R2-D2', $item->display());
         $this->assertEquals('http://localhost/r2', $item->url());
+    }
+
+    #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name()
+    {
+        $item = Nav::create(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
+    }
+
+    #[Test]
+    public function it_returns_the_nav_item_when_created_without_a_display_name_using_the_item_alias()
+    {
+        $item = Nav::item(null);
+
+        $this->assertInstanceOf(NavItem::class, $item);
+        $this->assertNull($item->display());
+        $this->assertEquals([$item], Nav::items());
     }
 
     #[Test]
@@ -185,6 +202,21 @@ class NavTest extends TestCase
             ->can('view death star');
 
         $this->assertNull($this->build()->get('The Empire'));
+    }
+
+    #[Test]
+    public function it_doesnt_build_unauthorized_sections_when_building_with_hidden()
+    {
+        $this->setTestRoles(['limited' => ['access cp']]);
+        $this->actingAs(tap(User::make()->assignRole('limited'))->save());
+
+        Nav::fields('Fields Management')->can('manage fields');
+        Nav::users('Users Management')->can('manage users');
+
+        $nav = Nav::build(true, true)->pluck('items', 'display');
+
+        $this->assertFalse($nav->has('Fields'));
+        $this->assertFalse($nav->has('Users'));
     }
 
     #[Test]

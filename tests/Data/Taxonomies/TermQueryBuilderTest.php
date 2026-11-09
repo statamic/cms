@@ -295,6 +295,31 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_filters_by_entries_count_using_only_published_entries()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['b']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['c']])->published(false)->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+        Term::make('c')->taxonomy('tags')->data([])->save();
+        Term::make('d')->taxonomy('tags')->data([])->save();
+
+        $this->assertEquals(['a', 'b'],
+            Term::query()->where('entries_count', '>=', 1)->get()->map->slug()->sort()->values()->all()
+        );
+
+        $this->assertEquals(['a'],
+            Term::query()->where('entries_count', '>=', 2)->get()->map->slug()->sort()->values()->all()
+        );
+    }
+
+    #[Test]
     public function it_substitutes_terms_by_id()
     {
         Taxonomy::make('tags')->save();

@@ -14,6 +14,13 @@ class MountingTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function tearDown(): void
+    {
+        Cache::store('file')->flush();
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
     {

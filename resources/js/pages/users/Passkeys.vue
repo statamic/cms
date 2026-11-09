@@ -54,7 +54,7 @@ async function createPasskey() {
 
     let startRegistrationResponse;
     try {
-        startRegistrationResponse = await startRegistration(await authOptionsResponse.json());
+        startRegistrationResponse = await startRegistration({ optionsJSON: await authOptionsResponse.json() });
     } catch (e) {
         console.error(e);
         passkeyWaiting.value = false;

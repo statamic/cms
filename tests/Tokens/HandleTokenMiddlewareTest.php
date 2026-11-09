@@ -90,6 +90,20 @@ class HandleTokenMiddlewareTest extends TestCase
 
         $this->assertEquals('ok', $return);
     }
+
+    #[Test]
+    public function it_should_not_handle_non_string_tokens()
+    {
+        Tokens::shouldReceive('find')->never()->andReturnNull();
+
+        $request = $this->request(['foo' => 'bar'], null);
+
+        $return = (new HandleToken)->handle($request, function () {
+            return 'ok';
+        });
+
+        $this->assertEquals('ok', $return);
+    }
 }
 
 class TestMiddlewareTokenHandler

@@ -69,8 +69,7 @@
 @media (prefers-reduced-motion: no-preference) {
     .starting-style-transition,
     .starting-style-transition-children > *,
-    .publish-fields > *,
-    .publish-fields-fluid > *  {
+    .publish-fields > * {
         transition: opacity var(--starting-style-transition-duration);
         @starting-style {
             opacity: 0;

@@ -79,6 +79,7 @@ const shouldCloseOnSubmit = computed(() => {
 <template>
     <Modal
         ref="modal"
+        data-ui-confirmation-modal
         :title="__(title)"
         :open="open"
         :blur="blur"

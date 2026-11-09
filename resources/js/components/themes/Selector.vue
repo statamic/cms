@@ -54,8 +54,9 @@ watch(
     (newValue) => newValue ? applyTheme(newValue) : applyDefaultTheme(),
 )
 
-const originalTheme = props.modelValue;
-onUnmounted(() => originalTheme ? applyTheme(originalTheme) : applyDefaultTheme());
+const themeColors = document.getElementById('theme-colors');
+const originalThemeColors = themeColors.textContent;
+onUnmounted(() => themeColors.textContent = originalThemeColors);
 
 function selectNewlyPublishedTheme() {
     if (!props.modelValue || props.modelValue.id !== 'custom') return;

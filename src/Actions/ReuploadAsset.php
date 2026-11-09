@@ -56,7 +56,8 @@ class ReuploadAsset extends Action
     {
         $asset = $assets->first();
 
-        $file = new ReplacementFile('statamic/file-uploads/'.$values['file']);
+        $basePath = config('statamic.system.file_uploads_path', 'statamic/file-uploads');
+        $file = new ReplacementFile($basePath.'/'.$values['file']);
 
         try {
             $asset->reupload($file);

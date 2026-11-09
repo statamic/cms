@@ -119,6 +119,20 @@ class InstallTest extends TestCase
     }
 
     #[Test]
+    public function it_loads_installed_config_files_into_the_running_app()
+    {
+        $this->files->put($this->preparePath($this->kitRepoPath('config/statamic/hockey.php')), "<?php\n\nreturn ['rink' => 'calgary'];");
+
+        $this->assertNull(config('filesystems.disks.bobsled_pics'));
+        $this->assertNull(config('statamic.hockey'));
+
+        $this->installCoolRunnings();
+
+        $this->assertEquals('local', config('filesystems.disks.bobsled_pics.driver'));
+        $this->assertEquals('calgary', config('statamic.hockey.rink'));
+    }
+
+    #[Test]
     public function it_installs_from_github()
     {
         $this->assertFileDoesNotExist($this->kitVendorPath());
@@ -656,6 +670,32 @@ EOT;
         $this->assertFileDoesNotExist(base_path('composer.json.bak'));
         $this->assertComposerJsonDoesntHave('repositories');
         $this->assertFileExists(base_path('copied.md'));
+    }
+
+    #[Test]
+    public function it_sends_the_statamic_user_agent_to_the_outpost()
+    {
+        Config::set('statamic.system.license_key', 'site-key');
+
+        $this->installCoolRunnings([], [
+            'outpost.*/v3/starter-kits/statamic/cool-runnings' => Http::response(['data' => [
+                'price' => 100,
+                'slug' => 'cool-runnings',
+                'seller' => ['slug' => 'statamic'],
+            ]], 200),
+            'outpost.*/v3/starter-kits/validate' => Http::response(['data' => [
+                'valid' => true,
+            ]], 200),
+            '*' => Http::response('', 200),
+        ]);
+
+        $outpostRequests = Http::recorded(fn ($request) => str_contains($request->url(), 'outpost.statamic.com'));
+
+        $this->assertCount(3, $outpostRequests);
+
+        $outpostRequests->each(function ($pair) {
+            $this->assertEquals(['Statamic/3.0.0-testing'], $pair[0]->header('User-Agent'));
+        });
     }
 
     #[Test]

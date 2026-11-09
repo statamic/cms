@@ -23,6 +23,7 @@ let serverItems = ref(setServerLoadingItems());
 let serverItemsLoaded = ref(false);
 let searchResults = ref([]);
 let selected = ref(null);
+let highlighted = ref(null);
 let recentItems = ref(getRecentItems());
 let keyboardBindings = ref([]);
 
@@ -227,6 +228,29 @@ function select(selected) {
     }
 }
 
+function openInNewTab(e) {
+    // Match Mousetrap's `mod`: Cmd on Mac, Ctrl elsewhere.
+    const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+    if (!(isMac ? e.metaKey : e.ctrlKey)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    let item = findSelectedItem(highlighted.value);
+    if (!item) return;
+
+    if (!item.url) {
+        selected.value = highlighted.value;
+        return;
+    }
+
+    // Simulate a modifier-click so the browser handles it like a real Cmd+click (background tab)
+    // or Cmd+Shift+click (foreground tab).
+    e.currentTarget.querySelector('[data-command-palette-item][data-highlighted]')?.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: e.metaKey, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey }),
+    );
+}
+
 function findSelectedItem(selected) {
     return find(aggregatedItems.value, (result) => result.text === selected);
 }
@@ -299,7 +323,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
         </DialogTrigger>
         <DialogPortal>
             <DialogOverlay class="fixed inset-0 z-30 bg-gray-800/20 backdrop-blur-[2px] dark:bg-gray-800/50" />
-            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content :aria-describedby="undefined">
+            <DialogContent :class="[modalClasses, $attrs.class]" data-ui-modal-content aria-modal="true" :aria-describedby="undefined">
                 <VisuallyHidden asChild>
                     <DialogTitle>{{ __('Command Palette') }}</DialogTitle>
                 </VisuallyHidden>
@@ -318,6 +342,8 @@ router.on('start', () => Statamic.$commandPalette.clear());
                         :ignore-filter="true"
                         v-model="selected"
                         @keydown.tab.prevent.stop="keydownTab"
+                        @keydown.enter="openInNewTab"
+                        @highlight="highlighted = $event?.value"
                     >
                         <header class="group/cmd-input flex h-14 items-center gap-2 border-b border-gray-200/80 px-5.5 dark:border-gray-950">
                             <Icon name="magnifying-glass" class="size-5 text-gray-400" />
@@ -328,7 +354,7 @@ router.on('start', () => Statamic.$commandPalette.clear());
                                 class="flex w-full bg-transparent py-4 text-lg antialiased outline-none placeholder:text-gray-500!"
                             />
                         </header>
-                        <ComboboxContent>
+                        <ComboboxContent :aria-label="__('Search results')">
                             <ComboboxViewport class="max-h-[360px] min-h-[360px] divide-y divide-gray-200/80 overflow-y-auto dark:divide-gray-950">
                                 <ComboboxEmpty v-if="query && !results.length" class="px-3 py-2 opacity-50">
                                     <CommandPaletteItem :text="__('No results found!')" icon="entry" disabled />
@@ -371,18 +397,18 @@ router.on('start', () => Statamic.$commandPalette.clear());
                                     </ComboboxItem>
                                 </ComboboxGroup>
                             </ComboboxViewport>
-                            <footer class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20">
-                                <div class="flex items-center gap-1.5">
-                                    <Icon name="up-square" class="size-4 text-gray-500" />
-                                    <Icon name="down-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Navigate') }}</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <Icon name="return-square" class="size-4 text-gray-500" />
-                                    <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Select') }}</span>
-                                </div>
-                            </footer>
                         </ComboboxContent>
+                        <footer @mousedown.prevent class="flex items-center gap-4 rounded-b-xl border-t border-gray-200/80 bg-gray-50 px-6 py-3 dark:border-gray-950 dark:bg-gray-800/20">
+                            <div class="flex items-center gap-1.5">
+                                <Icon name="up-square" class="size-4 text-gray-500" />
+                                <Icon name="down-square" class="size-4 text-gray-500" />
+                                <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Navigate') }}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <Icon name="return-square" class="size-4 text-gray-500" />
+                                <span class="text-sm text-gray-600 dark:text-gray-500">{{ __('Select') }}</span>
+                            </div>
+                        </footer>
                     </ComboboxRoot>
                 </motion.div>
             </DialogContent>

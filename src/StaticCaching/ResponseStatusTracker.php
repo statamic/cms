@@ -3,19 +3,25 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Http\Response;
+use WeakMap;
 
 class ResponseStatusTracker
 {
-    private array $responses = [];
+    private WeakMap $responses;
+
+    public function __construct()
+    {
+        $this->responses = new WeakMap;
+    }
 
     public function set(Response $response, ResponseStatus $status): void
     {
-        $this->responses[spl_object_id($response)] = $status;
+        $this->responses[$response] = $status;
     }
 
     public function get(Response $response): ResponseStatus
     {
-        return $this->responses[spl_object_id($response)] ?? ResponseStatus::UNDEFINED;
+        return $this->responses[$response] ?? ResponseStatus::UNDEFINED;
     }
 
     public function registerMacros(): void

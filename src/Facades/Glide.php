@@ -10,6 +10,8 @@ use Statamic\Imaging\GlideManager;
  * @method static \Illuminate\Contracts\Filesystem\Filesystem cacheDisk()
  * @method static bool shouldServeDirectly()
  * @method static bool shouldServeByHttp()
+ * @method static bool isUsingHybridCaching()
+ * @method static bool cachePathIsServedByRoute()
  * @method static string route()
  * @method static string url()
  * @method static \Illuminate\Contracts\Cache\Repository cacheStore()

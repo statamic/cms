@@ -70,6 +70,9 @@ class PasskeyFormTest extends TestCase
         $this->assertArrayHasKey('challenge', $data);
         $this->assertArrayHasKey('user', $data);
         $this->assertArrayHasKey('rp', $data);
+        $this->assertEquals('required', $data['authenticatorSelection']['residentKey']);
+        $this->assertTrue($data['authenticatorSelection']['requireResidentKey']);
+        $this->assertEquals('required', $data['authenticatorSelection']['userVerification']);
     }
 
     #[Test]

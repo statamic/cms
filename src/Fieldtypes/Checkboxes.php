@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\Concerns\MigratesLegacyInlineConfig;
 
 use function Statamic\trans as __;
 
@@ -11,6 +12,7 @@ class Checkboxes extends Fieldtype
     use HasSelectOptions {
         process as traitProcess;
     }
+    use MigratesLegacyInlineConfig;
 
     protected $categories = ['controls'];
     protected $selectableInForms = true;
@@ -37,10 +39,12 @@ class Checkboxes extends Fieldtype
             [
                 'display' => __('Appearance'),
                 'fields' => [
-                    'inline' => [
-                        'display' => __('Inline'),
-                        'instructions' => __('statamic::fieldtypes.checkboxes.config.inline'),
-                        'type' => 'toggle',
+                    'appearance' => [
+                        'display' => __('Appearance'),
+                        'instructions' => __('statamic::fieldtypes.checkboxes.config.appearance'),
+                        'type' => 'control_appearance',
+                        'default' => 'default',
+                        'control' => 'checkbox',
                     ],
                 ],
             ],

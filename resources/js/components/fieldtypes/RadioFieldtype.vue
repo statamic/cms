@@ -1,8 +1,9 @@
 <template>
-    <RadioGroup :inline="config.inline" :model-value="value" @update:model-value="update" ref="radio">
+    <RadioGroup :appearance="appearance" :model-value="value" @update:model-value="update" ref="radio">
         <Radio
             v-for="(option, index) in options"
             :disabled="config.disabled"
+            :id="`${id}_${index}`"
             :key="index"
             :label="option.label || option.value"
             :read-only="isReadOnly"
@@ -25,6 +26,14 @@ export default {
     },
 
     computed: {
+        appearance() {
+            if (this.config.appearance !== 'default') {
+                return this.config.appearance;
+            }
+
+            return this.config.inline ? 'inline' : 'default';
+        },
+
         options() {
             return this.normalizeInputOptions(this.meta.options || this.config.options);
         },

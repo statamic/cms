@@ -34,8 +34,8 @@
                         </div>
                     </publish-field-fullscreen-header>
 
-                    <div class="bard-fixed-toolbar" v-if="!readOnly && showFixedToolbar && !fullScreenMode">
-                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed">
+                    <div class="bard-fixed-toolbar" v-if="editor && !readOnly && showFixedToolbar && !fullScreenMode">
+                        <div class="no-select flex flex-1 flex-wrap items-center gap-1" v-if="toolbarIsFixed && toolbarIsNearViewport">
                             <component
                                 v-for="button in visibleButtons(buttons)"
                                 :key="button.name"
@@ -116,7 +116,13 @@
                         </floating-menu>
 
                         <div class="bard-error" v-if="initError" v-text="initError"></div>
-                        <editor-content :editor="editor" :id="fieldId" />
+                        <div v-else-if="!editor" class="bard-loading">
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <ui-icon name="loading" class="size-4" />
+                                {{ __('Loading') }}
+                            </div>
+                        </div>
+                        <editor-content :editor="editor" :id="fieldId" :dir="contentDirection" />
                     </div>
                     <div
                         class="bard-footer-toolbar"
@@ -139,6 +145,7 @@ import Emitter from 'tiny-emitter';
 import { Editor, EditorContent, NodeViewWrapper, NodeViewContent } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { Extension } from '@tiptap/core';
+import { TextSelection } from '@tiptap/pm/state';
 import { FloatingMenu } from './FloatingMenu';
 import Blockquote from '@tiptap/extension-blockquote';
 import Bold from '@tiptap/extension-bold';
@@ -155,7 +162,8 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Strike from '@tiptap/extension-strike';
 import Subscript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { TableRow, TableCell, TableHeader } from '@tiptap/extension-table';
+import { BardTable as Table } from './BardTable.js';
 import Text from '@tiptap/extension-text';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
@@ -164,6 +172,7 @@ import { Placeholder, Dropcursor, Gapcursor } from '@tiptap/extensions';
 import SetPicker from '../replicator/SetPicker.vue';
 import { DocumentBlock, DocumentInline } from './Document';
 import { Set } from './Set';
+import { IgnoreAriaHidden } from './IgnoreAriaHidden';
 import { Small } from './Small';
 import { Image } from './Image';
 import { Link } from './Link';
@@ -177,6 +186,16 @@ import 'highlight.js/styles/github.css';
 import importTiptap from '@/util/tiptap.js';
 import { computed } from 'vue';
 import { data_get } from "@/bootstrap/globals.js";
+import { useContentDirection } from '@/composables/content-direction';
+import { preloadIcons } from '@/components/ui/Icon/registry.js';
+
+preloadIcons(
+    'default',
+    import.meta.glob(
+        '../../../../svg/icons/{h1,h2,h3,h4,h5,h6,text-bold,text-italic,text-underline,text-strike-through,text-small,list-ul,list-ol,eraser,quote,superscript,subscript,insert-link,add-table,insert-image,code-inline,code-block,hr,paragraph-align-left,paragraph-align-center,paragraph-align-right,paragraph-align-justified}.svg',
+        { query: '?raw', import: 'default', eager: true },
+    ),
+);
 
 const lowlight = createLowlight(common);
 let tiptap = null;
@@ -198,6 +217,12 @@ export default {
         isInBardField: true,
     },
 
+    setup() {
+        const { direction: contentDirection } = useContentDirection();
+
+        return { contentDirection };
+    },
+
     data() {
         return {
             events: new Emitter(),
@@ -208,6 +233,8 @@ export default {
             buttons: [],
             collapsed: this.meta.collapsed,
             mounted: false,
+            toolbarIsNearViewport: false,
+            toolbarObserver: null,
             initError: null,
             pageHeader: null,
             escBinding: null,
@@ -390,9 +417,14 @@ export default {
         this.initEditor();
 
         this.json = this.editor.getJSON().content;
-        this.html = this.editor.getHTML();
+
+        if (this.config.reading_time) {
+            this.html = this.editor.getHTML();
+        }
 
 		this.$nextTick(() => this.mounted = true);
+
+        this.observeToolbarVisibility();
 
         this.pageHeader = document.querySelector('.global-header');
 
@@ -418,6 +450,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.toolbarObserver?.disconnect();
         this.editor?.destroy();
         this.escBinding?.destroy();
     },
@@ -442,13 +475,27 @@ export default {
         value(value, oldValue) {
             if (!this.editor) return;
 
-            const oldContent = this.editor.getJSON();
-            const content = this.valueToContent(value);
+            if (this.valueMatchesEditor(value)) return;
 
-            if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.commands.clearContent();
-                this.editor.commands.setContent(content, true);
+            // A repeat of the old value would undo typing that's still debounced.
+            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
+
+            const oldContent = this.editor.getJSON();
+
+            // Sets sync their own values into the editor, so a rebuild for those would only destroy their fields.
+            const oldNodes = oldContent.content ?? [];
+            if (this.onlySetValuesDiffer(value, oldNodes)) return;
+
+            // Same when the server has only stripped empty nodes, which can be deleted in place.
+            const emptyNodes = this.removableEmptyNodes(oldNodes);
+            const keptNodes = oldNodes.filter((node, i) => !emptyNodes.includes(i));
+            if (keptNodes.length && keptNodes.length < oldNodes.length && this.onlySetValuesDiffer(value, keptNodes)) {
+                this.deleteNodes(emptyNodes);
+                return;
             }
+
+            this.editor.commands.clearContent(false);
+            this.editor.commands.setContent(this.valueToContent(clone(value)), true);
         },
 
         readOnly(readOnly) {
@@ -592,10 +639,9 @@ export default {
         duplicateSet(old_id, attrs, getPos) {
             const id = uniqid();
             const enabled = attrs.enabled;
-            const deepCopy = JSON.parse(JSON.stringify(attrs.values));
-            const values = Object.assign({}, deepCopy);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[old_id]);
 
-            this.updateSetMeta(id, this.meta.existing[old_id]);
+            this.updateSetMeta(id, meta);
 
             this.debounceNextUpdate = false;
 
@@ -609,13 +655,12 @@ export default {
         },
 
         async pasteSet(attrs) {
-            const old_id = attrs.id;
             const id = uniqid();
             const enabled = attrs.enabled;
-            const values = Object.assign({}, attrs.values);
+            const { values, meta } = this.duplicateValues(attrs.values, this.meta.existing[attrs.id]);
 
-            if (this.meta.existing[old_id]) {
-                this.updateSetMeta(id, this.meta.existing[old_id]);
+            if (meta) {
+                this.updateSetMeta(id, meta);
             } else {
                 const data = await this.fetchSet(values.type);
                 this.updateSetMeta(id, data.new);
@@ -815,6 +860,25 @@ export default {
             this.buttons = buttons;
         },
 
+        // Rendering every toolbar button adds up on entries with lots of Bard fields, so they're
+        // only rendered once the editor is close to being scrolled into view, or its set is expanded.
+        observeToolbarVisibility() {
+            this.toolbarObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting) return;
+
+                    this.toolbarIsNearViewport = true;
+                    this.toolbarObserver.disconnect();
+                },
+                {
+                    root: this.$refs.container.closest('[scroll-region]'),
+                    rootMargin: '500px',
+                },
+            );
+
+            this.toolbarObserver.observe(this.$refs.container);
+        },
+
         buttonIsActive(button) {
             if (button.hasOwnProperty('active')) {
                 return button.active(this.editor, button.args);
@@ -883,10 +947,18 @@ export default {
                         return count;
                     };
 
-                    if (countNodes(oldJson) !== countNodes(newJson)) this.debounceNextUpdate = false;
+                    // Sets look up their values by index, so moving them can't wait for the debounce.
+                    const setPositions = (nodes) => (nodes ?? []).map((node) => (node.type === 'set' ? node.attrs.id : '')).join();
+
+                    if (countNodes(oldJson) !== countNodes(newJson) || setPositions(oldJson) !== setPositions(newJson)) {
+                        this.debounceNextUpdate = false;
+                    }
 
                     this.json = newJson;
-                    this.html = this.editor.getHTML();
+
+                    if (this.config.reading_time) {
+                        this.html = this.editor.getHTML();
+                    }
                 },
                 onCreate: ({ editor }) => {
                     const state = editor.view.state;
@@ -937,6 +1009,88 @@ export default {
 
         valueToContent(value) {
             return value.length ? { type: 'doc', content: value } : null;
+        },
+
+        // Mirrors Bard::removeEmptyNodes() on the PHP side.
+        removableEmptyNodes(nodes) {
+            const isEmpty = (node) => ['heading', 'paragraph'].includes(node.type) && !node.content;
+
+            if (this.config.remove_empty_nodes === true) {
+                return nodes.flatMap((node, i) => (isEmpty(node) ? [i] : []));
+            }
+
+            if (this.config.remove_empty_nodes !== 'trim') return [];
+
+            let start = 0;
+            while (start < nodes.length && isEmpty(nodes[start])) start++;
+
+            let end = nodes.length - 1;
+            while (end > start && isEmpty(nodes[end])) end--;
+
+            return nodes.flatMap((node, i) => (i < start || i > end ? [i] : []));
+        },
+
+        deleteNodes(indexes) {
+            const { tr, doc } = this.editor.state;
+            const ranges = [];
+
+            doc.forEach((node, offset, i) => {
+                if (indexes.includes(i)) ranges.push([offset, offset + node.nodeSize]);
+            });
+
+            ranges.reverse().forEach(([from, to]) => tr.delete(from, to));
+
+            // A selection that lands on a set would change its decorations and recreate its node view.
+            tr.setSelection(TextSelection.between(tr.selection.$from, tr.selection.$from, -1));
+
+            this.editor.view.dispatch(tr);
+        },
+
+        // Set field edits are already in the container. Emitting them back would hand each field a copy of its own value.
+        update(value) {
+            if (this.editor && this.valueMatchesEditor(this.value) && this.valueMatchesEditor(value)) return;
+
+            this.$emit('update:value', value);
+        },
+
+        // Parsing normalizes attrs that the stored value omits but ProseMirror serializes.
+        valueMatchesEditor(value) {
+            const content = this.valueToContent(value);
+            const current = this.editor.getJSON();
+
+            if (JSON.stringify(content) === JSON.stringify(current)) return true;
+
+            const node = this.contentToNode(content);
+
+            return node !== null && node.eq(this.editor.state.doc);
+        },
+
+        contentToNode(content) {
+            try {
+                return this.editor.schema.nodeFromJSON(
+                    content ?? { type: 'doc', content: [{ type: 'paragraph' }] },
+                );
+            } catch (error) {
+                return null;
+            }
+        },
+
+        onlySetValuesDiffer(value, oldNodes) {
+            const node = this.contentToNode(this.valueToContent(value));
+
+            if (node === null) return false;
+
+            return JSON.stringify(this.withoutSetValues(node.toJSON().content)) === JSON.stringify(this.withoutSetValues(oldNodes));
+        },
+
+        withoutSetValues(nodes) {
+            return nodes.map((node) => {
+                if (node.type === 'set') return { ...node, attrs: { ...node.attrs, values: null } };
+
+                if (node.content) return { ...node, content: this.withoutSetValues(node.content) };
+
+                return node;
+            });
         },
 
         getExtensions() {
@@ -994,7 +1148,7 @@ export default {
             });
 
             let exts = [
-                CharacterCount.configure({ limit: this.config.character_limit }),
+                CharacterCount.configure(),
                 ...modeExts,
                 DisableCtrlEnter,
                 SlashSetPicker.configure({
@@ -1007,6 +1161,7 @@ export default {
                 Dropcursor,
                 Gapcursor,
                 History,
+                IgnoreAriaHidden,
                 Paragraph,
                 Set.configure({ bard: this, foo: 'bar' }),
                 Text,

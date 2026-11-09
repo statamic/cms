@@ -4,8 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use FilesystemIterator;
 use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Statamic\Filesystem\RecursiveDirectoryIterator;
 use Statamic\Support\Str;
 
 class TemplateFolder extends Relationship

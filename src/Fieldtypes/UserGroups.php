@@ -18,7 +18,7 @@ class UserGroups extends Relationship
 
     protected function authorizeItemData($id): bool
     {
-        return User::current()->can('edit user groups');
+        return User::current()->can('assign user groups');
     }
 
     protected function toItemArray($id, $site = null)
@@ -35,7 +35,7 @@ class UserGroups extends Relationship
 
     public function getIndexItems($request)
     {
-        if (! User::current()->can('edit user groups')) {
+        if (! User::current()->can('assign user groups')) {
             return collect();
         }
 

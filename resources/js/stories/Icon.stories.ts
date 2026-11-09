@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {CardPanel, Icon, Input, registerIconSetFromStrings} from '@ui';
+import {CardPanel, Icon, Input, registerIconSetFromStrings} from '@statamic/cms/ui';
 import {computed, ref} from 'vue';
 import {icons} from "@/stories/icons";
 

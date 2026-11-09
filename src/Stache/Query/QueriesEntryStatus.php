@@ -61,20 +61,12 @@ trait QueriesEntryStatus
             $status === 'scheduled'
                 ? $query->where('date', '>', now())
                 : $query->where('date', '<', now());
-
-            if ($status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
         }
 
         if ($collection->pastDateBehavior() === 'private') {
             $status === 'expired'
                 ? $query->where('date', '<', now())
                 : $query->where('date', '>', now());
-
-            if ($status === 'scheduled') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
         }
     }
 

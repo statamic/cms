@@ -14,6 +14,7 @@ class Permissions
     protected $pendingGroup = null;
     protected $booted = false;
     private $flattened;
+    private $flattenedValues;
 
     public function boot()
     {
@@ -140,5 +141,12 @@ class Permissions
     public function flattened()
     {
         return $this->flattened ??= collect($this->permissions)->flatMap->flattened();
+    }
+
+    public function contains(string $value): bool
+    {
+        $this->flattenedValues ??= $this->flattened()->map->value()->flip()->all();
+
+        return isset($this->flattenedValues[$value]);
     }
 }

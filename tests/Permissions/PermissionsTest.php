@@ -171,18 +171,21 @@ class PermissionsTest extends TestCase
                         'label' => 'two',
                         'description' => null,
                         'group' => 'test',
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'child-three',
                                 'label' => 'child-three',
                                 'description' => null,
                                 'group' => 'test',
+                                'hidden_by' => [],
                                 'children' => [
                                     [
                                         'value' => 'nested-child',
                                         'label' => 'nested-child',
                                         'description' => null,
                                         'group' => 'test',
+                                        'hidden_by' => [],
                                         'children' => [],
                                     ],
                                 ],
@@ -200,18 +203,21 @@ class PermissionsTest extends TestCase
                         'label' => 'four FIRST',
                         'description' => null,
                         'group' => 'group-with-replacements',
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'replaced child first',
                                 'label' => 'Replaced FIRST',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
+                                'hidden_by' => [],
                                 'children' => [
                                     [
                                         'value' => 'replaced nested child first',
                                         'label' => 'Replaced Nested FIRST',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
+                                        'hidden_by' => [],
                                         'children' => [],
                                     ],
                                 ],
@@ -223,18 +229,21 @@ class PermissionsTest extends TestCase
                         'label' => 'four SECOND',
                         'description' => null,
                         'group' => 'group-with-replacements',
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'replaced child second',
                                 'label' => 'Replaced SECOND',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
+                                'hidden_by' => [],
                                 'children' => [
                                     [
                                         'value' => 'replaced nested child second',
                                         'label' => 'Replaced Nested SECOND',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
+                                        'hidden_by' => [],
                                         'children' => [],
                                     ],
                                 ],
@@ -252,12 +261,14 @@ class PermissionsTest extends TestCase
                         'label' => 'one',
                         'description' => null,
                         'group' => null,
+                        'hidden_by' => [],
                         'children' => [
                             [
                                 'value' => 'child-one',
                                 'label' => 'child-one',
                                 'description' => null,
                                 'group' => null,
+                                'hidden_by' => [],
                                 'children' => [],
                             ],
                             [
@@ -265,6 +276,7 @@ class PermissionsTest extends TestCase
                                 'label' => 'child-two',
                                 'description' => null,
                                 'group' => null,
+                                'hidden_by' => [],
                                 'children' => [],
                             ],
                         ],
@@ -274,6 +286,7 @@ class PermissionsTest extends TestCase
                         'label' => 'three',
                         'description' => null,
                         'group' => null,
+                        'hidden_by' => [],
                         'children' => [],
                     ],
                 ],
@@ -331,6 +344,18 @@ class PermissionsTest extends TestCase
             'replaced child second',
             'replaced nested child second',
         ])->all(), $resolved->map->value()->all());
+    }
+
+    #[Test]
+    public function it_checks_whether_it_contains_a_permission_with_placeholders_resolved()
+    {
+        $this->setupComplicatedTest($permissions = new Permissions);
+
+        $this->assertTrue($permissions->contains('one'));
+        $this->assertTrue($permissions->contains('nested-child'));
+        $this->assertTrue($permissions->contains('replaced nested child second'));
+        $this->assertFalse($permissions->contains('four {placeholder}'));
+        $this->assertFalse($permissions->contains('unknown'));
     }
 
     #[Test]

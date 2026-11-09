@@ -40,14 +40,11 @@ class AuthenticationTest extends TestCase
         Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
-            ->withToken($token = 'invalid')
-            ->getJson($url = '/api/collections/articles/entries')
-            ->assertUnauthorized();
-
-        $this
-            ->withToken($token)
-            ->get($url)
-            ->assertUnauthorized();
+            ->withToken('invalid')
+            ->getJson('/api/collections/articles/entries')
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
     }
 
     #[Test]
@@ -56,12 +53,37 @@ class AuthenticationTest extends TestCase
         Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
-            ->getJson($url = '/api/collections/articles/entries')
-            ->assertUnauthorized();
+            ->getJson('/api/collections/articles/entries')
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
+    }
+
+    #[Test]
+    public function it_returns_the_same_json_response_when_debug_mode_is_enabled()
+    {
+        Facades\Config::set('app.debug', true);
+        Facades\Config::set('statamic.api.auth_token', 'foobar');
 
         $this
-            ->get($url)
-            ->assertUnauthorized();
+            ->getJson('/api/collections/articles/entries')
+            ->assertUnauthorized()
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
+    }
+
+    #[Test]
+    public function it_returns_json_even_when_html_is_requested()
+    {
+        Facades\Config::set('statamic.api.auth_token', 'foobar');
+
+        $this
+            ->withHeader('Accept', 'text/html')
+            ->get('/api/collections/articles/entries')
+            ->assertUnauthorized()
+            ->assertHeader('Content-Type', 'application/json')
+            ->assertHeader('WWW-Authenticate', 'Bearer')
+            ->assertExactJson(['message' => 'Unauthenticated.']);
     }
 
     #[Test]

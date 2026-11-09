@@ -34,6 +34,6 @@ class NullIndex extends Index
 
     public function searchables()
     {
-        return new NullSearchables($this);
+        return new NullSearchables();
     }
 }

@@ -31,4 +31,14 @@ abstract class ImageUrlBuilder implements UrlBuilder
 
         return 'path';
     }
+
+    protected function withEncodedWatermark(array $params): array
+    {
+        if (isset($params['mark']) && $params['mark'] instanceof Asset) {
+            $asset = $params['mark'];
+            $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
+        }
+
+        return $params;
+    }
 }

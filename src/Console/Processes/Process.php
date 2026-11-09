@@ -12,6 +12,9 @@ use Statamic\Support\Str;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class Process
 {
     const CACHE_EXPIRY_MINUTES = 10;
@@ -158,7 +161,6 @@ class Process
     /**
      * Run callback without logging errors.
      *
-     * @param  Closure  $callable
      * @return mixed
      */
     public function withoutLoggingErrors(Closure $callback)

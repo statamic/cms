@@ -3,7 +3,12 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
@@ -277,6 +282,86 @@ class CacherTest extends TestCase
             'http://example.com/blog/*',
             'http://example.co.uk/blog/*',
         ]);
+    }
+
+    #[Test]
+    public function caches_a_url_inside_a_lock()
+    {
+        [$cache, $locked] = $this->lockingCache();
+        $cacher = Mockery::mock(AbstractCacher::class, [$cache, ['base_url' => 'http://example.com']])->makePartial();
+
+        $cache->shouldReceive('get')->with('static-cache:domains', [])->andReturn([]);
+        $cache->shouldReceive('get')->with($urlsKey = 'static-cache:'.md5('http://example.com').'.urls', [])->andReturn([]);
+        $cache->shouldReceive('forever')->with('static-cache:domains', ['http://example.com'])->once()->andReturnUsing(function () use ($locked) {
+            $this->assertTrue($locked->value, 'Domains were written outside the lock.');
+        });
+        $cache->shouldReceive('forever')->with($urlsKey, ['one' => '/one'])->once()->andReturnUsing(function () use ($locked) {
+            $this->assertTrue($locked->value, 'URLs were written outside the lock.');
+        });
+
+        $cacher->cacheUrl('one', '/one');
+    }
+
+    #[Test]
+    public function forgets_a_url_inside_a_lock()
+    {
+        [$cache, $locked] = $this->lockingCache();
+        $cacher = Mockery::mock(AbstractCacher::class, [$cache, ['base_url' => 'http://example.com']])->makePartial();
+
+        $cache->shouldReceive('get')->with($urlsKey = 'static-cache:'.md5('http://example.com').'.urls', [])->andReturn(['one' => '/one', 'two' => '/two']);
+        $cache->shouldReceive('forever')->with($urlsKey, ['two' => '/two'])->once()->andReturnUsing(function () use ($locked) {
+            $this->assertTrue($locked->value, 'URLs were written outside the lock.');
+        });
+
+        $cacher->forgetUrl('one');
+    }
+
+    #[Test]
+    public function concurrent_url_caching_does_not_lose_entries()
+    {
+        if (! function_exists('pcntl_fork')) {
+            $this->markTestSkipped('pcntl is not available.');
+        }
+
+        File::deleteDirectory($path = storage_path('framework/cache/url-race'));
+        config(['cache.stores.url-race' => ['driver' => 'file', 'path' => $path]]);
+        $cacher = Mockery::mock(AbstractCacher::class, [Cache::store('url-race'), ['base_url' => 'http://example.com']])->makePartial();
+
+        collect(range(1, 2))->map(function ($child) use ($cacher) {
+            if (($pid = pcntl_fork()) !== 0) {
+                return $pid;
+            }
+
+            collect(range(1, 100))->each(fn ($i) => $cacher->cacheUrl("{$child}-{$i}", "/{$child}/{$i}"));
+
+            exit(0);
+        })->each(fn ($pid) => pcntl_waitpid($pid, $status));
+
+        $urls = $cacher->getUrls();
+
+        File::deleteDirectory($path);
+
+        $this->assertCount(200, $urls);
+    }
+
+    private function lockingCache()
+    {
+        $locked = (object) ['value' => false];
+
+        $lock = Mockery::mock(Lock::class);
+        $lock->shouldReceive('block')->once()->andReturnUsing(function ($seconds, $callback) use ($locked) {
+            $locked->value = true;
+
+            return tap($callback(), fn () => $locked->value = false);
+        });
+
+        $store = Mockery::mock(Store::class, LockProvider::class);
+        $store->shouldReceive('lock')->with('static-cache:urls', 10)->once()->andReturn($lock);
+
+        $cache = Mockery::mock(\Illuminate\Contracts\Cache\Repository::class);
+        $cache->shouldReceive('getStore')->andReturn($store);
+
+        return [$cache, $locked];
     }
 
     private function cacher($config = [])

@@ -75,6 +75,29 @@ class EntriesTest extends TestCase
         ];
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15536
+     */
+    #[Test]
+    public function it_only_counts_published_entries_in_the_augmented_query_builder()
+    {
+        $augmented = $this->fieldtype()->augment([456, '123', 'draft', 'scheduled', 'expired']);
+
+        $this->assertEquals(2, $augmented->count());
+        $this->assertEqualsCanonicalizing(['456', '123'], $augmented->pluck('id')->all());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15536
+     */
+    #[Test]
+    public function it_doesnt_consider_unpublished_entries_to_exist_in_the_augmented_query_builder()
+    {
+        $augmented = $this->fieldtype()->augment(['draft']);
+
+        $this->assertFalse($augmented->exists());
+    }
+
     #[Test]
     public function it_augments_to_a_query_builder_when_theres_no_value()
     {
@@ -374,6 +397,24 @@ class EntriesTest extends TestCase
         $this->assertInstanceOf(Builder::class, $augmented);
         $this->assertEveryItemIsInstanceOf(Entry::class, $augmented->get());
         $this->assertEquals(['one', 'two', 'three', 'four'], $augmented->get()->map->slug()->all());
+    }
+
+    #[Test]
+    public function it_doesnt_inherit_the_item_cache_from_another_fieldtype_instance()
+    {
+        $this->actingAs(Facades\User::make()->makeSuper());
+
+        $field = new Field('test', ['type' => 'entries', 'collections' => ['blog']]);
+
+        // The fieldtype repository hands out clones of a single instance per handle,
+        // so one field's lookups must not leak into another's.
+        $first = $field->fieldtype();
+        $this->assertFalse($first->getItemData(['123'])->first()['invalid'] ?? false);
+
+        Facades\Entry::find('123')->delete();
+
+        $second = $field->fieldtype();
+        $this->assertTrue($second->getItemData(['123'])->first()['invalid']);
     }
 
     public function fieldtype($config = [], $parent = null)

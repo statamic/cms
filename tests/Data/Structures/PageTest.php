@@ -243,9 +243,10 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturnNull();
 
-        $tree = $this->newTree()->setStructure(
-            $this->mock(Nav::class)
-        );
+        $nav = $this->mock(Nav::class);
+        $nav->shouldReceive('canSelectAcrossSites')->andReturnFalse();
+
+        $tree = $this->newTree()->setStructure($nav);
 
         $page = (new Page)
             ->setTree($tree)
@@ -269,9 +270,10 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
 
-        $tree = $this->newTree()->setStructure(
-            $this->mock(Nav::class)
-        );
+        $nav = $this->mock(Nav::class);
+        $nav->shouldReceive('canSelectAcrossSites')->andReturnFalse();
+
+        $tree = $this->newTree()->setStructure($nav);
 
         $page = (new Page)
             ->setTree($tree)

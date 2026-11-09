@@ -2,16 +2,24 @@
 
 namespace Statamic\Http\Middleware\CP;
 
+use Closure;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
+use Inertia\Support\Header;
 use Statamic\CP\Toasts\Manager;
 use Statamic\Statamic;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use function Statamic\trans as __;
 
 class HandleInertiaRequests extends Middleware
 {
-    protected $rootView = 'statamic::layout';
+    public const ROOT_VIEW = 'statamic::layout';
+
+    protected $rootView = self::ROOT_VIEW;
 
     public function version(Request $request): ?string
     {
@@ -34,6 +42,26 @@ class HandleInertiaRequests extends Middleware
             ],
             '_toasts' => $this->toasts($request),
         ]);
+    }
+
+    public function handle(Request $request, Closure $next)
+    {
+        config(['inertia.devtools.enabled' => false]);
+
+        return parent::handle($request, function ($request) use ($next) {
+            $response = $next($request);
+
+            if ($request->header(Header::INERTIA) && $this->isDownload($response)) {
+                return Inertia::location($request->fullUrl());
+            }
+
+            return $response;
+        });
+    }
+
+    private function isDownload(Response $response): bool
+    {
+        return $response instanceof StreamedResponse || $response instanceof BinaryFileResponse;
     }
 
     private function logos()

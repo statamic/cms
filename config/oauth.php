@@ -13,6 +13,7 @@ return [
     'routes' => [
         'login' => 'oauth/{provider}',
         'callback' => 'oauth/{provider}/callback',
+        'disconnect' => 'oauth/{provider}/disconnect',
     ],
 
     /*

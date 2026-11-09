@@ -2,6 +2,9 @@
 
 namespace Statamic\Query;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class OrderBy
 {
     public $sort;

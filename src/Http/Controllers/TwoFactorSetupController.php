@@ -25,6 +25,10 @@ class TwoFactorSetupController extends Controller
             return redirect($redirect);
         }
 
+        if (session()->has('statamic_impersonated_by')) {
+            return redirect($redirect);
+        }
+
         return Inertia::render('auth/two-factor/Setup', [
             'routes' => $this->routes($user),
             'redirect' => $redirect,

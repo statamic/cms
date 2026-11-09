@@ -173,6 +173,27 @@ trait PermissibleContractTests
     }
 
     #[Test]
+    public function it_doesnt_treat_roles_inherited_from_groups_as_explicitly_assigned()
+    {
+        $directRole = RoleAPI::make('direct');
+        $groupRole = RoleAPI::make('grouped');
+        $group = (new UserGroup)->handle('usergroup')->assignRole($groupRole);
+
+        RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
+        RoleAPI::shouldReceive('find')->with('grouped')->andReturn($groupRole);
+        RoleAPI::shouldReceive('all')->andReturn(collect([$directRole, $groupRole]));
+        UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($group);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$group]));
+
+        $user = $this->createPermissible()->assignRole($directRole)->addToGroup($group);
+        $user->save();
+
+        $this->assertEquals(['direct', 'grouped'], $user->roles()->map->handle()->values()->all());
+        $this->assertEquals(['direct'], $user->explicitRoles()->map->handle()->values()->all());
+        $this->assertEquals(['direct'], $user->data()->get('roles'));
+    }
+
+    #[Test]
     public function it_gets_and_checks_permissions()
     {
         $directRole = RoleAPI::make('direct')->addPermission([

@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\DB;
 use Statamic\Auth\File\UserGroup as FileUserGroup;
 use Statamic\Facades\User;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class UserGroup extends FileUserGroup
 {
     protected $model;

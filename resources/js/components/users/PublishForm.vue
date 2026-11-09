@@ -19,6 +19,7 @@
                     <DropdownMenu>
                         <DropdownItem :text="__('Edit Blueprint')" icon="blueprint-edit" v-if="canEditBlueprint" :href="actions.editBlueprint" />
                         <DropdownItem :text="__('Passkeys')" icon="key" :href="cp_url('passkeys')" />
+                        <DropdownItem v-if="oauthEnabled" :text="__('Sign-in Providers')" icon="sign-in" :href="cp_url('oauth')" />
                         <DropdownSeparator v-if="canEditBlueprint && itemActions.length" />
                         <DropdownItem
                             v-for="action in itemActions"
@@ -49,7 +50,7 @@
                 prioritize
                 v-slot="{ text, action }"
             >
-                <Button variant="primary" @click.prevent="action" :text="text" />
+                <Button variant="primary" @click.prevent="action" :text="text" v-tooltip="saveAndCloseTooltip" />
             </CommandPaletteItem>
 
             <slot name="action-buttons-right" />
@@ -88,6 +89,7 @@ import {
     CommandPaletteItem
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
@@ -120,8 +122,10 @@ export default {
         method: String,
         canEditPassword: Boolean,
         canEditBlueprint: Boolean,
+        oauthEnabled: Boolean,
         requiresCurrentPassword: Boolean,
         twoFactor: Object,
+        isInline: Boolean,
     },
 
     data() {
@@ -131,6 +135,9 @@ export default {
             meta: clone(this.initialMeta),
             error: null,
             title: this.initialTitle,
+            saveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
+            closeAfterSave: false,
         };
     },
 
@@ -149,8 +156,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -160,9 +172,23 @@ export default {
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
+
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
     },
 
     methods: {
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
+
         save() {
             new Pipeline()
                 .provide({
@@ -184,7 +210,15 @@ export default {
 
                     this.title = response.data.title;
 
-                    this.$nextTick(() => this.$emit('saved', response));
+                    this.emitSaved(response);
+                })
+                .catch((e) => {
+                    this.closeAfterSave = false;
+
+                    if (!(e instanceof PipelineStopped)) {
+                        this.$toast.error(__('Something went wrong'));
+                        console.error(e);
+                    }
                 });
         },
 
@@ -213,12 +247,26 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
 
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                if (this.saving) return;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
+
         this.addToCommandPalette();
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>

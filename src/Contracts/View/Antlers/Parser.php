@@ -60,7 +60,7 @@ interface Parser
      * array or object.
      *
      * @param  string  $key  Dot-notated key to find
-     * @param  array|object  $data  Array or object to search
+     * @param  array|object  $context  Array or object to search
      * @param  mixed  $default  Default value to use if not found
      * @return mixed
      */

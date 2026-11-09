@@ -20,6 +20,22 @@ class ComponentsCascadeTest extends ParserTestCase
         EntryFactory::collection('blog')->id('1')->slug('one')->data(['title' => 'One'])->create();
     }
 
+    public function test_a_component_does_not_re_enable_the_cascade_for_an_isolated_caller()
+    {
+        $this->createEntry();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '{{ include:shell }}');
+        $this->viewShouldReturnRaw('shell', '[{{ title }}]<x-scope.cascade />[{{ title }}]');
+        $this->viewShouldReturnRaw('components.scope.cascade', 'C');
+
+        $this->assertSame(
+            '[]C[]',
+            Str::squish($this->get('one')->assertOk()->getContent())
+        );
+    }
+
     public function test_cascade_does_not_leak_into_components()
     {
         $this->createEntry();

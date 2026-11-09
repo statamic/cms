@@ -6,5 +6,6 @@ export const {
     toggleArchitecturalBackground,
     useArchitecturalBackground,
     useForm,
+    usePage,
     usePoll,
 } = __STATAMIC__.inertia;

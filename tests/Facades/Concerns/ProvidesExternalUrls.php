@@ -140,7 +140,11 @@ trait ProvidesExternalUrls
     public static function externalUrlProvider()
     {
         $keyFn = function ($key) {
-            return is_null($key) ? 'null' : $key;
+            return match (true) {
+                is_null($key) => 'null',
+                $key === '' => 'empty string',
+                default => $key,
+            };
         };
 
         return [

@@ -2,6 +2,7 @@
 
 namespace Tests\Permissions;
 
+use Illuminate\Auth\GenericUser;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -62,6 +63,12 @@ class GateTest extends TestCase
             Gate::allows($permission),
             'User should '.($expectsToBeAllowed ? '' : 'not ').'be allowed.'
         );
+    }
+
+    #[Test]
+    public function gate_checks_for_a_non_statamic_user_are_denied()
+    {
+        $this->assertFalse(Gate::forUser(new GenericUser(['id' => 1]))->allows('access cp'));
     }
 
     public static function gateProvider()

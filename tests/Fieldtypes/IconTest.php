@@ -27,6 +27,12 @@ class IconTest extends TestCase
         $this->assertStringContainsString('<svg class="w-4 h-4"', $result);
     }
 
+    #[Test]
+    public function it_augments_a_missing_icon_to_null()
+    {
+        $this->assertNull($this->fieldtype()->augment('this-icon-does-not-exist'));
+    }
+
     private function fieldtype($config = [])
     {
         return (new Icon)->setField(new Field('test', array_merge(['type' => 'icon'], $config)));

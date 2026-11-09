@@ -2,17 +2,22 @@
 
 namespace Statamic\Routing;
 
-use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades;
-use Statamic\Facades\Site;
 use Statamic\Fields\Values;
+use Statamic\Fieldtypes\Link;
 use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Structures\Page;
 use Statamic\Support\Str;
 
 class ResolveRedirect
 {
+    // Redirects followed in a row before we assume a loop (self-redirect, A -> B -> A).
+    private const MAX_DEPTH = 10;
+
+    private static int $depth = 0;
+
+    private static bool $cycleDetected = false;
+
     public function __invoke($redirect, $parent = null, $localize = false)
     {
         return $this->resolve($redirect, $parent, $localize);
@@ -24,6 +29,29 @@ class ResolveRedirect
             return null;
         }
 
+        // Resolving an entry's url() resolves its own redirect, so a loop never ends.
+        // Flag it so every level unwinds to null and entries fall back to their own URL.
+        if (self::$depth >= self::MAX_DEPTH) {
+            self::$cycleDetected = true;
+
+            return null;
+        }
+
+        self::$depth++;
+
+        try {
+            $result = $this->resolveItem($redirect, $parent, $localize);
+
+            return self::$cycleDetected ? null : $result;
+        } finally {
+            if (--self::$depth === 0) {
+                self::$cycleDetected = false;
+            }
+        }
+    }
+
+    private function resolveItem($redirect, $parent, $localize)
+    {
         if (! $item = $this->item($redirect, $parent, $localize)) {
             return 404;
         }
@@ -54,36 +82,17 @@ class ResolveRedirect
             return $redirect->url->value();
         }
 
-        if (Str::startsWith($redirect, 'entry::')) {
-            $id = Str::after($redirect, 'entry::');
-
-            return $this->findEntry($id, $parent, $localize);
-        }
-
-        if (Str::startsWith($redirect, 'asset::')) {
-            $id = Str::after($redirect, 'asset::');
-
-            return Facades\Asset::find($id);
+        foreach (Link::types() as $linkType) {
+            if (Str::startsWith($redirect, "{$linkType->handle()}::")) {
+                return $linkType->resolve(
+                    id: Str::after($redirect, "{$linkType->handle()}::"),
+                    parent: $parent,
+                    localize: $localize
+                );
+            }
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
-    }
-
-    private function findEntry($id, $parent, $localize)
-    {
-        if (! ($entry = Facades\Entry::find($id))) {
-            return null;
-        }
-
-        if (! $localize) {
-            return $entry;
-        }
-
-        $site = $parent instanceof Localization
-            ? $parent->locale()
-            : Site::current()->handle();
-
-        return $entry->in($site) ?? $entry;
     }
 
     private function firstChild($parent)
