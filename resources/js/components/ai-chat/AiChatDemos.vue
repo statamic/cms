@@ -28,13 +28,13 @@ function hideScrollbarWhileScrolling(nav) {
     // Already at the top, so there's no scroll to wait for
     if (nav.scrollTop === 0) done();
 }
-// Whether clicking a demo jumps the nav back to the top. A button at the very bottom of the nav turns it off (say, to keep your place in the list while
-// you try one after another), and it's remembered.
+// Whether clicking a demo jumps the nav back to the top. Off to start with, so you keep your place in the list while you try one after another.
+// A switch at the very bottom of the nav turns it on, and it's remembered.
 const scrollToTop = ref((() => {
     try {
-        return localStorage.getItem('ai-demos-scroll-to-top') !== 'off';
+        return localStorage.getItem('ai-demos-scroll-to-top') === 'on';
     } catch {
-        return true;
+        return false;
     }
 })());
 function toggleScrollToTop() {
