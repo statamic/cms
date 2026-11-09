@@ -453,6 +453,7 @@ function runPrompt(saved) {
 // Glides down for the small steps, as a run adds a line or two. The cards open up over a moment as they come in (see AiChatRun.vue), so
 // the bottom keeps moving as it scrolls. Rather than aim for where the bottom is now and correct afterwards, it follows the bottom down,
 // easing a fifth of the way each frame, in one movement, and keeps following a moment after it arrives in case a card is still opening.
+// Each step is a whole number of pixels, as Safari keeps scrollTop to whole pixels: smaller steps stall for a few frames, then lurch.
 // From further up (a long chat, or a run that grew a lot), it jumps most of the way first, as gliding that far takes a while.
 // Scrolling yourself (wheel or touch) stops it following. The scrollbar is hidden while it follows, as being moved a little every frame
 // makes it flicker in and out.
@@ -469,7 +470,7 @@ function scrollToBottom() {
         const step = () => {
             const gap = el.scrollHeight - el.clientHeight - el.scrollTop;
             if (gap > 0.5) {
-                el.scrollTop += gap > 2 ? gap / 5 : gap;
+                el.scrollTop += Math.min(gap, Math.max(1, Math.round(gap / 5)));
                 still = 0;
             }
             if (still++ < 30) following = requestAnimationFrame(step);
