@@ -32,6 +32,19 @@ class StatamicTest extends TestCase
     }
 
     #[Test]
+    public function it_knows_whether_booted_callbacks_have_run()
+    {
+        $property = new \ReflectionProperty(Statamic::class, 'hasBooted');
+        $property->setValue(null, false);
+
+        $this->assertFalse(Statamic::hasBooted());
+
+        Statamic::runBootedCallbacks();
+
+        $this->assertTrue(Statamic::hasBooted());
+    }
+
+    #[Test]
     public function it_checks_for_cp_route()
     {
         $this->get('/not-cp');
