@@ -100,6 +100,26 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
+    public function refreshing_urls_dispatches_the_configured_warm_job()
+    {
+        Queue::fake();
+
+        config(['statamic.static_caching.warm_job' => CustomStaticWarmJob::class]);
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $request = Request::create('http://example.com/one', 'GET');
+        $cacher->cachePage($request, response('one', 200));
+
+        $cacher->refreshUrls(['/one']);
+
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/one');
+        });
+    }
+
+    #[Test]
     public function refreshing_a_wildcard_warms_successful_urls_and_invalidates_error_urls()
     {
         Queue::fake();
@@ -587,4 +607,8 @@ class ApplicationCacherTest extends TestCase
             ],
         ];
     }
+}
+
+class CustomStaticWarmJob extends StaticWarmJob
+{
 }
