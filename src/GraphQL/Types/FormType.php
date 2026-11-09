@@ -6,6 +6,7 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
+use Statamic\Support\Str;
 
 class FormType extends \Rebing\GraphQL\Support\Type
 {
@@ -36,7 +37,16 @@ class FormType extends \Rebing\GraphQL\Support\Type
             'rules' => [
                 'type' => GraphQL::type(ArrayType::NAME),
                 'resolve' => function ($form, $args, $context, $info) {
-                    return collect($form->blueprint()->fields()->validator()->rules())
+                    $rules = $form->blueprint()->fields()->validator()->rules();
+
+                    foreach ($rules as $key => $itemRules) {
+                        if (Str::endsWith($key, '.*') && isset($rules[$base = Str::beforeLast($key, '.*')])) {
+                            $rules[$base] = array_merge($itemRules, $rules[$base]);
+                            unset($rules[$key]);
+                        }
+                    }
+
+                    return collect($rules)
                         ->map(function ($rules) {
                             return collect($rules)->map(function ($rule) {
                                 if (is_string($rule)) {

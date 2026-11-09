@@ -11,6 +11,11 @@ use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
+use Statamic\Fieldtypes\Assets\DimensionsRule;
+use Statamic\Fieldtypes\Assets\ImageRule;
+use Statamic\Fieldtypes\Assets\MimesRule;
+use Statamic\Fieldtypes\Assets\MimetypesRule;
+use Statamic\Fieldtypes\Assets\SizeBasedRule;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -147,17 +152,37 @@ class Field implements Arrayable
 
     public function rules()
     {
-        $rules = [$this->handle => $this->addNullableRule(array_merge(
+        $rules = $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
             Validator::explodeRules($this->fieldtype()->fieldRules()),
             Validator::explodeRules($this->fieldtype()->rules())
-        ))];
+        ));
+
+        [$itemRules, $rules] = collect($rules)
+            ->partition(fn ($rule) => $this->type() === 'assets' && $this->isAssetRule($rule))
+            ->map(fn ($rules) => $rules->values()->all());
+
+        $rules = [$this->handle => $rules];
+
+        // Asset rules validate each asset, so the error can be shown on the asset that failed.
+        if ($itemRules) {
+            $rules["{$this->handle}.*"] = $itemRules;
+        }
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
             return $this->addNullableRule(Validator::explodeRules($rules));
         })->all();
 
         return array_merge($rules, $extra);
+    }
+
+    private function isAssetRule($rule): bool
+    {
+        return $rule instanceof DimensionsRule
+            || $rule instanceof ImageRule
+            || $rule instanceof MimesRule
+            || $rule instanceof MimetypesRule
+            || $rule instanceof SizeBasedRule;
     }
 
     protected function addNullableRule($rules)

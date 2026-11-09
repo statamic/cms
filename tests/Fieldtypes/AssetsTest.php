@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\QueryBuilder;
@@ -255,6 +256,47 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertEquals('file', $replaced[0]);
+    }
+
+    #[Test]
+    public function asset_rules_are_applied_to_each_asset_and_other_rules_to_the_field()
+    {
+        $field = new Field('test', [
+            'type' => 'assets',
+            'max_files' => 2,
+            'min_files' => 1,
+            'validate' => ['required', 'max_filesize:100', 'mimes:jpg'],
+        ]);
+
+        $rules = $field->rules();
+
+        $this->assertEquals(['test', 'test.*'], array_keys($rules));
+        $this->assertEquals(['required', 'array', 'max:2', 'min:1'], $rules['test']);
+        $this->assertCount(2, $rules['test.*']);
+        $this->assertInstanceOf(MaxRule::class, $rules['test.*'][0]);
+        $this->assertInstanceOf(MimesRule::class, $rules['test.*'][1]);
+    }
+
+    #[Test]
+    public function it_gives_a_validation_error_for_each_invalid_asset()
+    {
+        Storage::disk('test')->put('bar/two.txt', str_repeat('a', 2048));
+
+        $field = new Field('test', [
+            'type' => 'assets',
+            'container' => 'test',
+            'max_files' => 1,
+            'validate' => ['max_filesize:1'],
+        ]);
+
+        $errors = Validator::make(
+            ['test' => ['test::foo/one.txt', 'test::bar/two.txt']],
+            $field->rules(),
+        )->errors();
+
+        $this->assertEquals(['test', 'test.1'], $errors->keys());
+        $this->assertEquals([__('validation.max.array', ['attribute' => 'test', 'max' => 1])], $errors->get('test'));
+        $this->assertEquals([__('validation.max.file', ['attribute' => 'test.1', 'max' => 1])], $errors->get('test.1'));
     }
 
     public function fieldtype($config = [])
