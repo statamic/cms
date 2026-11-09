@@ -25,7 +25,7 @@ class ModifierManager
      *
      * @var string[]
      */
-    public static $nullAwareModifiers = [
+    protected static $nullAwareModifiers = [
         'bool_string',
     ];
 
