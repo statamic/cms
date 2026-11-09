@@ -310,11 +310,12 @@ const stepTitle = (step) => {
                         </template>
                     </li>
                 </ul>
-                <!-- What it found, for searches: each entry's name, a link to open it, with the line that matched in its tooltip -->
+                <!-- What it found, for searches: each entry's name, a link to open it, with its full name and the line that matched in its tooltip.
+                     Names stay on one line, cut short if need be, as the whole list is a click away in the CP. -->
                 <ul v-if="run.done.results" class="space-y-1 pt-0.5 text-xs/5">
-                    <li v-for="result in run.done.results" :key="result.title" class="flex items-center gap-1.5">
-                        <Icon name="entry" class="size-3.5! text-gray-400" />
-                        <button type="button" :title="result.text" class="cursor-pointer font-medium text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900 dark:text-white dark:decoration-gray-600 dark:hover:decoration-white" @click="router.visit(result.url())">
+                    <li v-for="result in run.done.results" :key="result.title" class="flex min-w-0 items-center gap-1.5">
+                        <Icon name="entry" class="size-3.5! shrink-0 text-gray-400" />
+                        <button type="button" :title="`${result.title}\n${result.text}`" class="min-w-0 cursor-pointer truncate text-start font-medium text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900 dark:text-white dark:decoration-gray-600 dark:hover:decoration-white" @click="router.visit(result.url())">
                             {{ result.title }}
                         </button>
                     </li>
