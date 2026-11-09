@@ -93,6 +93,30 @@ class AiSettingsController extends CpController
             ->all();
     }
 
+    /**
+     * Phase 2: the scheduled prompts the current user can see the reports of, each with a handle for its URL (see AiReportsController).
+     * Limited to some roles: super users still see them all.
+     */
+    public static function scheduledPrompts(): array
+    {
+        $user = User::current();
+
+        if (! $user || (! $user->isSuper() && ! $user->hasPermission('use ai'))) {
+            return [];
+        }
+
+        $prompts = array_key_exists('scheduled_prompts', $saved = Cache::get(self::CACHE_KEY, []))
+            ? $saved['scheduled_prompts']
+            : app(static::class)->defaults()['scheduled_prompts'];
+
+        return collect($prompts)
+            ->filter(fn ($prompt) => filled($prompt['name'] ?? null))
+            ->filter(fn ($prompt) => empty($prompt['visible_to']) ? $user->isSuper() : ($user->isSuper() || collect($prompt['visible_to'])->contains(fn ($role) => $user->hasRole($role))))
+            ->map(fn ($prompt) => [...$prompt, 'handle' => Str::slug($prompt['name'])])
+            ->values()
+            ->all();
+    }
+
     // Prototype: the saved prompts, or the examples if none have been saved. Prompts saved before "Use on" existed are all page prompts, so the example field prompts are added to them.
     private static function savedPrompts(): array
     {

@@ -6,6 +6,7 @@ use Statamic\Facades\TwoFactor;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Addons\AddonsController;
 use Statamic\Http\Controllers\CP\Addons\AddonSettingsController;
+use Statamic\Http\Controllers\CP\Ai\AiReportsController;
 use Statamic\Http\Controllers\CP\Ai\AiSettingsController;
 use Statamic\Http\Controllers\CP\API\TemplatesController;
 use Statamic\Http\Controllers\CP\Assets\ActionController as AssetActionController;
@@ -277,6 +278,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     // Prototype: Settings → AI (a mock, see AiSettingsController)
     Route::get('ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
     Route::patch('ai', [AiSettingsController::class, 'update'])->name('ai.update');
+
+    // Prototype (phase 2): Tools → AI Reports, the runs of the scheduled prompts (a mock, see AiReportsController)
+    Route::get('ai-reports', [AiReportsController::class, 'index'])->name('ai.reports.index');
+    Route::get('ai-reports/{prompt}', [AiReportsController::class, 'show'])->name('ai.reports.show');
+    Route::get('ai-reports/{prompt}/{run}', [AiReportsController::class, 'report'])->name('ai.reports.report');
 
     Route::group(['prefix' => 'fields'], function () {
         Route::get('/', [FieldsController::class, 'index'])->name('fields.index');
