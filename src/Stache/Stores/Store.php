@@ -194,7 +194,7 @@ abstract class Store
         $existing = collect(Stache::cacheStore()->get($cacheKey, []));
 
         // Get the files and timestamps from the filesystem right now.
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+        $files = $this->traverseFiles();
 
         // Cache the files and timestamps, ready for comparisons on the next request.
         // We'll do it now since there are multiple early returns coming up.
@@ -283,6 +283,11 @@ abstract class Store
         $this->modified = $modified;
     }
 
+    protected function traverseFiles()
+    {
+        return Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+    }
+
     protected function handleModifiedItem($item)
     {
         //
@@ -310,7 +315,7 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
-        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+        $files = $this->traverseFiles();
 
         $fileItems = $files->map(function ($timestamp, $path) {
             return [

@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,6 +34,42 @@ class EntriesStoreTest extends TestCase
         Stache::registerStore($this->parent);
 
         Stache::store('collections')->directory($this->directory);
+    }
+
+    #[Test]
+    public function it_only_gets_files_for_the_collections_sites_when_multisite_is_enabled()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+            'de' => ['url' => '/de/'],
+        ]);
+
+        $collection = Facades\Collection::make('multisite_pages')->sites(['en', 'fr']);
+        Facades\Collection::partialMock()->shouldReceive('findByHandle')->with('multisite_pages')->andReturn($collection);
+
+        $dir = Path::tidy(__DIR__.'/tmp-multisite');
+        foreach (['en', 'fr', 'de'] as $site) {
+            @mkdir($dir.'/multisite_pages/'.$site, 0777, true);
+            touch($dir.'/multisite_pages/'.$site.'/page.md', 1234567890);
+        }
+
+        $store = (new EntriesStore)->directory($dir)->store('multisite_pages');
+
+        $expected = [
+            $dir.'/multisite_pages/en/page.md',
+            $dir.'/multisite_pages/fr/page.md',
+        ];
+
+        try {
+            // When the filter is called directly, it resolves the collection's sites for each file.
+            $this->assertEquals($expected, Traverser::filter([$store, 'getItemFilter'])->traverse($store)->keys()->all());
+
+            // When the store traverses its own files, it resolves them once up front.
+            $this->assertEquals($expected, (fn () => $this->traverseFiles())->call($store)->keys()->all());
+        } finally {
+            (new Filesystem)->deleteDirectory($dir);
+        }
     }
 
     #[Test]
