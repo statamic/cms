@@ -40,7 +40,6 @@ class Statamic
     protected static $jsonVariables = [];
     protected static $jsonVariablesSnapshot = null;
     protected static $bootedCallbacks = [];
-    protected static bool $hasBooted = false;
     protected static $afterInstalledCallbacks = [];
     public static bool $isRenderingCpException = false;
 
@@ -382,12 +381,13 @@ class Statamic
         }
 
         static::$bootedCallbacks = [];
-        static::$hasBooted = true;
+
+        app()->instance('statamic.booted', true);
     }
 
     public static function hasBooted(): bool
     {
-        return static::$hasBooted;
+        return app()->bound('statamic.booted');
     }
 
     public static function afterInstalled(Closure $callback)

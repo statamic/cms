@@ -17,9 +17,13 @@ class StatamicTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    private bool $hadBootedBeforeBoot;
+
     protected function resolveApplicationConfiguration($app)
     {
         parent::resolveApplicationConfiguration($app);
+
+        $this->hadBootedBeforeBoot = Statamic::hasBooted();
 
         $app['config']->set('statamic.system.date_format', 'system-date-format');
 
@@ -29,19 +33,6 @@ class StatamicTest extends TestCase
                 'dateTimeFormat' => Statamic::dateTimeFormat(),
             ];
         });
-    }
-
-    #[Test]
-    public function it_knows_whether_booted_callbacks_have_run()
-    {
-        $property = new \ReflectionProperty(Statamic::class, 'hasBooted');
-        $property->setValue(null, false);
-
-        $this->assertFalse(Statamic::hasBooted());
-
-        Statamic::runBootedCallbacks();
-
-        $this->assertTrue(Statamic::hasBooted());
     }
 
     #[Test]
@@ -377,5 +368,12 @@ class StatamicTest extends TestCase
 
         $this->assertSame(50, Statamic::cpPerPage(1000));
         $this->assertSame(25, Statamic::cpPerPage(25));
+    }
+
+    #[Test]
+    public function it_knows_whether_the_app_has_booted()
+    {
+        $this->assertFalse($this->hadBootedBeforeBoot);
+        $this->assertTrue(Statamic::hasBooted());
     }
 }
