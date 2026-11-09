@@ -245,6 +245,77 @@ export const canEditAi = ref(true);
 
 const ideaScenarios = [
     {
+        // Phase 2: "Write meta descriptions for the pages missing one or over the limit", from Fix with AI on a report (see Report.vue). It
+        // drafts one for each page, under 155 characters, and asks before adding them. (Before the edit scenario, as "meta" would match that.)
+        match: /\bmeta descriptions\b/i,
+        plan: () => ({
+            title: 'Write meta descriptions',
+            steps: [
+                { tool: 'statamic.get_entries', args: 'entries: 6 · fields: title, content, meta_description', detail: 'The 6 pages', result: 'Read 6 pages', ms: 1100 },
+                { tool: 'statamic.draft_text', args: 'field: meta_description · max: 155', detail: 'A description for each', result: '6 drafted', ms: 1400 },
+            ],
+            done: {
+                text: '6 meta descriptions drafted',
+                items: [
+                    'Our summer sale: “Up to half off garden furniture, BBQs and outdoor lighting until Sunday.”',
+                    'Garden range: “Loungers, dining sets and parasols, built to last outdoors.”',
+                    'Festival kit: “Everything for a weekend in a field, from tents to bum bags.”',
+                    'Retro games range: “Classic consoles and games, tested and ready to play.”',
+                    'Size guide: “Find your size in clothing and shoes, with measurements in cm and inches.”',
+                    'Gift cards: “Gift cards from £10, sent by email or post.”',
+                ],
+                note: 'All under 155 characters. Nothing’s changed yet. Want me to add them to the 6 pages?',
+            },
+        }),
+    },
+    {
+        // Phase 2: "Fix the broken links from this week's content health report", from Fix with AI on a report (see Report.vue). It finds where
+        // each link should go and lists the fixes, but asks before changing the pages.
+        match: /\bbroken links?\b/i,
+        plan: () => ({
+            title: 'Fix broken links',
+            steps: [
+                { tool: 'statamic.check_links', args: 'links: 3 from the report', detail: 'The 3 broken links', result: 'Still broken', ms: 1000 },
+                { tool: 'statamic.search_entries', args: 'query: "loungers", "delivery", "Royal Mail"', detail: 'For where they’ve moved to', result: '3 matches found', ms: 1200 },
+            ],
+            done: {
+                text: '3 fixes ready',
+                items: [
+                    '“Shop loungers” on Our summer sale: /garden/loungers → `/garden/sun-loungers`',
+                    '“Delivery” on Our summer sale: /delivery → `/delivery-information`',
+                    'The Royal Mail rates link on Delivery areas → Royal Mail’s new prices page',
+                ],
+                note: 'Nothing’s changed yet. Want me to make these changes on the 2 pages?',
+            },
+        }),
+    },
+    {
+        // Phase 2: "Run the weekly content health report", the example scheduled prompt on Settings → AI. Normally it runs on its own and is kept
+        // in Tools → AI Reports (see AiReportsController); asked for in the chat, it runs there and then. It only reads the site, so it changes nothing.
+        match: /\bhealth report\b/i,
+        plan: () => ({
+            title: 'Weekly content health report',
+            steps: [
+                { tool: 'statamic.check_links', args: 'entries: all', detail: 'Links on 86 pages', result: '3 broken', ms: 1400 },
+                { tool: 'statamic.list_entries', args: 'fields: updated_at · sort: updated_at', detail: 'When each page was last updated', result: '12 not updated in a year', ms: 900 },
+                { tool: 'statamic.get_assets', args: 'container: assets · fields: alt', detail: 'Alt text on 16 images', result: '4 without alt text', ms: 900 },
+                { tool: 'statamic.list_entries', args: 'status: draft · fields: updated_at', detail: 'Drafts, and when they were last touched', result: '2 untouched for a month', ms: 800 },
+                { tool: 'statamic.get_entries', args: 'fields: meta_description', detail: 'Meta descriptions', result: '6 missing or too long', ms: 900 },
+            ],
+            done: {
+                text: '27 things need attention this week',
+                items: [
+                    '3 broken links, 2 of them on “Our summer sale”',
+                    '4 images without alt text',
+                    '6 meta descriptions missing or too long',
+                    '2 drafts untouched for a month: “Spring planting guide” and “Meet the team”',
+                    '12 pages not updated in over a year, the oldest “Delivery areas”',
+                ],
+                note: 'Nothing was changed. This report runs every Monday at 9:00, and each one is kept in Tools → AI Reports.',
+            },
+        }),
+    },
+    {
         // "Update the copyright year in the footer". A global set has a form like an entry's, so it's filled in the same way, and saving is left to you.
         match: /\b(copyright|footer|globals?)\b/i,
         plan: () => editInForm({ ...footerGlobals, tool: 'cp.open_global', args: 'set: footer', read: { tool: 'statamic.get_global_set', args: 'set: footer', detail: 'The Footer global set', result: '2 fields' }, text: 'Updated the copyright year in the Footer', runTitle: 'Edit global set', name: 'Footer' }),
