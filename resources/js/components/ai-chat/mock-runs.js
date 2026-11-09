@@ -280,8 +280,9 @@ const ideaScenarios = [
         }),
     },
     {
-        // "Show me all my unpublished stories". It works out which collection holds stories, finds the drafts in it, and takes you to its list,
-        // filtered to drafts. The drafts are listed in the chat too, each a link to open it. Asking for news gets the News collection's 100
+        // "Show me all my unpublished stories". It works out which collection holds stories, takes you to its list, filtered to drafts, then
+        // finds the drafts there. That last step happens on the list, so the trail shows the move to it. The drafts are listed in the chat too,
+        // each a link to open it. Asking for news gets the News collection's 100
         // drafts, of which the chat lists only the first few (see AiChatRun.vue).
         match: /\bunpublished\b|\bdrafts?\b/i,
         plan: (text) => {
@@ -294,8 +295,8 @@ const ideaScenarios = [
                 title: 'Find drafts',
                 steps: [
                     { tool: 'statamic.get_collections', args: 'fields: title, handle', detail: news ? 'For one that holds news' : 'For one that holds stories', result: target.title, ms: 800 },
-                    { tool: 'statamic.list_entries', args: `collection: ${handle} · status: draft · limit: 5`, detail: `Drafts in ${target.title}`, result: `${total} not published`, ms: 900 },
                     ...openPageSteps(target, 'cp.open_listing', `collection: ${handle} · filter: status is draft`).map((step) => ({ ...step, result: 'Filtered to drafts' })),
+                    { tool: 'statamic.list_entries', args: `collection: ${handle} · status: draft · limit: 5`, detail: `Drafts in ${target.title}`, result: `${total} not published`, ms: 900 },
                 ],
                 done: {
                     text: news ? `${total} news articles aren’t published yet` : `${total} stories aren’t published yet`,
