@@ -65,6 +65,8 @@ const toolLabels = {
     'statamic.get_collections': ['Looking at Collections', 'Looked at Collections'],
     'statamic.list_entries': ['Listing Entries', 'Listed Entries'],
     'cp.open_listing': ['Opening the List', 'Opened the List'],
+    'statamic.check_links': ['Checking Links', 'Checked Links'],
+    'statamic.draft_text': ['Drafting Text', 'Drafted Text'],
 };
 
 // The cards double as the trail of pages the chat has taken you to. Each knows the page it happened on. A line runs down through the
