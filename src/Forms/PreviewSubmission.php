@@ -7,6 +7,8 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Fields\Field;
 use Statamic\Forms\Fields\FormField;
 
+use function Statamic\trans as __;
+
 class PreviewSubmission
 {
     public function values(FormContract $form): array
