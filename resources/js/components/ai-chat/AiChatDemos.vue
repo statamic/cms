@@ -159,6 +159,11 @@ const groups = [
 const phaseTwoDemos = [
     // Spoken rather than typed. It brings in the mic (and ⌘⇧D), which then stay until a phase 1 demo is played.
     { label: 'Dictate a request', text: 'Find all the entries that mention outdoor furniture', dictate: true, phase: 2 },
+    // A scheduled prompt (see Settings → AI), run there and then rather than waiting for Monday. Not marked phase 2, as that brings in the mic,
+    // which belongs to the dictation demo alone.
+    { label: 'Content health report', text: 'Run the weekly content health report' },
+    // Where its runs are kept, like a form's submissions (see AiReportsController)
+    { label: 'Past reports', run: () => router.visit(cp_url('ai-reports/weekly-content-health-report')), text: 'Opens the weekly content health report’s past runs, in Tools → AI Reports' },
 ];
 
 // Each group is a section of its own in the nav, with Phase 2 last

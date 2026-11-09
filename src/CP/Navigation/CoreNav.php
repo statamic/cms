@@ -23,6 +23,7 @@ use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
+use Statamic\Http\Controllers\CP\Ai\AiSettingsController;
 use Statamic\Statamic;
 
 /**
@@ -256,6 +257,14 @@ class CoreNav
                         ->extra(['breadcrumbs' => ['configure_url' => $form->editUrl()]]);
                 });
             });
+
+        // Prototype (phase 2): Tools → AI Reports, with one for each scheduled prompt on Settings → AI you can see (see AiReportsController)
+        if ($reports = AiSettingsController::scheduledPrompts()) {
+            Nav::tools('AI Reports')
+                ->route('ai.reports.index')
+                ->icon('pulse')
+                ->children(fn () => collect($reports)->map(fn ($prompt) => Nav::item($prompt['name'])->url(cp_route('ai.reports.show', $prompt['handle']))));
+        }
 
         Nav::tools('Updates')
             ->route('updater')
