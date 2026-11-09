@@ -210,6 +210,18 @@ const stepNote = (step) => {
     return { text: step.detail ?? step.args, class: 'text-gray-500 dark:text-gray-400' };
 };
 
+// A long list of results only shows the first few, then says how many more there are (total is how many it found in all, when that's more
+// than it lists), with a link to the list in the CP, which has them all.
+const resultLimit = 5;
+const shownResults = computed(() => (props.run.done?.results ?? []).slice(0, resultLimit));
+const moreResults = computed(() => {
+    const results = props.run.done?.results ?? [];
+    return Math.max(0, (props.run.done?.total ?? results.length) - Math.min(results.length, resultLimit));
+});
+
+// Whether you're on the list the results came from (whatever it's filtered to)
+const onList = computed(() => !!props.run.done?.list && inertiaPage.url.split('?')[0] === new URL(props.run.done.list.url(), window.location.origin).pathname);
+
 const stepTitle = (step) => {
     const labels = toolLabels[step.tool];
     return labels ? __(labels[step.state === 'done' ? 1 : 0]) : step.tool;
@@ -313,11 +325,22 @@ const stepTitle = (step) => {
                 <!-- What it found, for searches: each entry's name, a link to open it, with its full name and the line that matched in its tooltip.
                      Names stay on one line, cut short if need be, as the whole list is a click away in the CP. -->
                 <ul v-if="run.done.results" class="space-y-1 pt-0.5 text-xs/5">
-                    <li v-for="result in run.done.results" :key="result.title" class="flex min-w-0 items-center gap-1.5">
+                    <li v-for="result in shownResults" :key="result.title" class="flex min-w-0 items-center gap-1.5">
                         <Icon name="entry" class="size-3.5! shrink-0 text-gray-400" />
                         <button type="button" :title="`${result.title}\n${result.text}`" class="min-w-0 cursor-pointer truncate text-start font-medium text-gray-900 underline decoration-gray-300 underline-offset-2 hover:decoration-gray-900 dark:text-white dark:decoration-gray-600 dark:hover:decoration-white" @click="router.visit(result.url())">
                             {{ result.title }}
                         </button>
+                    </li>
+                    <!-- More than fit: how many more. The chat has taken you to the list that has them all, so it says they're there. Once you've
+                         gone somewhere else, it's a link back to it. It lines up with the icons rather than the names, with a little more space
+                         above, so it reads as a note on the list rather than one more item in it. -->
+                    <li v-if="moreResults" class="pt-1 text-gray-500 dark:text-gray-400">
+                        <template v-if="!run.done.list">{{ __('and :count more', { count: moreResults }) }}</template>
+                        <template v-else-if="onList">{{ __('+ :count in the list on this page', { count: moreResults }) }}</template>
+                        <template v-else>
+                            {{ __('and :count more', { count: moreResults }) }} ·
+                            <button type="button" class="cursor-pointer underline decoration-gray-300 underline-offset-2 hover:text-gray-900 hover:decoration-gray-900 dark:decoration-gray-600 dark:hover:text-white dark:hover:decoration-white" @click="router.visit(run.done.list.url())">{{ __('Open the list') }}</button>
+                        </template>
                     </li>
                 </ul>
                 <!-- The links it added: the words that are now links, in blue and underlined like links, so you can spot them in the field. Hover one to see the page it goes to, and its URL, which is also beside it in grey. -->
