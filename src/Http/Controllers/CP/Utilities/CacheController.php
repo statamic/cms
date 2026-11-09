@@ -19,13 +19,14 @@ use function Statamic\trans as __;
 
 class CacheController extends CpController
 {
-    public function index()
+    public function index(Request $request)
     {
         return Inertia::render('utilities/Cache', [
             'stache' => $this->getStacheStats(),
             'cache' => $this->getApplicationCacheStats(),
             'static' => $this->getStaticCacheStats(),
             'images' => Inertia::defer(fn () => $this->getImageCacheStats()),
+            'operationResult' => $request->session()->pull('cacheOperation'),
             'clearAllUrl' => cp_route('utilities.cache.clear-all'),
             'clearStacheUrl' => cp_route('utilities.cache.clear-stache'),
             'warmStacheUrl' => cp_route('utilities.cache.warm-stache'),
@@ -45,8 +46,8 @@ class CacheController extends CpController
         return [
             'records' => Stache::fileCount(),
             'size' => $size ? Str::fileSizeForHumans($size) : null,
-            'time' => $time ? Str::timeForHumans($time) : __('Refresh'),
-            'rebuilt' => $built ? $built->diffForHumans() : __('Refresh'),
+            'time' => $time === null ? null : Str::timeForHumans($time),
+            'rebuilt' => $built?->diffForHumans(),
         ];
     }
 
@@ -91,30 +92,38 @@ class CacheController extends CpController
 
     public function clearAll(Request $request)
     {
+        $started = microtime(true);
+
         $this->clearStacheCache();
         $this->clearStaticCache();
         $this->clearApplicationCache();
         $this->clearImageCache();
 
-        return back()->withSuccess(__('All caches cleared.'));
+        return $this->operationResponse(__('All caches cleared in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function clearStacheCache()
     {
+        $started = microtime(true);
+
         Stache::refresh();
 
-        return back()->withSuccess(__('Stache cleared.'));
+        return $this->operationResponse(__('Stache rebuilt in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function clearStaticCache()
     {
+        $started = microtime(true);
+
         StaticCache::flush();
 
-        return back()->withSuccess(__('Static page cache cleared.'));
+        return $this->operationResponse(__('Static page cache cleared in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function invalidateStaticUrls(Request $request)
     {
+        $started = microtime(true);
+
         $request->validate([
             'urls' => ['required', 'array'],
         ]);
@@ -135,30 +144,46 @@ class CacheController extends CpController
 
         app(Cacher::class)->invalidateUrls($urls);
 
-        return back()->withSuccess(__('Invalidated URLs in the Static Cache.'));
+        return $this->operationResponse(__('Static cache URLs invalidated in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function clearApplicationCache()
     {
+        $started = microtime(true);
+
         Artisan::call('cache:clear');
 
         // TODO: Stache doesn't appear to be clearing?
         // Maybe related to https://github.com/statamic/three-cms/issues/149
 
-        return back()->withSuccess(__('Application cache cleared.'));
+        return $this->operationResponse(__('Application cache cleared in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function clearImageCache()
     {
+        $started = microtime(true);
+
         Artisan::call('statamic:glide:clear');
 
-        return back()->withSuccess(__('Image cache cleared.'));
+        return $this->operationResponse(__('Image cache cleared in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function warmStacheCache()
     {
+        $started = microtime(true);
+
         Stache::warm();
 
-        return back()->withSuccess(__('Stache warmed.'));
+        return $this->operationResponse(__('Stache warmed in :time.', ['time' => $this->operationTime($started)]));
+    }
+
+    protected function operationTime(float $started): string
+    {
+        return Str::timeForHumans((int) round((microtime(true) - $started) * 1000));
+    }
+
+    protected function operationResponse(string $message)
+    {
+        return back()->withSuccess($message)->with('cacheOperation', $message);
     }
 }

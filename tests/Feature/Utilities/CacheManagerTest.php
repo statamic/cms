@@ -38,4 +38,33 @@ class CacheManagerTest extends TestCase
                 )
             );
     }
+
+    #[Test]
+    public function it_returns_operation_results_once_without_deferring_them()
+    {
+        config(['statamic.static_caching.strategy' => null]);
+
+        $url = cp_route('utilities.cache');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->from($url)
+            ->post(cp_route('utilities.cache.clear-static'))
+            ->assertRedirect($url)
+            ->assertSessionHas('cacheOperation');
+
+        $message = session('cacheOperation');
+
+        $this->assertMatchesRegularExpression('/^Static page cache cleared in [\\d.]+(?:ms|s)\\.$/', $message);
+
+        $this->get($url)->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('operationResult', $message)
+            ->where('_toasts.0.message', $message)
+            ->missing('images')
+        );
+
+        $this->get($url)->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('operationResult', null)
+        );
+    }
 }
