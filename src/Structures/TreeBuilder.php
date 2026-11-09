@@ -88,9 +88,8 @@ class TreeBuilder
     protected function transformTreeForController($tree)
     {
         $user = User::current();
-        $transformed = [];
 
-        foreach ($tree as $item) {
+        return collect($tree)->map(function ($item) use ($user) {
             $page = $item['page'];
             $collection = $page->mountedCollection();
 
@@ -98,7 +97,7 @@ class TreeBuilder
             $entry = $page->entry();
             $blueprint = $entry?->blueprint();
 
-            $transformed[] = [
+            return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
@@ -121,8 +120,6 @@ class TreeBuilder
                 ],
                 'children' => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
-        }
-
-        return $transformed;
+        })->values()->all();
     }
 }
