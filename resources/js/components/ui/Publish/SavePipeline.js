@@ -90,8 +90,8 @@ export class Request extends Step {
                         Statamic.$toast.error(message);
                         reveal.invalid();
                         e = new PipelineStopped();
-                    } else if (e.response && e.response.status === 409) {
-                        // The form decides how to resolve the conflict, so pass the response on.
+                    } else if (e.response && e.response.status === 409 && e.response.data?.version) {
+                        // The form decides how to resolve a version conflict, so pass the response on.
                         e = new PipelineStopped(e.response.data);
                     } else if (e.response && e.response.data.message) {
                         Statamic.$toast.error(e.response.data.message);

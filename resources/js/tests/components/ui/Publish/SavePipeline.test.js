@@ -109,6 +109,17 @@ test('a conflict stops the pipeline with the response instead of a toast', async
     expect(Statamic.$toast.error).not.toHaveBeenCalled();
 });
 
+test('other conflicts still show their message', async () => {
+    global.Statamic.$toast = { error: vi.fn() };
+    axios.patch.mockRejectedValue({ response: { status: 409, data: { message: 'Out of date' } } });
+
+    const error = await pipeline([new Request('/entries/1', 'PATCH', {})]).catch((e) => e);
+
+    expect(error).toBeInstanceOf(PipelineStopped);
+    expect(error.payload).toBeUndefined();
+    expect(Statamic.$toast.error).toHaveBeenCalledWith('Out of date');
+});
+
 test('it runs the steps and finishes', async () => {
     const middle = step();
 
