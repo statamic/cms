@@ -92,7 +92,7 @@ const line = (step) =>
 // anything still marked to animate all over again. The line the trail's dot draws has faded by then, so it goes for good.
 function settle(event) {
     const el = event.target;
-    if (event.animationName === 'ai-open') el.classList.remove('ai-card-in');
+    if (event.animationName === 'ai-card-open') el.classList.remove('ai-card-in');
     if (event.animationName === 'ai-trail-drop') el.classList.remove('ai-trail-drop');
     if (event.animationName === 'ai-trail-line-fade') el.style.display = 'none';
 }
