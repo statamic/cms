@@ -263,6 +263,7 @@ onUnmounted(() => {
             class="ai-chat-card rounded-xl border border-transparent ps-2.25 transition-shadow duration-150 [&:hover:not(:focus-within)]:duration-700 fixed end-4.75 bottom-[calc(1.25rem+var(--ai-keyboard,0px))] max-[999px]:bottom-[calc(4rem+var(--ai-keyboard,0px))] max-h-[calc(var(--ai-visible-height,100dvh)-11rem)] z-(--z-index-modal) group/chat flex w-84 max-w-[calc(100vw-2rem)] flex-col"
         >
             <AiChat />
+            <AiChatCloseControl />
             <AiChatDockControl />
         </div>
     </Transition>
