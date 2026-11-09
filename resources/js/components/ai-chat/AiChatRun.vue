@@ -62,6 +62,9 @@ const toolLabels = {
     'cp.fill_fields': ['Filling in Fields', 'Filled in Fields'],
     'cp.open_blueprint': ['Opening the Blueprint', 'Opened the Blueprint'],
     'cp.add_field': ['Adding a Field', 'Added a Field'],
+    'statamic.get_collections': ['Looking at Collections', 'Looked at Collections'],
+    'statamic.list_entries': ['Listing Entries', 'Listed Entries'],
+    'cp.open_listing': ['Opening the List', 'Opened the List'],
 };
 
 // The cards double as the trail of pages the chat has taken you to. Each knows the page it happened on. A line runs down through the

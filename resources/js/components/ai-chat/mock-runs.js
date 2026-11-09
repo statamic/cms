@@ -121,6 +121,36 @@ const newBlogPost = {
 // The same for a landing page
 const newLandingPage = { ...newBlogPost, title: 'New landing page' };
 
+// The demo Stories collection, for finding what isn't published yet. Its list opens filtered to drafts (the listing reads its filters from
+// the address, base64 encoded), so you see them where you'd normally manage them, and each draft is also a link in the chat.
+const storyUrl = (n) => () => cp_url(`collections/ai_stories/entries/7f3c2a10-ai00-4c1e-9b2a-stor000000${n}`);
+const unpublishedStories = {
+    title: 'Prototype AI Stories',
+    url: () => cp_url(`collections/ai_stories?filters=${btoa(JSON.stringify({ status: { status: 'draft' } }))}`),
+    drafts: [
+        { title: 'Behind the summer sale', url: storyUrl('04'), text: 'Draft · last edited 2 days ago' },
+        { title: 'Caring for oak in winter', url: storyUrl('05'), text: 'Draft · last edited last week' },
+        { title: 'From sketch to showroom: the Hayle bench', url: storyUrl('06'), text: 'Draft · last edited 3 weeks ago' },
+        { title: 'Our first year in Bristol', url: storyUrl('07'), text: 'Draft · last edited in September' },
+    ],
+};
+
+// The same idea in the demo News collection, which has 100 drafts, to show how the chat copes with a long list. It only gets the first
+// few back (in the list's own order) and the total.
+const newsUrl = (n) => () => cp_url(`collections/ai_news/entries/7f3c2a10-ai00-4c1e-9b2a-news0000000${n}`);
+const unpublishedNews = {
+    title: 'Prototype AI News',
+    url: () => cp_url(`collections/ai_news?filters=${btoa(JSON.stringify({ status: { status: 'draft' } }))}`),
+    total: 100,
+    drafts: [
+        { title: 'Ash benches are back in stock', url: newsUrl(1), text: 'Draft' },
+        { title: 'Ash parasols are back in stock', url: newsUrl(2), text: 'Draft' },
+        { title: 'Ash planters are back in stock', url: newsUrl(3), text: 'Draft' },
+        { title: 'Ash swing seats are back in stock', url: newsUrl(4), text: 'Draft' },
+        { title: 'Beech day beds are back in stock', url: newsUrl(5), text: 'Draft' },
+    ],
+};
+
 // What a search finds: the demo entries, and the line in each that matched (shown in each one's tooltip)
 const searchResults = [
     { title: summerSale.title, url: summerSale.url, text: 'The biggest discounts we have ever done on all of our outdoor furniture ranges this year' },
@@ -248,6 +278,34 @@ const ideaScenarios = [
                 note: 'Nothing’s saved yet. Check it over, then save as usual.',
             },
         }),
+    },
+    {
+        // "Show me all my unpublished stories". It works out which collection holds stories, finds the drafts in it, and takes you to its list,
+        // filtered to drafts. The drafts are listed in the chat too, each a link to open it. Asking for news gets the News collection's 100
+        // drafts, of which the chat lists only the first few (see AiChatRun.vue).
+        match: /\bunpublished\b|\bdrafts?\b/i,
+        plan: (text) => {
+            const news = /\bnews\b/i.test(text);
+            const target = news ? unpublishedNews : unpublishedStories;
+            const handle = news ? 'ai_news' : 'ai_stories';
+            const total = target.total ?? target.drafts.length;
+
+            return {
+                title: 'Find drafts',
+                steps: [
+                    { tool: 'statamic.get_collections', args: 'fields: title, handle', detail: news ? 'For one that holds news' : 'For one that holds stories', result: target.title, ms: 800 },
+                    { tool: 'statamic.list_entries', args: `collection: ${handle} · status: draft · limit: 5`, detail: `Drafts in ${target.title}`, result: `${total} not published`, ms: 900 },
+                    ...openPageSteps(target, 'cp.open_listing', `collection: ${handle} · filter: status is draft`).map((step) => ({ ...step, result: 'Filtered to drafts' })),
+                ],
+                done: {
+                    text: news ? `${total} news articles aren’t published yet` : `${total} stories aren’t published yet`,
+                    results: target.drafts,
+                    total,
+                    list: target,
+                    note: 'They’re all drafts. Want me to publish or schedule any of them?',
+                },
+            };
+        },
     },
     {
         // "Summarise our shipping policy". The search takes a long time (16 seconds), so the slow state shows (see AiChatRun.vue).

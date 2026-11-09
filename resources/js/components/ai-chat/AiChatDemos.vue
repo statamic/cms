@@ -109,6 +109,8 @@ const groups = [
         demos: [
             { label: 'Update homepage', text: 'How can I update the homepage?' },
             { label: 'Find content', text: 'Which entries mention outdoor furniture?' },
+            { label: 'Unpublished stories', text: 'Show me all my unpublished stories' },
+            { label: '100 unpublished', text: 'Show me all my unpublished news articles' },
             // The ideas from the research notes (see ideaScenarios in mock-runs.js)
             { label: 'Find missing alt text', text: 'Which images have no alt text?' },
             { label: 'Summarise submissions', text: "Summarise this week's contact form submissions" },
