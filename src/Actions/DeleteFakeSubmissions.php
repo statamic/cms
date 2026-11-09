@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Exception;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Forms\FakeSubmissionGenerator;
 
 use function Statamic\trans as __;
 use function Statamic\trans_choice;
@@ -27,7 +28,7 @@ class DeleteFakeSubmissions extends Action
 
     public function authorize($user, $item)
     {
-        return $user->can('generateFakeSubmissions', $item->form());
+        return FakeSubmissionGenerator::enabled() && $user->can('generateFakeSubmissions', $item->form());
     }
 
     public function run($items, $values)
@@ -45,7 +46,7 @@ class DeleteFakeSubmissions extends Action
         // The UI always posts the `_all_fake_submissions_` sentinel, which resolves to an
         // empty $items collection in ActionController, so authorize() never actually runs
         // for this flow. This check is the real enforcement point for the UI-driven request.
-        if (! $currentUser || $currentUser->cant('generateFakeSubmissions', $form)) {
+        if (! FakeSubmissionGenerator::enabled() || ! $currentUser || $currentUser->cant('generateFakeSubmissions', $form)) {
             throw new Exception(__('You are not authorized to run this action.'));
         }
 

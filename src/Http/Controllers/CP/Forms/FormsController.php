@@ -136,7 +136,6 @@ class FormsController extends CpController
             'title' => __($form->title()),
             'honeypot' => $form->honeypot(),
             'store' => $form->store(),
-            'generate_fake_submissions' => (bool) $form->get('generate_fake_submissions', true),
         ]);
 
         $fields = $blueprint
@@ -233,12 +232,6 @@ class FormsController extends CpController
                         'display' => __('Store Submissions'),
                         'type' => 'toggle',
                         'instructions' => __('statamic::messages.form_configure_store_instructions'),
-                    ],
-                    'generate_fake_submissions' => [
-                        'display' => __('Enable Fake Submission Generator'),
-                        'type' => 'toggle',
-                        'default' => true,
-                        'instructions' => __('statamic::messages.form_configure_generate_fake_submissions_instructions'),
                     ],
                 ],
             ],

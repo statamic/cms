@@ -12,6 +12,11 @@ class FakeSubmissionGenerator
 {
     protected $faker;
 
+    public static function enabled(): bool
+    {
+        return app()->isLocal() || app()->runningUnitTests();
+    }
+
     public function __construct()
     {
         $this->faker = \Faker\Factory::create();

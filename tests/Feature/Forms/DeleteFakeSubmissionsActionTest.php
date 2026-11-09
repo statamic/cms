@@ -3,6 +3,7 @@
 namespace Tests\Feature\Forms;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\DeleteFakeSubmissions;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -100,6 +101,35 @@ class DeleteFakeSubmissionsActionTest extends TestCase
             ]);
 
         $this->assertCount(2, $form->querySubmissions()->where('_fake', true)->get());
+    }
+
+    #[Test]
+    public function it_does_not_delete_fake_submissions_outside_local_environments()
+    {
+        $this->app['env'] = 'production';
+
+        $form = $this->makeForm('contact');
+        $user = tap(User::make()->makeSuper())->save();
+
+        $this->makeSubmission($form, ['name' => 'Fake 1', '_fake' => true]);
+
+        $this
+            ->actingAs($user)
+            ->withSession(['_token' => 'token']) // CSRF is only skipped in the testing env, so supply a token.
+            ->post(cp_route('forms.submissions.actions.run', $form->handle()), [
+                'action' => 'delete_fake_submissions',
+                'selections' => ['_all_fake_submissions_'],
+                'context' => ['form' => $form->handle()],
+                'values' => [],
+                '_token' => 'token',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'success' => false,
+            ]);
+
+        $this->assertCount(1, $form->querySubmissions()->where('_fake', true)->get());
+        $this->assertFalse((new DeleteFakeSubmissions)->authorize($user, $form->querySubmissions()->first()));
     }
 
     private function makeForm(string $handle)

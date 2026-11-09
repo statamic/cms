@@ -13,21 +13,17 @@ use function Statamic\trans as __;
 
 class GenerateFakeSubmissionController extends CpController
 {
-    public function __invoke(Request $request, $form, FakeSubmissionGenerator $generator)
+    public function __invoke(Request $request, $form)
     {
-        $this->authorize('generateFakeSubmissions', $form);
+        abort_unless(FakeSubmissionGenerator::enabled(), 404);
 
-        if (! $form->get('generate_fake_submissions', true)) {
-            return response([
-                'message' => __('statamic::messages.form_fake_submission_generation_disabled'),
-            ], 403);
-        }
+        $this->authorize('generateFakeSubmissions', $form);
 
         $validated = $request->validate([
             'mode' => ['required', 'in:cp_only,full_pipeline'],
         ]);
 
-        $values = $generator->generate($form);
+        $values = app(FakeSubmissionGenerator::class)->generate($form);
         $fields = $form->blueprint()->fields()->addValues($values);
         $submission = $form->makeSubmission()->site(Site::selected());
         $submission->data(
