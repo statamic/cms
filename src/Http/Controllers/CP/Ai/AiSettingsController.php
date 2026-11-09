@@ -141,6 +141,19 @@ class AiSettingsController extends CpController
                 'ip', 'ip_address',
             ],
             'excluded_other' => ['users', 'form_submissions'],
+            // Phase 2. One to show what they're for. They're kept apart from the other prompts, as they aren't offered anywhere: they run on their own,
+            // and each run is kept as a report under Tools → AI Reports (see AiReportsController).
+            'scheduled_prompts' => [
+                [
+                    'type' => 'prompt',
+                    'name' => 'Weekly content health report',
+                    'repeat' => 'weekly',
+                    'day' => 'monday',
+                    'time' => '09:00',
+                    'visible_to' => ['editor'],
+                    'instructions' => "Look over the whole site and list what needs attention: broken links, pages that haven't been updated in a year, images without alt text, drafts nobody has touched in a month, and meta descriptions that are missing or too long. Say which page each one is on. Don't change anything.",
+                ],
+            ],
             // A few to show what they're for. Page prompts get a /command in the AI chat, and field prompts show in the suggestions menu on fields.
             'prompts' => [
                 [
@@ -233,6 +246,34 @@ class AiSettingsController extends CpController
                 ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'width' => 33]],
                 ['handle' => 'instructions', 'field' => ['type' => 'text', 'display' => __('Instructions'), 'placeholder' => __('Make it shorter, keeping what it says.')]],
             ],
+        ]];
+    }
+
+    // Phase 2: like page prompts, but each runs on its own on a schedule, and each run is kept as a report in the CP, like a form's submissions.
+    // Collapsed, a row shows its name in the badge, then when it runs.
+    private function scheduledPromptsField(): array
+    {
+        return ['handle' => 'scheduled_prompts', 'field' => [
+            'type' => 'replicator',
+            'display' => __('Scheduled Prompts'),
+            'hide_display' => true,
+            'full_width_setting' => true,
+            'collapse' => true,
+            'previews' => true,
+            'button_label' => __('Add Prompt'),
+            'insert_between' => false,
+            'actions' => false,
+            'header_actions' => 'scheduled-prompts-actions',
+            'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
+                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Running'), __('Paused')], 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Weekly content health report'), 'replicator_preview' => false]],
+                    ['handle' => 'repeat', 'field' => ['type' => 'select', 'display' => __('Runs'), 'options' => ['daily' => __('Every day'), 'weekly' => __('Every week'), 'monthly' => __('Every month, on the 1st')], 'default' => 'weekly', 'width' => 33]],
+                    ['handle' => 'day', 'field' => ['type' => 'select', 'display' => __('On'), 'options' => collect(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])->mapWithKeys(fn ($day) => [$day => __(ucfirst($day))])->all(), 'default' => 'monday', 'if' => ['repeat' => 'weekly'], 'width' => 33]],
+                    ['handle' => 'time', 'field' => ['type' => 'time', 'display' => __('At'), 'default' => '09:00', 'width' => 33]],
+                    ['handle' => 'visible_to', 'field' => ['type' => 'select', 'display' => __('Reports Visible To'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Super users'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all()]],
+                    ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What the AI should look at, and what to put in the report.'), 'replicator_preview' => false]],
+                ]],
+            ]]],
         ]];
     }
 
@@ -419,6 +460,12 @@ class AiSettingsController extends CpController
                             'display' => __('Field Prompts'),
                             'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
                             'fields' => [$this->fieldPromptsField()],
+                        ],
+                        [
+                            'display' => __('Scheduled Prompts'),
+                            'header_actions' => 'scheduled-prompts-actions',
+                            'instructions' => __('Reports the AI writes on its own, on a schedule, like a weekly check of the whole site. Each run is kept under *Tools → AI Reports*. They only read: anything they find is left for your team to change.'),
+                            'fields' => [$this->scheduledPromptsField()],
                         ],
                         [
                             'display' => __('Kept Out of AI'),
