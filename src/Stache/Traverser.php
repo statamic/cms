@@ -21,7 +21,7 @@ class Traverser
             return collect();
         }
 
-        $files = Finder::create()->files()->ignoreDotFiles(true)->in($dir)->sortByName();
+        $files = Finder::create()->files()->ignoreDotFiles(true)->in($dir);
 
         $paths = [];
         foreach ($files as $file) {
@@ -32,7 +32,13 @@ class Traverser
             $paths[Path::tidy($file->getPathname())] = $file->getMTime();
         }
 
-        return collect($paths)->sort();
+        // Sort by path, then (stably) by timestamp, so files with the same timestamp are
+        // ordered by path. This is much faster than Finder's sortByName(), which calls
+        // realpath() on both files for every comparison.
+        ksort($paths, SORT_STRING);
+        asort($paths);
+
+        return collect($paths);
     }
 
     public function filter($filter)
