@@ -6,7 +6,7 @@ use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\PreviewSubmission;
+use Statamic\Fields\SampleValue;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
@@ -271,7 +271,7 @@ class Markdown extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return PreviewSubmission::placeholder($this->field());
+        return SampleValue::placeholder($this->field());
     }
 
     public function fakeValue(Generator $faker): mixed

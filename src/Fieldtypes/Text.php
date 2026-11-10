@@ -4,7 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Faker\Generator;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\PreviewSubmission;
+use Statamic\Fields\SampleValue;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -182,7 +182,7 @@ class Text extends Fieldtype
         return match ($this->field()->get('input_type')) {
             'email' => 'name@example.com',
             'url' => 'https://example.com',
-            default => PreviewSubmission::placeholder($this->field()),
+            default => SampleValue::placeholder($this->field()),
         };
     }
 

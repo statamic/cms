@@ -4,7 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Faker\Generator;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\FieldOptions;
+use Statamic\Fields\SampleValue;
 
 class Ranking extends Fieldtype
 {
@@ -12,11 +12,11 @@ class Ranking extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return FieldOptions::keys($this->field());
+        return SampleValue::optionKeys($this->field());
     }
 
     public function fakeValue(Generator $faker): mixed
     {
-        return $faker->shuffleArray(FieldOptions::keys($this->field()));
+        return $faker->shuffleArray(SampleValue::optionKeys($this->field()));
     }
 }

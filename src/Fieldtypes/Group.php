@@ -9,8 +9,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Fields\Values;
-use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\GraphQL\Types\GroupType;
@@ -240,12 +240,13 @@ class Group extends Fieldtype
     public function fakeValue(Generator $faker): mixed
     {
         return $this->sampleFields()
-            ->map(fn (Field $field) => FakeSubmissionGenerator::valueFor($field, $faker))
+            ->map(fn (Field $field) => SampleValue::fake($field, $faker))
             ->all();
     }
 
     private function sampleFields(): Collection
     {
+        // TODO: Use $this->fields() once the form Group fieldtype converts its nested fields to core fieldtypes.
         return collect($this->field()->get('fields', []))
             ->filter(fn ($config) => is_array($config) && isset($config['handle'], $config['field']))
             ->mapWithKeys(fn (array $config) => [

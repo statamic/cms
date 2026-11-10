@@ -6,7 +6,7 @@ use Faker\Generator;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\FieldOptions;
+use Statamic\Fields\SampleValue;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -96,7 +96,7 @@ class ImageChoice extends Fieldtype
 
     public function previewValue(): mixed
     {
-        $keys = FieldOptions::keys($this->field());
+        $keys = SampleValue::optionKeys($this->field());
 
         return $this->field()->get('multiple')
             ? array_slice($keys, 0, 1)
@@ -109,14 +109,14 @@ class ImageChoice extends Fieldtype
             return $this->randomOptionKeys($faker);
         }
 
-        $keys = FieldOptions::keys($this->field());
+        $keys = SampleValue::optionKeys($this->field());
 
         return $keys === [] ? null : $faker->randomElement($keys);
     }
 
     private function randomOptionKeys(Generator $faker): array
     {
-        $keys = FieldOptions::keys($this->field());
+        $keys = SampleValue::optionKeys($this->field());
 
         if ($keys === []) {
             return [];

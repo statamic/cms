@@ -5,7 +5,7 @@ namespace Statamic\Fieldtypes;
 use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\PreviewSubmission;
+use Statamic\Fields\SampleValue;
 
 use function Statamic\trans as __;
 
@@ -62,7 +62,7 @@ class Lists extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return [PreviewSubmission::placeholder($this->field())];
+        return [SampleValue::placeholder($this->field())];
     }
 
     public function fakeValue(Generator $faker): mixed

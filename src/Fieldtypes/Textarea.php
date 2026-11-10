@@ -4,7 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Faker\Generator;
 use Statamic\Fields\Fieldtype;
-use Statamic\Forms\PreviewSubmission;
+use Statamic\Fields\SampleValue;
 use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
 use function Statamic\trans as __;
@@ -71,7 +71,7 @@ class Textarea extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return PreviewSubmission::placeholder($this->field());
+        return SampleValue::placeholder($this->field());
     }
 
     public function fakeValue(Generator $faker): mixed

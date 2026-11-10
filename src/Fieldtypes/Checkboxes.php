@@ -4,8 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Faker\Generator;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Fieldtypes\Concerns\MigratesLegacyInlineConfig;
-use Statamic\Forms\FieldOptions;
 
 use function Statamic\trans as __;
 
@@ -83,7 +83,7 @@ class Checkboxes extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return array_slice(FieldOptions::keys($this->field()), 0, 1);
+        return array_slice(SampleValue::optionKeys($this->field()), 0, 1);
     }
 
     public function fakeValue(Generator $faker): mixed
@@ -93,7 +93,7 @@ class Checkboxes extends Fieldtype
 
     private function randomOptionKeys(Generator $faker): array
     {
-        $keys = FieldOptions::keys($this->field());
+        $keys = SampleValue::optionKeys($this->field());
 
         if ($keys === []) {
             return [];
