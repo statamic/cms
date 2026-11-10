@@ -486,6 +486,28 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('Saved', $item->get('title'));
     }
 
+    #[Test]
+    public function snapshots_are_not_kept_for_a_later_request_in_the_same_process()
+    {
+        $this->useSerializingCacheStore();
+
+        // The first request in a long-running process builds the entries from their files.
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // Another process saves the entry, which this process's store never hears about.
+        $key = (fn () => $this->getItemCacheKey('blog-christmas'))->call($store);
+        $changed = Stache::cacheStore()->get($key)->set('title', 'Saved by another process');
+        Stache::cacheStore()->forever($key, $changed);
+
+        // The next request gets a new Blink (Octane clears resolved facades), but the same store.
+        Blink::swap(new \Statamic\Support\Blink);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved by another process', $item->get('title'));
+    }
+
     private function useSerializingCacheStore()
     {
         config([

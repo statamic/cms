@@ -28,7 +28,6 @@ class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
     private bool $shouldBlinkEntryUris = true;
-    private array $snapshots = [];
     private int $makingItemsInBulk = 0;
     private array $collectionsForBulk = [];
 
@@ -298,31 +297,42 @@ class CollectionEntriesStore extends ChildStore
         parent::cacheItem($item);
 
         $key = $this->getItemKey($item);
-        $snapshot = $this->snapshots[$key] ?? null;
+        $snapshot = $this->snapshots()->get($key);
 
         // The first time the entry built from the file is cached, the cache holds exactly
         // what the snapshot holds. Anything cached after that may differ from it.
         if ($snapshot && ! $snapshot['cached'] && $snapshot['source']->get() === $item) {
-            $this->snapshots[$key]['cached'] = true;
+            $snapshot['cached'] = true;
+            $this->snapshots()->put($key, $snapshot);
         } else {
-            unset($this->snapshots[$key]);
+            $this->snapshots()->forget($key);
         }
     }
 
     public function forgetItem($key)
     {
-        unset($this->snapshots[$key]);
+        $this->snapshots()->forget($key);
 
         parent::forgetItem($key);
     }
 
     private function takeSnapshot(EntryInstance $entry): void
     {
-        $this->snapshots[$entry->id()] = [
+        $this->snapshots()->put($entry->id(), [
             'source' => WeakReference::create($entry),
             'snapshot' => $this->copy($entry),
             'cached' => false,
-        ];
+        ]);
+    }
+
+    /**
+     * Snapshots are only good for the request they were taken in, since another process can
+     * cache a different version of an entry at any time. This store can outlive a request
+     * (it does under Octane), but Blink is new for each one, so they are kept there.
+     */
+    private function snapshots()
+    {
+        return Blink::store('entry-snapshots::'.$this->key());
     }
 
     /**
@@ -336,7 +346,7 @@ class CollectionEntriesStore extends ChildStore
             return null;
         }
 
-        $snapshot = $this->snapshots[$key] ?? null;
+        $snapshot = $this->snapshots()->get($key);
 
         if (! $snapshot || ! $snapshot['cached']) {
             return null;
