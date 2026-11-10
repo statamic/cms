@@ -66,27 +66,60 @@ function generatedDate(date) {
     });
 }
 
-async function cachePage(url) {
-    if (status.value !== 'uncached' || processing.value) {
+async function cachePages(urls, selected = false) {
+    if (status.value !== 'uncached' || processing.value || !urls.length) {
         return;
     }
 
     processing.value = true;
-    pendingAction.value = url;
     emit('processing', true);
+    const cached = [];
+    const failed = [];
 
     try {
-        const { data } = await axios.post(props.cacheUrl, { url });
+        for (const url of urls) {
+            pendingAction.value = url;
 
-        toast.success(data.message);
-        listing.value.refresh();
-        emit('cached', data);
-    } catch (error) {
-        const errors = error.response?.data?.errors;
+            try {
+                const { data } = await axios.post(props.cacheUrl, { url });
 
-        toast.error(errors
-            ? Object.values(errors).flat()[0]
-            : error.response?.data?.message || __('Unable to cache this page.'));
+                cached.push({
+                    url,
+                    data,
+                });
+            } catch (error) {
+                const errors = error.response?.data?.errors;
+
+                failed.push(errors
+                    ? Object.values(errors).flat()[0]
+                    : error.response?.data?.message || __('Unable to cache this page.'));
+            }
+        }
+
+        if (cached.length) {
+            const cachedUrls = cached.map((page) => page.url);
+            selections.value = selections.value.filter((url) => !cachedUrls.includes(url));
+
+            toast.success(selected
+                ? __n('statamic::messages.cache_utility_pages_cached', cached.length)
+                : cached[0].data.message);
+            listing.value.refresh();
+
+            const result = selected
+                ? {
+                    count: cached.length,
+                    urls: cachedUrls,
+                }
+                : cached[0].data;
+
+            emit('cached', result);
+        }
+
+        if (failed.length) {
+            toast.error(selected
+                ? __n('statamic::messages.cache_utility_pages_cache_failed', failed.length)
+                : failed[0]);
+        }
     } finally {
         processing.value = false;
         pendingAction.value = null;
@@ -156,7 +189,7 @@ async function invalidate(urls, selected = false) {
             :preferences-prefix="status === 'cached' ? 'cache.static_pages' : 'cache.uncached_pages'"
             :sort-column="status === 'cached' ? 'generated_at' : 'url'"
             :sort-direction="status === 'cached' ? 'desc' : 'asc'"
-            :allow-selections="status === 'cached'"
+            allow-selections
             :allow-presets="false"
             :allow-select-all-matching="false"
             :per-page="15"
@@ -164,9 +197,9 @@ async function invalidate(urls, selected = false) {
             :show-pagination-page-links="false"
             :show-pagination-per-page-selector="false"
             :inert="processing || undefined"
-            bulk-action="Clear"
+            :bulk-action="status === 'cached' ? 'Clear' : 'Cache'"
             :processing="processing"
-            @bulk-action="invalidate($event, true)"
+            @bulk-action="status === 'cached' ? invalidate($event, true) : cachePages($event, true)"
             @update:search-query="selections = []"
             @request-completed="requestCompleted"
         >
@@ -216,7 +249,7 @@ async function invalidate(urls, selected = false) {
                     size="sm"
                     :loading="pendingAction === row.url"
                     :disabled="processing"
-                    @click="cachePage(row.url)"
+                    @click="cachePages([row.url])"
                 />
             </template>
         </CacheListing>

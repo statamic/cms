@@ -7,13 +7,22 @@ import CacheListing from '@/components/utilities/CacheListing.vue';
 import Explorer from '@/components/utilities/StaticCacheExplorer.vue';
 import * as Globals from '@/bootstrap/globals';
 import { dateFormatter, toast } from '@api';
+import { setTranslations } from '@/translations/translator';
 
 vi.mock('axios', () => ({ default: { post: vi.fn(), get: vi.fn(), isCancel: () => false } }));
 
 const url = 'https://example.com/blog/one';
 const refresh = vi.fn();
 const ListingStub = defineComponent({
-    props: ['url', 'additionalParameters', 'selections', 'allowSelections', 'sortColumn', 'sortDirection'],
+    props: {
+        url: String,
+        additionalParameters: Object,
+        selections: Array,
+        allowSelections: Boolean,
+        bulkAction: String,
+        sortColumn: String,
+        sortDirection: String,
+    },
     emits: ['update:selections', 'update:searchQuery', 'requestCompleted', 'bulkAction'],
     setup(props, { expose, slots }) {
         expose({ refresh });
@@ -43,11 +52,17 @@ function mountExplorer() {
 
 beforeEach(() => {
     vi.clearAllMocks();
+    Object.assign(window, Globals);
+    setTranslations({
+        'statamic::messages.cache_utility_pages_cached': '{1} Cached :count page.|[0,*] Cached :count pages.',
+        'statamic::messages.cache_utility_pages_cache_failed': '{1} :count page could not be cached.|[0,*] :count pages could not be cached.',
+    });
     vi.spyOn(toast, 'success').mockImplementation(() => {});
     vi.spyOn(toast, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
+    setTranslations({});
     vi.useRealTimers();
     vi.restoreAllMocks();
 });
@@ -96,7 +111,7 @@ test('invalidates an individual URL once, reports the actual result, and refresh
     wrapper.unmount();
 });
 
-test('browses uncached URLs without offering invalidation or selection', async () => {
+test('browses uncached URLs with Cache bulk actions and resets out-of-scope selections', async () => {
     const wrapper = mountExplorer();
     wrapper.findComponent(CacheListing).vm.$emit('update:selections', [url]);
     await nextTick();
@@ -106,14 +121,69 @@ test('browses uncached URLs without offering invalidation or selection', async (
 
     const listing = wrapper.findComponent(CacheListing);
     expect(listing.props('additionalParameters')).toEqual({ site: null, domain: null, status: 'uncached' });
-    expect(listing.props('allowSelections')).toBe(false);
+    expect(listing.props('allowSelections')).toBe(true);
+    expect(listing.props('bulkAction')).toBe('Cache');
     expect(listing.props('sortColumn')).toBe('url');
     expect(listing.props('sortDirection')).toBe('asc');
     expect(listing.props('selections')).toEqual([]);
     expect(wrapper.findAllComponents(Button).some((button) => button.props('text') === 'Clear')).toBe(false);
 
-    listing.vm.$emit('bulkAction', [url]);
     expect(axios.post).not.toHaveBeenCalled();
+    wrapper.unmount();
+});
+
+test('caches selected URLs across pages and domains through the native bulk action', async () => {
+    const selected = [url, 'https://example.de/blog/two'];
+    axios.post.mockImplementation(async (endpoint, { url }) => ({ data: { url, message: 'Page cached.' } }));
+    const wrapper = mountExplorer();
+    wrapper.findAllComponents(Select)[0].vm.$emit('update:modelValue', 'uncached');
+    await nextTick();
+    const listing = wrapper.findComponent(CacheListing);
+    listing.vm.$emit('update:selections', selected);
+    await nextTick();
+
+    listing.vm.$emit('requestCompleted', { response: { data: { meta: { domains: ['https://example.de'] } } } });
+    expect(listing.props('selections')).toEqual(selected);
+    listing.vm.$emit('bulkAction', selected);
+    await flushPromises();
+
+    expect(axios.post.mock.calls).toEqual(selected.map((url) => ['/cache-page', { url }]));
+    expect(listing.props('selections')).toEqual([]);
+    expect(refresh).toHaveBeenCalledOnce();
+    expect(toast.success).toHaveBeenCalledExactlyOnceWith('Cached 2 pages.');
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(wrapper.emitted('cached')).toEqual([[{ count: 2, urls: selected }]]);
+    expect(wrapper.emitted('processing')).toEqual([[true], [false]]);
+    wrapper.unmount();
+});
+
+test('retains failed bulk cache selections and allows retrying only those URLs', async () => {
+    const failedUrl = 'https://example.de/blog/two';
+    axios.post
+        .mockResolvedValueOnce({ data: { url, message: 'Page cached.' } })
+        .mockRejectedValueOnce({ response: { data: { message: 'The page could not be cached.' } } });
+    const wrapper = mountExplorer();
+    wrapper.findAllComponents(Select)[0].vm.$emit('update:modelValue', 'uncached');
+    await nextTick();
+    const listing = wrapper.findComponent(CacheListing);
+    listing.vm.$emit('update:selections', [url, failedUrl]);
+    await nextTick();
+    listing.vm.$emit('bulkAction', [url, failedUrl]);
+    await flushPromises();
+
+    expect(listing.props('selections')).toEqual([failedUrl]);
+    expect(toast.success).toHaveBeenCalledExactlyOnceWith('Cached 1 page.');
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith('1 page could not be cached.');
+    expect(refresh).toHaveBeenCalledOnce();
+    expect(wrapper.vm.processing).toBe(false);
+
+    axios.post.mockResolvedValueOnce({ data: { url: failedUrl, message: 'Page cached.' } });
+    listing.vm.$emit('bulkAction', [failedUrl]);
+    await flushPromises();
+
+    expect(axios.post.mock.lastCall).toEqual(['/cache-page', { url: failedUrl }]);
+    expect(listing.props('selections')).toEqual([]);
+    expect(refresh).toHaveBeenCalledTimes(2);
     wrapper.unmount();
 });
 

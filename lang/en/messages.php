@@ -28,6 +28,8 @@ return [
     'cache_utility_images_cleared' => '{1} Cleared :count cached image (:size) from :container in :time.|[0,*] Cleared :count cached images (:size) from :container in :time.',
     'cache_utility_invalidated' => '{1} Cleared :count cached page in :time.|[0,*] Cleared :count cached pages in :time.',
     'cache_utility_matches' => '{0} No cached pages match these URLs.|{1} :count cached page matches.|[2,*] :count cached pages match.',
+    'cache_utility_pages_cache_failed' => '{1} :count page could not be cached.|[0,*] :count pages could not be cached.',
+    'cache_utility_pages_cached' => '{1} Cached :count page.|[0,*] Cached :count pages.',
     'cache_utility_stache_description' => 'The Stache is Statamic\'s content store that functions much like a database. It is generated automatically from the content files.',
     'cache_utility_static_cache_description' => 'Static pages bypass Statamic completely and are rendered directly from the server for maximum performance.',
     'choose_entry_localization_deletion_behavior' => 'Choose the action you wish to perform on the localized entries.',
