@@ -410,6 +410,69 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('From the cache', $item->get('title'));
     }
 
+    #[Test]
+    public function unsaved_changes_to_entries_in_memory_do_not_reach_indexes()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // The instance built from the file is handed out on a cache miss and can be changed without saving.
+        Blink::store('structure-entries')->get('blog-christmas')->set('title', 'Unsaved');
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $this->assertEquals('Christmas', $item->get('title'));
+
+        // Page::setEntry() puts whatever entry it is given into the same Blink store.
+        $unsaved = Facades\Entry::make()->id('blog-christmas')->collection('blog')->set('title', 'Also unsaved');
+        Blink::store('structure-entries')->put('blog-christmas', $unsaved);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $this->assertEquals('Christmas', $item->get('title'));
+    }
+
+    #[Test]
+    public function changing_the_date_of_a_copy_does_not_change_later_copies()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $first = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $original = $first->date()->toDateTimeString();
+        $first->date()->addDay();
+
+        $second = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals($original, $second->date()->toDateTimeString());
+    }
+
+    #[Test]
+    public function once_the_entry_is_cached_again_it_reads_the_cache()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $changed = $store->getItem('blog-christmas')->set('title', 'Saved');
+        (fn () => $this->cacheItem($changed))->call($store);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved', $item->get('title'));
+    }
+
+    private function useSerializingCacheStore()
+    {
+        config([
+            'cache.stores.stache-serializing' => ['driver' => 'array', 'serialize' => true],
+            'statamic.stache.cache_store' => 'stache-serializing',
+        ]);
+    }
+
     private function putInItemCache($store, $key, $item)
     {
         $cacheKey = (fn () => $this->getItemCacheKey($key))->call($store);
