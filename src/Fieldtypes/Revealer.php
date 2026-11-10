@@ -2,9 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Faker\Generator;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\SampleValue;
 
 use function Statamic\trans as __;
 
@@ -55,15 +53,5 @@ class Revealer extends Fieldtype
         // masquerade as lost data.
 
         // return null;
-    }
-
-    public function previewValue(): mixed
-    {
-        return SampleValue::placeholder($this->field());
-    }
-
-    public function fakeValue(Generator $faker): mixed
-    {
-        return app(Text::class)->setField($this->field())->fakeValue($faker);
     }
 }

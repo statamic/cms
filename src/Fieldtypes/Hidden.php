@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Faker\Generator;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\SampleValue;
 
@@ -30,11 +29,6 @@ class Hidden extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return SampleValue::placeholder($this->field());
-    }
-
-    public function fakeValue(Generator $faker): mixed
-    {
-        return app(Text::class)->setField($this->field())->fakeValue($faker);
+        return $this->field()->defaultValue() ?? SampleValue::placeholder($this->field());
     }
 }

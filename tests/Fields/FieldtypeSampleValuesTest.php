@@ -69,7 +69,8 @@ class FieldtypeSampleValuesTest extends TestCase
             'textarea' => [['type' => 'textarea', 'display' => 'Message'], '[Message]'],
             'markdown' => [['type' => 'markdown', 'display' => 'Body'], '[Body]'],
             'hidden' => [['type' => 'hidden', 'display' => 'Source'], '[Source]'],
-            'revealer' => [['type' => 'revealer', 'display' => 'More'], '[More]'],
+            'hidden with default' => [['type' => 'hidden', 'display' => 'Source', 'default' => 'newsletter'], 'newsletter'],
+            'revealer' => [['type' => 'revealer', 'display' => 'More'], null],
             'list' => [['type' => 'list', 'display' => 'Items'], ['[Items]']],
             'integer' => [['type' => 'integer'], 1],
             'integer with min' => [['type' => 'integer', 'min' => 16], 16],
@@ -120,7 +121,10 @@ class FieldtypeSampleValuesTest extends TestCase
             'slug' => [['type' => 'slug'], fn ($value) => $this->assertMatchesRegularExpression('/^[a-z0-9-]+$/', $value)],
             'textarea' => [['type' => 'textarea'], fn ($value) => $this->assertIsString($value)],
             'markdown' => [['type' => 'markdown'], fn ($value) => $this->assertIsString($value)],
-            'hidden' => [['type' => 'hidden'], fn ($value) => $this->assertIsString($value)],
+            'hidden' => [['type' => 'hidden', 'display' => 'Source'], fn ($value) => $this->assertSame('[Source]', $value)],
+            'hidden with default' => [['type' => 'hidden', 'default' => 'newsletter'], fn ($value) => $this->assertSame('newsletter', $value)],
+            'revealer' => [['type' => 'revealer'], fn ($value) => $this->assertNull($value)],
+            'text ignores default' => [['type' => 'text', 'default' => 'Hello'], fn ($value) => $this->assertNotSame('Hello', $value)],
             'list' => [['type' => 'list'], fn ($value) => $this->assertCount(3, $value)],
             'integer' => [['type' => 'integer', 'min' => 16, 'max' => 18], fn ($value) => $this->assertContains($value, [16, 17, 18])],
             'range' => [['type' => 'range', 'min' => 1, 'max' => 2], fn ($value) => $this->assertContains($value, [1, 2])],
@@ -140,7 +144,7 @@ class FieldtypeSampleValuesTest extends TestCase
             'dictionary' => [['type' => 'dictionary', 'dictionary' => 'countries', 'max_items' => 1], fn ($value) => $this->assertIsString($value)],
             'form upload' => [['type' => 'form_upload'], fn ($value) => $this->assertNull($value)],
             'group' => [['type' => 'group', 'fields' => [
-                ['handle' => 'city', 'field' => ['type' => 'text', 'default' => 'Toronto']],
+                ['handle' => 'city', 'field' => ['type' => 'hidden', 'default' => 'Toronto']],
                 ['handle' => 'agree', 'field' => ['type' => 'toggle']],
             ]], function ($value) {
                 $this->assertSame('Toronto', $value['city']);

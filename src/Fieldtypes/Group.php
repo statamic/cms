@@ -9,7 +9,6 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\SampleValue;
 use Statamic\Fields\Values;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
@@ -240,7 +239,7 @@ class Group extends Fieldtype
     public function fakeValue(Generator $faker): mixed
     {
         return $this->sampleFields()
-            ->map(fn (Field $field) => SampleValue::fake($field, $faker))
+            ->map(fn (Field $field) => $field->fieldtype()->fakeValue($faker))
             ->all();
     }
 

@@ -276,10 +276,11 @@ class FakeSubmissionGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_defaults_for_text_but_randomizes_options()
+    public function it_uses_hidden_field_defaults_but_ignores_other_defaults()
     {
         $form = $this->makeForm('defaults', [
-            ['handle' => 'source', 'field' => ['type' => 'short_answer', 'default' => 'newsletter']],
+            ['handle' => 'source', 'field' => ['type' => 'hidden', 'default' => 'newsletter']],
+            ['handle' => 'subject', 'field' => ['type' => 'short_answer', 'default' => 'Hello']],
             ['handle' => 'colour', 'field' => [
                 'type' => 'dropdown',
                 'default' => 'red',
@@ -293,6 +294,7 @@ class FakeSubmissionGeneratorTest extends TestCase
         $values = collect(range(1, 30))->map(fn () => (new FakeSubmissionGenerator)->generate($form));
 
         $this->assertSame(['newsletter'], $values->pluck('source')->unique()->values()->all());
+        $this->assertNotSame(['Hello'], $values->pluck('subject')->unique()->values()->all());
         $this->assertEqualsCanonicalizing(['red', 'blue'], $values->pluck('colour')->unique()->values()->all());
     }
 
@@ -304,7 +306,7 @@ class FakeSubmissionGeneratorTest extends TestCase
                 'type' => 'group',
                 'fields' => [
                     ['handle' => 'city', 'field' => ['type' => 'text', 'display' => 'City']],
-                    ['handle' => 'country', 'field' => ['type' => 'text', 'default' => 'Canada']],
+                    ['handle' => 'country', 'field' => ['type' => 'hidden', 'default' => 'Canada']],
                     ['handle' => 'floor', 'field' => ['type' => 'integer', 'min' => 1, 'max' => 3]],
                 ],
             ]],

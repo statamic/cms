@@ -5,7 +5,6 @@ namespace Statamic\Forms;
 use Faker\Generator;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Fields\Field;
-use Statamic\Fields\SampleValue;
 
 class FakeSubmissionGenerator
 {
@@ -24,7 +23,7 @@ class FakeSubmissionGenerator
     public function generate(FormContract $form): array
     {
         return $form->blueprint()->fields()->all()
-            ->mapWithKeys(fn (Field $field) => [$field->handle() => SampleValue::fake($field, $this->faker)])
+            ->mapWithKeys(fn (Field $field) => [$field->handle() => $field->fieldtype()->fakeValue($this->faker)])
             ->all();
     }
 }

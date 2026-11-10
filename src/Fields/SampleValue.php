@@ -2,28 +2,12 @@
 
 namespace Statamic\Fields;
 
-use Faker\Generator;
 use Illuminate\Support\Arr;
 
 use function Statamic\trans as __;
 
 class SampleValue
 {
-    private const RANDOMIZED_DEFAULTS = [
-        'toggle', 'checkboxes', 'select', 'radio', 'button_group', 'image_choice', 'yes_no', 'ranking', 'dictionary',
-    ];
-
-    public static function fake(Field $field, Generator $faker): mixed
-    {
-        $default = $field->defaultValue();
-
-        if ($default !== null && ! in_array($field->type(), self::RANDOMIZED_DEFAULTS)) {
-            return $default;
-        }
-
-        return $field->fieldtype()->fakeValue($faker) ?? $default;
-    }
-
     public static function placeholder(Field $field): string
     {
         return '['.__($field->display()).']';
