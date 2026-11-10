@@ -84,6 +84,8 @@ class FastParserTest extends TestCase
 
             'deep nesting' => self::nested(70),
             'nesting beyond symfony\'s limit' => self::nested(130),
+            'unindented nesting' => self::unindentedNesting(30),
+            'unindented nesting beyond symfony\'s limit' => self::unindentedNesting(70),
             'unindented list after a blank line' => "a:\n\n- x\n- y\nb: 1\n",
             'unindented list after a whitespace-only line' => "a:\n  \n- x\nb: 1\n",
             'nested unindented list after a blank line' => "a:\n  b:\n\n  - x\n  c: 1\n",
@@ -97,6 +99,10 @@ class FastParserTest extends TestCase
             'front matter, nested literal block, two more lines' => "---\na:\n  b: |\n    text\nc: 1\nd: 2\n",
             'text after a closing quote' => "a: 'x' y\nb: \"x\" y\n",
             'value ending in an ellipsis' => "a: Read more...\nb: 'Quoted...'\n",
+            'front matter ending in an ellipsis' => "---\ntitle: Hi\nexcerpt: Read more...",
+            'front matter ending in an ellipsis and a newline' => "---\ntitle: Hi\nexcerpt: Read more...\n",
+            'front matter ending in an ellipsis in a list' => "---\na:\n  - Read more...",
+            'front matter with an ellipsis before the end' => "---\nexcerpt: Read more...\ntitle: Hi\n",
             'document end marker' => "a: 1\n...",
             'document end marker in a sequence' => "a:\n  - x\n...\n",
             'tab inside a literal block' => "a: |\n  one\ttwo\nb: 1\n",
@@ -115,6 +121,21 @@ class FastParserTest extends TestCase
             'invalid: mapping in sequence' => "a:\n  - x\n  b: 1\n",
             'invalid: utf-8' => "a: \xff\n",
         ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
+    }
+
+    /**
+     * A key whose value is a sequence at the key's own indentation, holding "- key:" items:
+     * two levels of nesting for each step, but only two columns of indentation.
+     */
+    private static function unindentedNesting(int $steps): string
+    {
+        $yaml = "k:\n";
+
+        for ($i = 0; $i < $steps; $i++) {
+            $yaml .= str_repeat(' ', $i * 2)."- k:\n";
+        }
+
+        return $yaml.str_repeat(' ', $steps * 2)."- end\n";
     }
 
     private static function nested(int $depth): string

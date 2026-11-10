@@ -44,9 +44,9 @@ class FastParser
     private const RESERVED = ['null' => null, 'true' => true, 'false' => false];
 
     /**
-     * Deeper indentation is left to Symfony, which applies its own nesting limit.
+     * Deeper nesting is left to Symfony, which applies its own limit (128 levels by default).
      */
-    private const MAX_INDENT = 100;
+    private const MAX_DEPTH = 64;
 
     /**
      * Parsed keys are remembered for the life of the process. This caps how many, so
@@ -56,8 +56,6 @@ class FastParser
 
     /** Raw key text => parsed key, for keys already proven safe. */
     private static array $keys = [];
-
-    private static ?CannotFastParse $cannot = null;
 
     private static ?Parser $symfony = null;
 
@@ -73,6 +71,9 @@ class FastParser
 
     /** How many "- key: value" mappings are open. */
     private int $compact = 0;
+
+    /** How many mappings and sequences are open. */
+    private int $depth = 0;
 
     /** Whether the document has tabs, which are only understood inside literal blocks. */
     private bool $tabs = false;
@@ -103,8 +104,15 @@ class FastParser
             $this->fail();
         }
 
+        // In a document starting with "---", which all front matter does, Symfony strips a
+        // trailing "..." as an end of document marker, even from a value like "Read more...".
+        if (str_ends_with(rtrim($yaml, " \t\n"), '...')) {
+            $this->fail();
+        }
+
         $this->lead = 0;
         $this->compact = 0;
+        $this->depth = 0;
 
         // Front matter arrives with its opening "---" line, which Symfony ignores.
         if (str_starts_with($yaml, "---\n")) {
@@ -145,8 +153,17 @@ class FastParser
 
     private function fail(): never
     {
-        // Reused, as building an exception's stack trace is the slowest part of giving up.
-        throw self::$cannot ??= new CannotFastParse;
+        // A new exception each time, so no document is kept alive by a stored stack trace.
+        throw new CannotFastParse;
+    }
+
+    private function enter(): void
+    {
+        // Indentation doesn't measure depth: a key's value can be a sequence at the key's
+        // own indentation, and "- key: value" adds a mapping inside a sequence item.
+        if (++$this->depth > self::MAX_DEPTH) {
+            $this->fail();
+        }
     }
 
     private function isSequenceItem(string $line, int $indent): bool
@@ -159,6 +176,8 @@ class FastParser
      */
     private function parseMapping(int $indent, ?string $line): array
     {
+        $this->enter();
+
         $data = [];
         $keys = 0;
         $lines = $this->lines;
@@ -238,12 +257,15 @@ class FastParser
         }
 
         $this->p = $p;
+        $this->depth--;
 
         return $data;
     }
 
     private function parseSequence(int $indent): array
     {
+        $this->enter();
+
         $data = [];
         $lines = $this->lines;
         $count = $this->count;
@@ -324,6 +346,7 @@ class FastParser
         }
 
         $this->p = $p;
+        $this->depth--;
 
         return $data;
     }
@@ -364,10 +387,6 @@ class FastParser
         }
 
         if ($i > $indent) {
-            if ($i > self::MAX_INDENT) {
-                $this->fail();
-            }
-
             return $this->isSequenceItem($line, $i)
                 ? $this->parseSequence($i)
                 : $this->parseMapping($i, null);
