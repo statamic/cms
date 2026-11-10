@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Faker\Generator;
 use Illuminate\Support\Arr;
 
 class SampleValue
@@ -14,6 +15,17 @@ class SampleValue
     public static function paragraph(): string
     {
         return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+    }
+
+    public static function randomKeys(array $keys, Generator $faker, mixed $max = null): array
+    {
+        if ($keys === []) {
+            return [];
+        }
+
+        $limit = min((int) $max > 0 ? (int) $max : 3, count($keys));
+
+        return $faker->randomElements($keys, $faker->numberBetween(1, $limit));
     }
 
     public static function optionKeys(Field $field): array

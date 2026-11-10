@@ -106,22 +106,11 @@ class ImageChoice extends Fieldtype
     public function fakeValue(Generator $faker): mixed
     {
         if ($this->field()->get('multiple')) {
-            return $this->randomOptionKeys($faker);
+            return SampleValue::randomKeys(SampleValue::optionKeys($this->field()), $faker);
         }
 
         $keys = SampleValue::optionKeys($this->field());
 
         return $keys === [] ? null : $faker->randomElement($keys);
-    }
-
-    private function randomOptionKeys(Generator $faker): array
-    {
-        $keys = SampleValue::optionKeys($this->field());
-
-        if ($keys === []) {
-            return [];
-        }
-
-        return $faker->randomElements($keys, $faker->numberBetween(1, min(2, count($keys))));
     }
 }

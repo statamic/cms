@@ -224,7 +224,7 @@ trait HasSelectOptions
     {
         $keys = SampleValue::optionKeys($this->field());
 
-        return $this->field()->get('multiple')
+        return $this->multiple()
             ? array_slice($keys, 0, 1)
             : ($keys[0] ?? null);
     }
@@ -232,6 +232,10 @@ trait HasSelectOptions
     public function fakeValue(Generator $faker): mixed
     {
         $keys = SampleValue::optionKeys($this->field());
+
+        if ($this->multiple()) {
+            return SampleValue::randomKeys($keys, $faker, $this->field()->get('max_items'));
+        }
 
         return $keys === [] ? null : $faker->randomElement($keys);
     }

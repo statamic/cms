@@ -88,17 +88,6 @@ class Checkboxes extends Fieldtype
 
     public function fakeValue(Generator $faker): mixed
     {
-        return $this->randomOptionKeys($faker);
-    }
-
-    private function randomOptionKeys(Generator $faker): array
-    {
-        $keys = SampleValue::optionKeys($this->field());
-
-        if ($keys === []) {
-            return [];
-        }
-
-        return $faker->randomElements($keys, $faker->numberBetween(1, min(2, count($keys))));
+        return SampleValue::randomKeys(SampleValue::optionKeys($this->field()), $faker);
     }
 }

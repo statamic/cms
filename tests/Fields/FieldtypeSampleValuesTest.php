@@ -183,6 +183,15 @@ class FieldtypeSampleValuesTest extends TestCase
             'time' => [['type' => 'time'], fn ($value) => $this->assertMatchesRegularExpression('/^\d{2}:\d{2}$/', $value)],
             'link' => [['type' => 'link'], fn ($value) => $this->assertMatchesRegularExpression('/^https?:\/\//', $value)],
             'select' => [['type' => 'select', ...$options], fn ($value) => $this->assertContains($value, ['red', 'blue'])],
+            'select multiple' => [['type' => 'select', 'multiple' => true, ...$options], function ($value) {
+                $this->assertIsArray($value);
+                $this->assertNotEmpty($value);
+                $this->assertEmpty(array_diff($value, ['red', 'blue']));
+            }],
+            'select multiple with max items' => [['type' => 'select', 'multiple' => true, 'max_items' => 1, 'options' => ['a' => 'A', 'b' => 'B', 'c' => 'C']], function ($value) {
+                $this->assertIsArray($value);
+                $this->assertCount(1, $value);
+            }],
             'radio' => [['type' => 'radio', ...$options], fn ($value) => $this->assertContains($value, ['red', 'blue'])],
             'button group' => [['type' => 'button_group', ...$options], fn ($value) => $this->assertContains($value, ['red', 'blue'])],
             'checkboxes' => [['type' => 'checkboxes', ...$options], fn ($value) => $this->assertEmpty(array_diff($value, ['red', 'blue']))],

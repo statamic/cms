@@ -10,6 +10,7 @@ use Statamic\Exceptions\UndefinedDictionaryException;
 use Statamic\Facades\Dictionary as Dictionaries;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -220,7 +221,7 @@ class Dictionary extends Fieldtype
             return $faker->randomElement($keys);
         }
 
-        return $faker->randomElements($keys, $faker->numberBetween(1, min($maxItems ? (int) $maxItems : 2, count($keys))));
+        return SampleValue::randomKeys($keys, $faker, $maxItems);
     }
 
     private function sampleOptions(): array
