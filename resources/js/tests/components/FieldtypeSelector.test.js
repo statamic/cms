@@ -1,5 +1,7 @@
 import { flushPromises, mount, shallowMount } from '@vue/test-utils';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
+import { ref } from 'vue';
+import qs from 'qs';
 import * as Globals from '@/bootstrap/globals';
 import FieldtypeSelector from '@/components/fields/FieldtypeSelector.vue';
 import Fields from '@/components/blueprints/Fields.vue';
@@ -36,13 +38,14 @@ const fieldtypes = [
     },
 ];
 
-async function mountSelector() {
+async function mountSelector({ context = {}, get = () => Promise.resolve({ data: fieldtypes }), forms = false } = {}) {
     const wrapper = mount(FieldtypeSelector, {
         props: { allowTitle: true },
         global: {
+            provide: { fieldtypeContext: context },
             mocks: {
-                $axios: { get: () => Promise.resolve({ data: fieldtypes }) },
-                $config: { get: () => undefined },
+                $axios: { get },
+                $config: { get: () => forms },
                 $toast: { error: () => {} },
             },
             stubs: {
@@ -103,4 +106,37 @@ test('the fieldtype icon does not leak into the created field config', () => {
     expect(pending.icon).toBe('test-fieldtype-icon');
     expect(pending.fieldtype).toBe('test');
     expect(pending.config.icon).toBe('default-icon');
+});
+
+test('picker caches isolate owners, nested paths and forms, including late responses', async () => {
+    const context = ref({ blueprint: 'runway::post', field_path: [], nested: false });
+    let resolveFirst;
+    const get = vi.fn()
+        .mockImplementationOnce(() => new Promise(resolve => resolveFirst = resolve))
+        .mockResolvedValueOnce({ data: [fieldtypes[1]] });
+    const root = await mountSelector({ context, get });
+
+    context.value = { blueprint: 'runway::video', field_path: ['blocks', 'quote'], nested: true };
+    await flushPromises();
+    resolveFirst({ data: [fieldtypes[0]] });
+    await flushPromises();
+
+    expect(root.vm.allFieldtypes.map(field => field.value)).toEqual(['title', 'text']);
+    expect(qs.parse(get.mock.calls[1][0].split('?')[1]).context).toEqual({
+        blueprint: 'runway::video', field_path: ['blocks', 'quote'], nested: 'true',
+    });
+
+    const cachedGet = vi.fn();
+    const cached = await mountSelector({ context: { blueprint: 'runway::post', field_path: [], nested: false }, get: cachedGet });
+    expect(cached.vm.allFieldtypes.map(field => field.value)).toEqual(['title', 'test']);
+    expect(cachedGet).not.toHaveBeenCalled();
+
+    const formGet = vi.fn().mockResolvedValue({ data: [] });
+    const form = await mountSelector({ context, get: formGet, forms: true });
+    expect(form.vm.allFieldtypes.map(field => field.value)).toEqual(['title']);
+    expect(formGet).toHaveBeenCalledOnce();
+
+    root.unmount();
+    cached.unmount();
+    form.unmount();
 });

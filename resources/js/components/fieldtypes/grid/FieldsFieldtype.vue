@@ -18,12 +18,20 @@ import Fieldtype from '../Fieldtype.vue';
 import Fields from '../../blueprints/Fields.vue';
 import { Sortable, Plugins } from '@shopify/draggable';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
+import { computed } from 'vue';
 
 export default {
     mixins: [Fieldtype, SuggestsConditionalFields],
 
     inject: {
         suggestableConditionFieldsProvider: { default: null },
+        parentFieldtypeContext: { from: 'fieldtypeContext', default: () => ({}) },
+    },
+
+    provide() {
+        return {
+            fieldtypeContext: computed(() => ({ ...this.parentFieldtypeContext, nested: true })),
+        };
     },
 
     components: {
