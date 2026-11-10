@@ -139,7 +139,8 @@ class FastParserTest extends TestCase
             'form feed after a sequence dash' => "- \fx\n",
             'form feed as a sequence separator' => "-\fa: 1\n",
             'non-breaking space as a key' => "-\u{A0}null: x\n",
-            'non-breaking spaces elsewhere' => "a: \u{A0}x\nb: x\u{A0}\n\u{A0}c: x\nd:\u{A0}x\ne:\n  - a:\u{A0}b\n",        ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
+            'non-breaking spaces elsewhere' => "a: \u{A0}x\nb: x\u{A0}\n\u{A0}c: x\nd:\u{A0}x\ne:\n  - a:\u{A0}b\n",
+            'numeric value shaped like a uuid' => "a: 1234567e-123456789012345678901234567\n",        ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
     }
 
     /**

@@ -536,7 +536,7 @@ class FastParser
                 return (int) $value;
             }
 
-            if ($length === 36 && $value[8] === '-' && strspn($value, self::HEX) === 36) {
+            if ($length === 36 && $value[8] === '-' && $value[13] === '-' && $value[18] === '-' && $value[23] === '-' && strspn($value, self::HEX) === 36) {
                 return $value; // A UUID.
             }
         } elseif ($c === '"') {
