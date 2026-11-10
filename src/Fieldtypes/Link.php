@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Faker\Generator;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
@@ -297,5 +298,15 @@ class Link extends Fieldtype
         }
 
         return $newValue !== null ? "asset::{$container}::{$newValue}" : null;
+    }
+
+    public function previewValue(): mixed
+    {
+        return 'https://example.com';
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->url();
     }
 }

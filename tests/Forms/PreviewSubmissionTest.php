@@ -2,10 +2,12 @@
 
 namespace Tests\Forms;
 
+use Faker\Generator;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Forms\PreviewSubmission;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,9 +16,24 @@ class PreviewSubmissionTestFieldtype extends Fieldtype
 {
     protected static $handle = 'preview_submission_test';
 
-    public function fakeValue(): mixed
+    public function previewValue(): mixed
     {
-        return 'from fake value';
+        return 'from preview value';
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        throw new \Exception('The preview should not call fakeValue().');
+    }
+}
+
+class PreviewSubmissionFakeOnlyTestFieldtype extends Fieldtype
+{
+    protected static $handle = 'preview_submission_fake_only_test';
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        throw new \Exception('The preview should not call fakeValue().');
     }
 }
 
@@ -32,7 +49,7 @@ class PreviewSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_placeholder_values_for_each_field_type()
+    public function it_uses_example_values_for_each_field_type()
     {
         Carbon::setTestNow('2026-11-09 14:30:00');
 
@@ -122,12 +139,12 @@ class PreviewSubmissionTest extends TestCase
 
         $values = (new PreviewSubmission)->values($form);
 
-        $this->assertSame('[Who are you?]', $values['name']);
-        $this->assertSame('[First Name]', $values['first_name']);
+        $this->assertSame('Jane Doe', $values['name']);
+        $this->assertSame('Jane', $values['first_name']);
         $this->assertSame('name@example.com', $values['email']);
-        $this->assertSame('[Call me]', $values['phone']);
+        $this->assertSame('555-0100', $values['phone']);
         $this->assertSame('https://example.com', $values['website']);
-        $this->assertSame('[Message]', $values['long']);
+        $this->assertSame(SampleValue::paragraph(), $values['long']);
         $this->assertSame(1, $values['number']);
         $this->assertSame(16, $values['age']);
         $this->assertSame(1, $values['currency']);
@@ -147,7 +164,7 @@ class PreviewSubmissionTest extends TestCase
         $this->assertIsString($values['dict']);
         $this->assertIsArray($values['dicts']);
         $this->assertCount(1, $values['dicts']);
-        $this->assertSame(['city' => '[City]', 'nested_email' => 'name@example.com'], $values['group']);
+        $this->assertSame(['city' => 'Springfield', 'nested_email' => 'name@example.com'], $values['group']);
         $this->assertNull($values['upload']);
         $this->assertNull($values['banner']);
         $this->assertNull($values['heading']);
@@ -156,7 +173,7 @@ class PreviewSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_null_for_unknown_fieldtypes()
+    public function it_uses_a_custom_fieldtypes_preview_value()
     {
         PreviewSubmissionTestFieldtype::register();
 
@@ -164,7 +181,35 @@ class PreviewSubmissionTest extends TestCase
             ['handle' => 'widget', 'field' => ['type' => 'preview_submission_test']],
         ]);
 
+        $this->assertSame('from preview value', (new PreviewSubmission)->values($form)['widget']);
+    }
+
+    #[Test]
+    public function it_uses_null_for_fieldtypes_without_a_preview_value()
+    {
+        PreviewSubmissionFakeOnlyTestFieldtype::register();
+
+        $form = $this->makeForm('fake_only_type', [
+            ['handle' => 'widget', 'field' => ['type' => 'preview_submission_fake_only_test']],
+        ]);
+
         $this->assertNull((new PreviewSubmission)->values($form)['widget']);
+    }
+
+    #[Test]
+    public function it_uses_example_values_for_groups_with_core_fieldtypes()
+    {
+        $form = $this->makeForm('core_group', [
+            ['handle' => 'address', 'field' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'city', 'field' => ['type' => 'text', 'display' => 'City']],
+                    ['handle' => 'floor', 'field' => ['type' => 'integer', 'min' => 2]],
+                ],
+            ]],
+        ]);
+
+        $this->assertSame(['city' => 'Springfield', 'floor' => 2], (new PreviewSubmission)->values($form)['address']);
     }
 
     #[Test]

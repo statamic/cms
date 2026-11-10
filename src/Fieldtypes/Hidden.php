@@ -25,4 +25,9 @@ class Hidden extends Fieldtype
             ],
         ];
     }
+
+    public function previewValue(): mixed
+    {
+        return $this->field()->defaultValue();
+    }
 }

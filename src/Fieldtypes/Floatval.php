@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Floatval as FloatFilter;
@@ -99,5 +100,17 @@ class Floatval extends Fieldtype
         }
 
         return $rules;
+    }
+
+    public function previewValue(): mixed
+    {
+        $min = $this->field()->get('min');
+
+        return is_numeric($min) ? $min + 0 : 1;
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->randomFloat(2, 1, 1000);
     }
 }

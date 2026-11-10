@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Illuminate\Support\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\LabeledValue;
+use Statamic\Fields\SampleValue;
 use Statamic\GraphQL\Types\LabeledValueType;
 use Statamic\Support\Arr;
 
@@ -216,5 +218,25 @@ trait HasSelectOptions
                 ->mapWithKeys(fn ($option) => [$option['value'] => $option['label']])
                 ->all(),
         ];
+    }
+
+    public function previewValue(): mixed
+    {
+        $keys = SampleValue::optionKeys($this->field());
+
+        return $this->multiple()
+            ? array_slice($keys, 0, 1)
+            : ($keys[0] ?? null);
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        $keys = SampleValue::optionKeys($this->field());
+
+        if ($this->multiple()) {
+            return SampleValue::randomKeys($keys, $faker, $this->field()->get('max_items'));
+        }
+
+        return $keys === [] ? null : $faker->randomElement($keys);
     }
 }

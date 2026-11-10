@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
 use function Statamic\trans as __;
@@ -65,5 +67,15 @@ class Textarea extends Fieldtype
     public function filter()
     {
         return new TextareaFilter($this);
+    }
+
+    public function previewValue(): mixed
+    {
+        return SampleValue::paragraph();
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->paragraph(2);
     }
 }

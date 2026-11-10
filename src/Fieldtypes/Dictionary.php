@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Dictionaries\Dictionary as DictionaryInstance;
 use Statamic\Dictionaries\Item;
 use Statamic\Exceptions\DictionaryNotFoundException;
@@ -9,6 +10,7 @@ use Statamic\Exceptions\UndefinedDictionaryException;
 use Statamic\Facades\Dictionary as Dictionaries;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
@@ -194,5 +196,40 @@ class Dictionary extends Fieldtype
             ])
             ->merge(['select', 'option', 'choice', 'dropdown', 'list'])
             ->unique()->values()->all();
+    }
+
+    public function previewValue(): mixed
+    {
+        if (($key = array_key_first($this->sampleOptions())) === null) {
+            return null;
+        }
+
+        return $this->field()->get('max_items') === 1 ? $key : [$key];
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        $keys = array_keys($this->sampleOptions());
+
+        if ($keys === []) {
+            return null;
+        }
+
+        $maxItems = $this->field()->get('max_items');
+
+        if ($maxItems === 1) {
+            return $faker->randomElement($keys);
+        }
+
+        return SampleValue::randomKeys($keys, $faker, $maxItems);
+    }
+
+    private function sampleOptions(): array
+    {
+        try {
+            return $this->dictionary()->options();
+        } catch (\Throwable) {
+            return [];
+        }
     }
 }

@@ -151,7 +151,7 @@ class EmailConnectorTest extends TestCase
                 'sample' => true,
             ]);
 
-        $this->assertEquals('Hello [Name]', $response->json('subject'));
+        $this->assertEquals('Hello Jane Doe', $response->json('subject'));
         $this->assertEquals(['name@example.com', 'Team <team@example.com>'], $response->json('to'));
         $this->assertEquals(['name@example.com'], $response->json('reply_to'));
         $this->assertStringContainsString('<b>Name:</b>', $response->json('body'));
@@ -175,7 +175,7 @@ class EmailConnectorTest extends TestCase
             ])
             ->assertOk()
             ->assertJson([
-                'subject' => 'Hello [Name]',
+                'subject' => 'Hello Jane Doe',
                 'to' => ['name@example.com'],
                 'sample' => true,
             ]);
@@ -222,7 +222,7 @@ class EmailConnectorTest extends TestCase
             ])
             ->assertOk()
             ->assertJson([
-                'subject' => 'Hello [Name]',
+                'subject' => 'Hello Jane Doe',
                 'to' => ['name@example.com'],
                 'sample' => true,
             ]);
