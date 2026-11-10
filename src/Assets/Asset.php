@@ -347,8 +347,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 ]);
             } catch (UnableToRetrieveMetadata|UnableToReadFile) {
                 $this->forgetMissingFile();
-
-                return ['data' => $this->data->all()];
             }
         }
 
