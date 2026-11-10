@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
+use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
@@ -46,7 +47,7 @@ class FormSubmissionsController extends CpController
                 'status' => $form->status(),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
-                'canGenerateFakeSubmissions' => $can['generateFakeSubmissions'] && (bool) $form->get('generate_fake_submissions', true),
+                'canGenerateFakeSubmissions' => FakeSubmissionGenerator::enabled() && $can['generateFakeSubmissions'],
             ],
             'can' => $can,
             'columns' => $columns,

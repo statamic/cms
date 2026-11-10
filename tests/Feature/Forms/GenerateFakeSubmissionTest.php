@@ -200,20 +200,48 @@ class GenerateFakeSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_cannot_generate_fake_submissions_when_disabled_in_form_configuration()
+    public function it_cannot_generate_fake_submissions_outside_local_environments()
     {
-        $form = $this->makeForm('contact', false);
-        $user = $this->userWithConfigureFormsPermission();
+        $this->app['env'] = 'production';
+
+        $form = $this->makeForm('contact');
 
         $this
-            ->actingAs($user)
-            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only'])
-            ->assertStatus(403);
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->withSession(['_token' => 'token']) // CSRF is only skipped in the testing env, so supply a token.
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'cp_only', '_token' => 'token'])
+            ->assertNotFound();
 
         $this->assertEquals(0, $form->querySubmissions()->count());
     }
 
-    private function makeForm(string $handle, bool $generateFakeSubmissions = true)
+    #[Test]
+    public function the_generator_is_available_on_the_submissions_listing()
+    {
+        $form = $this->makeForm('contact');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('forms.submissions.index', $form->handle()))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('form.canGenerateFakeSubmissions', true));
+    }
+
+    #[Test]
+    public function the_generator_is_unavailable_on_the_submissions_listing_outside_local_environments()
+    {
+        $this->app['env'] = 'production';
+
+        $form = $this->makeForm('contact');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('forms.submissions.index', $form->handle()))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('form.canGenerateFakeSubmissions', false));
+    }
+
+    private function makeForm(string $handle)
     {
         Blueprint::makeFromFields([
             'name' => ['type' => 'text'],
@@ -261,9 +289,7 @@ class GenerateFakeSubmissionTest extends TestCase
         ])->setHandle($handle)->setNamespace('forms')->save();
 
         /** @var \Statamic\Forms\Form $form */
-        $form = Form::make($handle)->title('Contact')->merge([
-            'generate_fake_submissions' => $generateFakeSubmissions,
-        ]);
+        $form = Form::make($handle)->title('Contact');
 
         $form->save();
 

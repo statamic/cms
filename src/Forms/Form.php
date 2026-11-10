@@ -441,10 +441,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             $data['charts'] = [];
         }
 
-        if ($this->get('generate_fake_submissions') === false) {
-            $data['generate_fake_submissions'] = false;
-        }
-
         File::put($this->path(), YAML::dump($data));
 
         if ($blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {

@@ -11,6 +11,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\FormConnector;
 use Statamic\Facades\User;
 use Statamic\Forms\Connectors\Email;
+use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -150,14 +151,34 @@ class EmailConnectorTest extends TestCase
                 'sample' => true,
             ]);
 
-        $this->assertStringStartsWith('Hello ', $response->json('subject'));
-        $this->assertNotEquals('Hello ', $response->json('subject'));
-        $this->assertNotFalse(filter_var($response->json('to.0'), FILTER_VALIDATE_EMAIL));
-        $this->assertEquals('Team <team@example.com>', $response->json('to.1'));
-        $this->assertEquals($response->json('to.0'), $response->json('reply_to.0'));
+        $this->assertEquals('Hello [Name]', $response->json('subject'));
+        $this->assertEquals(['name@example.com', 'Team <team@example.com>'], $response->json('to'));
+        $this->assertEquals(['name@example.com'], $response->json('reply_to'));
         $this->assertStringContainsString('<b>Name:</b>', $response->json('body'));
         $this->assertStringContainsString('<b>Email:</b>', $response->json('body'));
         $this->assertEquals(0, $form->querySubmissions()->count());
+    }
+
+    #[Test]
+    public function it_previews_a_sample_submission_without_the_fake_submission_generator()
+    {
+        $this->app->bind(FakeSubmissionGenerator::class, fn () => throw new \Exception('The fake submission generator should not be used.'));
+
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithEditPermission())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                'subject' => 'Hello {{ name }}',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'subject' => 'Hello [Name]',
+                'to' => ['name@example.com'],
+                'sample' => true,
+            ]);
     }
 
     #[Test]
@@ -192,7 +213,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
         $this->makeSubmission($form, ['name' => 'Latest', 'email' => 'latest@example.com'], '2026-02-01 10:00');
 
-        $response = $this
+        $this
             ->actingAs($this->userWithEditPermission())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
@@ -200,10 +221,11 @@ class EmailConnectorTest extends TestCase
                 'subject' => 'Hello {{ name }}',
             ])
             ->assertOk()
-            ->assertJson(['sample' => true]);
-
-        $this->assertNotEquals('Hello Latest', $response->json('subject'));
-        $this->assertNotEquals(['latest@example.com'], $response->json('to'));
+            ->assertJson([
+                'subject' => 'Hello [Name]',
+                'to' => ['name@example.com'],
+                'sample' => true,
+            ]);
     }
 
     #[Test]
