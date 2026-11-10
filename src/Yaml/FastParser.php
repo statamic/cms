@@ -36,6 +36,12 @@ class FastParser
      */
     private const RESERVED = ['null' => null, '~' => null, 'true' => true, 'false' => false];
 
+    /**
+     * Deeper documents are left to Symfony, which applies its own nesting limit. This is
+     * well below Symfony's default limit, and far deeper than real content goes.
+     */
+    private const MAX_DEPTH = 64;
+
     public function __construct(private Parser $symfony = new Parser)
     {
     }
@@ -143,6 +149,10 @@ class FastParser
                 if ($stack === []) {
                     throw new CannotFastParse;
                 }
+            }
+
+            if (count($stack) > self::MAX_DEPTH) {
+                throw new CannotFastParse;
             }
 
             $frame = end($stack);

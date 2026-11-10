@@ -79,6 +79,8 @@ class FastParserTest extends TestCase
             'document end marker' => "a: 1\n...\n",
             'windows line endings' => "a: 1\r\nb: 2\r\n",
 
+            'deep nesting' => self::nested(70),
+            'nesting beyond symfony\'s limit' => self::nested(130),
             'top level sequence' => "- a\n- b\n",
             'top level scalar' => 'just a string',
             'invalid: tab indentation' => "a:\n\tb: 1\n",
@@ -90,6 +92,17 @@ class FastParserTest extends TestCase
             'invalid: mapping in sequence' => "a:\n  - x\n  b: 1\n",
             'invalid: utf-8' => "a: \xff\n",
         ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
+    }
+
+    private static function nested(int $depth): string
+    {
+        $yaml = "root:\n";
+
+        for ($i = 1; $i <= $depth; $i++) {
+            $yaml .= str_repeat('  ', $i)."level$i:\n";
+        }
+
+        return $yaml;
     }
 
     #[Test]
