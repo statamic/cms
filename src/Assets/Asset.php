@@ -294,11 +294,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 return YAML::file($path)->parse($contents);
             }
 
-            $meta = $this->generateMeta();
-
-            if ($this->exists()) {
-                $this->writeMeta($meta);
-            }
+            $this->writeMeta($meta = $this->generateMeta());
 
             return $meta;
         });
@@ -320,11 +316,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->cacheStore()->forget($this->metaCacheKey());
 
-        $meta = $this->generateMeta();
-
-        if ($this->exists()) {
-            $this->writeMeta($meta);
-        }
+        $this->writeMeta($meta = $this->generateMeta());
 
         return Arr::get($meta, $key);
     }
@@ -386,6 +378,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function writeMeta($meta)
     {
+        if (! $this->exists()) {
+            return;
+        }
+
         $meta['data'] = Arr::removeNullValues($meta['data']);
 
         $contents = YAML::dump($meta);
