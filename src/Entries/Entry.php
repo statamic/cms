@@ -58,7 +58,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 {
     use ContainsComputedData, ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance, Localizable, Publishable, Revisable, Searchable, TracksLastModified, TracksQueriedColumns, TracksQueriedRelations;
 
-    use HasDirtyState;
+    use HasDirtyState {
+        isDirty as traitIsDirty;
+        getOriginal as traitGetOriginal;
+    }
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -82,6 +85,12 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     private $augmentationReferenceKey;
     private $computedCallbackCache;
     private $siteCache;
+
+    /**
+     * This entry as it was when its original state was last synced, kept until
+     * something asks what the original state was.
+     */
+    private $originalEntry;
 
     public function __construct()
     {
@@ -228,6 +237,74 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
+    }
+
+    /**
+     * The original state is synced every time an entry is read from the Stache, but
+     * is rarely asked for. Rather than working out every attribute each time, a copy
+     * of the entry is kept, and the attributes are taken from it when they're needed.
+     */
+    public function syncOriginal(): static
+    {
+        $this->originalEntry = null;
+
+        $entry = clone $this;
+
+        // Dates can be modified in place, so the copy needs its own.
+        if ($entry->date instanceof \DateTimeInterface) {
+            $entry->date = clone $entry->date;
+        }
+
+        $this->originalEntry = $entry;
+
+        return $this;
+    }
+
+    public function isDirty($attributes = null): bool
+    {
+        $this->resolveOriginal();
+
+        return $this->traitIsDirty($attributes);
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        $this->resolveOriginal();
+
+        return $this->traitGetOriginal($key, $fallback);
+    }
+
+    private function resolveOriginal(): void
+    {
+        if (! $entry = $this->originalEntry) {
+            return;
+        }
+
+        $this->originalEntry = null;
+
+        if (! $entry->origin) {
+            $this->original = $entry->getCurrentDirtyStateAttributes();
+
+            return;
+        }
+
+        // Origins are remembered by entry id, so the copy would be given this entry's
+        // origin as it is now. It needs the origin it had when it was synced, and
+        // whatever was remembered has to be put back afterwards.
+        $key = $entry->getOriginBlinkKey();
+        $remembered = Blink::get($key);
+
+        if ($origin = $entry->getOriginByString($entry->origin)) {
+            Blink::put($key, $origin);
+        } else {
+            Blink::forget($key);
+        }
+
+        try {
+            $this->original = $entry->getCurrentDirtyStateAttributes();
+        } finally {
+            $remembered ? Blink::put($key, $remembered) : Blink::forget($key);
+        }
     }
 
     public function getCurrentDirtyStateAttributes(): array
@@ -1272,6 +1349,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $this->slug = $slug($this);
         }
 
-        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache', 'augmentationReferenceKey']));
+        $this->resolveOriginal();
+
+        return array_keys(Arr::except(get_object_vars($this), ['cachedKeys', 'computedCallbackCache', 'siteCache', 'augmentationReferenceKey', 'originalEntry']));
     }
 }

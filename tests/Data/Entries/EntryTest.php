@@ -2867,6 +2867,121 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function it_only_works_out_the_original_state_when_asked()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $entry = new class extends Entry
+        {
+            public $timesWorkedOut = 0;
+
+            public function getCurrentDirtyStateAttributes(): array
+            {
+                $this->timesWorkedOut++;
+
+                return parent::getCurrentDirtyStateAttributes();
+            }
+        };
+
+        $entry->collection($collection)->locale('en')->id('en')->slug('test')->data(['title' => 'English']);
+
+        $entry->syncOriginal();
+        $entry->syncOriginal();
+        $this->assertSame(0, $entry->timesWorkedOut);
+
+        $this->assertSame('English', $entry->getOriginal('title'));
+        $this->assertSame('test', $entry->getOriginal('slug'));
+        $this->assertSame(0, $entry->timesWorkedOut, 'The original state should come from the copy, not this entry.');
+
+        $this->assertFalse($entry->isDirty());
+        $this->assertSame(1, $entry->timesWorkedOut, 'Only the current state should have been worked out.');
+    }
+
+    #[Test]
+    public function the_original_state_is_what_it_was_when_synced_whatever_changes_afterwards()
+    {
+        $collection = tap(Collection::make('test')->dated(true))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->id('en')->slug('original-slug')
+            ->date('2024-05-06')->published(true)->data(['title' => 'Original', 'food' => 'Burger']);
+
+        $entry->syncOriginal();
+
+        $entry->set('title', 'Changed');
+        $entry->data()->put('food', 'Pizza');
+        $entry->slug('changed-slug');
+        $entry->published(false);
+        $entry->date()->addDays(3);
+
+        $this->assertSame('Original', $entry->getOriginal('title'));
+        $this->assertSame('Burger', $entry->getOriginal('food'));
+        $this->assertSame('original-slug', $entry->getOriginal('slug'));
+        $this->assertTrue($entry->getOriginal('published'));
+        $this->assertSame('2024-05-06-0000', $entry->getOriginal('date'));
+
+        $this->assertTrue($entry->isDirty(['title', 'food', 'slug', 'published', 'date']));
+        $this->assertTrue($entry->isDirty('title'));
+        $this->assertTrue($entry->isDirty('date'));
+        $this->assertFalse($entry->isDirty('locale'));
+    }
+
+    #[Test]
+    public function the_original_state_keeps_the_origin_it_was_synced_with()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en_US', 'url' => '/'],
+            'fr' => ['locale' => 'fr_FR', 'url' => '/fr/'],
+        ]);
+
+        $collection = tap(Collection::make('test')->dated(true)->sites(['en', 'fr']))->save();
+        $one = EntryFactory::collection('test')->id('one')->locale('en')->slug('one')->date('2024-01-01')->create();
+        $two = EntryFactory::collection('test')->id('two')->locale('en')->slug('two')->date('2024-02-02')->create();
+        EntryFactory::collection('test')->id('fr')->locale('fr')->slug('fr')->origin('one')->create();
+
+        // The localization has no date of its own, so its date comes from its origin.
+        $fr = Facades\Entry::find('fr');
+        (fn () => $this->date = null)->call($fr);
+        $fr->syncOriginal();
+
+        $fr->origin($two);
+
+        $this->assertSame('one', $fr->getOriginal('origin'));
+        $this->assertSame('2024-01-01-0000', $fr->getOriginal('date'));
+        $this->assertTrue($fr->isDirty('origin'));
+        $this->assertSame('two', $fr->origin()->id(), 'Working out the original state should not change the current origin.');
+
+        $fr->syncOriginal();
+        $fr->origin(null);
+
+        $this->assertSame('two', $fr->getOriginal('origin'));
+        $this->assertNull($fr->origin());
+        $this->assertTrue($fr->isDirty('origin'));
+    }
+
+    #[Test]
+    public function the_original_state_survives_serialization_and_cloning()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->id('en')->slug('test')->data(['title' => 'Original']);
+        $entry->syncOriginal();
+
+        $this->assertNotContains('originalEntry', $entry->__sleep());
+
+        $unserialized = unserialize(serialize($entry));
+        $unserialized->set('title', 'Changed');
+        $this->assertSame('Original', $unserialized->getOriginal('title'));
+        $this->assertTrue($unserialized->isDirty('title'));
+
+        $entry->syncOriginal();
+        $clone = clone $entry;
+        $clone->set('title', 'Changed on the clone');
+
+        $this->assertSame('Original', $clone->getOriginal('title'));
+        $this->assertTrue($clone->isDirty('title'));
+        $this->assertSame('Original', $entry->getOriginal('title'));
+        $this->assertFalse($entry->isDirty());
+    }
+
+    #[Test]
     public function it_syncs_original_at_the_right_time()
     {
         $eventsHandled = 0;
