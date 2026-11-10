@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class StatamicOAuthConnectionsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('OAUTH_CONNECTIONS_TABLE', function (Blueprint $table) {
+            $table->id();
+            $table->string('provider');
+            $table->foreignId('user_id')->constrained('USERS_TABLE')->cascadeOnDelete();
+            $table->string('provider_user_id');
+            $table->timestamps();
+
+            $table->unique(['provider', 'user_id']);
+            $table->unique(['provider', 'provider_user_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down()
+    {
+        Schema::dropIfExists('OAUTH_CONNECTIONS_TABLE');
+    }
+}
