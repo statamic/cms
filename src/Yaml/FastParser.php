@@ -653,8 +653,9 @@ class FastParser
 
     private function literalBySymfony(string $header, int $indent): string
     {
-        if ($header !== '|' && $header !== '|-' && $header !== '|+') {
-            $this->fail(); // Indentation indicators, comments, etc.
+        // Indentation indicators are written when a block's first line starts with spaces.
+        if (! preg_match('/^\|[1-9]?[-+]?$/', $header)) {
+            $this->fail(); // Comments, folded blocks, etc.
         }
 
         $lines = $this->lines;
