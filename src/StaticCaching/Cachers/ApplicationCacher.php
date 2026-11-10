@@ -66,6 +66,7 @@ class ApplicationCacher extends AbstractCacher
                 'content' => $value,
                 'headers' => $headers,
                 'status' => $event->response->getStatusCode(),
+                'generated_at' => now()->getTimestamp(),
             ];
 
             $this->getDefaultExpiration()
@@ -103,6 +104,11 @@ class ApplicationCacher extends AbstractCacher
         $key = $this->makeHash($url);
 
         return $this->cache->get($this->normalizeKey('responses:'.$key));
+    }
+
+    public function getGeneratedAt(string $url): ?int
+    {
+        return $this->getFromCache(Request::create($url))['generated_at'] ?? null;
     }
 
     /**

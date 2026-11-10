@@ -31,9 +31,19 @@ class CoreUtilities
                 $router->post('clear-stache', [CacheController::class, 'clearStacheCache'])->name('clear-stache');
                 $router->post('warm-stache', [CacheController::class, 'warmStacheCache'])->name('warm-stache');
                 $router->post('clear-static', [CacheController::class, 'clearStaticCache'])->name('clear-static');
+                $router->post('warm-static', [CacheController::class, 'warmStaticCache'])->name('warm-static');
+                $router->get('static-pages', [CacheController::class, 'staticPages'])->name('static-pages');
+                $router->post('preview-static-pages', [CacheController::class, 'previewStaticPages'])->name('preview-static-pages');
                 $router->post('invalidate-static-pages', [CacheController::class, 'invalidateStaticUrls'])->name('invalidate-static-pages');
                 $router->post('clear-application-cache', [CacheController::class, 'clearApplicationCache'])->name('clear-application-cache');
                 $router->post('clear-image-cache', [CacheController::class, 'clearImageCache'])->name('clear-image-cache');
+                $router->get('image-containers', [CacheController::class, 'imageContainers'])->name('image-containers');
+                $router->post('clear-image-container', [CacheController::class, 'clearImageContainer'])->name('clear-image-container');
+                $router->get('image-assets', [CacheController::class, 'imageAssets'])->name('image-assets');
+                $router->post('clear-image-asset', [CacheController::class, 'clearImageAsset'])->name('clear-image-asset');
+                $router->get('image-variants', [CacheController::class, 'imageVariants'])->name('image-variants');
+                $router->post('clear-image-variant', [CacheController::class, 'clearImageVariant'])->name('clear-image-variant');
+                $router->get('image-preview', [CacheController::class, 'imagePreview'])->name('image-preview');
             });
 
         Utility::register('phpinfo')

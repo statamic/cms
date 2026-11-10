@@ -113,6 +113,14 @@ class FileCacher extends AbstractCacher
         return File::exists($this->getFilePath($url));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $site = Site::findByUrl($url)?->handle();
+        $timestamp = @File::lastModified($this->getFilePath($url, $site));
+
+        return $timestamp === false ? null : $timestamp;
+    }
+
     /**
      * Flush out the entire static cache.
      *
