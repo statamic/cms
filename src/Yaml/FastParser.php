@@ -82,7 +82,7 @@ class FastParser
         // Flags change how values are interpreted, which we leave to Symfony.
         if ($flags === 0) {
             try {
-                return (new static)->parseBlocks($yaml);
+                return (new self)->parseBlocks($yaml);
             } catch (CannotFastParse) {
                 //
             }
