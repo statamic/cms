@@ -67,6 +67,7 @@
                         :component-props="formComponentProps"
                         :icon="icon"
                         :text="createLabel"
+                        :menu-label="createMenuLabel"
                         :site="site"
                         :stack-size="formStackSize"
                         @created="itemCreated"
@@ -82,22 +83,24 @@
             </div>
 
             <Stack v-model:open="isSelecting" inset :show-close-button="false">
-                <ItemSelector
-                    :name="name"
-                    :filters-url="filtersUrl"
-                    :selections-url="selectionsUrl"
-                    :site="site"
-                    :initial-sort-column="initialSortColumn"
-                    :initial-sort-direction="initialSortDirection"
-                    :initial-selections="value"
-                    :max-selections="maxItems"
-                    :search="search"
-                    :exclusions="exclusions"
-                    :type="config.type"
-                    :tree="config.query_scopes?.length > 0 ? null : tree"
-                    @selected="selectionsUpdated"
-                    @closed="isSelecting = false"
-                />
+                <slot name="selector" :select="selectionsUpdated" :close="() => isSelecting = false">
+                    <ItemSelector
+                        :name="name"
+                        :filters-url="filtersUrl"
+                        :selections-url="selectionsUrl"
+                        :site="site"
+                        :initial-sort-column="initialSortColumn"
+                        :initial-sort-direction="initialSortDirection"
+                        :initial-selections="value"
+                        :max-selections="maxItems"
+                        :search="search"
+                        :exclusions="exclusions"
+                        :type="config.type"
+                        :tree="config.query_scopes?.length > 0 ? null : tree"
+                        @selected="selectionsUpdated"
+                        @closed="isSelecting = false"
+                    />
+                </slot>
             </Stack>
 
             <input v-if="name" type="hidden" :name="name" :value="JSON.stringify(value)" />
@@ -136,6 +139,7 @@ export default {
         canReorder: { type: Boolean },
         config: { type: Object },
         creatables: { type: Array },
+        createMenuLabel: { type: String },
         data: { type: Array },
         exclusions: { type: Array },
         filtersUrl: { type: String },
