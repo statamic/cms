@@ -172,6 +172,17 @@ class FastParser
     }
 
     /**
+     * Whether a dash at the start of the string is followed by whitespace other than a space.
+     * Symfony treats a form feed or Unicode whitespace there as a separator too, so the
+     * dash would start a sequence item.
+     */
+    private function dashWithOtherWhitespace(string $s): bool
+    {
+        return isset($s[1]) && $s[0] === '-'
+            && ($s[1] === "\f" || $s[1] >= "\x80" && preg_match('/^-\s/u', $s));
+    }
+
+    /**
      * @param  string|null  $line  The first line, when it isn't the current line as written ("- key: value").
      */
     private function parseMapping(int $indent, ?string $line): array
@@ -323,8 +334,12 @@ class FastParser
 
             $c = $rest[0];
 
-            if ($c === '-' && (! isset($rest[1]) || $rest[1] === ' ' || str_starts_with($rest, '---')) || $c === '.' && str_starts_with($rest, '...')) {
+            if ($c === '-' && (! isset($rest[1]) || $rest[1] === ' ' || str_starts_with($rest, '---') || $this->dashWithOtherWhitespace($rest)) || $c === '.' && str_starts_with($rest, '...')) {
                 $this->fail(); // "- - x", or document markers.
+            }
+
+            if (($c === "\f" || $c >= "\x80") && preg_match('/^\s/u', $rest)) {
+                $this->fail(); // Symfony strips other whitespace after the dash too.
             }
 
             if ((str_contains($rest, ': ') || $rest[-1] === ':')
@@ -423,7 +438,7 @@ class FastParser
             }
         }
 
-        if (str_contains(' \'"[{!#&*?%@`|>~.', $c) || str_contains($raw, ' ') || str_starts_with($raw, '---')) {
+        if (str_contains(' \'"[{!#&*?%@`|>~.', $c) || str_contains($raw, ' ') || str_starts_with($raw, '---') || $this->dashWithOtherWhitespace($raw)) {
             return null;
         }
 
@@ -458,7 +473,7 @@ class FastParser
         $c = $line[0];
 
         if (str_contains('#&*!?%@`{[|>', $c)
-            || $c === '-' && (! isset($line[1]) || $line[1] === ' ')
+            || $c === '-' && (! isset($line[1]) || $line[1] === ' ' || $this->dashWithOtherWhitespace($line))
             || str_starts_with($line, '---')
             || str_starts_with($line, '...')
         ) {

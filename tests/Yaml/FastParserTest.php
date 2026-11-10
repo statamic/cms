@@ -128,7 +128,18 @@ class FastParserTest extends TestCase
             'invalid: unexpected indentation' => "a: 1\n  b: 2\n",
             'invalid: mapping in sequence' => "a:\n  - x\n  b: 1\n",
             'invalid: utf-8' => "a: \xff\n",
-        ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
+            'invalid: mapping after a sequence item with a non-breaking space' => "-\u{A0}x: y\nb: z\n",
+            'invalid: quote after a non-breaking space in a sequence item' => "a:\n  - \u{A0}'\n",
+
+            'non-breaking space after a sequence dash' => "- \u{A0}x\na:\n  - \u{A0}b\n",
+            'non-breaking space as a sequence separator' => "-\u{A0}x: y\n",
+            'nested non-breaking space as a sequence separator' => "a:\n  -\u{A0}b: 1\n",
+            'non-breaking space in a nested sequence item' => "- -\u{A0}x\n",
+            'unicode whitespace after a sequence dash' => "- \u{2003}x\n- \u{3000}y\n- \u{2028}z\n",
+            'form feed after a sequence dash' => "- \fx\n",
+            'form feed as a sequence separator' => "-\fa: 1\n",
+            'non-breaking space as a key' => "-\u{A0}null: x\n",
+            'non-breaking spaces elsewhere' => "a: \u{A0}x\nb: x\u{A0}\n\u{A0}c: x\nd:\u{A0}x\ne:\n  - a:\u{A0}b\n",        ])->mapWithKeys(fn ($yaml, $name) => [$name => [$yaml]])->all();
     }
 
     /**
@@ -252,6 +263,7 @@ class FastParserTest extends TestCase
         "'single'", "'it''s'", "''", '""', '"double"', '"esc\\"aped"', '"uni\\u00e9"', "'a\"b'", "'unterminated", '"unterminated',
         '{ }', '[]', '[a, b]', '{ a: 1 }', '&anchor foo', '*alias', '!tag foo', '!!str 1', '? complex', '@at', '`tick', '%pct',
         'café', '日本語', 'with space', '-', '- x', '---', '...', ':', 'a:', ',', '<<', '\\', 'v1.2.3', '-foo', '.foo', '_foo',
+        "\u{A0}", "-\u{A0}", "\u{2003}x", "\fx", "-\f",
     ];
 
     private function randomScalar(): string
