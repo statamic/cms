@@ -3,6 +3,7 @@
 namespace Statamic\Auth\WebAuthn;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Statamic\Contracts\Auth\Passkey as Contract;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -68,7 +69,7 @@ abstract class Passkey implements Contract
         return $this->lastLogin;
     }
 
-    public function setLastLogin(null|int|Carbon $time): Contract
+    public function setLastLogin(null|int|CarbonInterface $time): Contract
     {
         if ($time === null) {
             $this->lastLogin = null;
@@ -76,7 +77,7 @@ abstract class Passkey implements Contract
             return $this;
         }
 
-        $this->lastLogin = $time instanceof Carbon ? $time : Carbon::createFromTimestamp($time);
+        $this->lastLogin = is_int($time) ? Carbon::createFromTimestamp($time) : Carbon::instance($time);
 
         return $this;
     }

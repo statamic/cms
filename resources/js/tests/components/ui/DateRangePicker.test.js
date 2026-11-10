@@ -2,15 +2,16 @@ import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import { CalendarDateTime, toZoned } from '@internationalized/date';
 import DateRangePicker from '@/components/ui/DateRangePicker/DateRangePicker.vue';
+import TimezoneHoverCard from '@/components/ui/TimezoneHoverCard.vue';
 import { config } from '@api';
 
 window.__ = (key) => key;
 
 config.initialize({ translationLocale: 'en' });
 
-const makeDateRangePicker = (modelValue) => {
+const makeDateRangePicker = (modelValue, granularity = 'minute') => {
     return mount(DateRangePicker, {
-        props: { modelValue, granularity: 'minute' },
+        props: { modelValue, granularity },
         global: {
             mocks: {
                 $date: { locale: 'en-US' },
@@ -59,4 +60,19 @@ test('day period reflects the zoned date rather than the browser timezone when o
 
     expect(dateRangePicker.get(segment('end', 'hour')).text()).toBe('4');
     expect(dateRangePicker.get(segment('end', 'dayPeriod')).text()).toBe('PM');
+});
+
+test.each([
+    ['minute', false],
+    ['second', true],
+])('the timezone hover card with %s granularity shows seconds: %s', (granularity, showSeconds) => {
+    const dateRangePicker = makeDateRangePicker(
+        {
+            start: toZoned(new CalendarDateTime(2024, 1, 20, 15, 30, 27), 'Europe/London'),
+            end: toZoned(new CalendarDateTime(2024, 1, 21, 16, 30, 27), 'Europe/London'),
+        },
+        granularity,
+    );
+
+    expect(dateRangePicker.findComponent(TimezoneHoverCard).props('showSeconds')).toBe(showSeconds);
 });
