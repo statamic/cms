@@ -474,11 +474,17 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     {
         $asset = $this->makeAsset($path);
 
+        if (! $asset->verifyExists()) {
+            return null;
+        }
+
+        $asset->hydrate()->syncOriginal();
+
         if (! $asset->exists()) {
             return null;
         }
 
-        return $asset->hydrate()->syncOriginal();
+        return $asset;
     }
 
     /**

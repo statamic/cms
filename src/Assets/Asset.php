@@ -8,6 +8,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -76,6 +78,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
+    protected $forgettingMissingFile = false;
 
     public function syncOriginal()
     {
@@ -230,6 +233,34 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->files()->contains($path);
     }
 
+    /**
+     * Confirm a cached listing entry against the disk.
+     *
+     * The listing can still name a file that has been removed. Metadata reads
+     * then ask Flysystem for the file size and throw. Drop that path and
+     * report the asset as missing.
+     */
+    public function verifyExists(): bool
+    {
+        if (! $this->exists()) {
+            return false;
+        }
+
+        try {
+            $exists = $this->disk()->exists($this->path());
+        } catch (UnableToRetrieveMetadata|UnableToReadFile) {
+            $exists = false;
+        }
+
+        if ($exists) {
+            return true;
+        }
+
+        $this->forgetMissingFile();
+
+        return false;
+    }
+
     public function getRawMeta()
     {
         return $this->meta;
@@ -260,15 +291,25 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $meta;
         }
 
-        return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
+        $meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
             if ($contents = $this->disk()->get($path = $this->metaPath())) {
                 return YAML::file($path)->parse($contents);
             }
 
-            $this->writeMeta($meta = $this->generateMeta());
+            $meta = $this->generateMeta();
+
+            if ($this->exists()) {
+                $this->writeMeta($meta);
+            }
 
             return $meta;
         });
+
+        if (! $this->exists()) {
+            $this->cacheStore()->forget($this->metaCacheKey());
+        }
+
+        return $this->meta = $meta;
     }
 
     private function metaValue($key)
@@ -281,7 +322,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->cacheStore()->forget($this->metaCacheKey());
 
-        $this->writeMeta($meta = $this->generateMeta());
+        $meta = $this->generateMeta();
+
+        if ($this->exists()) {
+            $this->writeMeta($meta);
+        }
 
         return Arr::get($meta, $key);
     }
@@ -291,19 +336,44 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $attributes = Attributes::asset($this)->get();
+            try {
+                $attributes = Attributes::asset($this)->get();
 
-            $meta = array_merge($meta, [
-                'size' => $this->disk()->size($this->path()),
-                'last_modified' => $this->disk()->lastModified($this->path()),
-                'width' => Arr::get($attributes, 'width'),
-                'height' => Arr::get($attributes, 'height'),
-                'mime_type' => $this->disk()->mimeType($this->path()),
-                'duration' => Arr::get($attributes, 'duration'),
-            ]);
+                $meta = array_merge($meta, [
+                    'size' => $this->disk()->size($this->path()),
+                    'last_modified' => $this->disk()->lastModified($this->path()),
+                    'width' => Arr::get($attributes, 'width'),
+                    'height' => Arr::get($attributes, 'height'),
+                    'mime_type' => $this->disk()->mimeType($this->path()),
+                    'duration' => Arr::get($attributes, 'duration'),
+                ]);
+            } catch (UnableToRetrieveMetadata|UnableToReadFile) {
+                $this->forgetMissingFile();
+
+                return ['data' => $this->data->all()];
+            }
         }
 
         return $meta;
+    }
+
+    /**
+     * The cached directory listing still names this path, but the file is gone.
+     * Drop the path so later reads treat it as missing instead of asking Flysystem
+     * for metadata and throwing.
+     */
+    private function forgetMissingFile(): void
+    {
+        if ($this->forgettingMissingFile) {
+            return;
+        }
+
+        $this->forgettingMissingFile = true;
+
+        $this->meta = null;
+        $this->cacheStore()->forget($this->metaCacheKey());
+
+        Facades\Asset::delete($this);
     }
 
     public function metaPath()

@@ -817,6 +817,39 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function a_listed_path_whose_file_is_missing_is_not_an_asset()
+    {
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        $this->assertNull($container->asset($missing));
+        $this->assertMissingPathWasDropped($container, $missing);
+
+        $kept = $container->asset('keep.txt');
+
+        $this->assertInstanceOf(AssetContract::class, $kept);
+        $this->assertSame('keep.txt', $kept->path());
+
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        $this->assertNull($container->queryAssets()->where('path', $missing)->first());
+        $this->assertMissingPathWasDropped($container, $missing);
+    }
+
+    #[Test]
+    public function reading_meta_for_a_listed_path_whose_file_is_missing_does_not_throw()
+    {
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        $asset = $container->makeAsset($missing);
+
+        $this->assertSame(['data' => []], $asset->meta());
+        $this->assertSame(['data' => []], $asset->generateMeta());
+        $this->assertFalse($asset->exists());
+        $this->assertFalse(Storage::disk('stale_assets')->exists('social_images/collection-events/.meta/missing.png.yaml'));
+        $this->assertMissingPathWasDropped($container, $missing);
+    }
+
+    #[Test]
     public function it_makes_an_asset_at_given_path()
     {
         $container = $this->containerWithDisk();
@@ -1099,5 +1132,52 @@ class AssetContainerTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->andReturn($container);
 
         return $container;
+    }
+
+    private function containerWithStaleListedFile(): array
+    {
+        Blink::flush();
+
+        Storage::fake('stale_assets');
+        Storage::disk('stale_assets')->put('keep.txt', 'still here');
+
+        $missing = 'social_images/collection-events/missing.png';
+        $handle = 'stale_'.md5($missing.microtime());
+
+        Cache::put('asset-list-contents-'.$handle, collect([
+            'keep.txt' => [
+                'type' => 'file',
+                'path' => 'keep.txt',
+                'basename' => 'keep.txt',
+                'filename' => 'keep',
+                'dirname' => '',
+                'extension' => 'txt',
+            ],
+            $missing => [
+                'type' => 'file',
+                'path' => $missing,
+                'basename' => 'missing.png',
+                'filename' => 'missing',
+                'dirname' => 'social_images/collection-events',
+                'extension' => 'png',
+            ],
+        ]));
+
+        $container = (new AssetContainer)->handle($handle)->disk('stale_assets');
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with($handle)->andReturn($container);
+
+        return [$container, $missing];
+    }
+
+    private function assertMissingPathWasDropped($container, string $missing): void
+    {
+        $listed = Cache::get('asset-list-contents-'.$container->handle());
+
+        $this->assertFalse(
+            $listed?->has($missing) ?? false,
+            'Missing path is still listed: '.json_encode($listed?->keys()->all())
+        );
+        $this->assertTrue($listed->has('keep.txt'));
     }
 }
