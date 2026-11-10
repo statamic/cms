@@ -2,10 +2,8 @@
 
 namespace Statamic\Yaml;
 
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Inline;
 use Symfony\Component\Yaml\Parser;
-use Symfony\Component\Yaml\Tag\TaggedValue;
 use Throwable;
 
 /**
@@ -15,9 +13,9 @@ use Throwable;
  * the block's lines and parses them again with a new parser, so each line is scanned once
  * per level of nesting. Content like Bard is deeply nested, which makes that expensive.
  *
- * This parser walks the lines once, keeping a stack of the open mappings and sequences.
- * Simple keys and values are read directly, and everything else is handed to Symfony's
- * own inline parser, so values are interpreted exactly as Symfony would interpret them.
+ * This parser walks the lines once, descending into each nested block as it meets it.
+ * Plain keys and the most common values are read directly. Any other key or value is
+ * handed to Symfony's inline parser, so it is read exactly as Symfony would read it.
  *
  * Anything outside the subset it understands (comments, anchors, tags, multi-line flow
  * collections or plain scalars, invalid YAML, etc.) makes it give up, and the whole
@@ -27,390 +25,628 @@ use Throwable;
  */
 class FastParser
 {
-    private const WORD_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
+    private const WORD = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
 
-    private const PLAIN_CHARS = self::WORD_CHARS.'./';
-
-    /**
-     * Plain scalars that Symfony gives a special meaning to, by their lowercase form.
-     */
-    private const RESERVED = ['null' => null, '~' => null, 'true' => true, 'false' => false];
+    private const HEX = '0123456789abcdef-';
 
     /**
-     * Deeper documents are left to Symfony, which applies its own nesting limit. This is
-     * well below Symfony's default limit, and far deeper than real content goes.
+     * First characters of a plain value that Symfony always reads as a string,
+     * apart from null, true and false.
      */
-    private const MAX_DEPTH = 64;
+    private const PLAIN = [
+        'a' => 1, 'b' => 1, 'c' => 1, 'd' => 1, 'e' => 1, 'f' => 1, 'g' => 1, 'h' => 1, 'i' => 1, 'j' => 1, 'k' => 1, 'l' => 1, 'm' => 1,
+        'n' => 1, 'o' => 1, 'p' => 1, 'q' => 1, 'r' => 1, 's' => 1, 't' => 1, 'u' => 1, 'v' => 1, 'w' => 1, 'x' => 1, 'y' => 1, 'z' => 1,
+        'A' => 1, 'B' => 1, 'C' => 1, 'D' => 1, 'E' => 1, 'F' => 1, 'G' => 1, 'H' => 1, 'I' => 1, 'J' => 1, 'K' => 1, 'L' => 1, 'M' => 1,
+        'N' => 1, 'O' => 1, 'P' => 1, 'Q' => 1, 'R' => 1, 'S' => 1, 'T' => 1, 'U' => 1, 'V' => 1, 'W' => 1, 'X' => 1, 'Y' => 1, 'Z' => 1,
+        '_' => 1, '/' => 1, '(' => 1, '$' => 1, '=' => 1, ';' => 1, '^' => 1, '<' => 1,
+    ];
 
-    public function __construct(private Parser $symfony = new Parser)
-    {
-    }
+    private const RESERVED = ['null' => null, 'true' => true, 'false' => false];
+
+    /**
+     * Deeper indentation is left to Symfony, which applies its own nesting limit.
+     */
+    private const MAX_INDENT = 100;
+
+    /**
+     * Parsed keys are remembered for the life of the process. This caps how many, so
+     * long-running processes (Octane, queue workers) don't grow without limit.
+     */
+    private const MAX_CACHED_KEYS = 2000;
+
+    /** Raw key text => parsed key, for keys already proven safe. */
+    private static array $keys = [];
+
+    private static ?CannotFastParse $cannot = null;
+
+    private static ?Parser $symfony = null;
+
+    private array $lines = [];
+
+    private int $count = 0;
+
+    /** The current line. */
+    private int $p = 0;
+
+    /** Lines Symfony strips from the top (the "---" marker and blank lines). */
+    private int $lead = 0;
+
+    /** How many "- key: value" mappings are open. */
+    private int $compact = 0;
+
+    /** Whether the document has tabs, which are only understood inside literal blocks. */
+    private bool $tabs = false;
 
     public function parse(string $yaml, int $flags = 0): mixed
     {
         // Flags change how values are interpreted, which we leave to Symfony.
         if ($flags === 0) {
             try {
-                return $this->parseBlocks($yaml);
+                return (new static)->parseBlocks($yaml);
             } catch (CannotFastParse) {
                 //
             }
         }
 
-        return $this->symfony->parse($yaml, $flags);
+        return self::symfony()->parse($yaml, $flags);
+    }
+
+    private static function symfony(): Parser
+    {
+        // Symfony's parser resets its state on every parse, so one can be reused.
+        return self::$symfony ??= new Parser;
     }
 
     private function parseBlocks(string $yaml): array
     {
-        if (str_contains($yaml, "\t") || str_contains($yaml, "\r") || str_starts_with($yaml, "\xEF\xBB\xBF") || ! preg_match('//u', $yaml)) {
-            throw new CannotFastParse;
+        if ($yaml === '' || strpbrk($yaml, "\r\0\x0B") !== false || str_starts_with($yaml, "\xEF\xBB\xBF") || ! preg_match('//u', $yaml)) {
+            $this->fail();
         }
 
-        $lines = explode("\n", $yaml);
+        $this->lead = 0;
+        $this->compact = 0;
 
         // Front matter arrives with its opening "---" line, which Symfony ignores.
-        if ($lines[0] === '---') {
-            array_shift($lines);
+        if (str_starts_with($yaml, "---\n")) {
+            $yaml = substr($yaml, 4);
+            $this->lead = 1;
         }
 
-        $count = count($lines);
+        $this->tabs = str_contains($yaml, "\t");
+        $this->lines = $lines = explode("\n", $yaml);
+        $this->count = $count = count($lines);
 
         Inline::initialize(0);
 
-        $root = null;
-        $stack = [];
+        $p = 0;
 
-        // When a line ends a key or sequence item with no value, its value is whatever
-        // nested block follows. This holds that line's indentation until we know.
-        $pending = null;
+        while ($p < $count && $lines[$p] === '') {
+            $p++;
+        }
 
-        $i = 0;
+        $this->p = $p;
+        $this->lead += $p;
 
-        while ($i < $count) {
-            $line = $lines[$i];
-            $trimmed = ltrim($line, ' ');
+        if ($p >= $count || $lines[$p][0] === ' ') {
+            $this->fail();
+        }
 
-            if ($trimmed === '') {
-                $i++;
+        $result = $this->isSequenceItem($lines[$p], 0)
+            ? $this->parseSequence(0)
+            : $this->parseMapping(0, null);
 
-                continue;
-            }
+        // Anything left over (such as a less indented line) is for Symfony to explain.
+        if ($this->p < $count) {
+            $this->fail();
+        }
 
-            $indent = strlen($line) - strlen($trimmed);
-            $c = $trimmed[0];
+        return $result;
+    }
 
-            if (str_contains('#&*!?%@`{[|>', $c)
-                || ($c === '"' || $c === "'") && ! $this->startsWithQuotedKey($trimmed)
-                || str_starts_with($trimmed, '---')
-                || str_starts_with($trimmed, '...')
-            ) {
-                throw new CannotFastParse;
-            }
+    private function fail(): never
+    {
+        // Reused, as building an exception's stack trace is the slowest part of giving up.
+        throw self::$cannot ??= new CannotFastParse;
+    }
 
-            $isSequenceItem = $c === '-' && (! isset($trimmed[1]) || $trimmed[1] === ' ');
+    private function isSequenceItem(string $line, int $indent): bool
+    {
+        return $line[$indent] === '-' && (! isset($line[$indent + 1]) || $line[$indent + 1] === ' ');
+    }
 
-            if ($pending !== null) {
-                [$pendingIndent, $pendingIsKey] = $pending;
-                $pending = null;
+    /**
+     * @param  string|null  $line  The first line, when it isn't the current line as written ("- key: value").
+     */
+    private function parseMapping(int $indent, ?string $line): array
+    {
+        $data = [];
+        $keys = 0;
+        $lines = $this->lines;
+        $count = $this->count;
+        $p = $this->p;
+        $tabs = $this->tabs;
 
-                // A key's value may also be a sequence at the key's own indentation.
-                $isUnindentedSequence = $pendingIsKey && $indent === $pendingIndent && $isSequenceItem;
-
-                if ($indent > $pendingIndent || $isUnindentedSequence) {
-                    $stack[] = new FastParserFrame($indent, $isSequenceItem, $isUnindentedSequence);
-                } else {
-                    $this->setLastValue($stack, null);
-                }
-            }
-
-            if ($stack === []) {
-                if ($indent !== 0) {
-                    throw new CannotFastParse;
-                }
-
-                $stack[] = new FastParserFrame(0, $isSequenceItem);
-            }
-
-            // Close any collections this line has moved out of.
-            while (true) {
-                $top = end($stack);
-
-                if ($indent > $top->indent) {
-                    // Indented without a key or sequence item opening a block.
-                    throw new CannotFastParse;
-                }
-
-                if ($indent === $top->indent && ! ($top->unindentedSequence && ! $isSequenceItem)) {
+        while (true) {
+            if ($line === null) {
+                if ($p >= $count) {
                     break;
                 }
 
-                $this->close($stack, $root);
-
-                if ($stack === []) {
-                    throw new CannotFastParse;
-                }
+                $line = $lines[$p];
             }
 
-            if (count($stack) > self::MAX_DEPTH) {
-                throw new CannotFastParse;
-            }
+            $i = strspn($line, ' ');
 
-            $frame = end($stack);
+            if ($i !== $indent || ! isset($line[$i])) {
+                if (! isset($line[$i])) {
+                    if ($i) {
+                        $this->fail(); // Whitespace-only lines can change how Symfony reads what follows.
+                    }
 
-            if ($isSequenceItem) {
-                if (! $frame->isSequence) {
-                    throw new CannotFastParse;
-                }
-
-                $rest = ltrim(substr($trimmed, 1), ' ');
-
-                if ($rest === '') {
-                    $frame->data[] = null;
-                    $pending = [$indent, false];
-                    $i++;
+                    $p++;
+                    $line = null;
 
                     continue;
                 }
 
-                if ($rest[0] === '-' && (! isset($rest[1]) || $rest[1] === ' ')
-                    || str_starts_with($rest, '---')
-                    || str_starts_with($rest, '...')
-                ) {
-                    throw new CannotFastParse;
+                if ($i < $indent) {
+                    break;
                 }
 
-                if ($this->isCompactMapping($rest)) {
-                    // "- key: value" starts a mapping indented to the key. Re-read the
-                    // line as the first key of that mapping.
-                    $frame->data[] = null;
-                    $childIndent = $indent + strlen($trimmed) - strlen($rest);
-                    $stack[] = new FastParserFrame($childIndent, false, compact: true);
-                    $lines[$i] = str_repeat(' ', $childIndent).$rest;
-
-                    continue;
-                }
-
-                $frame->data[] = $this->scalar($rest, $lines, $i);
-                $i++;
-
-                continue;
+                $this->fail();
             }
 
-            if ($frame->isSequence) {
-                throw new CannotFastParse;
+            if ($tabs && str_contains($line, "\t")) {
+                $this->fail();
             }
 
-            [$key, $value] = $this->splitKey($trimmed);
+            $pos = strpos($line, ':', $i);
 
-            if (array_key_exists($key, $frame->data)) {
-                throw new CannotFastParse; // Let Symfony report the duplicate key.
+            if ($pos !== false && (! isset($line[$pos + 1]) || $line[$pos + 1] === ' ')
+                && ($key = self::$keys[$raw = substr($line, $i, $pos - $i)] ?? $this->key($raw)) !== null
+            ) {
+                $value = isset($line[$pos + 2]) ? trim(substr($line, $pos + 2), ' ') : '';
+            } else {
+                [$key, $value] = $this->splitKey(substr($line, $i));
             }
 
-            $frame->lastKey = $key;
+            $p++;
+            $line = null;
 
             if ($value === '') {
-                $frame->data[$key] = null;
-                $pending = [$indent, true];
-                $i++;
-
-                continue;
+                // The value is the nested block that follows, if there is one.
+                $this->p = $p;
+                $data[$key] = $this->child($indent, true);
+                $p = $this->p;
+            } elseif (isset(self::PLAIN[$c = $value[0]])) {
+                $data[$key] = strpbrk($value, ':#') !== false
+                    ? $this->inline($value, $c)
+                    : $this->plain($value);
+            } elseif ($c === "'" && $value[-1] === "'" && isset($value[1]) && strpos($value, "'", 1) === strlen($value) - 1) {
+                $data[$key] = substr($value, 1, -1);
+            } elseif ($c === '|') {
+                $this->p = $p;
+                $data[$key] = $this->literal($value, $indent);
+                $p = $this->p;
+            } else {
+                $data[$key] = $this->scalar($value, $c);
             }
 
-            if ($value[0] === '|') {
-                // Inside "- key: value" items, Symfony keeps or drops a block scalar's final
-                // newline depending on what follows the item. Statamic doesn't write that
-                // form, so we leave it to Symfony.
-                foreach ($stack as $open) {
-                    if ($open->compact) {
-                        throw new CannotFastParse;
+            if (count($data) !== ++$keys) {
+                $this->fail(); // A duplicate key: let Symfony report it.
+            }
+        }
+
+        $this->p = $p;
+
+        return $data;
+    }
+
+    private function parseSequence(int $indent): array
+    {
+        $data = [];
+        $lines = $this->lines;
+        $count = $this->count;
+        $p = $this->p;
+        $tabs = $this->tabs;
+
+        while ($p < $count) {
+            $line = $lines[$p];
+            $i = strspn($line, ' ');
+
+            if ($i !== $indent || ! isset($line[$i])) {
+                if (! isset($line[$i])) {
+                    if ($i) {
+                        $this->fail();
                     }
+
+                    $p++;
+
+                    continue;
                 }
 
-                [$frame->data[$key], $i] = $this->blockScalar($value, $lines, $i, $indent);
+                if ($i < $indent) {
+                    break;
+                }
+
+                $this->fail();
+            }
+
+            if ($line[$i] !== '-') {
+                break;
+            }
+
+            if (! isset($line[$i + 1])) {
+                // A dash on its own: the item is the block that follows.
+                $this->p = $p + 1;
+                $data[] = $this->child($indent, false);
+                $p = $this->p;
 
                 continue;
             }
 
-            $frame->data[$key] = $this->scalar($value, $lines, $i);
-            $i++;
+            if ($line[$i + 1] !== ' ' || $tabs && str_contains($line, "\t")) {
+                $this->fail();
+            }
+
+            $rest = trim(substr($line, $i + 2), ' ');
+
+            if ($rest === '') {
+                $this->p = $p + 1;
+                $data[] = $this->child($indent, false);
+                $p = $this->p;
+
+                continue;
+            }
+
+            $c = $rest[0];
+
+            if ($c === '-' && (! isset($rest[1]) || $rest[1] === ' ' || str_starts_with($rest, '---')) || $c === '.' && str_starts_with($rest, '...')) {
+                $this->fail(); // "- - x", or document markers.
+            }
+
+            if ((str_contains($rest, ': ') || $rest[-1] === ':')
+                && preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $rest)
+            ) {
+                // "- key: value" starts a mapping indented to the key, with this line as its first.
+                $offset = strlen(rtrim($line, ' ')) - strlen($rest);
+                $this->p = $p;
+                $this->compact++;
+                $data[] = $this->parseMapping($offset, str_repeat(' ', $offset).$rest);
+                $this->compact--;
+                $p = $this->p;
+
+                continue;
+            }
+
+            $p++;
+            $data[] = $this->scalar($rest, $c);
         }
 
-        if ($pending !== null) {
-            $this->setLastValue($stack, null);
-        }
+        $this->p = $p;
 
-        while ($stack !== []) {
-            $this->close($stack, $root);
-        }
-
-        if (! is_array($root)) {
-            throw new CannotFastParse;
-        }
-
-        return $root;
+        return $data;
     }
 
     /**
-     * Close the innermost collection and set it as its parent's latest value.
+     * The nested block that follows a key or sequence item with no value of its own.
      */
-    private function close(array &$stack, ?array &$root): void
+    private function child(int $indent, bool $allowUnindentedSequence): ?array
     {
-        $frame = array_pop($stack);
+        $p = $this->p;
 
-        if ($stack === []) {
-            $root = $frame->data;
-
-            return;
+        if ($p >= $this->count) {
+            return null;
         }
 
-        $this->setLastValue($stack, $frame->data);
-    }
+        $line = $this->lines[$p];
 
-    private function setLastValue(array $stack, mixed $value): void
-    {
-        $frame = end($stack);
+        if ($line === '') {
+            // Symfony reads an empty value followed by a blank line differently depending on
+            // what comes after it (an unindented list is an error), unless only blank lines follow.
+            while ($p < $this->count && $this->lines[$p] === '') {
+                $p++;
+            }
 
-        $frame->data[$frame->isSequence ? array_key_last($frame->data) : $frame->lastKey] = $value;
-    }
+            if ($p < $this->count) {
+                $this->fail();
+            }
 
-    private function startsWithQuotedKey(string $line): bool
-    {
-        return (bool) preg_match('/^(?:'.Inline::REGEX_QUOTED_STRING.') *:(?: |$)/u', $line);
+            $this->p = $p;
+
+            return null;
+        }
+
+        $i = strspn($line, ' ');
+
+        if (! isset($line[$i])) {
+            $this->fail();
+        }
+
+        if ($i > $indent) {
+            if ($i > self::MAX_INDENT) {
+                $this->fail();
+            }
+
+            return $this->isSequenceItem($line, $i)
+                ? $this->parseSequence($i)
+                : $this->parseMapping($i, null);
+        }
+
+        // A key's value may also be a sequence at the key's own indentation.
+        if ($allowUnindentedSequence && $i === $indent && $this->isSequenceItem($line, $i)) {
+            return $this->parseSequence($indent);
+        }
+
+        return null;
     }
 
     /**
-     * Whether a sequence item's value is a mapping, using the same check as Symfony.
+     * A plain key not seen before, or null when the line needs the full key pattern.
      */
-    private function isCompactMapping(string $value): bool
+    private function key(string $raw): string|int|null
     {
-        return (bool) preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        $c = $raw[0];
+
+        // Plain words are returned as they are, unless they could be a number,
+        // a sequence item or a reserved word.
+        if (strspn($raw, self::WORD) === strlen($raw)) {
+            if ($c !== '-' && ($c < '0' || $c > '9') && ! array_key_exists(strtolower($raw), self::RESERVED)) {
+                return $this->rememberKey($raw, $raw);
+            }
+
+            if ($c === '-' && ($raw === '-' || str_starts_with($raw, '---'))) {
+                return null;
+            }
+        }
+
+        if (str_contains(' \'"[{!#&*?%@`|>~.', $c) || str_contains($raw, ' ') || str_starts_with($raw, '---')) {
+            return null;
+        }
+
+        try {
+            $key = Inline::parseScalar($raw);
+        } catch (Throwable) {
+            $this->fail();
+        }
+
+        // Symfony rejects other key types, and "<<" is a merge key.
+        if (! is_string($key) && ! is_int($key) || $raw === '<<') {
+            $this->fail();
+        }
+
+        return $this->rememberKey($raw, $key);
+    }
+
+    private function rememberKey(string $raw, string|int $key): string|int
+    {
+        if (count(self::$keys) >= self::MAX_CACHED_KEYS) {
+            self::$keys = [];
+        }
+
+        return self::$keys[$raw] = $key;
     }
 
     /**
-     * Split a "key: value" line, interpreting the key the same way Symfony does.
+     * Split a "key: value" line the way Symfony does, for keys the fast path doesn't cover.
      */
     private function splitKey(string $line): array
     {
-        // Most keys are plain words, which Symfony would return as they are.
-        $pos = strpos($line, ':');
+        $c = $line[0];
 
-        if ($pos > 0
-            && (! isset($line[$pos + 1]) || $line[$pos + 1] === ' ')
-            && strspn($line, self::WORD_CHARS, 0, $pos) === $pos
-            && ! ctype_digit($line[0]) && $line[0] !== '-'
-            && ! array_key_exists(strtolower(substr($line, 0, $pos)), self::RESERVED)
+        if (str_contains('#&*!?%@`{[|>', $c)
+            || $c === '-' && (! isset($line[1]) || $line[1] === ' ')
+            || str_starts_with($line, '---')
+            || str_starts_with($line, '...')
         ) {
-            return [substr($line, 0, $pos), trim(substr($line, $pos + 1), ' ')];
+            $this->fail();
+        }
+
+        if (($c === '"' || $c === "'") && ! preg_match('/^(?:'.Inline::REGEX_QUOTED_STRING.') *:(?: |$)/u', $line)) {
+            $this->fail();
         }
 
         if (! preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{!].*?) *\:(?: ++(?P<value>.+))?$#u', rtrim($line, ' '), $matches)) {
-            throw new CannotFastParse;
+            $this->fail();
         }
 
-        if (str_contains($matches['key'], ' #') && ! in_array($matches['key'][0], ['"', "'"], true)) {
-            throw new CannotFastParse;
+        if (str_contains($matches['key'], ' #') && $c !== '"' && $c !== "'") {
+            $this->fail();
         }
 
-        $key = Inline::parseScalar($matches['key']);
+        try {
+            $key = Inline::parseScalar($matches['key']);
+        } catch (Throwable) {
+            $this->fail();
+        }
 
-        // Symfony rejects other key types, and "<<" is a merge key.
         if (! is_string($key) && ! is_int($key) || $key === '<<') {
-            throw new CannotFastParse;
+            $this->fail();
         }
 
         return [$key, $matches['value'] ?? ''];
     }
 
     /**
-     * Interpret a value that fits on a single line.
+     * A plain value with no colon or hash, which Symfony reads as a string unless it's reserved.
      */
-    private function scalar(string $value, array $lines, int $i): mixed
+    private function plain(string $value): mixed
     {
-        $value = rtrim($value, ' ');
-        $c = $value[0];
-        $quoted = $c === '"' || $c === "'";
+        return isset($value[5]) || ! array_key_exists($lower = strtolower($value), self::RESERVED)
+            ? $value
+            : self::RESERVED[$lower];
+    }
 
-        if (str_contains('&*!|>#?', $c)
-            // Symfony checks for stray characters after a flow collection, which Inline doesn't.
-            || $c === '{' && ! str_ends_with($value, '}')
-            || $c === '[' && ! str_ends_with($value, ']')
-            // Symfony rejects some plain values containing a colon.
-            || ! $quoted && (str_contains($value, ': ') || str_ends_with($value, ':'))
-            // A plain value that continues onto more indented lines.
-            || ! $quoted && $c !== '{' && $c !== '[' && $this->nextLineIsMoreIndented($lines, $i)
-        ) {
-            throw new CannotFastParse;
-        }
-
-        // Shortcuts for the most common values, where Symfony's result is certain.
+    private function scalar(string $value, string $c): mixed
+    {
         $length = strlen($value);
 
-        if ($quoted && $length > 1 && $value[$length - 1] === $c && strpos($value, $c, 1) === $length - 1 && ($c === "'" || ! str_contains($value, '\\'))) {
-            return substr($value, 1, -1);
+        if ($c === "'") {
+            if ($length > 1 && $value[$length - 1] === "'") {
+                $inner = substr($value, 1, -1);
+
+                if (! str_contains($inner, "'")) {
+                    return $inner;
+                }
+
+                if (! str_contains(str_replace("''", '', $inner), "'")) {
+                    return str_replace("''", "'", $inner);
+                }
+            }
+        } elseif ($c >= '0' && $c <= '9') {
+            if ($length < 19 && ctype_digit($value) && ($c !== '0' || $length === 1)) {
+                return (int) $value;
+            }
+
+            if ($length === 36 && $value[8] === '-' && strspn($value, self::HEX) === 36) {
+                return $value; // A UUID.
+            }
+        } elseif ($c === '"') {
+            if ($length > 1 && $value[$length - 1] === '"' && strpos($value, '"', 1) === $length - 1 && ! str_contains($value, '\\')) {
+                return substr($value, 1, -1);
+            }
+        } elseif (isset(self::PLAIN[$c]) || $c >= "\x80") {
+            if (strpbrk($value, ':#') === false) {
+                return $this->plain($value);
+            }
+        } elseif ($value === '[]' || $value === '{}') {
+            return [];
         }
 
-        if (array_key_exists($lower = strtolower($value), self::RESERVED)) {
-            return self::RESERVED[$lower];
-        }
+        return $this->inline($value, $c);
+    }
 
-        if (ctype_alpha($c) && strspn($value, self::PLAIN_CHARS) === $length) {
-            return $value;
-        }
-
-        if ($length < 19 && ($value === '0' || preg_match('/^-?[1-9][0-9]*$/', $value))) {
-            return (int) $value;
+    /**
+     * Anything the shortcuts don't cover is read by Symfony's inline parser.
+     */
+    private function inline(string $value, string $c): mixed
+    {
+        if (str_contains('&*!|>#?', $c)
+            // Symfony reads flow collections with a stricter lexer than Inline, so only the simplest are taken.
+            || $c === '{' && ! preg_match('/^\{ *\}$/', $value)
+            || $c === '[' && ! preg_match('/^\[ *(?:[A-Za-z0-9_.\/-]+(?: *, *[A-Za-z0-9_.\/-]+)*)? *\]$/', $value)
+            // Symfony rejects some plain values containing a colon.
+            || $c !== '"' && $c !== "'" && (str_contains($value, ': ') || str_ends_with($value, ':'))
+        ) {
+            $this->fail();
         }
 
         try {
             $parsed = Inline::parse($value);
-        } catch (ParseException) {
-            throw new CannotFastParse; // e.g. a quoted string spanning multiple lines.
+        } catch (Throwable) {
+            $this->fail(); // e.g. a quoted string spanning multiple lines.
         }
 
-        if ($parsed instanceof TaggedValue || is_object($parsed)) {
-            throw new CannotFastParse;
+        if (is_object($parsed)) {
+            $this->fail();
         }
 
         return $parsed;
     }
 
-    private function nextLineIsMoreIndented(array $lines, int $i): bool
+    /**
+     * A literal block scalar. "|" and "|-" blocks are read directly; anything awkward
+     * is handed to Symfony as a small document of its own.
+     */
+    private function literal(string $header, int $indent): string
     {
-        $indent = strlen($lines[$i]) - strlen(ltrim($lines[$i], ' '));
-
-        for ($j = $i + 1, $count = count($lines); $j < $count; $j++) {
-            $trimmed = ltrim($lines[$j], ' ');
-
-            if ($trimmed !== '') {
-                return strlen($lines[$j]) - strlen($trimmed) > $indent;
-            }
+        if ($this->compact) {
+            // Inside "- key: value" items, Symfony keeps or drops a block's final newline
+            // depending on what follows the item.
+            $this->fail();
         }
 
-        return false;
+        if ($header !== '|' && $header !== '|-') {
+            return $this->literalBySymfony($header, $indent);
+        }
+
+        $lines = $this->lines;
+        $count = $this->count;
+        $block = [];
+        $blockIndent = null;
+        $j = $this->p;
+
+        while ($j < $count) {
+            $line = $lines[$j];
+            $i = strspn($line, ' ');
+
+            if (! isset($line[$i])) {
+                if ($line !== '') {
+                    return $this->literalBySymfony($header, $indent); // Whitespace-only lines.
+                }
+
+                $block[] = '';
+                $j++;
+
+                continue;
+            }
+
+            if ($i <= $indent) {
+                break;
+            }
+
+            if ($blockIndent === null) {
+                $blockIndent = $i;
+            } elseif ($i < $blockIndent) {
+                return $this->literalBySymfony($header, $indent);
+            }
+
+            $block[] = substr($line, $blockIndent);
+            $j++;
+        }
+
+        if ($blockIndent === null) {
+            $this->fail(); // An empty block holds different things depending on what follows.
+        }
+
+        if ($block[0] === '') {
+            return $this->literalBySymfony($header, $indent);
+        }
+
+        while (end($block) === '') {
+            array_pop($block);
+        }
+
+        if ($header === '|-') {
+            $this->p = $j;
+
+            return implode("\n", $block);
+        }
+
+        if ($j >= $count) {
+            return $this->literalBySymfony($header, $indent);
+        }
+
+        if ($count - $j <= $this->lead) {
+            // Symfony miscounts the end of the document by the lines it stripped from the
+            // top, and drops this block's final newline. Leave the document to it.
+            $this->fail();
+        }
+
+        $this->p = $j;
+
+        return implode("\n", $block)."\n";
     }
 
-    /**
-     * Parse a literal block scalar by handing it to Symfony as a small document of its
-     * own, so that chomping and indentation follow Symfony's rules exactly.
-     *
-     * @return array{mixed, int} The value, and the index of the line after the block.
-     */
-    private function blockScalar(string $header, array $lines, int $i, int $indent): array
+    private function literalBySymfony(string $header, int $indent): string
     {
-        $header = rtrim($header, ' ');
-
         if ($header !== '|' && $header !== '|-' && $header !== '|+') {
-            throw new CannotFastParse; // Indentation indicators, comments, etc.
+            $this->fail(); // Indentation indicators, comments, etc.
         }
 
+        $lines = $this->lines;
+        $count = $this->count;
         $block = ['k: '.$header];
-        $count = count($lines);
 
-        for ($j = $i + 1; $j < $count; $j++) {
+        for ($j = $this->p; $j < $count; $j++) {
             $line = $lines[$j];
-            $trimmed = ltrim($line, ' ');
+            $i = strspn($line, ' ');
 
-            if ($trimmed !== '' && strlen($line) - strlen($trimmed) <= $indent) {
+            if (isset($line[$i]) && $i <= $indent) {
                 break;
             }
 
@@ -418,13 +654,23 @@ class FastParser
             $block[] = strlen($line) > $indent ? substr($line, $indent) : '';
         }
 
-        try {
-            // The block's last line only ends with a newline if more lines followed it.
-            $value = $this->symfony->parse(implode("\n", $block).($j < $count ? "\n" : ''))['k'];
-        } catch (Throwable) {
-            throw new CannotFastParse;
+        if ($j < $count && $count - $j <= $this->lead && $header !== '|-') {
+            $this->fail(); // See literal().
         }
 
-        return [$value, $j];
+        try {
+            // The block's last line only ends with a newline if more lines followed it.
+            $value = self::symfony()->parse(implode("\n", $block).($j < $count ? "\n" : ''))['k'];
+        } catch (Throwable) {
+            $this->fail();
+        }
+
+        if (! is_string($value) || trim($value, "\n") === '') {
+            $this->fail();
+        }
+
+        $this->p = $j;
+
+        return $value;
     }
 }
