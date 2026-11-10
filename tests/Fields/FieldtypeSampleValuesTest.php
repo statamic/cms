@@ -105,6 +105,49 @@ class FieldtypeSampleValuesTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('textMatchingProvider')]
+    public function it_picks_text_preview_values_from_the_field(array $config, $expected)
+    {
+        $this->assertSame($expected, $this->field(['type' => 'text', ...$config])->fieldtype()->previewValue());
+    }
+
+    public static function textMatchingProvider()
+    {
+        $sentence = SampleValue::sentence();
+
+        return [
+            'input type wins over handle' => [['handle' => 'name', 'input_type' => 'email'], 'name@example.com'],
+            'autocomplete wins over handle' => [['handle' => 'name', 'autocomplete' => 'postal-code'], '97477'],
+            'autocomplete with section' => [['handle' => 'field', 'autocomplete' => 'shipping address-level2'], 'Springfield'],
+            'autocomplete given name' => [['handle' => 'field', 'autocomplete' => 'given-name'], 'Jane'],
+            'autocomplete organization' => [['handle' => 'field', 'autocomplete' => 'organization'], 'Acme Inc.'],
+            'unknown autocomplete falls through' => [['handle' => 'city', 'autocomplete' => 'off'], 'Springfield'],
+            'snake case handle' => [['handle' => 'first_name'], 'Jane'],
+            'camel case handle' => [['handle' => 'lastName'], 'Doe'],
+            'label with spaces' => [['handle' => 'field', 'display' => 'Given Name'], 'Jane'],
+            'hyphenated label' => [['handle' => 'field', 'display' => 'E-mail'], 'name@example.com'],
+            'email address' => [['handle' => 'email_address'], 'name@example.com'],
+            'company email' => [['handle' => 'company_email'], 'name@example.com'],
+            'company website' => [['handle' => 'company_website'], 'https://example.com'],
+            'company name' => [['handle' => 'company_name'], 'Acme Inc.'],
+            'city name' => [['handle' => 'city_name'], 'Springfield'],
+            'full name' => [['handle' => 'full_name'], 'Jane Doe'],
+            'phone number' => [['handle' => 'phone_number'], '555-0100'],
+            'zip code' => [['handle' => 'zip_code'], '97477'],
+            'job title' => [['handle' => 'job_title'], 'Product Manager'],
+            'message' => [['handle' => 'your_message'], SampleValue::paragraph()],
+            'hotel is not a phone' => [['handle' => 'hotel'], $sentence],
+            'statement is not a state' => [['handle' => 'statement'], $sentence],
+            'website title is a url' => [['handle' => 'website_title'], 'https://example.com'],
+            'title is not a job' => [['handle' => 'title'], $sentence],
+            'page title is not a job' => [['handle' => 'page_title'], $sentence],
+            'subtitle is not a job' => [['handle' => 'subtitle'], $sentence],
+            'username is not a name' => [['handle' => 'username'], $sentence],
+            'site is not a url' => [['handle' => 'site'], $sentence],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('fakeValueProvider')]
     public function it_gets_fake_values(array $config, \Closure $assertion)
     {

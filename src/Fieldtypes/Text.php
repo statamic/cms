@@ -223,41 +223,100 @@ class Text extends Fieldtype
 
     private function sampleKind(): ?string
     {
-        $inputType = match ($this->field()->get('input_type')) {
+        return $this->sampleKindFromInputType()
+            ?? $this->sampleKindFromAutocomplete()
+            ?? $this->sampleKindFromWords();
+    }
+
+    private function sampleKindFromInputType(): ?string
+    {
+        return match ($this->field()->get('input_type')) {
             'email' => 'email',
             'url' => 'url',
             'tel' => 'phone',
             default => null,
         };
+    }
 
-        if ($inputType) {
-            return $inputType;
+    private function sampleKindFromAutocomplete(): ?string
+    {
+        $autocomplete = $this->field()->get('autocomplete');
+
+        if (! is_string($autocomplete) || $autocomplete === '') {
+            return null;
         }
 
-        $haystack = str_replace(' ', '_', Str::lower(implode(' ', array_filter(
-            [$this->field()->handle(), $this->field()->display()],
-            fn ($part) => is_string($part) && $part !== ''
-        ))));
-
-        $looksLike = fn (array $tokens) => collect($tokens)->contains(fn ($token) => str_contains($haystack, $token));
-
-        return match (true) {
-            $looksLike(['email', 'e-mail']) => 'email',
-            $looksLike(['phone', 'tel', 'mobile', 'fax']) => 'phone',
-            $looksLike(['first_name', 'firstname', 'given_name']) => 'first_name',
-            $looksLike(['last_name', 'lastname', 'surname', 'family_name']) => 'last_name',
-            $looksLike(['full_name', 'name']) || $this->field()->get('autocomplete') === 'name' => 'name',
-            $looksLike(['company', 'organization', 'organisation', 'business']) => 'company',
-            $looksLike(['address', 'street']) => 'address',
-            $looksLike(['city', 'town']) => 'city',
-            $looksLike(['state', 'province', 'region']) => 'state',
-            $looksLike(['country']) => 'country',
-            $looksLike(['zip', 'postal', 'postcode']) => 'postcode',
-            $looksLike(['url', 'website', 'site']) => 'url',
-            $looksLike(['job', 'title', 'position', 'role']) => 'job',
-            $looksLike(['subject']) => 'subject',
-            $looksLike(['message', 'comment', 'notes', 'description', 'bio']) => 'paragraph',
+        return match (Str::afterLast(Str::lower(trim($autocomplete)), ' ')) {
+            'email' => 'email',
+            'url' => 'url',
+            'tel', 'tel-national', 'tel-local' => 'phone',
+            'given-name' => 'first_name',
+            'family-name' => 'last_name',
+            'name' => 'name',
+            'organization' => 'company',
+            'organization-title' => 'job',
+            'street-address', 'address-line1', 'address-line2', 'address-line3' => 'address',
+            'address-level2' => 'city',
+            'address-level1' => 'state',
+            'country', 'country-name' => 'country',
+            'postal-code' => 'postcode',
             default => null,
         };
+    }
+
+    private function sampleKindFromWords(): ?string
+    {
+        // Checked in order, so "company_email" is an email, "company_name" is a company and "city_name" is a city.
+        $kinds = [
+            'first_name' => [['first', 'name'], ['given', 'name'], ['firstname'], ['forename']],
+            'last_name' => [['last', 'name'], ['family', 'name'], ['lastname'], ['surname']],
+            'email' => [['email'], ['e', 'mail']],
+            'phone' => [['phone'], ['telephone'], ['tel'], ['mobile'], ['cell'], ['fax']],
+            'url' => [['url'], ['website'], ['homepage']],
+            'postcode' => [['postcode'], ['postal', 'code'], ['post', 'code'], ['zip'], ['zipcode']],
+            'company' => [['company'], ['organization'], ['organisation'], ['business'], ['employer']],
+            'address' => [['address'], ['street']],
+            'city' => [['city'], ['town']],
+            'state' => [['state'], ['province'], ['region'], ['county']],
+            'country' => [['country']],
+            'job' => [['job'], ['occupation'], ['position']],
+            'subject' => [['subject']],
+            'paragraph' => [['message'], ['comment'], ['comments'], ['notes'], ['description'], ['bio']],
+            'name' => [['name'], ['fullname']],
+        ];
+
+        $wordLists = collect([$this->field()->handle(), $this->field()->display()])
+            ->filter(fn ($part) => is_string($part) && $part !== '')
+            ->map(fn (string $part) => $this->sampleWords($part));
+
+        foreach ($kinds as $kind => $sequences) {
+            foreach ($sequences as $sequence) {
+                if ($wordLists->contains(fn (array $words) => $this->containsSequence($words, $sequence))) {
+                    return $kind;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function sampleWords(string $text): array
+    {
+        $text = preg_replace('/(?<=\p{Ll})(?=\p{Lu})/u', ' ', $text);
+
+        return preg_split('/[^\p{L}\p{N}]+/u', Str::lower($text), -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+    private function containsSequence(array $words, array $sequence): bool
+    {
+        $length = count($sequence);
+
+        for ($i = 0; $i <= count($words) - $length; $i++) {
+            if (array_slice($words, $i, $length) === $sequence) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
