@@ -113,7 +113,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     protected function getItems($keys)
     {
         return parent::getItems($keys)
-            ->filter(fn ($asset) => $asset->verifyExists())
+            ->filter(fn ($asset) => $asset->reconcile()->exists())
             ->values();
     }
 

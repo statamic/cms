@@ -474,7 +474,7 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
     {
         $asset = $this->makeAsset($path);
 
-        if (! $asset->verifyExists()) {
+        if (! $asset->reconcile()->exists()) {
             return null;
         }
 

@@ -234,16 +234,16 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     }
 
     /**
-     * Confirm a cached listing entry against the disk.
+     * Make the cached listing agree with the disk.
      *
      * The listing can still name a file that has been removed. Metadata reads
-     * then ask Flysystem for the file size and throw. Drop that path and
-     * report the asset as missing.
+     * then ask Flysystem for the file size and throw. Drop that path from the
+     * listing and the asset index so exists() reports the asset as missing.
      */
-    public function verifyExists(): bool
+    public function reconcile(): static
     {
         if (! $this->exists()) {
-            return false;
+            return $this;
         }
 
         try {
@@ -252,13 +252,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             $exists = false;
         }
 
-        if ($exists) {
-            return true;
+        if (! $exists) {
+            $this->forgetMissingFile();
         }
 
-        $this->forgetMissingFile();
-
-        return false;
+        return $this;
     }
 
     public function getRawMeta()
