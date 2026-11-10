@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
@@ -38,6 +39,23 @@ class ServiceProvider extends LaravelServiceProvider
 
         $this->app->bind(SubmissionQueryBuilder::class, function () {
             return new SubmissionQueryBuilder($this->app->make(Stache::class)->store('form-submissions'));
+        });
+
+        $this->app->booting(fn () => $this->registerCacheDriver());
+    }
+
+    private function registerCacheDriver()
+    {
+        // A file cache driver laid out for the Stache. The callback is bound to the cache manager.
+        Cache::extend('stache', function ($app, $config) {
+            $store = new StacheFileStore(
+                $app['files'],
+                $config['path'],
+                $config['permission'] ?? null,
+                ...(method_exists($this, 'getSerializableClasses') ? [$this->getSerializableClasses($config)] : []),
+            );
+
+            return $this->repository($store->setLockDirectory($config['lock_path'] ?? null), $config);
         });
     }
 
