@@ -190,6 +190,48 @@ class StaticWarmTest extends TestCase
     }
 
     #[Test]
+    public function it_queues_the_requests_using_the_configured_warm_job()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.warm_job' => CustomStaticWarmJob::class,
+            'queue.default' => 'redis',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true])
+            ->expectsOutputToContain('Adding 2 requests')
+            ->assertExitCode(0);
+
+        Queue::assertCount(2);
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/about';
+        });
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/contact';
+        });
+    }
+
+    #[Test]
+    public function it_queues_the_uncached_job_when_the_uncached_option_is_used_with_a_configured_warm_job()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.warm_job' => CustomStaticWarmJob::class,
+            'queue.default' => 'redis',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true, '--uncached' => true])
+            ->assertExitCode(0);
+
+        Queue::assertPushed(StaticWarmUncachedJob::class, 2);
+        Queue::assertNotPushed(CustomStaticWarmJob::class);
+    }
+
+    #[Test]
     public function it_queues_the_request_when_the_uncached_option_is_used()
     {
         config([
@@ -361,4 +403,8 @@ class StaticWarmTest extends TestCase
             ->routes('{slug}')
             ->template('default');
     }
+}
+
+class CustomStaticWarmJob extends StaticWarmJob
+{
 }

@@ -73,6 +73,27 @@ class EntriesStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_only_looks_up_the_collection_once_when_building_paths()
+    {
+        $collection = Facades\Collection::findByHandle('numeric');
+
+        $lookups = 0;
+        Facades\Collection::partialMock()
+            ->shouldReceive('findByHandle')
+            ->with('numeric')
+            ->andReturnUsing(function () use ($collection, &$lookups) {
+                $lookups++;
+
+                return $collection;
+            });
+
+        $store = $this->parent->store('numeric');
+
+        $this->assertCount(3, $store->paths());
+        $this->assertEquals(1, $lookups);
+    }
+
+    #[Test]
     public function it_gets_nested_files()
     {
         $dir = Path::tidy($this->directory);
