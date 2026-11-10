@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\FieldOptions;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -90,5 +92,36 @@ class ImageChoice extends Fieldtype
             ->filter()
             ->first()
             ?->url();
+    }
+
+    public function previewValue(): mixed
+    {
+        $keys = FieldOptions::keys($this->field());
+
+        return $this->field()->get('multiple')
+            ? array_slice($keys, 0, 1)
+            : ($keys[0] ?? null);
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        if ($this->field()->get('multiple')) {
+            return $this->randomOptionKeys($faker);
+        }
+
+        $keys = FieldOptions::keys($this->field());
+
+        return $keys === [] ? null : $faker->randomElement($keys);
+    }
+
+    private function randomOptionKeys(Generator $faker): array
+    {
+        $keys = FieldOptions::keys($this->field());
+
+        if ($keys === []) {
+            return [];
+        }
+
+        return $faker->randomElements($keys, $faker->numberBetween(1, min(2, count($keys))));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Integer as IntegerFilter;
@@ -108,5 +109,20 @@ class Integer extends Fieldtype
     public function filter()
     {
         return new IntegerFilter($this);
+    }
+
+    public function previewValue(): mixed
+    {
+        $min = $this->field()->get('min');
+
+        return is_numeric($min) ? $min + 0 : 1;
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        $min = (int) ($this->field()->get('min') ?? 1);
+        $max = (int) ($this->field()->get('max') ?? 5000);
+
+        return $faker->numberBetween(min($min, $max), max($min, $max));
     }
 }

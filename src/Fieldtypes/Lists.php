@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\PreviewSubmission;
 
 use function Statamic\trans as __;
 
@@ -56,5 +58,15 @@ class Lists extends Fieldtype
     public function toGqlType()
     {
         return GraphQL::listOf(GraphQL::string());
+    }
+
+    public function previewValue(): mixed
+    {
+        return [PreviewSubmission::placeholder($this->field())];
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return [$faker->word(), $faker->word(), $faker->word()];
     }
 }

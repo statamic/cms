@@ -2,6 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
+use Illuminate\Support\Str as IlluminateStr;
+
 use function Statamic\trans as __;
 
 class Slug extends Text
@@ -40,5 +43,15 @@ class Slug extends Text
                 ],
             ],
         ];
+    }
+
+    public function previewValue(): mixed
+    {
+        return IlluminateStr::slug(__($this->field()->display()));
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return IlluminateStr::slug(parent::fakeValue($faker));
     }
 }

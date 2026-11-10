@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\PreviewSubmission;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
@@ -265,5 +267,15 @@ class Markdown extends Fieldtype
         }
 
         return $this->replaceStatamicUrls($data, $newValue, $oldValue);
+    }
+
+    public function previewValue(): mixed
+    {
+        return PreviewSubmission::placeholder($this->field());
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->paragraph(2);
     }
 }

@@ -354,13 +354,25 @@ abstract class Fieldtype implements Arrayable
     }
 
     /**
-     * Generate a fake value for form submission testing.
+     * A deterministic placeholder value, used when previewing form emails without a real submission.
      *
-     * Return null to fall back to FakeSubmissionGenerator's built-in handling.
+     * This runs in production, so it must not use Faker. The field's config is available via `$this->field()`.
+     * Return null if the fieldtype doesn't collect a value.
      */
-    public function fakeValue(): mixed
+    public function previewValue(): mixed
     {
         return null;
+    }
+
+    /**
+     * A realistic random value, used when generating fake form submissions.
+     *
+     * This only runs locally. Defaults to `previewValue()`, so override it only when you want more realistic data.
+     * The field's config is available via `$this->field()`.
+     */
+    public function fakeValue(\Faker\Generator $faker): mixed
+    {
+        return $this->previewValue();
     }
 
     public function preProcessConfig($data)

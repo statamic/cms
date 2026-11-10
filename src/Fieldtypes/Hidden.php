@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Fields\Fieldtype;
+use Statamic\Forms\PreviewSubmission;
 
 use function Statamic\trans as __;
 
@@ -24,5 +26,15 @@ class Hidden extends Fieldtype
                 ],
             ],
         ];
+    }
+
+    public function previewValue(): mixed
+    {
+        return PreviewSubmission::placeholder($this->field());
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return app(Text::class)->setField($this->field())->fakeValue($faker);
     }
 }

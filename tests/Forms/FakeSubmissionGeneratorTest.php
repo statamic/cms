@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Faker\Generator;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldtype;
@@ -13,9 +14,24 @@ class FakeValueTestFieldtype extends Fieldtype
 {
     protected static $handle = 'fake_value_test';
 
-    public function fakeValue(): mixed
+    public function previewValue(): mixed
+    {
+        return 'from preview value';
+    }
+
+    public function fakeValue(Generator $faker): mixed
     {
         return ['ok' => true];
+    }
+}
+
+class PreviewValueOnlyTestFieldtype extends Fieldtype
+{
+    protected static $handle = 'preview_value_only_test';
+
+    public function previewValue(): mixed
+    {
+        return 'from preview value';
     }
 }
 
@@ -232,7 +248,7 @@ class FakeSubmissionGeneratorTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_fieldtype_fake_value_for_unknown_types()
+    public function it_uses_a_custom_fieldtypes_fake_value_over_its_preview_value()
     {
         FakeValueTestFieldtype::register();
 
@@ -243,6 +259,63 @@ class FakeSubmissionGeneratorTest extends TestCase
         $values = (new FakeSubmissionGenerator)->generate($form);
 
         $this->assertEquals(['ok' => true], $values['widget']);
+    }
+
+    #[Test]
+    public function it_falls_back_to_a_custom_fieldtypes_preview_value()
+    {
+        PreviewValueOnlyTestFieldtype::register();
+
+        $form = $this->makeForm('custom_preview_type', [
+            ['handle' => 'widget', 'field' => ['type' => 'preview_value_only_test']],
+        ]);
+
+        $values = (new FakeSubmissionGenerator)->generate($form);
+
+        $this->assertSame('from preview value', $values['widget']);
+    }
+
+    #[Test]
+    public function it_uses_defaults_for_text_but_randomizes_options()
+    {
+        $form = $this->makeForm('defaults', [
+            ['handle' => 'source', 'field' => ['type' => 'short_answer', 'default' => 'newsletter']],
+            ['handle' => 'colour', 'field' => [
+                'type' => 'dropdown',
+                'default' => 'red',
+                'options' => [
+                    ['key' => 'red', 'value' => 'Red'],
+                    ['key' => 'blue', 'value' => 'Blue'],
+                ],
+            ]],
+        ]);
+
+        $values = collect(range(1, 30))->map(fn () => (new FakeSubmissionGenerator)->generate($form));
+
+        $this->assertSame(['newsletter'], $values->pluck('source')->unique()->values()->all());
+        $this->assertEqualsCanonicalizing(['red', 'blue'], $values->pluck('colour')->unique()->values()->all());
+    }
+
+    #[Test]
+    public function it_generates_values_for_groups_with_core_fieldtypes()
+    {
+        $form = $this->makeForm('core_group', [
+            ['handle' => 'address', 'field' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'city', 'field' => ['type' => 'text', 'display' => 'City']],
+                    ['handle' => 'country', 'field' => ['type' => 'text', 'default' => 'Canada']],
+                    ['handle' => 'floor', 'field' => ['type' => 'integer', 'min' => 1, 'max' => 3]],
+                ],
+            ]],
+        ]);
+
+        $values = (new FakeSubmissionGenerator)->generate($form)['address'];
+
+        $this->assertSame(['city', 'country', 'floor'], array_keys($values));
+        $this->assertIsString($values['city']);
+        $this->assertSame('Canada', $values['country']);
+        $this->assertContains($values['floor'], [1, 2, 3]);
     }
 
     #[Test]
