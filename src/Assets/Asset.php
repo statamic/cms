@@ -78,7 +78,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     protected $withEvents = true;
     protected $shouldHydrate = true;
     protected $removedData = [];
-    protected $forgettingMissingFile = false;
 
     public function syncOriginal()
     {
@@ -352,12 +351,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     private function forgetMissingFile(): void
     {
-        if ($this->forgettingMissingFile) {
-            return;
-        }
-
-        $this->forgettingMissingFile = true;
-
         $this->meta = null;
         $this->cacheStore()->forget($this->metaCacheKey());
 
