@@ -111,7 +111,7 @@ class FastParserTest extends TestCase
             'front matter ending in an ellipsis and a newline' => "---\ntitle: Hi\nexcerpt: Read more...\n",
             'front matter ending in an ellipsis in a list' => "---\na:\n  - Read more...",
             'front matter with an ellipsis before the end' => "---\nexcerpt: Read more...\ntitle: Hi\n",
-            'document end marker' => "a: 1\n...",
+            'document end marker, no final newline' => "a: 1\n...",
             'document end marker in a sequence' => "a:\n  - x\n...\n",
             'tab inside a literal block' => "a: |\n  one\ttwo\nb: 1\n",
             'tab inside a value' => "a: 'one\ttwo'\nb: one\ttwo\n",
