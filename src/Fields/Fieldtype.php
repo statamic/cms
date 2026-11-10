@@ -354,10 +354,11 @@ abstract class Fieldtype implements Arrayable
     }
 
     /**
-     * A deterministic placeholder value, used when previewing form emails without a real submission.
+     * A deterministic sample value, used wherever a value is needed for previewing but no real one exists.
+     * For example, form email previews.
      *
-     * This runs in production, so it must not use Faker. The field's config is available via `$this->field()`.
-     * Return null if the fieldtype doesn't collect a value.
+     * Return the value in its processed (stored) shape. This may run in production, so it must not use Faker.
+     * The field's config is available via `$this->field()`. Return null if the fieldtype doesn't collect a value.
      */
     public function previewValue(): mixed
     {
@@ -365,9 +366,10 @@ abstract class Fieldtype implements Arrayable
     }
 
     /**
-     * A realistic random value, used when generating fake form submissions.
+     * A realistic random sample value, used where Faker is available. For example, fake form submissions.
      *
-     * This only runs locally. Defaults to `previewValue()`, so override it only when you want more realistic data.
+     * Return the value in its processed (stored) shape. This only runs in local environments.
+     * Defaults to `previewValue()`, so override it only when you want more realistic data.
      * The field's config is available via `$this->field()`.
      */
     public function fakeValue(\Faker\Generator $faker): mixed
