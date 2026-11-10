@@ -67,6 +67,19 @@
 }
 
 @layer components {
+    /* Safari paints the tall content card in tiles while scrolling, and a quick scroll shows the grey body through tiles it hasn't painted yet. Paint the card colour on the (non-scrolling) scroller too, so any gap shows the same colour. It stops short of the top and bottom so it never shows behind the card's rounded corners. */
+    .main-content {
+        /* A solid block of the card colour (a gradient, as background-color can't be sized) */
+        background-image: linear-gradient(var(--theme-color-content-bg), var(--theme-color-content-bg));
+        /* One block, not tiled */
+        background-repeat: no-repeat;
+        /* Size and place it inside the padding, so the grey gutter around the card stays grey */
+        background-origin: content-box;
+        /* Full width, 1.5rem short of the top and bottom so it stays clear of the card's rounded corners */
+        background-size: 100% calc(100% - 3rem);
+        background-position: center;
+    }
+
     .content-card {
         @apply min-h-full px-2 sm:px-6 md:px-12 pb-6 border dark:border-y-0 dark:border-r-0 border-content-border sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
         background: var(--theme-color-content-bg);
