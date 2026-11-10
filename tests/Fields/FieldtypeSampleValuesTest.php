@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Tests\TestCase;
 
 class FieldtypeSampleValuesTest extends TestCase
@@ -61,17 +62,20 @@ class FieldtypeSampleValuesTest extends TestCase
         $options = ['options' => ['red' => 'Red', 'blue' => 'Blue']];
 
         return [
-            'text' => [['type' => 'text', 'display' => 'First Name'], '[First Name]'],
+            'text' => [['type' => 'text', 'display' => 'Favourite Colour'], 'Lorem ipsum dolor sit amet'],
+            'text first name' => [['type' => 'text', 'display' => 'First Name'], 'Jane'],
+            'text name' => [['type' => 'text', 'display' => 'Who are you?', 'autocomplete' => 'name'], 'Jane Doe'],
+            'text city' => [['type' => 'text', 'handle' => 'city'], 'Springfield'],
             'text email' => [['type' => 'text', 'input_type' => 'email'], 'name@example.com'],
             'text url' => [['type' => 'text', 'input_type' => 'url'], 'https://example.com'],
-            'text tel' => [['type' => 'text', 'display' => 'Phone', 'input_type' => 'tel'], '[Phone]'],
-            'slug' => [['type' => 'slug', 'display' => 'Page Title'], 'page-title'],
-            'textarea' => [['type' => 'textarea', 'display' => 'Message'], '[Message]'],
-            'markdown' => [['type' => 'markdown', 'display' => 'Body'], '[Body]'],
-            'hidden' => [['type' => 'hidden', 'display' => 'Source'], '[Source]'],
+            'text tel' => [['type' => 'text', 'display' => 'Call me', 'input_type' => 'tel'], '555-0100'],
+            'slug' => [['type' => 'slug', 'display' => 'Slug'], 'lorem-ipsum-dolor-sit-amet'],
+            'textarea' => [['type' => 'textarea'], SampleValue::paragraph()],
+            'markdown' => [['type' => 'markdown'], SampleValue::paragraph()],
+            'hidden' => [['type' => 'hidden'], null],
             'hidden with default' => [['type' => 'hidden', 'display' => 'Source', 'default' => 'newsletter'], 'newsletter'],
             'revealer' => [['type' => 'revealer', 'display' => 'More'], null],
-            'list' => [['type' => 'list', 'display' => 'Items'], ['[Items]']],
+            'list' => [['type' => 'list'], ['Lorem', 'Ipsum', 'Dolor']],
             'integer' => [['type' => 'integer'], 1],
             'integer with min' => [['type' => 'integer', 'min' => 16], 16],
             'range' => [['type' => 'range', 'min' => 0], 0],
@@ -96,7 +100,7 @@ class FieldtypeSampleValuesTest extends TestCase
             'group' => [['type' => 'group', 'fields' => [
                 ['handle' => 'city', 'field' => ['type' => 'text', 'display' => 'City']],
                 ['handle' => 'agree', 'field' => ['type' => 'toggle']],
-            ]], ['city' => '[City]', 'agree' => true]],
+            ]], ['city' => 'Springfield', 'agree' => true]],
         ];
     }
 
@@ -121,7 +125,7 @@ class FieldtypeSampleValuesTest extends TestCase
             'slug' => [['type' => 'slug'], fn ($value) => $this->assertMatchesRegularExpression('/^[a-z0-9-]+$/', $value)],
             'textarea' => [['type' => 'textarea'], fn ($value) => $this->assertIsString($value)],
             'markdown' => [['type' => 'markdown'], fn ($value) => $this->assertIsString($value)],
-            'hidden' => [['type' => 'hidden', 'display' => 'Source'], fn ($value) => $this->assertSame('[Source]', $value)],
+            'hidden' => [['type' => 'hidden'], fn ($value) => $this->assertNull($value)],
             'hidden with default' => [['type' => 'hidden', 'default' => 'newsletter'], fn ($value) => $this->assertSame('newsletter', $value)],
             'revealer' => [['type' => 'revealer'], fn ($value) => $this->assertNull($value)],
             'text ignores default' => [['type' => 'text', 'default' => 'Hello'], fn ($value) => $this->assertNotSame('Hello', $value)],

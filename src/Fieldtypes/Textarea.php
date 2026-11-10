@@ -71,7 +71,7 @@ class Textarea extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return SampleValue::placeholder($this->field());
+        return SampleValue::paragraph();
     }
 
     public function fakeValue(Generator $faker): mixed

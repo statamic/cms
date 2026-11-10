@@ -3,7 +3,6 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\SampleValue;
 
 use function Statamic\trans as __;
 
@@ -29,6 +28,6 @@ class Hidden extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return $this->field()->defaultValue() ?? SampleValue::placeholder($this->field());
+        return $this->field()->defaultValue();
     }
 }

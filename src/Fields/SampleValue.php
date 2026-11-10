@@ -4,13 +4,16 @@ namespace Statamic\Fields;
 
 use Illuminate\Support\Arr;
 
-use function Statamic\trans as __;
-
 class SampleValue
 {
-    public static function placeholder(Field $field): string
+    public static function sentence(): string
     {
-        return '['.__($field->display()).']';
+        return 'Lorem ipsum dolor sit amet';
+    }
+
+    public static function paragraph(): string
+    {
+        return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
     }
 
     public static function optionKeys(Field $field): array

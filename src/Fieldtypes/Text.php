@@ -179,49 +179,85 @@ class Text extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return match ($this->field()->get('input_type')) {
+        return match ($this->sampleKind()) {
             'email' => 'name@example.com',
             'url' => 'https://example.com',
-            default => SampleValue::placeholder($this->field()),
+            'phone' => '555-0100',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'name' => 'Jane Doe',
+            'company' => 'Acme Inc.',
+            'address' => '123 Main Street',
+            'city' => 'Springfield',
+            'state' => 'Oregon',
+            'country' => 'Canada',
+            'postcode' => '97477',
+            'job' => 'Product Manager',
+            'subject' => 'A question about your services',
+            'paragraph' => SampleValue::paragraph(),
+            default => SampleValue::sentence(),
         };
     }
 
     public function fakeValue(Generator $faker): mixed
     {
-        return match ($this->field()->get('input_type')) {
+        return (string) match ($this->sampleKind()) {
             'email' => $faker->safeEmail(),
             'url' => $faker->url(),
-            'tel' => $faker->phoneNumber(),
-            default => $this->fakeValueFromContext($faker),
+            'phone' => $faker->phoneNumber(),
+            'first_name' => $faker->firstName(),
+            'last_name' => $faker->lastName(),
+            'name' => $faker->name(),
+            'company' => $faker->company(),
+            'address' => $faker->streetAddress(),
+            'city' => $faker->city(),
+            'state' => $faker->state(),
+            'country' => $faker->country(),
+            'postcode' => $faker->postcode(),
+            'job' => $faker->jobTitle(),
+            'subject' => $faker->sentence(6),
+            'paragraph' => $faker->paragraph(2),
+            default => $faker->sentence(4),
         };
     }
 
-    private function fakeValueFromContext(Generator $faker): string
+    private function sampleKind(): ?string
     {
-        $haystack = Str::lower(implode(' ', array_filter(
+        $inputType = match ($this->field()->get('input_type')) {
+            'email' => 'email',
+            'url' => 'url',
+            'tel' => 'phone',
+            default => null,
+        };
+
+        if ($inputType) {
+            return $inputType;
+        }
+
+        $haystack = str_replace(' ', '_', Str::lower(implode(' ', array_filter(
             [$this->field()->handle(), $this->field()->display()],
             fn ($part) => is_string($part) && $part !== ''
-        )));
+        ))));
 
         $looksLike = fn (array $tokens) => collect($tokens)->contains(fn ($token) => str_contains($haystack, $token));
 
-        return (string) match (true) {
-            $looksLike(['email', 'e-mail']) => $faker->safeEmail(),
-            $looksLike(['phone', 'tel', 'mobile', 'fax']) => $faker->phoneNumber(),
-            $looksLike(['first_name', 'firstname', 'given_name']) => $faker->firstName(),
-            $looksLike(['last_name', 'lastname', 'surname', 'family_name']) => $faker->lastName(),
-            $looksLike(['full_name', 'name']) || $this->field()->get('autocomplete') === 'name' => $faker->name(),
-            $looksLike(['company', 'organization', 'organisation', 'business']) => $faker->company(),
-            $looksLike(['address', 'street']) => $faker->streetAddress(),
-            $looksLike(['city', 'town']) => $faker->city(),
-            $looksLike(['state', 'province', 'region']) => $faker->state(),
-            $looksLike(['country']) => $faker->country(),
-            $looksLike(['zip', 'postal', 'postcode']) => $faker->postcode(),
-            $looksLike(['url', 'website', 'site']) => $faker->url(),
-            $looksLike(['job', 'title', 'position', 'role']) => $faker->jobTitle(),
-            $looksLike(['subject']) => $faker->sentence(6),
-            $looksLike(['message', 'comment', 'notes', 'description', 'bio']) => $faker->paragraph(2),
-            default => $faker->sentence(4),
+        return match (true) {
+            $looksLike(['email', 'e-mail']) => 'email',
+            $looksLike(['phone', 'tel', 'mobile', 'fax']) => 'phone',
+            $looksLike(['first_name', 'firstname', 'given_name']) => 'first_name',
+            $looksLike(['last_name', 'lastname', 'surname', 'family_name']) => 'last_name',
+            $looksLike(['full_name', 'name']) || $this->field()->get('autocomplete') === 'name' => 'name',
+            $looksLike(['company', 'organization', 'organisation', 'business']) => 'company',
+            $looksLike(['address', 'street']) => 'address',
+            $looksLike(['city', 'town']) => 'city',
+            $looksLike(['state', 'province', 'region']) => 'state',
+            $looksLike(['country']) => 'country',
+            $looksLike(['zip', 'postal', 'postcode']) => 'postcode',
+            $looksLike(['url', 'website', 'site']) => 'url',
+            $looksLike(['job', 'title', 'position', 'role']) => 'job',
+            $looksLike(['subject']) => 'subject',
+            $looksLike(['message', 'comment', 'notes', 'description', 'bio']) => 'paragraph',
+            default => null,
         };
     }
 }

@@ -47,7 +47,7 @@ class Slug extends Text
 
     public function previewValue(): mixed
     {
-        return IlluminateStr::slug(__($this->field()->display()));
+        return IlluminateStr::slug(parent::previewValue());
     }
 
     public function fakeValue(Generator $faker): mixed

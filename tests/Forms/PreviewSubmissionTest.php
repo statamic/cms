@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Forms\PreviewSubmission;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -48,7 +49,7 @@ class PreviewSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_placeholder_values_for_each_field_type()
+    public function it_uses_example_values_for_each_field_type()
     {
         Carbon::setTestNow('2026-11-09 14:30:00');
 
@@ -138,12 +139,12 @@ class PreviewSubmissionTest extends TestCase
 
         $values = (new PreviewSubmission)->values($form);
 
-        $this->assertSame('[Who are you?]', $values['name']);
-        $this->assertSame('[First Name]', $values['first_name']);
+        $this->assertSame('Jane Doe', $values['name']);
+        $this->assertSame('Jane', $values['first_name']);
         $this->assertSame('name@example.com', $values['email']);
-        $this->assertSame('[Call me]', $values['phone']);
+        $this->assertSame('555-0100', $values['phone']);
         $this->assertSame('https://example.com', $values['website']);
-        $this->assertSame('[Message]', $values['long']);
+        $this->assertSame(SampleValue::paragraph(), $values['long']);
         $this->assertSame(1, $values['number']);
         $this->assertSame(16, $values['age']);
         $this->assertSame(1, $values['currency']);
@@ -163,7 +164,7 @@ class PreviewSubmissionTest extends TestCase
         $this->assertIsString($values['dict']);
         $this->assertIsArray($values['dicts']);
         $this->assertCount(1, $values['dicts']);
-        $this->assertSame(['city' => '[City]', 'nested_email' => 'name@example.com'], $values['group']);
+        $this->assertSame(['city' => 'Springfield', 'nested_email' => 'name@example.com'], $values['group']);
         $this->assertNull($values['upload']);
         $this->assertNull($values['banner']);
         $this->assertNull($values['heading']);
@@ -196,7 +197,7 @@ class PreviewSubmissionTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_placeholders_for_groups_with_core_fieldtypes()
+    public function it_uses_example_values_for_groups_with_core_fieldtypes()
     {
         $form = $this->makeForm('core_group', [
             ['handle' => 'address', 'field' => [
@@ -208,7 +209,7 @@ class PreviewSubmissionTest extends TestCase
             ]],
         ]);
 
-        $this->assertSame(['city' => '[City]', 'floor' => 2], (new PreviewSubmission)->values($form)['address']);
+        $this->assertSame(['city' => 'Springfield', 'floor' => 2], (new PreviewSubmission)->values($form)['address']);
     }
 
     #[Test]
