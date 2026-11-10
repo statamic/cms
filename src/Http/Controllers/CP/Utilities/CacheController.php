@@ -27,6 +27,7 @@ use Statamic\StaticCaching\WarmableUrls;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class CacheController extends CpController
 {
