@@ -5,7 +5,7 @@ import axios from 'axios';
 import { router } from '@inertiajs/vue3';
 import Cache from '@/pages/utilities/Cache.vue';
 import { toast } from '@api';
-import { Stack } from '@ui';
+import { Panel, Stack } from '@ui';
 import ImageCacheExplorer from '@/components/utilities/ImageCacheExplorer.vue';
 import StaticCacheExplorer from '@/components/utilities/StaticCacheExplorer.vue';
 
@@ -28,6 +28,7 @@ function mountCache() {
             cacheSites: [{ value: 'en', label: 'English' }, { value: 'fr', label: 'French' }],
             previewStaticPagesUrl: '/preview',
             invalidatePagesUrl: '/invalidate',
+            cacheStaticPageUrl: '/cache-page',
             warmStaticUrl: '/warm',
             imageContainersUrl: '/image-containers',
             clearImageContainerUrl: '/clear-image-container',
@@ -91,7 +92,8 @@ test('opens the image explorer, protects an in-progress clear, and reloads image
 
 test('shows image variations and asset totals and browses cached or uncached static pages', async () => {
     const wrapper = mountCache();
-    const imageMetrics = wrapper.findAll('dl').at(-1);
+    const imagePanel = wrapper.findAllComponents(Panel).find((panel) => panel.text().includes('Image Cache'));
+    const imageMetrics = imagePanel.find('dl');
     expect(imageMetrics.findAll('dt').map((label) => label.text())).toEqual(['Variations', 'Assets', 'Size']);
     expect(imageMetrics.findAll('dd').map((value) => value.text())).toEqual(['4', '2', '1 KB']);
 
@@ -99,8 +101,13 @@ test('shows image variations and asset totals and browses cached or uncached sta
     await wrapper.find('[text="Uncached pages"]').trigger('click');
     const explorer = wrapper.findComponent(StaticCacheExplorer);
     expect(explorer.props('status')).toBe('uncached');
+    expect(explorer.props('cacheUrl')).toBe('/cache-page');
+    expect(wrapper.findAllComponents(Stack).some((stack) => stack.props('title') === 'Static Page Cache')).toBe(true);
 
     explorer.vm.$emit('invalidated');
+    expect(router.reload).toHaveBeenCalledExactlyOnceWith({ only: ['static', 'staticCoverage'], preserveScroll: true });
+    router.reload.mockClear();
+    explorer.vm.$emit('cached');
     expect(router.reload).toHaveBeenCalledExactlyOnceWith({ only: ['static', 'staticCoverage'], preserveScroll: true });
 
     await wrapper.find('[text="Cached pages"]').trigger('click');
@@ -179,7 +186,7 @@ test('shows validation errors and recovers when the input is corrected', async (
     await nextTick();
 
     expect(wrapper.vm.invalidateStaticUrlsModal).toBe(false);
-    expect(wrapper.text()).not.toContain('Invalidated 1 cached page in 2ms.');
+    expect(wrapper.text()).not.toContain('Cleared 1 cached page in 2ms.');
     expect(wrapper.vm.activeAction).toBeNull();
 });
 

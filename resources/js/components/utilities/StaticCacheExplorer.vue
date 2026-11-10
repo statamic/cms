@@ -14,13 +14,17 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    cacheUrl: {
+        type: String,
+        required: true,
+    },
     sites: {
         type: Array,
         required: true,
     },
 });
 
-const emit = defineEmits(['invalidated', 'processing']);
+const emit = defineEmits(['invalidated', 'cached', 'processing']);
 const status = defineModel('status', {
     type: String,
     default: 'cached',
@@ -62,6 +66,34 @@ function generatedDate(date) {
     });
 }
 
+async function cachePage(url) {
+    if (status.value !== 'uncached' || processing.value) {
+        return;
+    }
+
+    processing.value = true;
+    pendingAction.value = url;
+    emit('processing', true);
+
+    try {
+        const { data } = await axios.post(props.cacheUrl, { url });
+
+        toast.success(data.message);
+        listing.value.refresh();
+        emit('cached', data);
+    } catch (error) {
+        const errors = error.response?.data?.errors;
+
+        toast.error(errors
+            ? Object.values(errors).flat()[0]
+            : error.response?.data?.message || __('Unable to cache this page.'));
+    } finally {
+        processing.value = false;
+        pendingAction.value = null;
+        emit('processing', false);
+    }
+}
+
 async function invalidate(urls, selected = false) {
     if (status.value !== 'cached' || processing.value || !urls.length) {
         return;
@@ -85,7 +117,7 @@ async function invalidate(urls, selected = false) {
     } catch (error) {
         const errors = error.response?.data?.errors;
 
-        toast.error(errors ? Object.values(errors).flat()[0] : __('Unable to invalidate cached pages.'));
+        toast.error(errors ? Object.values(errors).flat()[0] : __('Unable to clear cached pages.'));
     } finally {
         processing.value = false;
         pendingAction.value = null;
@@ -132,7 +164,7 @@ async function invalidate(urls, selected = false) {
             :show-pagination-page-links="false"
             :show-pagination-per-page-selector="false"
             :inert="processing || undefined"
-            bulk-action="Invalidate"
+            bulk-action="Clear"
             :processing="processing"
             @bulk-action="invalidate($event, true)"
             @update:search-query="selections = []"
@@ -170,12 +202,21 @@ async function invalidate(urls, selected = false) {
             <template #cell-actions="{ row }">
                 <Button
                     v-if="status === 'cached'"
-                    :text="__('Invalidate')"
-                    :aria-label="__('Invalidate :url', { url: row.url })"
+                    :text="__('Clear')"
+                    :aria-label="__('Clear :url', { url: row.url })"
                     size="sm"
                     :loading="pendingAction === row.url"
                     :disabled="processing"
                     @click="invalidate([row.url])"
+                />
+                <Button
+                    v-else
+                    :text="__('Cache')"
+                    :aria-label="__('Cache :url', { url: row.url })"
+                    size="sm"
+                    :loading="pendingAction === row.url"
+                    :disabled="processing"
+                    @click="cachePage(row.url)"
                 />
             </template>
         </CacheListing>

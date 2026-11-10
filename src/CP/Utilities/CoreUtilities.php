@@ -33,6 +33,7 @@ class CoreUtilities
                 $router->post('clear-static', [CacheController::class, 'clearStaticCache'])->name('clear-static');
                 $router->post('warm-static', [CacheController::class, 'warmStaticCache'])->name('warm-static');
                 $router->get('static-pages', [CacheController::class, 'staticPages'])->name('static-pages');
+                $router->post('cache-static-page', [CacheController::class, 'cacheStaticPage'])->name('cache-static-page');
                 $router->post('preview-static-pages', [CacheController::class, 'previewStaticPages'])->name('preview-static-pages');
                 $router->post('invalidate-static-pages', [CacheController::class, 'invalidateStaticUrls'])->name('invalidate-static-pages');
                 $router->post('clear-application-cache', [CacheController::class, 'clearApplicationCache'])->name('clear-application-cache');

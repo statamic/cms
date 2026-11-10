@@ -3,10 +3,15 @@
 namespace Tests\Feature\Utilities;
 
 use Facades\Tests\Factories\EntryFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +21,8 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarm;
 use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Events\StacheCleared;
+use Statamic\Events\StacheWarmed;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
@@ -151,7 +158,7 @@ class CacheManagerTest extends TestCase
             ->assertJsonPath('meta.last_page', 3);
         $columns = collect($result->json('meta.columns'))->pluck('field');
         $this->assertNotContains('generated_at', $columns);
-        $this->assertNotContains('actions', $columns);
+        $this->assertContains('actions', $columns);
 
         $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'site' => 'fr', 'search' => 'bon']))
             ->assertOk()
@@ -187,6 +194,155 @@ class CacheManagerTest extends TestCase
     }
 
     #[Test]
+    public function it_caches_one_warmable_url_and_removes_it_from_the_uncached_list()
+    {
+        $cacher = $this->cachePages([]);
+        Collection::make('pages')->routes('/{slug}')->save();
+        EntryFactory::collection('pages')->slug('about')->create();
+        EntryFactory::collection('pages')->slug('contact')->create();
+        $url = 'https://example.com/about';
+
+        $this->mock(Client::class)->shouldReceive('get')->once()
+            ->with($url, ['verify' => true, 'allow_redirects' => false, 'timeout' => 30])
+            ->andReturnUsing(function () use ($cacher, $url) {
+                $request = Request::create($url);
+                $response = response('Cached page');
+                $cacher->cachePage($request, $response);
+                event(new ResponsePrepared($request, $response));
+
+                return new GuzzleResponse(200);
+            });
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+            ->assertOk()
+            ->assertJsonPath('url', $url)
+            ->assertJsonPath('message', fn ($message) => str_starts_with($message, 'Page cached in '));
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.url', 'https://example.com/contact');
+
+        $this->getJson(cp_route('utilities.cache.static-pages'))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.url', $url);
+    }
+
+    #[Test]
+    public function it_only_accepts_warmable_urls_for_individual_caching()
+    {
+        $this->cachePages([]);
+        config(['statamic.static_caching.exclude' => ['/excluded']]);
+        Collection::make('pages')->routes('/{slug}')->save();
+        EntryFactory::collection('pages')->slug('draft')->published(false)->create();
+        EntryFactory::collection('pages')->slug('excluded')->create();
+        $this->mock(Client::class)->shouldNotReceive('get');
+
+        foreach ([
+            'https://external.example/about',
+            'https://example.com/missing',
+            'https://example.com/draft',
+            'https://example.com/excluded',
+            'https://example.com/*',
+        ] as $url) {
+            $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('url');
+        }
+    }
+
+    #[Test]
+    public function it_does_not_report_a_page_as_cached_when_the_request_fails_or_does_not_cache_it()
+    {
+        $this->cachePages([]);
+        Collection::make('pages')->routes('/{slug}')->save();
+        EntryFactory::collection('pages')->slug('about')->create();
+        $url = 'https://example.com/about';
+        $client = $this->mock(Client::class);
+        $client->shouldReceive('get')->once()->andThrow(new ConnectException('Connection failed.', new GuzzleRequest('GET', $url)));
+        $client->shouldReceive('get')->once()->andReturn(new GuzzleResponse(200));
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+            ->assertStatus(502)
+            ->assertJsonPath('message', 'Unable to cache this page.');
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'The page could not be cached.');
+    }
+
+    #[Test]
+    public function it_recognizes_an_already_cached_page_in_its_own_site_directory()
+    {
+        $disk = Storage::fake('cache-single-page');
+        $cacher = $this->cachePages([], [
+            'driver' => 'file',
+            'path' => [
+                'en' => $disk->path('en'),
+                'fr' => $disk->path('fr'),
+                'de' => $disk->path('de'),
+            ],
+        ]);
+        Collection::make('pages')->routes('/{slug}')->sites(['en', 'fr'])->save();
+        EntryFactory::collection('pages')->locale('fr')->slug('bonjour')->create();
+        $url = 'https://example.com/fr/bonjour';
+        $path = $cacher->getFilePath($url, 'fr');
+        File::ensureDirectoryExists(dirname($path));
+        File::put($path, 'Already cached');
+        $this->mock(Client::class)->shouldNotReceive('get');
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+            ->assertOk()
+            ->assertJsonPath('message', 'Page is already cached.');
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 0);
+    }
+
+    #[Test]
+    public function it_lists_and_caches_a_homepage_without_a_trailing_slash_using_the_file_driver()
+    {
+        $disk = Storage::fake('cache-homepage');
+        $cacher = $this->cachePages([], ['driver' => 'file', 'path' => $disk->path('pages')]);
+        $url = 'https://example.com';
+        StaticWarm::hook('additional', fn () => collect([$url]));
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.url', $url);
+
+        $this->mock(Client::class)->shouldReceive('get')->once()->with($url, Mockery::type('array'))
+            ->andReturnUsing(function () use ($cacher, $url) {
+                $cacher->cachePage(Request::create($url), 'Cached homepage');
+
+                return new GuzzleResponse(200);
+            });
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])
+            ->assertOk()
+            ->assertJsonPath('url', $url);
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 0);
+    }
+
+    #[Test]
+    public function it_does_not_cache_individual_pages_when_static_caching_is_disabled()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+        config(['statamic.static_caching.strategy' => null]);
+        $this->mock(Client::class)->shouldNotReceive('get');
+
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => 'https://example.com/about'])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Static caching is not enabled.');
+    }
+
+    #[Test]
     public function it_sends_operation_feedback_as_a_toast()
     {
         config(['statamic.static_caching.strategy' => null]);
@@ -209,6 +365,36 @@ class CacheManagerTest extends TestCase
             ->missing('operationResult')
             ->missing('images')
         );
+    }
+
+    #[Test]
+    public function it_clears_the_stache_without_warming_it()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+        Event::fake([StacheCleared::class, StacheWarmed::class]);
+        $url = cp_route('utilities.cache');
+
+        $this->from($url)->post(cp_route('utilities.cache.clear-stache'))
+            ->assertRedirect($url)
+            ->assertSessionHas('success', fn ($message) => str_starts_with($message, 'Stache cleared in '));
+
+        Event::assertDispatched(StacheCleared::class);
+        Event::assertNotDispatched(StacheWarmed::class);
+    }
+
+    #[Test]
+    public function it_warms_the_stache_without_clearing_it()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+        Event::fake([StacheCleared::class, StacheWarmed::class]);
+        $url = cp_route('utilities.cache');
+
+        $this->from($url)->post(cp_route('utilities.cache.warm-stache'))
+            ->assertRedirect($url)
+            ->assertSessionHas('success', fn ($message) => str_starts_with($message, 'Stache warmed in '));
+
+        Event::assertDispatched(StacheWarmed::class);
+        Event::assertNotDispatched(StacheCleared::class);
     }
 
     #[Test]
@@ -399,7 +585,7 @@ class CacheManagerTest extends TestCase
         $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => ['https://example.com/blog/one']])
             ->assertOk()
             ->assertJsonPath('count', 2)
-            ->assertJsonPath('message', fn ($message) => str_starts_with($message, 'Invalidated 2 cached pages in '));
+            ->assertJsonPath('message', fn ($message) => str_starts_with($message, 'Cleared 2 cached pages in '));
 
         $this->assertSame(['/blog/one-more'], $cacher->getUrls('https://example.com')->values()->all());
         $this->assertSame(['/blog/one'], $cacher->getUrls('https://example.de')->values()->all());
@@ -482,6 +668,7 @@ class CacheManagerTest extends TestCase
         $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => ['/blog/*']])->assertForbidden();
         $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => ['/blog/*']])->assertForbidden();
         $this->postJson(cp_route('utilities.cache.warm-static'))->assertForbidden();
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => 'https://example.com/blog/one'])->assertForbidden();
     }
 
     #[Test]
@@ -491,6 +678,7 @@ class CacheManagerTest extends TestCase
 
         $this->get(cp_route('utilities.cache'))->assertInertia(fn (AssertableInertia $page) => $page
             ->where('staticPagesUrl', cp_route('utilities.cache.static-pages'))
+            ->where('cacheStaticPageUrl', cp_route('utilities.cache.cache-static-page'))
             ->where('previewStaticPagesUrl', cp_route('utilities.cache.preview-static-pages'))
             ->where('warmStaticUrl', cp_route('utilities.cache.warm-static'))
             ->where('cacheSites.1', ['value' => 'fr', 'label' => 'French'])
@@ -506,7 +694,7 @@ class CacheManagerTest extends TestCase
 
         $this->from($url)->post(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => ['/blog/*']])
             ->assertRedirect($url)
-            ->assertSessionHas('success', fn ($message) => str_starts_with($message, 'Invalidated 1 cached page in '));
+            ->assertSessionHas('success', fn ($message) => str_starts_with($message, 'Cleared 1 cached page in '));
     }
 
     #[Test]

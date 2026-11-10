@@ -5,9 +5,11 @@ namespace Statamic\StaticCaching;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\Support\Str;
 
 class CachedPages
@@ -34,7 +36,7 @@ class CachedPages
     public function coverage(): array
     {
         $urls = app(WarmableUrls::class)->all();
-        $cached = $urls->filter(fn ($url) => $this->cacher->hasCachedPage(Request::create($url)))->count();
+        $cached = $urls->filter(fn ($url) => $this->isCached($url))->count();
 
         return [
             'cached' => $cached,
@@ -46,9 +48,22 @@ class CachedPages
     public function uncached(): Collection
     {
         return app(WarmableUrls::class)->all()
-            ->reject(fn ($url) => $this->cacher->hasCachedPage(Request::create($url)))
+            ->reject(fn ($url) => $this->isCached($url))
             ->map(fn ($url) => $this->page($url, Request::create($url)->getSchemeAndHttpHost()))
             ->values();
+    }
+
+    public function isCached(string $url): bool
+    {
+        $request = Request::create($url);
+
+        if ($this->cacher instanceof FileCacher) {
+            $normalized = $this->cacher->getUrl($request);
+
+            return File::exists($this->cacher->getFilePath($normalized, Site::findByUrl($url)?->handle()));
+        }
+
+        return $this->cacher->hasCachedPage($request);
     }
 
     private function page(string $url, string $domain): array

@@ -2,6 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Artisan;
@@ -20,6 +22,8 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Imaging\CachedImages;
 use Statamic\StaticCaching\CachedPages;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Statamic\StaticCaching\RecacheToken;
+use Statamic\StaticCaching\WarmableUrls;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -38,6 +42,7 @@ class CacheController extends CpController
             'images' => Inertia::defer(fn () => $this->getImageCacheStats()),
             'cacheSites' => Site::all()->map(fn ($site) => ['value' => $site->handle(), 'label' => $site->name()])->values(),
             'staticPagesUrl' => cp_route('utilities.cache.static-pages'),
+            'cacheStaticPageUrl' => cp_route('utilities.cache.cache-static-page'),
             'previewStaticPagesUrl' => cp_route('utilities.cache.preview-static-pages'),
             'imageContainersUrl' => cp_route('utilities.cache.image-containers'),
             'clearImageContainerUrl' => cp_route('utilities.cache.clear-image-container'),
@@ -121,9 +126,9 @@ class CacheController extends CpController
     {
         $started = microtime(true);
 
-        Stache::refresh();
+        Stache::clear();
 
-        return back()->withSuccess(__('Stache rebuilt in :time.', ['time' => $this->operationTime($started)]));
+        return back()->withSuccess(__('Stache cleared in :time.', ['time' => $this->operationTime($started)]));
     }
 
     public function clearStaticCache()
@@ -163,7 +168,9 @@ class CacheController extends CpController
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['sometimes', 'integer', 'min:1'],
             'perPage' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'sort' => ['sometimes', Rule::in(['url', 'path', 'generated_at', 'site_name', 'domain'])],
+            'sort' => ['sometimes', Rule::in($request->input('status') === 'uncached'
+                ? ['url', 'path', 'site_name', 'domain']
+                : ['url', 'path', 'generated_at', 'site_name', 'domain'])],
             'order' => ['sometimes', Rule::in(['asc', 'desc'])],
             'columns' => ['nullable', 'string', 'max:255'],
         ]);
@@ -177,7 +184,7 @@ class CacheController extends CpController
         $page = $filters['page'] ?? 1;
         $items = $pages->forPage($page, $perPage)->values();
 
-        if ($sort !== 'generated_at') {
+        if (! $uncached && $sort !== 'generated_at') {
             $items = $cachedPages->withGeneratedAt($items);
         }
 
@@ -198,6 +205,44 @@ class CacheController extends CpController
         ];
     }
 
+    public function cacheStaticPage(Request $request, CachedPages $cachedPages, WarmableUrls $warmableUrls, Client $client)
+    {
+        abort_unless(config('statamic.static_caching.strategy'), 422, __('Static caching is not enabled.'));
+
+        $input = $request->validate([
+            'url' => ['required', 'string', 'max:2048', Rule::in($warmableUrls->all()->all())],
+        ]);
+        $url = $input['url'];
+
+        if ($cachedPages->isCached($url)) {
+            return ['message' => __('Page is already cached.'), 'url' => $url];
+        }
+
+        $started = microtime(true);
+        $target = config('statamic.static_caching.background_recache', false)
+            ? RecacheToken::addToUrl($url)
+            : $url;
+
+        try {
+            $response = $client->get($target, [
+                'verify' => ! config('statamic.static_caching.warm_insecure') && ! app()->isLocal(),
+                'allow_redirects' => false,
+                'timeout' => 30,
+            ]);
+        } catch (GuzzleException) {
+            return response()->json(['message' => __('Unable to cache this page.')], 502);
+        }
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || ! $cachedPages->isCached($url)) {
+            return response()->json(['message' => __('The page could not be cached.')], 422);
+        }
+
+        return [
+            'message' => __('Page cached in :time.', ['time' => $this->operationTime($started)]),
+            'url' => $url,
+        ];
+    }
+
     protected function staticPageColumns(Request $request): Columns
     {
         $uncached = $request->input('status') === 'uncached';
@@ -210,7 +255,7 @@ class CacheController extends CpController
             Column::make('domain')->label(__('Domain'))->visible(false)->defaultVisibility(false),
             Column::make('actions')->label(__('Actions'))->sortable(false),
         ]))
-            ->reject(fn ($column) => $uncached && in_array($column->field(), ['generated_at', 'actions']))
+            ->reject(fn ($column) => $uncached && $column->field() === 'generated_at')
             ->values()
             ->map(fn ($column, $index) => $column->defaultOrder($index))
             ->setPreferred($request->filled('columns')

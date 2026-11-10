@@ -27,6 +27,7 @@ function mountExplorer() {
         props: {
             url: '/cached-pages',
             invalidateUrl: '/invalidate',
+            cacheUrl: '/cache-page',
             sites: [{ value: 'en', label: 'English' }, { value: 'fr', label: 'French' }],
         },
         global: {
@@ -75,14 +76,14 @@ test('invalidates an individual URL once, reports the actual result, and refresh
     let resolve;
     axios.post.mockReturnValue(new Promise((done) => resolve = done));
     const wrapper = mountExplorer();
-    const rowButton = wrapper.findAllComponents(Button).find((button) => button.props('text') === 'Invalidate');
+    const rowButton = wrapper.findAllComponents(Button).find((button) => button.props('text') === 'Clear');
 
     await rowButton.trigger('click');
     await rowButton.trigger('click');
     expect(axios.post).toHaveBeenCalledExactlyOnceWith('/invalidate', { urls: [url], site: null, domain: null });
     expect(rowButton.props('disabled')).toBe(true);
 
-    const result = { message: 'Invalidated 2 cached pages in 3ms.', count: 2 };
+    const result = { message: 'Cleared 2 cached pages in 3ms.', count: 2 };
     resolve({ data: result });
     await flushPromises();
 
@@ -109,16 +110,55 @@ test('browses uncached URLs without offering invalidation or selection', async (
     expect(listing.props('sortColumn')).toBe('url');
     expect(listing.props('sortDirection')).toBe('asc');
     expect(listing.props('selections')).toEqual([]);
-    expect(wrapper.findAllComponents(Button).some((button) => button.props('text') === 'Invalidate')).toBe(false);
+    expect(wrapper.findAllComponents(Button).some((button) => button.props('text') === 'Clear')).toBe(false);
 
     listing.vm.$emit('bulkAction', [url]);
     expect(axios.post).not.toHaveBeenCalled();
     wrapper.unmount();
 });
 
+test('caches an uncached URL once, refreshes after success, and permits retry after failure', async () => {
+    const wrapper = mountExplorer();
+    wrapper.findAllComponents(Select)[0].vm.$emit('update:modelValue', 'uncached');
+    await nextTick();
+
+    let resolve;
+    axios.post.mockReturnValueOnce(new Promise((done) => resolve = done));
+    const cache = wrapper.findAllComponents(Button).find((button) => button.props('text') === 'Cache');
+    await cache.trigger('click');
+    await cache.trigger('click');
+
+    expect(axios.post).toHaveBeenCalledExactlyOnceWith('/cache-page', { url });
+    expect(cache.props('disabled')).toBe(true);
+    expect(cache.props('loading')).toBe(true);
+
+    const result = { message: 'Page cached in 30ms.', url };
+    resolve({ data: result });
+    await flushPromises();
+
+    expect(toast.success).toHaveBeenCalledExactlyOnceWith(result.message);
+    expect(refresh).toHaveBeenCalledOnce();
+    expect(wrapper.emitted('cached')).toEqual([[result]]);
+    expect(wrapper.emitted('processing')).toEqual([[true], [false]]);
+    expect(cache.props('disabled')).toBe(false);
+
+    axios.post.mockRejectedValueOnce({ response: { data: { message: 'The page could not be cached.' } } });
+    await cache.trigger('click');
+    await flushPromises();
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith('The page could not be cached.');
+    expect(refresh).toHaveBeenCalledOnce();
+    expect(cache.props('disabled')).toBe(false);
+
+    axios.post.mockResolvedValueOnce({ data: result });
+    await cache.trigger('click');
+    await flushPromises();
+    expect(refresh).toHaveBeenCalledTimes(2);
+    wrapper.unmount();
+});
+
 test('retains selections across pages and invalidates all selected URLs', async () => {
     const selected = [url, 'https://example.de/blog/two'];
-    axios.post.mockResolvedValue({ data: { message: 'Invalidated 2 cached pages.', count: 2 } });
+    axios.post.mockResolvedValue({ data: { message: 'Cleared 2 cached pages.', count: 2 } });
     const wrapper = mountExplorer();
     const listing = wrapper.findComponent(CacheListing);
 
@@ -136,7 +176,7 @@ test('retains selections across pages and invalidates all selected URLs', async 
 });
 
 test('keeps selections after a failed invalidation and allows retrying', async () => {
-    axios.post.mockRejectedValue({ response: { data: { errors: { urls: ['Could not invalidate these URLs.'] } } } });
+    axios.post.mockRejectedValue({ response: { data: { errors: { urls: ['Could not clear these URLs.'] } } } });
     const wrapper = mountExplorer();
     const listing = wrapper.findComponent(CacheListing);
 
@@ -145,12 +185,12 @@ test('keeps selections after a failed invalidation and allows retrying', async (
     listing.vm.$emit('bulkAction', [url]);
     await flushPromises();
 
-    expect(toast.error).toHaveBeenCalledExactlyOnceWith('Could not invalidate these URLs.');
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith('Could not clear these URLs.');
     expect(listing.props('selections')).toEqual([url]);
     expect(listing.props('selections')).toEqual([url]);
     expect(refresh).not.toHaveBeenCalled();
 
-    axios.post.mockResolvedValue({ data: { message: 'Invalidated 1 cached page.', count: 1 } });
+    axios.post.mockResolvedValue({ data: { message: 'Cleared 1 cached page.', count: 1 } });
     listing.vm.$emit('bulkAction', [url]);
     await flushPromises();
 
@@ -219,6 +259,7 @@ test('uses the native listing for sorting, column preferences, search, paginatio
         props: {
             url: '/cached-pages',
             invalidateUrl: '/invalidate',
+            cacheUrl: '/cache-page',
             sites: [{ value: 'en', label: 'English' }, { value: 'fr', label: 'French' }],
         },
         global: {
