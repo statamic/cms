@@ -153,8 +153,10 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $filePath = $this->getFilePath($domain.$url, $site);
+
         $this->getFiles($site)
-            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->filter(fn ($file, $path) => $path === $filePath || str_starts_with($file, $url.'_'))
             ->each(function ($file, $path) {
                 $this->writer->delete($path);
             });

@@ -59,7 +59,7 @@ class CachedImages
     {
         $before = $this->stats($container);
 
-        $container->assets()->each(fn ($asset) => Glide::clearAsset($asset));
+        $container->assets()->each(fn ($asset) => Glide::clearAsset($asset, preserveHybridMappings: true));
 
         $this->server->getCache()->deleteDirectory('containers/'.$container->id());
 
@@ -149,7 +149,7 @@ class CachedImages
     {
         $before = $this->stats($asset->container(), $asset->path());
 
-        Glide::clearAsset($asset);
+        Glide::clearAsset($asset, preserveHybridMappings: true);
 
         $after = $this->stats($asset->container(), $asset->path());
 

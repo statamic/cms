@@ -5,6 +5,7 @@ namespace Tests\Feature\Utilities;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Glide;
@@ -518,6 +519,7 @@ class ImageCacheExplorerTest extends TestCase
 
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
         $keys = Glide::cacheStore()->get($manifestKey);
+        $hybridKeys = collect($keys)->filter(fn ($key) => str_starts_with($key, 'hybrid::'))->values()->all();
         $disk = Storage::disk('image-cache-explorer');
         $size = collect($disk->allFiles('containers/blog/'.$asset->path()))->sum(fn ($path) => $disk->size($path));
         $otherFiles = $disk->allFiles('containers/blog/'.$otherAsset->path());
@@ -531,9 +533,9 @@ class ImageCacheExplorerTest extends TestCase
         $this->assertSame([], $disk->allFiles('containers/blog/'.$asset->path()));
         $this->assertSame($otherFiles, $disk->allFiles('containers/blog/'.$otherAsset->path()));
         Storage::disk('image-originals')->assertExists($asset->path());
-        $this->assertNull(Glide::cacheStore()->get($manifestKey));
+        $this->assertSame($hybridKeys, Glide::cacheStore()->get($manifestKey));
 
-        foreach ($keys as $key) {
+        foreach (array_diff($keys, $hybridKeys) as $key) {
             $this->assertNull(Glide::cacheStore()->get($key));
         }
 
@@ -550,6 +552,69 @@ class ImageCacheExplorerTest extends TestCase
 
         $generator->generateByAsset($asset, ['w' => 10]);
         $this->assertCount(1, $disk->allFiles('containers/blog/'.$asset->path()));
+    }
+
+    #[Test]
+    #[DataProvider('hybridCacheClearActions')]
+    public function it_regenerates_existing_hybrid_urls_after_clearing_an_asset_or_container(string $action)
+    {
+        $disk = Storage::disk('image-cache-explorer');
+        config([
+            'statamic.assets.image_manipulation.cache' => 'hybrid',
+            'statamic.assets.image_manipulation.cache_path' => $disk->path(''),
+        ]);
+
+        $asset = $this->createAsset('blog', 'nested/photo.jpg');
+        $builder = new HybridUrlBuilder(app(GlideCachePathResolver::class), ['route' => '/img']);
+        $url = $builder->build($asset, ['w' => 10]);
+        $uncachedUrl = $builder->build($asset, ['w' => 20]);
+        $path = app(ImageGenerator::class)->generateByAsset($asset, ['w' => 10]);
+        $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
+        $recipes = collect(Glide::cacheStore()->get($manifestKey))
+            ->filter(fn ($key) => str_starts_with($key, 'hybrid::'))
+            ->mapWithKeys(fn ($key) => [$key => Glide::cacheStore()->get($key)]);
+
+        $this->get($url)->assertOk();
+
+        $input = ['container' => 'blog'];
+
+        if ($action === 'clear-image-asset') {
+            $input['asset'] = $asset->id();
+        }
+
+        $this->postJson(cp_route('utilities.cache.'.$action), $input)
+            ->assertOk()
+            ->assertJsonPath('count', 1);
+
+        $disk->assertMissing($path);
+        $this->assertSame($recipes->keys()->all(), Glide::cacheStore()->get($manifestKey));
+        $this->assertNull(Glide::cacheStore()->get(ImageGenerator::manipulationCacheKey('asset', $asset, ['w' => 10])));
+
+        foreach ($recipes as $key => $recipe) {
+            $this->assertSame($recipe, Glide::cacheStore()->get($key));
+        }
+
+        $this->get($url)->assertOk();
+        $this->get($uncachedUrl)->assertOk();
+        $disk->assertExists($path);
+        $this->assertCount(2, $disk->allFiles('containers/blog/'.$asset->path()));
+
+        Glide::clearAsset($asset);
+
+        $this->assertSame([], $disk->allFiles('containers/blog/'.$asset->path()));
+        $this->assertNull(Glide::cacheStore()->get($manifestKey));
+
+        foreach ($recipes->keys() as $key) {
+            $this->assertNull(Glide::cacheStore()->get($key));
+        }
+    }
+
+    public static function hybridCacheClearActions(): array
+    {
+        return [
+            'asset' => ['clear-image-asset'],
+            'container' => ['clear-image-container'],
+        ];
     }
 
     #[Test]
@@ -582,6 +647,7 @@ class ImageCacheExplorerTest extends TestCase
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
         $keys = Glide::cacheStore()->get($manifestKey);
         $this->assertCount(2, $keys);
+        $hybridKeys = collect($keys)->filter(fn ($key) => str_starts_with($key, 'hybrid::'))->values()->all();
 
         $disk = Storage::disk('image-cache-explorer');
         $disk->put('containers/blog/deleted.jpg/old.jpg', 'orphan');
@@ -602,9 +668,9 @@ class ImageCacheExplorerTest extends TestCase
         $this->assertSame($otherFiles, $disk->allFiles('containers/blogger'));
         $disk->assertExists('paths/photo.jpg/one.jpg');
         Storage::disk('image-originals')->assertExists(['nested/photo.jpg', 'profile.jpg']);
-        $this->assertNull(Glide::cacheStore()->get($manifestKey));
+        $this->assertSame($hybridKeys, Glide::cacheStore()->get($manifestKey));
 
-        foreach ($keys as $key) {
+        foreach (array_diff($keys, $hybridKeys) as $key) {
             $this->assertNull(Glide::cacheStore()->get($key));
         }
 

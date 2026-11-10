@@ -130,11 +130,25 @@ class CachedPages
 
     public function matching(Collection $pages, array $rules, ?string $site = null): Collection
     {
-        $baseUrl = rtrim(($site ? Site::get($site) : Site::selected())->absoluteUrl(), '/');
+        $sites = $site ? collect([Site::get($site)]) : Site::all();
 
-        $rules = collect($rules)->map(function ($rule) use ($baseUrl) {
-            return URL::isAbsolute($rule) ? $rule : $baseUrl.'/'.ltrim($rule, '/');
-        });
+        $rules = collect($rules)->flatMap(function ($rule) use ($sites) {
+            if (URL::isAbsolute($rule)) {
+                return [$rule];
+            }
+
+            return $sites->map(fn ($site) => rtrim($site->absoluteUrl(), '/').'/'.ltrim($rule, '/'))->values()->all();
+        })->unique()->values();
+
+        if ($this->cacher instanceof FileCacher) {
+            // Static files can outlive the URL index when the application cache is cleared.
+            $unindexed = $rules
+                ->reject(fn ($rule) => str_ends_with($rule, '*') || $pages->contains('url', $rule))
+                ->filter(fn ($url) => Site::findByUrl($url) && $this->isCached($url))
+                ->map(fn ($url) => $this->page($url, Request::create($url)->getSchemeAndHttpHost()));
+
+            $pages = $pages->merge($unindexed)->unique('url');
+        }
 
         return $pages->filter(function ($page) use ($rules) {
             return $rules->contains(function ($rule) use ($page) {
@@ -155,6 +169,9 @@ class CachedPages
 
         $this->cacher->invalidateUrls($pages->pluck('url')->all());
 
-        return $pages->pluck('url')->diff($this->all()->pluck('url'))->count();
+        $remaining = $this->all()->pluck('url');
+
+        return $pages->reject(fn ($page) => $remaining->contains($page['url'])
+            || ($this->cacher instanceof FileCacher && $this->isCached($page['url'])))->count();
     }
 }

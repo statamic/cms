@@ -266,8 +266,8 @@ class CacheController extends CpController
     public function previewStaticPages(Request $request, CachedPages $cachedPages)
     {
         $input = $this->validateStaticUrls($request);
-        $pages = $cachedPages->filter($cachedPages->all(), $input);
-        $matches = $cachedPages->matching($pages, $input['urls'], $input['site'] ?? null);
+        $matches = $cachedPages->matching($cachedPages->all(), $input['urls'], $input['site'] ?? null);
+        $matches = $cachedPages->filter($matches, $input);
 
         return ['data' => $matches->take(10)->values(), 'total' => $matches->count()];
     }
@@ -276,8 +276,8 @@ class CacheController extends CpController
     {
         $started = microtime(true);
         $input = $this->validateStaticUrls($request);
-        $pages = $cachedPages->filter($cachedPages->all(), $input);
-        $matches = $cachedPages->matching($pages, $input['urls'], $input['site'] ?? null);
+        $matches = $cachedPages->matching($cachedPages->all(), $input['urls'], $input['site'] ?? null);
+        $matches = $cachedPages->filter($matches, $input);
         $count = $cachedPages->invalidate($matches);
 
         $message = trans_choice('statamic::messages.cache_utility_invalidated', $count, [

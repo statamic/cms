@@ -633,6 +633,31 @@ class CacheManagerTest extends TestCase
     }
 
     #[Test]
+    public function it_previews_and_invalidates_relative_urls_across_all_sites()
+    {
+        $urls = [
+            'https://example.com/blog/one',
+            'https://example.com/fr/blog/one',
+            'https://example.de/blog/one',
+        ];
+        $cacher = $this->cachePages([...$urls, 'https://example.com/about']);
+        Site::setSelected('fr');
+        $input = ['urls' => ['/blog/*', '/blog/one'], 'site' => null];
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), $input)
+            ->assertOk()
+            ->assertJsonPath('total', 3)
+            ->assertJsonCount(3, 'data');
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), $input)
+            ->assertOk()
+            ->assertJsonPath('count', 3);
+
+        $this->assertSame(['/about'], $cacher->getUrls('https://example.com')->values()->all());
+        $this->assertCount(0, $cacher->getUrls('https://example.de'));
+    }
+
+    #[Test]
     public function it_ignores_blank_lines_and_deduplicates_overlapping_matches()
     {
         $this->cachePages(['https://example.com/blog/one', 'https://example.com/blog/two']);
@@ -718,6 +743,77 @@ class CacheManagerTest extends TestCase
         $this->assertFileDoesNotExist($cacher->getFilePath($urls[0]));
         $this->assertFileDoesNotExist($cacher->getFilePath($urls[1]));
         $this->assertFileExists($cacher->getFilePath($urls[2]));
+    }
+
+    #[Test]
+    public function it_previews_and_invalidates_exact_file_urls_after_the_application_cache_is_cleared()
+    {
+        $disk = Storage::fake('unindexed-static-pages');
+        $cacher = $this->cachePages([], ['driver' => 'file', 'path' => [
+            'en' => $disk->path('en'),
+            'fr' => $disk->path('fr'),
+            'de' => $disk->path('de'),
+        ]]);
+        $urls = [
+            'https://example.com/about',
+            'https://example.com/fr/about',
+            'https://example.de/about?foo=bar',
+        ];
+
+        foreach ($urls as $url) {
+            $site = Site::findByUrl($url)->handle();
+            $path = $cacher->getFilePath($url, $site);
+            File::ensureDirectoryExists(dirname($path));
+            File::put($path, 'Cached page');
+            $parts = parse_url($url);
+            $cacher->cacheUrl(md5($url), $url, $parts['scheme'].'://'.$parts['host']);
+        }
+
+        $this->post(cp_route('utilities.cache.clear-application-cache'))->assertRedirect();
+        $this->assertCount(0, $cacher->getDomains());
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => [...$urls, $urls[0]]])
+            ->assertOk()
+            ->assertJsonPath('total', 3)
+            ->assertJsonCount(3, 'data');
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => ['/about'], 'site' => 'fr'])
+            ->assertOk()
+            ->assertJsonPath('total', 1)
+            ->assertJsonPath('data.0.url', $urls[1]);
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => [$urls[0]], 'site' => 'fr'])
+            ->assertOk()
+            ->assertJsonPath('total', 0);
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => [$urls[0]], 'site' => 'fr'])
+            ->assertOk()
+            ->assertJsonPath('count', 0);
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => ['https://unknown.example/about']])
+            ->assertOk()
+            ->assertJsonPath('total', 0);
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), [
+            'urls' => $urls,
+            'domain' => 'https://example.de',
+        ])->assertOk()->assertJsonPath('count', 1);
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => ['/about']])
+            ->assertOk()
+            ->assertJsonPath('count', 2);
+
+        foreach ($urls as $url) {
+            $this->assertFileDoesNotExist($cacher->getFilePath($url, Site::findByUrl($url)->handle()));
+        }
+
+        $this->postJson(cp_route('utilities.cache.preview-static-pages'), ['urls' => $urls])
+            ->assertOk()
+            ->assertJsonPath('total', 0);
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => $urls])
+            ->assertOk()
+            ->assertJsonPath('count', 0);
     }
 
     #[Test]
