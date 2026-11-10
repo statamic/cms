@@ -3,9 +3,11 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
@@ -664,6 +666,107 @@ EOT;
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
         ], true));
+    }
+
+    #[Test]
+    #[DataProvider('repeatedNavProvider')]
+    public function a_nav_output_more_than_once_gives_what_each_tag_gives_on_its_own($first, $second)
+    {
+        $this->createCollectionAndNav();
+
+        $template = fn ($params) => '{{ nav:test '.$params.' }}[{{ id ?? entry_id }} {{ depth }}{{ if first }} first{{ /if }}{{ if last }} last{{ /if }}{{ if children }} > {{ children }}({{ id ?? entry_id }} {{ depth }}{{ if parent }} in {{ parent:id }}{{ /if }}){{ /children }}{{ /if }}]{{ /nav:test }}';
+
+        $alone = [];
+        foreach ([$first, $second] as $params) {
+            Blink::flush();
+            Blink::store('structure-tag-trees')->flush();
+            $alone[] = (string) Antlers::parse($template($params), [], true);
+        }
+
+        Blink::flush();
+        Blink::store('structure-tag-trees')->flush();
+
+        $this->assertNotSame('', $alone[0]);
+        $this->assertSame(
+            $alone[0].'|'.$alone[1].'|'.$alone[0],
+            (string) Antlers::parse($template($first).'|'.$template($second).'|'.$template($first), [], true)
+        );
+    }
+
+    public static function repeatedNavProvider()
+    {
+        return [
+            'the same tag twice' => ['', ''],
+            'whole tree then one level' => ['', 'max_depth="1"'],
+            'one level then whole tree' => ['max_depth="1"', ''],
+            'one level then two' => ['max_depth="1"', 'max_depth="2"'],
+            'two levels then one' => ['max_depth="2"', 'max_depth="1"'],
+            'deeper than the tree, then all of it' => ['max_depth="5"', ''],
+            'limited then offset' => ['limit="2"', 'offset="2"'],
+            'with and without parents' => ['include_parents="false"', ''],
+            'selected fields then all fields' => ['select="title"', ''],
+            'hidden then shown unpublished entries' => ['', 'show_unpublished="true"'],
+            'shown then hidden unpublished entries' => ['show_unpublished="true"', 'max_depth="1"'],
+        ];
+    }
+
+    #[Test]
+    public function a_nav_output_more_than_once_is_only_built_as_often_as_it_needs_to_be()
+    {
+        $this->createCollectionAndNav();
+
+        $built = fn () => collect(Blink::store('structure-tag-trees')->all())->flatten(1)->count();
+
+        // The whole tree serves any depth.
+        $this->parseBasicTemplate('test');
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'limit="1" include_parents="false"');
+        $this->assertSame(1, $built());
+
+        // One level of a deeper tree can't serve two levels, but two levels reach the bottom of this one.
+        Blink::store('structure-tag-trees')->flush();
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'max_depth="2"');
+        $this->parseBasicTemplate('test');
+        $this->assertSame(2, $built());
+
+        // Parameters that change which pages are in the tree get a tree of their own.
+        $this->parseBasicTemplate('test', 'show_unpublished="true"');
+        $this->assertSame(3, $built());
+    }
+
+    #[Test]
+    public function a_reused_nav_still_works_out_the_current_page_for_each_tag()
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1'],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
+        $this->assertEquals('[1=parent][1-1=current][2]', (string) Antlers::parse($template, [], true));
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
+        $this->assertEquals('[1][1-1][2=current]', (string) Antlers::parse($template, [], true));
+
+        $this->assertCount(1, collect(Blink::store('structure-tag-trees')->all())->flatten(1));
+    }
+
+    #[Test]
+    public function a_nav_saved_after_it_was_output_is_built_again()
+    {
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1']]);
+        $this->assertEquals('[1]', $this->parseBasicTemplate('test'));
+
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1'], ['id' => '2', 'title' => '2', 'url' => '/2']]);
+        $this->assertEquals('[1][2]', $this->parseBasicTemplate('test'));
     }
 
     private function makeNav($tree)

@@ -377,6 +377,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
         return $value;
     }
 
+    public function hasChildren(): bool
+    {
+        return ! empty($this->children);
+    }
+
     public function pages()
     {
         $pages = (new Pages)
