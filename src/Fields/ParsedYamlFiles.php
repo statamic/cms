@@ -2,13 +2,13 @@
 
 namespace Statamic\Fields;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
-use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 
 /**
- * Parsed blueprint and fieldset YAML, kept in the Stache's cache store
+ * Parsed blueprint and fieldset YAML, kept in the cache
  * between requests. Each file's entry is stored with a hash of the
  * contents it was parsed from, so a changed file is parsed again.
  *
@@ -23,7 +23,7 @@ class ParsedYamlFiles
         // Keyed on the path within the app, so a deploy into a new release directory reuses the entries.
         $key = 'statamic.parsed-yaml::'.md5(Str::after($path, base_path()));
         $hash = hash('xxh128', (string) $contents);
-        $cache = Stache::cacheStore();
+        $cache = Cache::store();
 
         $cached = $cache->get($key);
 

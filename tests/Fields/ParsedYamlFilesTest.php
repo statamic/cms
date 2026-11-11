@@ -3,8 +3,8 @@
 namespace Tests\Fields;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Facades\Stache;
 use Statamic\Fields\ParsedYamlFiles;
 use Statamic\Support\Str;
 use Statamic\Yaml\ParseException;
@@ -46,7 +46,7 @@ class ParsedYamlFilesTest extends TestCase
 
         // Swap what's stored for something parsing the file couldn't give, to show it's what comes back.
         $key = 'statamic.parsed-yaml::'.md5(Str::after($path, base_path()));
-        Stache::cacheStore()->forever($key, ['data' => ['title' => 'From the cache']] + Stache::cacheStore()->get($key));
+        Cache::store()->forever($key, ['data' => ['title' => 'From the cache']] + Cache::store()->get($key));
 
         $this->assertSame(['title' => 'From the cache'], ParsedYamlFiles::parse($path));
     }
@@ -77,7 +77,7 @@ class ParsedYamlFilesTest extends TestCase
             $this->assertSame($path, $e->getFile());
         }
 
-        $this->assertNull(Stache::cacheStore()->get('statamic.parsed-yaml::'.md5(Str::after($path, base_path()))));
+        $this->assertNull(Cache::store()->get('statamic.parsed-yaml::'.md5(Str::after($path, base_path()))));
     }
 
     #[Test]
