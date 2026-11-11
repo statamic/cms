@@ -41,9 +41,14 @@ trait ChecksEntryVersions
             return;
         }
 
+        $workingCopy = $entry->revisionsEnabled() ? $entry->workingCopy() : null;
+        $user = $workingCopy ? $workingCopy->user() : $entry->lastModifiedBy();
+
         // The current version lets the editor deliberately save over the changes.
         throw new HttpResponseException(response()->json([
-            'message' => __('statamic::messages.entry_version_conflict'),
+            'message' => $user
+                ? __('statamic::messages.entry_version_conflict_by_user', ['user' => $user->name()])
+                : __('statamic::messages.entry_version_conflict'),
             'version' => $version,
         ], 409));
     }

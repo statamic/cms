@@ -52,7 +52,8 @@ class EntryVersionConflictTest extends TestCase
 
         $this->save($entry, 'Stale overwrite', $staleVersion)
             ->assertStatus(409)
-            ->assertJsonPath('version', $this->loadVersion($entry));
+            ->assertJsonPath('version', $this->loadVersion($entry))
+            ->assertJsonPath('message', 'Jane Doe saved this entry after you opened it. Reloading shows their changes and discards yours.');
 
         $this->assertEquals('Saved by someone else', Entry::find($entry->id())->value('title'));
     }
