@@ -10,6 +10,8 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Text;
+use Statamic\Modifiers\AcceptsNull;
+use Statamic\Modifiers\Modifier;
 use Tests\Antlers\ParserTestCase;
 
 class CoreModifiersTest extends ParserTestCase
@@ -622,6 +624,33 @@ EOT;
         $this->assertSame('false', $this->renderString('{{ empty_field | bool_string() }}', $data, true));
         $this->assertSame('FALSE', $this->renderString('{{ empty_field | bool_string | upper }}', $data, true));
         $this->assertSame('true', $this->renderString('{{ filled_field | bool_string }}', $data, true));
+    }
+
+    public function test_core_modifiers_that_accept_null_run_for_empty_fields()
+    {
+        $data = ['empty_field' => new Value(null, 'empty_field', new Text)];
+
+        $this->assertSame('null', $this->renderString('{{ empty_field | to_json }}', $data, true));
+        $this->assertSame('null', $this->renderString('{{ empty_field | json }}', $data, true));
+    }
+
+    public function test_modifiers_marked_with_accepts_null_run_for_null()
+    {
+        (new class extends Modifier
+        {
+            protected static $handle = 'accepts_null';
+
+            #[AcceptsNull]
+            public function index($value)
+            {
+                return var_export($value, true);
+            }
+        })::register();
+
+        $data = ['bare' => null, 'wrapped' => new Value(null)];
+
+        $this->assertSame('NULL', $this->renderString('{{ bare | accepts_null }}', $data, true));
+        $this->assertSame('NULL', $this->renderString('{{ wrapped | accepts_null }}', $data, true));
     }
 }
 

@@ -4,6 +4,7 @@ namespace Statamic\View\Antlers\Language\Runtime;
 
 use Illuminate\Support\Facades\Log;
 use Statamic\Fields\Value;
+use Statamic\Modifiers\Loader;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
 use Statamic\Support\Str;
@@ -19,15 +20,6 @@ class ModifierManager
     public static $statamicModifiers = null;
     public static $lastModifierName = null;
     const METHOD_MODIFIER = '{__method_args}';
-
-    /**
-     * Modifiers that should still run when the value is null.
-     *
-     * @var string[]
-     */
-    protected static $nullAwareModifiers = [
-        'bool_string',
-    ];
 
     public static function isModifier(ParameterNode $node)
     {
@@ -104,7 +96,7 @@ class ModifierManager
 
     protected static function acceptsNull($modifierName)
     {
-        return in_array($modifierName, self::$nullAwareModifiers, true);
+        return app(Loader::class)->acceptsNull($modifierName);
     }
 
     public static function evaluate($value, Environment $env, ModifierChainNode $modifierChain, $context)
