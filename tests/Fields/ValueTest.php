@@ -425,31 +425,6 @@ class ValueTest extends TestCase
 
         $this->assertEquals('augmented_value', (string) $value);
     }
-}
-
-class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
-{
-    use \Statamic\Data\HasAugmentedData;
-
-    private $id;
-
-    public function __construct($id)
-    {
-        $this->id = $id;
-    }
-
-    public function blueprint()
-    {
-        return Blueprint::make();
-    }
-
-    public function augmentedArrayData()
-    {
-        return [
-            'id' => $this->id,
-            'title' => 'Title for '.$this->id,
-        ];
-    }
 
     #[Test]
     public function it_remembers_the_augmented_value_of_fieldtypes_that_only_depend_on_the_raw_value()
@@ -498,5 +473,30 @@ class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
 
         $this->assertEquals('foo 1', $value->value());
         $this->assertEquals('foo 2', $value->value());
+    }
+}
+
+class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
+{
+    use \Statamic\Data\HasAugmentedData;
+
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
+
+    public function blueprint()
+    {
+        return Blueprint::make();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'id' => $this->id,
+            'title' => 'Title for '.$this->id,
+        ];
     }
 }
