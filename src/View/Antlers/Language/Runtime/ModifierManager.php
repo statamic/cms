@@ -94,7 +94,7 @@ class ModifierManager
         return true;
     }
 
-    protected static function acceptsNull($modifierName)
+    public static function acceptsNull($modifierName)
     {
         return app(Loader::class)->acceptsNull($modifierName);
     }

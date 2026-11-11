@@ -2821,6 +2821,10 @@ class NodeProcessor
             GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
         }
 
+        if ($value === null && ! ModifierManager::acceptsNull($modifier)) {
+            return null;
+        }
+
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
