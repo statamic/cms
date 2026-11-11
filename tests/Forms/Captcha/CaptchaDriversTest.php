@@ -240,4 +240,13 @@ class CaptchaDriversTest extends TestCase
         $this->assertEquals(2, substr_count($widget, '</script>'));
         $this->assertStringContainsString('{action:"submit"}', $widget);
     }
+
+    #[Test]
+    public function recaptcha_v3_waits_for_the_script_instead_of_submitting_without_a_token()
+    {
+        $widget = (new RecaptchaV3(self::CONFIG))->widget();
+
+        $this->assertStringContainsString('if(input.value)return;event.preventDefault();grecaptcha.ready(', $widget);
+        $this->assertStringContainsString('grecaptcha.ready=grecaptcha.ready||function(cb)', $widget);
+    }
 }

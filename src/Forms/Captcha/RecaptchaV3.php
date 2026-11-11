@@ -14,10 +14,11 @@ class RecaptchaV3 extends Recaptcha
     {
         $key = $this->attr($this->siteKey());
 
-        // Asks Google for a token as the form is submitted, then submits it again.
+        // Asks Google for a token as the form is submitted, then submits it again. The ready()
+        // stub is Google's documented way to queue the call until the async script has loaded.
         return '<input type="hidden" name="g-recaptcha-response" value="" data-captcha data-captcha-recaptcha>'
             .'<script src="https://www.google.com/recaptcha/api.js?render='.$key.'" async defer></script>'
-            .'<script>(function(){document.querySelectorAll("[data-captcha-recaptcha]").forEach(function(input){var form=input.form;if(!form||form.dataset.captchaRecaptcha)return;form.dataset.captchaRecaptcha=1;form.addEventListener("submit",function(event){if(input.value||!window.grecaptcha)return;event.preventDefault();grecaptcha.ready(function(){grecaptcha.execute('.$this->js($this->siteKey()).',{action:'.$this->js($this->action()).'}).then(function(token){input.value=token;form.requestSubmit?form.requestSubmit():form.submit()})})})})})();</script>';
+            .'<script>(function(){if(typeof grecaptcha==="undefined"){grecaptcha={}}grecaptcha.ready=grecaptcha.ready||function(cb){var c="___grecaptcha_cfg";window[c]=window[c]||{};(window[c].fns=window[c].fns||[]).push(cb)};document.querySelectorAll("[data-captcha-recaptcha]").forEach(function(input){var form=input.form;if(!form||form.dataset.captchaRecaptcha)return;form.dataset.captchaRecaptcha=1;form.addEventListener("submit",function(event){if(input.value)return;event.preventDefault();grecaptcha.ready(function(){grecaptcha.execute('.$this->js($this->siteKey()).',{action:'.$this->js($this->action()).'}).then(function(token){input.value=token;form.requestSubmit?form.requestSubmit():form.submit()})})})})})();</script>';
     }
 
     public function action(): string
