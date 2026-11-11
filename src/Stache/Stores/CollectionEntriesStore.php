@@ -335,6 +335,15 @@ class CollectionEntriesStore extends ChildStore
         return Blink::store('entry-snapshots::'.$this->key());
     }
 
+    public function resetMemoizedState()
+    {
+        parent::resetMemoizedState();
+
+        // Blink isn't cleared between a worker's jobs, so the snapshots
+        // would otherwise last for as long as the worker does.
+        $this->snapshots()->flush();
+    }
+
     /**
      * While indexes are being built, hand out a copy of the snapshot taken when the entry
      * was made from its file, rather than unserialising a second full copy from the cache.

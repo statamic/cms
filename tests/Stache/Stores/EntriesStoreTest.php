@@ -508,6 +508,29 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('Saved by another process', $item->get('title'));
     }
 
+    #[Test]
+    public function snapshots_are_not_kept_for_a_later_job_in_the_same_worker()
+    {
+        $this->useSerializingCacheStore();
+
+        // A job builds the entries from their files.
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // Another process saves the entry, which this process's store never hears about.
+        $key = (fn () => $this->getItemCacheKey('blog-christmas'))->call($store);
+        $changed = Stache::cacheStore()->get($key)->set('title', 'Saved by another process');
+        Stache::cacheStore()->forever($key, $changed);
+
+        // The worker moves on to its next job. Blink is left as it was.
+        Stache::stores()->each->resetMemoizedState();
+        app('stache.indexes')->each->resetMemoizedState();
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved by another process', $item->get('title'));
+    }
+
     private function useSerializingCacheStore()
     {
         config([
