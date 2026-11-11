@@ -147,6 +147,62 @@ class FeatureTest extends TestCase
     }
 
     #[Test]
+    public function the_watcher_updates_entry_uris_when_a_tree_file_changes()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        $path = __DIR__.'/__fixtures__/content/structures/collections/pages.yaml';
+        $original = file_get_contents($path);
+
+        try {
+            $this->assertEquals('/about/board/directors', Entry::find('pages-directors')->uri());
+
+            // Move "directors" from under about/board to the top level, as a git pull or a hand edit would.
+            file_put_contents($path, <<<'YAML'
+tree:
+  -
+    entry: pages-home
+  -
+    entry: pages-about
+    children:
+      -
+        entry: pages-board
+  -
+    entry: pages-directors
+  -
+    entry: pages-blog
+
+YAML);
+            touch($path, time() + 10);
+
+            $this->nextRequest();
+
+            $this->assertEquals('/directors', Entry::find('pages-directors')->uri());
+            $this->assertEquals('pages-directors', Entry::findByUri('/directors')?->id());
+            $this->assertNull(Entry::findByUri('/about/board/directors'));
+        } finally {
+            file_put_contents($path, $original);
+        }
+    }
+
+    /**
+     * What the next request starts with: the cache as it is, nothing memoized in the stores.
+     */
+    private function nextRequest()
+    {
+        \Statamic\Facades\Blink::flush();
+
+        $this->stache->stores()
+            ->flatMap(fn ($store) => $store instanceof \Statamic\Stache\Stores\AggregateStore ? $store->discoverStores() : [$store])
+            ->each(function ($store) {
+                $store->resetMemoizedState();
+                (fn () => $this->fileChangesHandled = false)->call($store);
+            });
+
+        app('stache.indexes')->each->resetMemoizedState();
+    }
+
+    #[Test]
     public function it_returns_null_when_cannot_find_entry_by_uri()
     {
         $this->assertNull(Entry::findByUri('/unknown'));

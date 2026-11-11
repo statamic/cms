@@ -168,6 +168,10 @@ return [
     | that will be used when warming the static cache and
     | optionally set the "--insecure" flag by default.
     |
+    | You may also define the job class used to warm each URL. It should
+    | extend Statamic\Console\Commands\StaticWarmJob, for example to
+    | change its uniqueness or add a delay.
+    |
     */
 
     'warm_queue' => env('STATAMIC_STATIC_WARM_QUEUE'),
@@ -175,6 +179,8 @@ return [
     'warm_queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
 
     'warm_insecure' => env('STATAMIC_STATIC_WARM_INSECURE', false),
+
+    'warm_job' => null,
 
     /*
     |--------------------------------------------------------------------------

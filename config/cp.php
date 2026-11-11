@@ -44,6 +44,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | After Saving
+    |--------------------------------------------------------------------------
+    |
+    | What happens after saving an entry or term, until a user picks another
+    | option in the save button dropdown. Supported: "listing",
+    | "continue_editing", "create_another".
+    |
+    */
+
+    'after_save' => 'listing',
+
+    /*
+    |--------------------------------------------------------------------------
     | Dashboard Widgets
     |--------------------------------------------------------------------------
     |

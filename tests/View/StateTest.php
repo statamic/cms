@@ -2,6 +2,7 @@
 
 namespace Tests\View;
 
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\FakesContent;
 use Tests\FakesViews;
@@ -48,6 +49,27 @@ EOT;
         $this->assertSame($expected, $resultOne);
         $this->assertSame($expected, $resultTwo);
         $this->assertSame($expected, $resultThree);
+    }
+
+    public function test_interpolated_variables_are_cleared_between_responses()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '{{ link to="/pages/{slug}" }} {{ num | add:{num} }}');
+
+        $this->createPage('home', [
+            'with' => [
+                'title' => 'Home Page',
+                'num' => 3,
+                'template' => 'default',
+            ],
+        ]);
+
+        $this->assertSame('/pages/home 6', $this->getResponseContent('/home'));
+        $this->assertSame([], GlobalRuntimeState::$interpolatedVariables);
+
+        $this->assertSame('/pages/home 6', $this->getResponseContent('/home'));
+        $this->assertSame([], GlobalRuntimeState::$interpolatedVariables);
     }
 
     protected function getResponseContent($uri)

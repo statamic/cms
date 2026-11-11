@@ -91,6 +91,21 @@ export const _Range: Story = {
     }),
 };
 
+export const _WithoutSeconds: Story = {
+    tags: ['!dev'],
+    args: {
+        date: exampleDate,
+    },
+    render: (args) => ({
+        components: { Timezones },
+        setup() {
+            const date = args.date;
+            return { date };
+        },
+        template: `<Timezones :date="date" :show-seconds="false" />`,
+    }),
+};
+
 const customDateCode = `
 <Timezones :date="isoString" />
 <Timezones :date="dateObject" />

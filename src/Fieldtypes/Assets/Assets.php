@@ -101,11 +101,12 @@ class Assets extends Fieldtype
                     'mode' => [
                         'display' => __('UI Mode'),
                         'instructions' => __('statamic::fieldtypes.assets.config.mode'),
-                        'type' => 'select',
+                        'type' => 'button_group',
                         'default' => 'list',
                         'options' => [
                             'grid' => __('Grid'),
                             'list' => __('List'),
+                            'compact' => __('Compact'),
                         ],
                         'width' => '50',
                     ],

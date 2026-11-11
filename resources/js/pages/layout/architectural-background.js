@@ -1,4 +1,4 @@
-import { nextTick, onMounted, onUnmounted } from 'vue';
+import { getCurrentInstance, nextTick, onMounted, onUnmounted } from 'vue';
 
 const className = 'bg-architectural-lines';
 
@@ -21,5 +21,8 @@ export default function useArchitecturalBackground() {
 
 export function toggleArchitecturalBackground(enable) {
     enable ? add() : remove();
-    onUnmounted(() => remove());
+
+    if (getCurrentInstance()) {
+        onUnmounted(() => remove());
+    }
 }
