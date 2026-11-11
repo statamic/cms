@@ -3,6 +3,7 @@
 namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -57,6 +58,50 @@ class EntriesStoreTest extends TestCase
 
         $this->assertCount(3, $store->paths());
         $this->assertEquals(1, $lookups);
+    }
+
+    #[Test]
+    public function it_only_looks_up_the_collection_once_when_filtering_files_on_multisite()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+            'de' => ['url' => '/de/'],
+        ]);
+
+        $collection = Facades\Collection::make('multisite_pages')->sites(['en', 'fr']);
+
+        $lookups = 0;
+        Facades\Collection::partialMock()
+            ->shouldReceive('findByHandle')
+            ->with('multisite_pages')
+            ->andReturnUsing(function () use ($collection, &$lookups) {
+                $lookups++;
+
+                return $collection;
+            });
+
+        $dir = Path::tidy(__DIR__.'/tmp-multisite');
+        foreach (['en', 'fr', 'de'] as $site) {
+            @mkdir($dir.'/multisite_pages/'.$site, 0777, true);
+            foreach (['one', 'two'] as $slug) {
+                file_put_contents($dir.'/multisite_pages/'.$site.'/'.$slug.'.md', "---\nid: $site-$slug\n---\n");
+            }
+        }
+
+        $store = (new EntriesStore)->directory($dir)->store('multisite_pages');
+
+        try {
+            $this->assertEquals([
+                $dir.'/multisite_pages/en/one.md',
+                $dir.'/multisite_pages/en/two.md',
+                $dir.'/multisite_pages/fr/one.md',
+                $dir.'/multisite_pages/fr/two.md',
+            ], $store->paths()->values()->sort()->values()->all());
+            $this->assertEquals(1, $lookups);
+        } finally {
+            (new Filesystem)->deleteDirectory($dir);
+        }
     }
 
     #[Test]

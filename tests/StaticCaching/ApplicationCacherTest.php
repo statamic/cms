@@ -91,6 +91,78 @@ class ApplicationCacherTest extends TestCase
         $this->assertEquals($content, $cacher->getCachedPage($request)->content);
     }
 
+    #[Test]
+    public function reading_a_generation_date_does_not_load_the_cached_response()
+    {
+        $url = 'http://example.com/test?foo=bar';
+        $timestamp = now()->getTimestamp();
+        $cache = $this->mock(Repository::class);
+        $cache->shouldReceive('get')->with('static-cache:generated-at:'.md5($url))->once()->andReturn($timestamp);
+        $cache->shouldNotReceive('get')->with('static-cache:responses:'.md5($url));
+
+        $cacher = new ApplicationCacher($cache, []);
+
+        $this->assertSame($timestamp, $cacher->getGeneratedAt($url));
+    }
+
+    #[Test]
+    public function generation_dates_expire_with_their_responses()
+    {
+        $this->freezeTime();
+        $cacher = new ApplicationCacher(app(Repository::class), ['base_url' => 'http://example.com', 'expiry' => 1]);
+        $request = Request::create('http://example.com/one');
+        $response = response('Cached content');
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $this->assertSame(now()->getTimestamp(), $cacher->getGeneratedAt($request->getUri()));
+        $this->assertTrue($cacher->hasCachedPage($request));
+
+        $this->travel(61)->seconds();
+
+        $this->assertNull($cacher->getGeneratedAt($request->getUri()));
+        $this->assertFalse($cacher->hasCachedPage($request));
+    }
+
+    #[Test]
+    #[DataProvider('generationDateInvalidationMethods')]
+    public function generation_dates_are_removed_with_their_responses(string $method)
+    {
+        $cacher = new ApplicationCacher(app(Repository::class), ['base_url' => 'http://example.com']);
+
+        foreach (['one', 'one?foo=bar', 'other'] as $path) {
+            $request = Request::create('http://example.com/'.$path);
+            $response = response('Cached content');
+            $cacher->cachePage($request, $response);
+            event(new ResponsePrepared($request, $response));
+            $this->assertNotNull($cacher->getGeneratedAt($request->getUri()));
+        }
+
+        match ($method) {
+            'invalidateUrl' => $cacher->invalidateUrl('/one'),
+            'invalidateUrls' => $cacher->invalidateUrls(['/one']),
+            'flush' => $cacher->flush(),
+        };
+
+        $this->assertNull($cacher->getGeneratedAt('http://example.com/one'));
+        $this->assertNull($cacher->getGeneratedAt('http://example.com/one?foo=bar'));
+
+        if ($method === 'flush') {
+            $this->assertNull($cacher->getGeneratedAt('http://example.com/other'));
+        } else {
+            $this->assertNotNull($cacher->getGeneratedAt('http://example.com/other'));
+        }
+    }
+
+    public static function generationDateInvalidationMethods(): array
+    {
+        return [
+            'single URL' => ['invalidateUrl'],
+            'multiple URLs' => ['invalidateUrls'],
+            'flush' => ['flush'],
+        ];
+    }
+
     public static function cachedResponseProvider()
     {
         return [

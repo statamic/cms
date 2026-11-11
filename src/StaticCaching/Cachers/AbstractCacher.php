@@ -149,6 +149,11 @@ abstract class AbstractCacher implements Cacher
         return collect($this->cache->get($key, []));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        return null;
+    }
+
     /**
      * Flush all the cached URLs.
      *

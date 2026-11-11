@@ -113,6 +113,14 @@ class FileCacher extends AbstractCacher
         return File::exists($this->getFilePath($url));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $site = Site::findByUrl($url)?->handle();
+        $timestamp = @File::lastModified($this->getFilePath($url, $site));
+
+        return $timestamp === false ? null : $timestamp;
+    }
+
     /**
      * Flush out the entire static cache.
      *
@@ -145,8 +153,10 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $filePath = $this->getFilePath($domain.$url, $site);
+
         $this->getFiles($site)
-            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->filter(fn ($file, $path) => $path === $filePath || str_starts_with($file, $url.'_'))
             ->each(function ($file, $path) {
                 $this->writer->delete($path);
             });

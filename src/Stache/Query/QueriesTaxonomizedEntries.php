@@ -80,10 +80,9 @@ trait QueriesTaxonomizedEntries
 
         [$taxonomy, $slug] = explode('::', $term);
 
-        return Stache::store('terms')->store($taxonomy)
-            ->index('associations')
-            ->items()->where('slug', $slug)
-            ->pluck('entry');
+        return collect(Stache::store('terms')->store($taxonomy)->index('associations')->forSlug($slug))
+            ->pluck('entry')
+            ->values();
     }
 
     private function getKeysForTaxonomyWhereIn($where)
@@ -103,10 +102,9 @@ trait QueriesTaxonomizedEntries
             });
 
         return $taxonomies->flatMap(function ($terms, $taxonomy) {
-            return Stache::store('terms')->store($taxonomy)
-                ->index('associations')
-                ->items()->whereIn('slug', $terms->all())
-                ->pluck('entry');
+            return collect(Stache::store('terms')->store($taxonomy)->index('associations')->forSlugs($terms->all()))
+                ->pluck('entry')
+                ->values();
         });
     }
 }
