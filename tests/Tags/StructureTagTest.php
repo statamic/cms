@@ -790,8 +790,10 @@ EOT;
         event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
         $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
 
+        $request = request();
         \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
         event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
+        \Illuminate\Support\Facades\Request::swap($request);
         $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
     }
 
