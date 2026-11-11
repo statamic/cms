@@ -86,7 +86,8 @@ class UrlBuilder implements UrlBuilderContract
      */
     private function fillPlaceholders($route): ?string
     {
-        if (! is_string($route) || Str::contains($route, '{{')) {
+        // Antlers also compiles component tags (<s:partial />), so anything that might be one is left to it.
+        if (! is_string($route) || Str::contains($route, ['{{', '<'])) {
             return null;
         }
 

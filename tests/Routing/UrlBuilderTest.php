@@ -161,6 +161,14 @@ class UrlBuilderTest extends TestCase
         $this->assertNotNull($expected);
     }
 
+    #[Test]
+    public function it_uses_antlers_when_a_route_might_contain_a_component_tag()
+    {
+        Antlers::partialMock()->shouldReceive('parse')->once()->andReturn('/blog/from-antlers');
+
+        $this->assertSame('/blog/from-antlers', $this->builder->build('/blog/<s:foo />/{slug}'));
+    }
+
     public static function routesNeedingAntlersProvider()
     {
         return [
