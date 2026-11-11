@@ -635,6 +635,9 @@ EOT;
         $this->assertSame('null', $this->renderString('{{ bare | to_json }}', $data, true));
         $this->assertSame('null', $this->renderString('{{ empty_field | to_json }}', $data, true));
         $this->assertSame('null', $this->renderString('{{ empty_field | json }}', $data, true));
+        $this->assertSame('null', $this->renderString('{{ missing | to_json }}', $data, true));
+        $this->assertSame('null', $this->renderString("{{ empty_field | to_json('pretty') }}", $data, true));
+        $this->assertSame('NULL', $this->renderString('{{ empty_field | to_json | upper }}', $data, true));
         $this->assertSame('"yes"', $this->renderString('{{ filled_field | to_json }}', $data, true));
     }
 }
