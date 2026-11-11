@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Queue;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarm;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Console\Commands\StaticWarmUncachedJob;
 use Statamic\Facades\Collection;
@@ -400,6 +401,36 @@ class StaticWarmTest extends TestCase
         })->all();
 
         $this->assertEquals(['/about', '/contact', '/about?page=1', '/about?page=2', '/about?page=3'], $visited);
+    }
+
+    #[Test]
+    public function it_adds_the_page_to_a_url_that_already_has_a_query_string()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        StaticWarm::hook('additional', fn () => collect(['/zebra?filter=stripes']));
+
+        $history = [];
+        $this->mockClient([
+            new Response(200),
+            new Response(200),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['filter=stripes', 'filter=stripes&page=1', 'filter=stripes&page=2'], $queries);
     }
 
     #[Test]

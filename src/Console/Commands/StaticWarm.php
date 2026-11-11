@@ -193,7 +193,7 @@ class StaticWarm extends Command
             $cachedAs = $cacher->getUrl(HttpRequest::create($url));
 
             return collect(range($currentPage, $totalPages))
-                ->map(fn ($page) => "{$url}?{$pageName}={$page}")
+                ->map(fn ($page) => $url.(str_contains($url, '?') ? '&' : '?')."{$pageName}={$page}")
                 // When query strings are ignored, a page is cached under the same URL
                 // as the one that has just been warmed, so there's nothing left to warm.
                 ->reject(fn ($pageUrl) => $cacher->getUrl(HttpRequest::create($pageUrl)) === $cachedAs)
