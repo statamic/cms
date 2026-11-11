@@ -91,7 +91,7 @@ class TermAssociationsTest extends TestCase
     }
 
     #[Test]
-    public function saving_and_deleting_entries_is_seen_straight_away()
+    public function saving_entries_is_seen_straight_away()
     {
         $this->createEntries();
 
