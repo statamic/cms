@@ -601,7 +601,7 @@ EOT;
     {
         $data = ['wrapped' => new Value(null), 'bare' => null];
 
-        foreach (['sanitize', 'count', 'md5', 'is_blank', 'upper | md5'] as $modifiers) {
+        foreach (['sanitize', 'count', 'md5', 'is_alpha', 'upper | md5'] as $modifiers) {
             $this->assertSame('', $this->renderString("{{ bare | {$modifiers} }}", $data, true), $modifiers);
             $this->assertSame('', $this->renderString("{{ wrapped | {$modifiers} }}", $data, true), $modifiers);
         }
@@ -632,6 +632,7 @@ EOT;
 
         $this->assertSame('null', $this->renderString('{{ empty_field | to_json }}', $data, true));
         $this->assertSame('null', $this->renderString('{{ empty_field | json }}', $data, true));
+        $this->assertSame('1', $this->renderString('{{ empty_field | is_blank }}', $data, true));
     }
 
     public function test_modifiers_marked_with_accepts_null_run_for_null()

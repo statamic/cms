@@ -1297,6 +1297,7 @@ class CoreModifiers extends Modifier
      *
      * @return bool
      */
+    #[AcceptsNull]
     public function isBlank($value)
     {
         return Stringy::isBlank($value);
