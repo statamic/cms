@@ -338,7 +338,7 @@ function invalidateStaticUrls() {
             </Field>
             <Field
                 :label="__('URLs')"
-                :instructions="__('One URL per line. Use /blog/* to include a section.')"
+                :instructions="__('statamic::messages.cache_utility_urls_instructions')"
                 :error="invalidateStaticUrlsError || previewError"
             >
                 <Textarea

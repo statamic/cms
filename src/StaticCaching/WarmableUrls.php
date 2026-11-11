@@ -4,6 +4,7 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarm;
 use Statamic\Entries\Collection as EntriesCollection;
 use Statamic\Entries\Entry;
@@ -17,7 +18,30 @@ use Statamic\Taxonomies\Taxonomy;
 
 class WarmableUrls
 {
+    private const CACHE_KEY = 'statamic:cache-utility:warmable-urls';
+
     public function all(): Collection
+    {
+        return collect(array_keys($this->cachedUrls()));
+    }
+
+    public function contains(string $url): bool
+    {
+        return isset($this->cachedUrls()[$url]);
+    }
+
+    public static function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+        CachedPages::clearCache();
+    }
+
+    private function cachedUrls(): array
+    {
+        return Cache::remember(self::CACHE_KEY, 60, fn () => array_fill_keys($this->discover()->all(), true));
+    }
+
+    protected function discover(): Collection
     {
         $site = Site::current();
         $cacher = app(Cacher::class);

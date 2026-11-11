@@ -155,6 +155,8 @@ class CacheController extends CpController
             return back()->withError(__('Unable to warm the static cache.'));
         }
 
+        CachedPages::clearCache();
+
         return back()->withSuccess($queued
             ? __('Static cache warming queued.')
             : __('Static cache warmed in :time.', ['time' => $this->operationTime($started)]));
@@ -211,11 +213,20 @@ class CacheController extends CpController
         abort_unless(config('statamic.static_caching.strategy'), 422, __('Static caching is not enabled.'));
 
         $input = $request->validate([
-            'url' => ['required', 'string', 'max:2048', Rule::in($warmableUrls->all()->all())],
+            'url' => [
+                'bail', 'required', 'string', 'max:2048',
+                function ($attribute, $value, $fail) use ($warmableUrls) {
+                    if (! $warmableUrls->contains($value)) {
+                        $fail(__('validation.in', ['attribute' => $attribute]));
+                    }
+                },
+            ],
         ]);
         $url = $input['url'];
 
         if ($cachedPages->isCached($url)) {
+            CachedPages::clearCache();
+
             return ['message' => __('Page is already cached.'), 'url' => $url];
         }
 
@@ -237,6 +248,8 @@ class CacheController extends CpController
         if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || ! $cachedPages->isCached($url)) {
             return response()->json(['message' => __('The page could not be cached.')], 422);
         }
+
+        CachedPages::clearCache();
 
         return [
             'message' => __('Page cached in :time.', ['time' => $this->operationTime($started)]),
@@ -307,7 +320,7 @@ class CacheController extends CpController
             'site' => ['nullable', Rule::in(Site::all()->keys()->all())],
             'domain' => ['nullable', 'string', 'max:2048'],
         ], [
-            'urls.*.regex' => __('Use a single wildcard at the end of a URL, such as /blog/*.'),
+            'urls.*.regex' => __('statamic::messages.cache_utility_invalid_wildcard'),
         ]);
     }
 

@@ -5,15 +5,19 @@ namespace Statamic\StaticCaching;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\Support\Str;
 
 class CachedPages
 {
+    private const CACHE_KEY = 'statamic:cache-utility:page-statuses';
+
     public function __construct(private Cacher $cacher)
     {
     }
@@ -35,22 +39,38 @@ class CachedPages
 
     public function coverage(): array
     {
-        $urls = app(WarmableUrls::class)->all();
-        $cached = $urls->filter(fn ($url) => $this->isCached($url))->count();
+        $statuses = $this->statuses();
+        $uncached = count($statuses['uncached']);
 
         return [
-            'cached' => $cached,
-            'total' => $urls->count(),
-            'uncached' => $urls->count() - $cached,
+            'cached' => $statuses['total'] - $uncached,
+            'total' => $statuses['total'],
+            'uncached' => $uncached,
         ];
     }
 
     public function uncached(): Collection
     {
-        return app(WarmableUrls::class)->all()
-            ->reject(fn ($url) => $this->isCached($url))
+        return collect($this->statuses()['uncached'])
             ->map(fn ($url) => $this->page($url, Request::create($url)->getSchemeAndHttpHost()))
             ->values();
+    }
+
+    public static function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    private function statuses(): array
+    {
+        return Cache::remember(self::CACHE_KEY, 60, function () {
+            $urls = app(WarmableUrls::class)->all();
+
+            return [
+                'total' => $urls->count(),
+                'uncached' => $urls->reject(fn ($url) => $this->isCached($url))->values()->all(),
+            ];
+        });
     }
 
     public function isCached(string $url): bool
@@ -61,6 +81,10 @@ class CachedPages
             $normalized = $this->cacher->getUrl($request);
 
             return File::exists($this->cacher->getFilePath($normalized, Site::findByUrl($url)?->handle()));
+        }
+
+        if ($this->cacher instanceof ApplicationCacher && $this->cacher->getGeneratedAt($url) !== null) {
+            return true;
         }
 
         return $this->cacher->hasCachedPage($request);
@@ -168,6 +192,7 @@ class CachedPages
         }
 
         $this->cacher->invalidateUrls($pages->pluck('url')->all());
+        self::clearCache();
 
         $remaining = $this->all()->pluck('url');
 

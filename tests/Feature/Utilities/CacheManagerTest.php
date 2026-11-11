@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
@@ -26,8 +27,11 @@ use Statamic\Events\StacheWarmed;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\StaticCache;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\FrontendController;
+use Statamic\StaticCaching\WarmableUrls;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -191,6 +195,124 @@ class CacheManagerTest extends TestCase
                     ->where('staticCoverage', null)
                 )
             );
+    }
+
+    #[Test]
+    public function it_reuses_url_discovery_across_coverage_listing_and_bulk_cache_requests()
+    {
+        $cacher = $this->cachePages([]);
+        $urls = ['https://example.com/one', 'https://example.com/two', 'https://example.com/three'];
+        $discoveries = 0;
+
+        app()->bind(WarmableUrls::class, function () use ($urls, &$discoveries) {
+            $warmableUrls = Mockery::mock(WarmableUrls::class)->makePartial()->shouldAllowMockingProtectedMethods();
+            $warmableUrls->shouldReceive('discover')->andReturnUsing(function () use ($urls, &$discoveries) {
+                $discoveries++;
+
+                return collect($urls);
+            });
+
+            return $warmableUrls;
+        });
+
+        foreach (range(1, 2) as $visit) {
+            $this->get(cp_route('utilities.cache'))
+                ->assertInertia(fn (AssertableInertia $page) => $page
+                    ->loadDeferredProps(fn (AssertableInertia $reload) => $reload
+                        ->where('staticCoverage', ['cached' => 0, 'total' => 3, 'uncached' => 3])
+                    )
+                );
+        }
+
+        foreach (range(1, 3) as $page) {
+            $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'perPage' => 1, 'page' => $page]))
+                ->assertOk()
+                ->assertJsonPath('meta.total', 3);
+        }
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'search' => 'two', 'sort' => 'url', 'order' => 'desc']))
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1);
+
+        $this->mock(Client::class)->shouldReceive('get')->times(3)
+            ->andReturnUsing(function ($url) use ($cacher) {
+                $request = Request::create($url);
+                $response = response('Cached content');
+                $cacher->cachePage($request, $response);
+                event(new ResponsePrepared($request, $response));
+
+                return new GuzzleResponse(200);
+            });
+
+        foreach ($urls as $index => $url) {
+            $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => $url])->assertOk();
+            $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+                ->assertOk()
+                ->assertJsonPath('meta.total', 2 - $index);
+        }
+
+        $this->postJson(cp_route('utilities.cache.invalidate-static-pages'), ['urls' => [$urls[0]]])
+            ->assertOk()->assertJsonPath('count', 1);
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.url', $urls[0]);
+
+        $this->assertSame(1, $discoveries);
+    }
+
+    #[Test]
+    public function it_refreshes_url_discovery_and_coverage_after_entry_and_collection_changes()
+    {
+        $this->cachePages([]);
+        $collection = tap(Collection::make('pages')->routes('/{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->slug('about')->create();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()->assertJsonPath('data.0.url', 'https://example.com/about');
+
+        $entry->published(false)->save();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()->assertJsonPath('meta.total', 0);
+        $this->postJson(cp_route('utilities.cache.cache-static-page'), ['url' => 'https://example.com/about'])
+            ->assertUnprocessable()->assertJsonValidationErrors('url');
+
+        $entry->published(true)->save();
+        $collection->routes('/pages/{slug}')->save();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached']))
+            ->assertOk()->assertJsonPath('data.0.url', 'https://example.com/pages/about');
+
+        $entry->delete();
+
+        $this->get(cp_route('utilities.cache'))
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->loadDeferredProps(fn (AssertableInertia $reload) => $reload
+                    ->where('staticCoverage', ['cached' => 0, 'total' => 0, 'uncached' => 0])
+                )
+            );
+    }
+
+    #[Test]
+    public function it_refreshes_url_discovery_after_term_changes()
+    {
+        $this->cachePages([]);
+        Taxonomy::make('tags')->template('example')->termTemplate('example')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('one')->data(['title' => 'One']))->save();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'search' => '/tags/one']))
+            ->assertOk()->assertJsonPath('meta.total', 1);
+
+        $term->slug('two')->save();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'search' => '/tags/two']))
+            ->assertOk()->assertJsonPath('meta.total', 1);
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'search' => '/tags/one']))
+            ->assertOk()->assertJsonPath('meta.total', 0);
+
+        $term->delete();
+
+        $this->getJson(cp_route('utilities.cache.static-pages', ['status' => 'uncached', 'search' => '/tags/two']))
+            ->assertOk()->assertJsonPath('meta.total', 0);
     }
 
     #[Test]
@@ -464,9 +586,16 @@ class CacheManagerTest extends TestCase
                 'content' => 'Cached content',
                 'headers' => [],
                 'status' => 200,
-                'generated_at' => $timestamp,
             ]);
+
+            if ($timestamp !== null) {
+                StaticCache::cacheStore()->forever('static-cache:generated-at:'.md5($url), $timestamp);
+            }
         }
+
+        Event::listen(CacheHit::class, function ($event) {
+            $this->assertStringNotContainsString('static-cache:responses:', $event->key);
+        });
 
         $this->getJson(cp_route('utilities.cache.static-pages', ['perPage' => 2]))
             ->assertOk()
