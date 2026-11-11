@@ -2,7 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
+use Closure;
 use Illuminate\Support\Carbon;
+use Statamic\Entries\Entry as EntryInstance;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -20,6 +22,7 @@ use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
+use WeakReference;
 
 class CollectionEntriesStore extends ChildStore
 {
@@ -155,6 +158,8 @@ class CollectionEntriesStore extends ChildStore
             $this->writeItemToDiskWithoutIncrementing($entry);
         }
 
+        $this->takeSnapshot($entry);
+
         return $entry;
     }
 
@@ -278,9 +283,7 @@ class CollectionEntriesStore extends ChildStore
 
     protected function getCachedItem($key)
     {
-        $cacheKey = $this->getItemCacheKey($key);
-
-        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
+        if (! $entry = $this->getSnapshotCopy($key) ?? Stache::cacheStore()->get($this->getItemCacheKey($key))) {
             return null;
         }
 
@@ -289,6 +292,95 @@ class CollectionEntriesStore extends ChildStore
         }
 
         return $entry;
+    }
+
+    protected function cacheItem($item)
+    {
+        parent::cacheItem($item);
+
+        $key = $this->getItemKey($item);
+        $snapshot = $this->snapshots()->get($key);
+
+        // The first time the entry built from the file is cached, the cache holds exactly
+        // what the snapshot holds. Anything cached after that may differ from it.
+        if ($snapshot && ! $snapshot['cached'] && $snapshot['source']->get() === $item) {
+            $snapshot['cached'] = true;
+            $this->snapshots()->put($key, $snapshot);
+        } else {
+            $this->snapshots()->forget($key);
+        }
+    }
+
+    public function forgetItem($key)
+    {
+        $this->snapshots()->forget($key);
+
+        parent::forgetItem($key);
+    }
+
+    private function takeSnapshot(EntryInstance $entry): void
+    {
+        $this->snapshots()->put($entry->id(), [
+            'source' => WeakReference::create($entry),
+            'snapshot' => $this->copy($entry),
+            'cached' => false,
+        ]);
+    }
+
+    /**
+     * Snapshots are only good for the request they were taken in, since another process can
+     * cache a different version of an entry at any time. This store can outlive a request
+     * (it does under Octane), but Blink is new for each one, so they are kept there.
+     */
+    private function snapshots()
+    {
+        return Blink::store('entry-snapshots::'.$this->key());
+    }
+
+    public function resetMemoizedState()
+    {
+        parent::resetMemoizedState();
+
+        // Blink isn't cleared between a worker's jobs, so the snapshots
+        // would otherwise last for as long as the worker does.
+        $this->snapshots()->flush();
+    }
+
+    /**
+     * While indexes are being built, hand out a copy of the snapshot taken when the entry
+     * was made from its file, rather than unserialising a second full copy from the cache.
+     * Its data arrays are shared with the snapshot until the caller changes them.
+     */
+    private function getSnapshotCopy($key): ?EntryInstance
+    {
+        if (! Index::isLoading()) {
+            return null;
+        }
+
+        $snapshot = $this->snapshots()->get($key);
+
+        if (! $snapshot || ! $snapshot['cached']) {
+            return null;
+        }
+
+        return $this->copy($snapshot['snapshot']);
+    }
+
+    private function copy(EntryInstance $entry): EntryInstance
+    {
+        $copy = clone $entry;
+
+        Closure::bind(function () {
+            // A copy read from the cache doesn't carry these (see Entry::__sleep).
+            $this->cachedKeys = $this->computedCallbackCache = $this->siteCache = $this->augmentationReferenceKey = null;
+
+            // Carbon is mutable, so the copy needs its own date.
+            if (is_object($this->date)) {
+                $this->date = clone $this->date;
+            }
+        }, $copy, EntryInstance::class)();
+
+        return $copy;
     }
 
     public function withoutBlinkingEntryUris($callback)

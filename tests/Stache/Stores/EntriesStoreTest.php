@@ -8,10 +8,13 @@ use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionProperty;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
+use Statamic\Stache\Indexes\Index;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -426,5 +429,177 @@ class EntriesStoreTest extends TestCase
     public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();
+    }
+
+    #[Test]
+    public function while_an_index_loads_it_hands_out_a_clone_of_the_entry_built_in_this_request_instead_of_the_cached_copy()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+        $this->putInItemCache($store, 'blog-christmas', (clone $inMemory)->set('title', 'From the cache'));
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertNotSame($inMemory, $item);
+        $this->assertEquals('Christmas', $item->get('title'));
+        $this->assertEquals($inMemory->data()->all(), $item->data()->all());
+    }
+
+    #[Test]
+    public function changing_the_clone_does_not_change_the_entry_in_memory()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $item->set('title', 'Changed');
+
+        $this->assertEquals('Christmas', $inMemory->get('title'));
+    }
+
+    #[Test]
+    public function outside_of_index_loading_it_still_reads_the_cached_copy()
+    {
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $inMemory = Blink::store('structure-entries')->get('blog-christmas');
+        $this->putInItemCache($store, 'blog-christmas', (clone $inMemory)->set('title', 'From the cache'));
+
+        $item = $store->getItem('blog-christmas');
+
+        $this->assertNotSame($inMemory, $item);
+        $this->assertEquals('From the cache', $item->get('title'));
+    }
+
+    #[Test]
+    public function unsaved_changes_to_entries_in_memory_do_not_reach_indexes()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // The instance built from the file is handed out on a cache miss and can be changed without saving.
+        Blink::store('structure-entries')->get('blog-christmas')->set('title', 'Unsaved');
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $this->assertEquals('Christmas', $item->get('title'));
+
+        // Page::setEntry() puts whatever entry it is given into the same Blink store.
+        $unsaved = Facades\Entry::make()->id('blog-christmas')->collection('blog')->set('title', 'Also unsaved');
+        Blink::store('structure-entries')->put('blog-christmas', $unsaved);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $this->assertEquals('Christmas', $item->get('title'));
+    }
+
+    #[Test]
+    public function changing_the_date_of_a_copy_does_not_change_later_copies()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $first = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+        $original = $first->date()->toDateTimeString();
+        $first->date()->addDay();
+
+        $second = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals($original, $second->date()->toDateTimeString());
+    }
+
+    #[Test]
+    public function once_the_entry_is_cached_again_it_reads_the_cache()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        $changed = $store->getItem('blog-christmas')->set('title', 'Saved');
+        (fn () => $this->cacheItem($changed))->call($store);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved', $item->get('title'));
+    }
+
+    #[Test]
+    public function snapshots_are_not_kept_for_a_later_request_in_the_same_process()
+    {
+        $this->useSerializingCacheStore();
+
+        // The first request in a long-running process builds the entries from their files.
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // Another process saves the entry, which this process's store never hears about.
+        $key = (fn () => $this->getItemCacheKey('blog-christmas'))->call($store);
+        $changed = Stache::cacheStore()->get($key)->set('title', 'Saved by another process');
+        Stache::cacheStore()->forever($key, $changed);
+
+        // The next request gets a new Blink (Octane clears resolved facades), but the same store.
+        Blink::swap(new \Statamic\Support\Blink);
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved by another process', $item->get('title'));
+    }
+
+    #[Test]
+    public function snapshots_are_not_kept_for_a_later_job_in_the_same_worker()
+    {
+        $this->useSerializingCacheStore();
+
+        // A job builds the entries from their files.
+        $store = $this->parent->store('blog');
+        $store->paths();
+
+        // Another process saves the entry, which this process's store never hears about.
+        $key = (fn () => $this->getItemCacheKey('blog-christmas'))->call($store);
+        $changed = Stache::cacheStore()->get($key)->set('title', 'Saved by another process');
+        Stache::cacheStore()->forever($key, $changed);
+
+        // The worker moves on to its next job. Blink is left as it was.
+        Stache::stores()->each->resetMemoizedState();
+        app('stache.indexes')->each->resetMemoizedState();
+
+        $item = $this->whileAnIndexLoads(fn () => $store->getItem('blog-christmas'));
+
+        $this->assertEquals('Saved by another process', $item->get('title'));
+    }
+
+    private function useSerializingCacheStore()
+    {
+        config([
+            'cache.stores.stache-serializing' => ['driver' => 'array', 'serialize' => true],
+            'statamic.stache.cache_store' => 'stache-serializing',
+        ]);
+    }
+
+    private function putInItemCache($store, $key, $item)
+    {
+        $cacheKey = (fn () => $this->getItemCacheKey($key))->call($store);
+
+        Stache::cacheStore()->forever($cacheKey, $item);
+    }
+
+    private function whileAnIndexLoads(callable $callback)
+    {
+        $stack = new ReflectionProperty(Index::class, 'loadingStack');
+        $stack->setValue(null, ['entries::blog/test']);
+
+        try {
+            return $callback();
+        } finally {
+            $stack->setValue(null, []);
+        }
     }
 }
