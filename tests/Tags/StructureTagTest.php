@@ -786,8 +786,12 @@ EOT;
 
         $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
         $job->shouldReceive('payload')->andReturn([]);
+        // A job run synchronously during a request leaves what the request has kept alone.
         event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
+        $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
 
+        \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+        event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
         $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
     }
 

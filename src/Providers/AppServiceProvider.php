@@ -58,7 +58,11 @@ class AppServiceProvider extends ServiceProvider
             Event::listen(\Laravel\Octane\Events\RequestReceived::class, fn () => Ffmpeg::clearBinaryCache());
         }
 
-        Event::listen(JobProcessing::class, fn () => StructureTag::forgetTrees());
+        Event::listen(JobProcessing::class, function () {
+            if (Statamic::isWorker()) {
+                StructureTag::forgetTrees();
+            }
+        });
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
