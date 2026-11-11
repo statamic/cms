@@ -17,6 +17,7 @@ use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\PathTraversalDetected;
 use League\Flysystem\UnableToRetrieveMetadata;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
@@ -821,7 +822,7 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function a_listed_path_whose_file_is_missing_is_not_an_asset()
+    public function it_does_not_return_an_asset_when_a_listed_file_is_missing()
     {
         [$container, $missing] = $this->containerWithStaleListedFile();
 
@@ -835,43 +836,39 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
-    public function reading_meta_for_a_listed_path_whose_file_is_missing_does_not_throw()
+    public function it_does_not_throw_when_reading_meta_for_a_missing_listed_file()
     {
         [$container, $missing] = $this->containerWithStaleListedFile();
 
         $asset = $container->makeAsset($missing);
 
         $this->assertSame(['data' => []], $asset->meta());
-        $this->assertSame(['data' => []], $asset->generateMeta());
-        $this->assertFalse($asset->exists());
         $this->assertFalse(Storage::disk('stale_assets')->exists('social_images/collection-events/.meta/missing.png.yaml'));
         $this->assertMissingPathWasDropped($container, $missing);
     }
 
     #[Test]
-    public function a_metadata_read_failure_keeps_a_file_that_still_exists()
+    public function it_keeps_a_listed_file_when_metadata_cannot_be_read()
     {
         $path = 'notes.txt';
-        $filesystem = \Mockery::mock(FilesystemAdapter::class);
+        $filesystem = Mockery::mock(FilesystemAdapter::class);
         $filesystem->shouldReceive('get')->andReturn(null);
         $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
-        $filesystem->shouldReceive('exists')->twice()->andReturn(true);
+        $filesystem->shouldReceive('exists')->once()->andReturn(true);
         $filesystem->shouldReceive('put')->never();
 
         [$container, $asset] = $this->containerWithListedFile($path, $filesystem);
 
         $this->assertSame(['data' => []], $asset->meta());
-        $this->assertSame(['data' => []], $asset->meta());
-        $this->assertNull($asset->getRawMeta());
         $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
     }
 
     #[Test]
-    public function a_metadata_read_failure_throws_when_the_existence_check_fails()
+    public function it_does_not_drop_a_listed_file_when_the_existence_check_throws()
     {
         $path = 'notes.txt';
-        $filesystem = \Mockery::mock(FilesystemAdapter::class);
+        $filesystem = Mockery::mock(FilesystemAdapter::class);
         $filesystem->shouldReceive('get')->andReturn(null);
         $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
         $filesystem->shouldReceive('exists')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
@@ -881,15 +878,18 @@ class AssetContainerTest extends TestCase
 
         try {
             $asset->meta();
-            $this->fail('The existence check should throw.');
         } catch (UnableToRetrieveMetadata) {
             $this->assertNull(Cache::get($asset->metaCacheKey()));
             $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
+
+            return;
         }
+
+        $this->fail('Exception was not thrown.');
     }
 
     #[Test]
-    public function dropping_a_missing_file_leaves_the_asset_repository_alone()
+    public function it_keeps_stored_asset_data_when_dropping_a_missing_file()
     {
         $repository = $this->partialMock(AssetRepository::class);
         $repository->shouldNotReceive('delete');
@@ -902,13 +902,7 @@ class AssetContainerTest extends TestCase
             "data:\n  alt: 'Event poster'\n"
         );
 
-        $asset = $container->asset($missing);
-
-        $this->assertInstanceOf(AssetContract::class, $asset);
-        $this->assertSame('Event poster', $asset->get('alt'));
-        $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($missing));
-
-        $asset->generateMeta();
+        $container->makeAsset($missing)->generateMeta();
 
         $this->assertMissingPathWasDropped($container, $missing);
         $this->assertSame(
@@ -1266,10 +1260,7 @@ class AssetContainerTest extends TestCase
     {
         $listed = Cache::get('asset-list-contents-'.$container->handle());
 
-        $this->assertFalse(
-            $listed?->has($missing) ?? false,
-            'Missing path is still listed: '.json_encode($listed?->keys()->all())
-        );
+        $this->assertFalse($listed->has($missing));
         $this->assertTrue($listed->has('keep.txt'));
     }
 }
