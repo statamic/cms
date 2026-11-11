@@ -110,13 +110,6 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         return AssetCollection::make($items);
     }
 
-    protected function getItems($keys)
-    {
-        return parent::getItems($keys)
-            ->filter(fn ($asset) => ! $asset->exists() || $asset->reconcile()->exists())
-            ->values();
-    }
-
     protected function getWhereColumnKeyValuesByIndex($column)
     {
         $container = $this->getContainer()->handle();

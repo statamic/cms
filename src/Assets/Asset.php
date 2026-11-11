@@ -233,32 +233,6 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         return $this->container()->files()->contains($path);
     }
 
-    /**
-     * Make the cached listing agree with the disk.
-     *
-     * The listing can still name a file that has been removed. Metadata reads
-     * then ask Flysystem for the file size and throw. Drop that path from the
-     * listing and the asset index so exists() reports the asset as missing.
-     */
-    public function reconcile(): static
-    {
-        if (! $this->exists()) {
-            return $this;
-        }
-
-        try {
-            $exists = $this->disk()->exists($this->path());
-        } catch (UnableToRetrieveMetadata|UnableToReadFile) {
-            $exists = false;
-        }
-
-        if (! $exists) {
-            $this->forgetMissingFile();
-        }
-
-        return $this;
-    }
-
     public function getRawMeta()
     {
         return $this->meta;

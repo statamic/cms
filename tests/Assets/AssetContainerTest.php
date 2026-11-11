@@ -832,11 +832,6 @@ class AssetContainerTest extends TestCase
 
         $this->assertInstanceOf(AssetContract::class, $kept);
         $this->assertSame('keep.txt', $kept->path());
-
-        [$container, $missing] = $this->containerWithStaleListedFile();
-
-        $this->assertNull($container->queryAssets()->where('path', $missing)->first());
-        $this->assertMissingPathWasDropped($container, $missing);
     }
 
     #[Test]
@@ -907,7 +902,14 @@ class AssetContainerTest extends TestCase
             "data:\n  alt: 'Event poster'\n"
         );
 
-        $this->assertNull($container->asset($missing));
+        $asset = $container->asset($missing);
+
+        $this->assertInstanceOf(AssetContract::class, $asset);
+        $this->assertSame('Event poster', $asset->get('alt'));
+        $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($missing));
+
+        $asset->generateMeta();
+
         $this->assertMissingPathWasDropped($container, $missing);
         $this->assertSame(
             "data:\n  alt: 'Event poster'\n",
