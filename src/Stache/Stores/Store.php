@@ -3,10 +3,12 @@
 namespace Statamic\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
+use ReflectionMethod;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Exceptions\DuplicateKeyException;
+use Statamic\Stache\Exceptions\ItemsNotReadyException;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Arr;
@@ -26,6 +28,11 @@ abstract class Store
     protected $shouldCacheFileItems = false;
     protected $modified;
     protected $keys;
+    private ?array $filling = null;
+    private bool $makingItems = false;
+    private ?string $filledDuringWarm = null;
+    private static array $buildsItsOwnItems = [];
+    private static ?string $warmRun = null;
 
     /**
      * @return string
@@ -310,30 +317,20 @@ abstract class Store
             return $this->paths = collect($paths);
         }
 
+        // An index value being worked out as the items are made can't be given the items.
+        if ($this->makingItems && $this->filling !== null) {
+            throw new ItemsNotReadyException;
+        }
+
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
-        $fileItems = $files->map(function ($timestamp, $path) {
-            return [
-                'item' => $item = $this->makeItemFromFile($path, File::get($path)),
-                'key' => $this->getItemKey($item),
-                'path' => $path,
-            ];
-        });
+        $this->makingItems = true;
 
-        $items = $fileItems->reject(function ($item) {
-            try {
-                $this->keys()->add($item['key'], $item['path']);
-            } catch (DuplicateKeyException $e) {
-                $isDuplicate = true;
-                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
-            }
-
-            return $isDuplicate ?? false;
-        });
-
-        $items->each(fn ($item) => $this->cacheItem($item['item']));
-
-        $paths = $items->pluck('path', 'key');
+        try {
+            $paths = collect($this->makeAndCacheItemsOneAtATime($files));
+        } finally {
+            $this->makingItems = false;
+        }
 
         $this->cachePaths($paths);
 
@@ -416,11 +413,196 @@ abstract class Store
         Stache::cacheStore()->forget("stache::timestamps::{$this->key()}");
     }
 
+    /**
+     * Each file is turned into an item and cached before the next one is read, so the
+     * items don't all have to be in memory at once. While indexes are being filled,
+     * an item that needs no other item to be indexed is indexed here and let go of.
+     */
+    private function makeAndCacheItemsOneAtATime($files): array
+    {
+        $paths = [];
+        $indexAsMade = true;
+
+        foreach ($files as $path => $timestamp) {
+            $item = $this->makeItemFromFile($path, File::get($path));
+            $key = $this->getItemKey($item);
+
+            try {
+                $this->keys()->add($key, $path);
+            } catch (DuplicateKeyException $e) {
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
+
+                continue;
+            }
+
+            $this->cacheItem($item);
+            $paths[$key] = $path;
+
+            if ($this->filling === null) {
+                continue;
+            }
+
+            if ($indexAsMade && $this->canIndexWithoutOtherItems($item)) {
+                try {
+                    $this->takeIndexValues($key, $item);
+                } catch (ItemsNotReadyException $e) {
+                    // Something an index needs (a mount, a computed value) went looking for another
+                    // item of this store. The rest are likely to as well, so they wait their turn.
+                    $indexAsMade = false;
+                }
+            }
+
+            $this->releaseItem($key, $item);
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Whether an item's index values can be worked out before the rest of the store's items exist.
+     */
+    protected function canIndexWithoutOtherItems($item): bool
+    {
+        return false;
+    }
+
+    /**
+     * Whether an index needs the store's other indexes to be there before it can be built.
+     */
+    protected function indexNeedsOtherIndexes($name): bool
+    {
+        return false;
+    }
+
+    /**
+     * Called while indexes are being filled, once an item has been indexed or has been
+     * cached to be indexed later, for a store that would otherwise hold on to its items.
+     */
+    protected function releaseItem($key, $item): void
+    {
+        //
+    }
+
+    private function takeIndexValues($key, $item): void
+    {
+        foreach ($this->filling['indexes'] as $name => $index) {
+            $this->filling['values'][$name][$key] = $index->getItemValue($item);
+        }
+
+        $this->filling['done'][$key] = true;
+    }
+
+    /**
+     * The indexes that get their values from one item at a time, and so can be filled
+     * in a single pass over the items. An index that works out its items some
+     * other way, or that needs the other indexes first, builds itself.
+     */
+    private function indexesFilledTogether($indexes)
+    {
+        return $indexes->filter(function ($index, $name) {
+            return $index instanceof Indexes\Value
+                && ! $this->indexNeedsOtherIndexes($name)
+                && (static::$buildsItsOwnItems[$index::class] ??= (new ReflectionMethod($index, 'getItems'))->class !== Indexes\Value::class) === false;
+        });
+    }
+
+    /**
+     * Fills indexes from a single pass over the store's items, reading one item at a time,
+     * rather than each index reading every item for itself.
+     *
+     * Asked for by an index that needs building, it fills that index along with any others
+     * that haven't been built yet. Returns false if that index has to build itself.
+     */
+    public function fillIndexes(?Index $for = null): bool
+    {
+        // An index asked for while the pass is running is one that an item's value depends on.
+        if ($this->filling !== null) {
+            return false;
+        }
+
+        // A store that gathers its items in its own way is left to do so.
+        if ((new ReflectionMethod($this, 'getItemsFromFiles'))->class !== self::class) {
+            return false;
+        }
+
+        $indexes = $this->indexesFilledTogether($this->resolveIndexes());
+
+        $all = $indexes->count();
+
+        if ($for) {
+            if (! $indexes->contains(fn ($index) => $index === $for)) {
+                return false;
+            }
+
+            $indexes = $indexes->filter(fn ($index) => $index === $for || ! $index->isCached());
+        }
+
+        $this->filling = ['indexes' => $indexes->all(), 'values' => $indexes->map(fn () => [])->all(), 'done' => []];
+
+        try {
+            // On a cold Stache this is where the items are made, and most are indexed as they go.
+            $paths = $this->paths();
+
+            // The rest need other items to exist before they can be indexed. They all do now.
+            Index::whileLoading($this->key().'/*', function () use ($paths) {
+                foreach ($paths as $key => $path) {
+                    if (isset($this->filling['done'][$key])) {
+                        continue;
+                    }
+
+                    if ($item = $this->getItem($key)) {
+                        $this->takeIndexValues($key, $item);
+                        $this->releaseItem($key, $item);
+                    }
+                }
+            });
+
+            $filled = $this->filling;
+        } finally {
+            $this->filling = null;
+        }
+
+        foreach ($indexes as $name => $index) {
+            // In the order of the paths, as it would be if the index had read every item itself.
+            $index->fill(
+                $paths->filter(fn ($path, $key) => isset($filled['done'][$key]))
+                    ->map(fn ($path, $key) => $filled['values'][$name][$key])
+                    ->all()
+            );
+        }
+
+        // Only a pass that filled every one of them saves a warm from doing so.
+        $this->filledDuringWarm = $indexes->count() === $all ? self::$warmRun : null;
+
+        return true;
+    }
+
+    /**
+     * Runs a warm of several stores. A store that another one needed
+     * along the way will know it has already been dealt with.
+     */
+    public static function duringWarm(callable $callback)
+    {
+        self::$warmRun = uniqid('', true);
+
+        try {
+            return $callback();
+        } finally {
+            self::$warmRun = null;
+        }
+    }
+
     public function warm()
     {
+        $indexes = $this->resolveIndexes();
+
+        // Another store warmed before this one may have needed these
+        // indexes, and they'll have been filled then.
+        $filled = ($this->filledDuringWarm && $this->filledDuringWarm === self::$warmRun) || $this->fillIndexes();
+
         $this->shouldCacheFileItems = true;
 
-        $this->resolveIndexes()->each->update();
+        ($filled ? $indexes->diffKeys($this->indexesFilledTogether($indexes)) : $indexes)->each->update();
 
         $this->shouldCacheFileItems = false;
         $this->fileItems = null;

@@ -95,11 +95,44 @@ abstract class Index
 
         debugbar()->addMessage("Updating index: {$this->store->key()}/{$this->name}", 'stache');
 
+        // Most indexes are filled in a single pass over the store's items, along with
+        // any others that are waiting to be built, rather than each reading every item.
+        if ($this->store->fillIndexes($this)) {
+            return $this;
+        }
+
         $this->items = $this->getItems();
 
         $this->cache();
 
         return $this;
+    }
+
+    /**
+     * Sets and caches items that have been worked out elsewhere.
+     */
+    public function fill(array $items)
+    {
+        $this->items = $items;
+
+        $this->cache();
+
+        return $this;
+    }
+
+    /**
+     * Runs a callback as if an index were loading, for work that
+     * fills indexes without going through load().
+     */
+    public static function whileLoading(string $key, callable $callback)
+    {
+        static::$loadingStack[] = $key;
+
+        try {
+            return $callback();
+        } finally {
+            array_pop(static::$loadingStack);
+        }
     }
 
     public function isCached()
