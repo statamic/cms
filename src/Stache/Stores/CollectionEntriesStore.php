@@ -87,7 +87,9 @@ class CollectionEntriesStore extends ChildStore
 
         if (Site::multiEnabled()) {
             [$site, $relative] = explode('/', $relative, 2);
-            if (! $this->collection()->sites()->contains($site)) {
+            $collection = $this->collection ?? $this->findCollection($this->childKey);
+
+            if (! $collection->sites()->contains($site)) {
                 return false;
             }
         }
