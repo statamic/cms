@@ -41,6 +41,7 @@
                                     <a class="title-index-field" :href="entry.edit_url" @click.prevent="toggleSelection(entry.id)">
                                         <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                                         <span v-text="entry.title" />
+                                        <StructureBreadcrumbBadge :breadcrumb="entry.breadcrumb" />
                                     </a>
                                 </template>
                                 <template #cell-status="{ row: entry }">
@@ -145,6 +146,7 @@ import {
     StatusIndicator,
     Badge,
 } from '@/components/ui';
+import StructureBreadcrumbBadge from '../../entries/StructureBreadcrumbBadge.vue';
 
 export default {
     components: {
@@ -163,6 +165,7 @@ export default {
         Icon,
         StatusIndicator,
         Badge,
+        StructureBreadcrumbBadge,
     },
 
     // todo, when opening and closing the stack, you cant save?

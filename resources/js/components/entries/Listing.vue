@@ -19,6 +19,7 @@
             <Link class="title-index-field" :href="entry.edit_url" @click.stop>
                 <StatusIndicator v-if="!isColumnVisible('status')" :status="entry.status" />
                 <span v-text="entry.title" />
+                <StructureBreadcrumbBadge :breadcrumb="entry.breadcrumb" />
             </Link>
         </template>
         <template #cell-status="{ row: entry }">
@@ -39,6 +40,7 @@
 
 <script>
 import { StatusIndicator, DropdownItem, Listing } from '@/components/ui';
+import StructureBreadcrumbBadge from './StructureBreadcrumbBadge.vue';
 import { Link } from '@inertiajs/vue3';
 
 export default {
@@ -46,6 +48,7 @@ export default {
 
     components: {
         Link,
+        StructureBreadcrumbBadge,
         StatusIndicator,
         Listing,
         DropdownItem,
