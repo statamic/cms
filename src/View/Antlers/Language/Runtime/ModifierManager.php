@@ -27,6 +27,8 @@ class ModifierManager
      */
     protected static $nullAwareModifiers = [
         'bool_string',
+        'json',
+        'to_json',
     ];
 
     public static function isModifier(ParameterNode $node)

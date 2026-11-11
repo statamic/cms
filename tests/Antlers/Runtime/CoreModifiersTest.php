@@ -623,6 +623,20 @@ EOT;
         $this->assertSame('FALSE', $this->renderString('{{ empty_field | bool_string | upper }}', $data, true));
         $this->assertSame('true', $this->renderString('{{ filled_field | bool_string }}', $data, true));
     }
+
+    public function test_to_json_outputs_null_for_null()
+    {
+        $data = [
+            'bare' => null,
+            'empty_field' => new Value(null, 'empty_field', new Text),
+            'filled_field' => new Value('yes', 'filled_field', new Text),
+        ];
+
+        $this->assertSame('null', $this->renderString('{{ bare | to_json }}', $data, true));
+        $this->assertSame('null', $this->renderString('{{ empty_field | to_json }}', $data, true));
+        $this->assertSame('null', $this->renderString('{{ empty_field | json }}', $data, true));
+        $this->assertSame('"yes"', $this->renderString('{{ filled_field | to_json }}', $data, true));
+    }
 }
 
 class SimpleEntryObject implements Arrayable
