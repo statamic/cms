@@ -67,6 +67,26 @@
 }
 
 @layer components {
+    /* Safari paints the tall content card in tiles while scrolling, and a quick scroll shows the grey body through tiles it hasn't painted yet. This screen-high block of the card colour sticks to the top of the scroller behind the card, so any gap shows the same colour. It's part of the scrolling content, so the trackpad bounce at either end moves it along with the card rather than uncovering it. */
+    .main-content-backing {
+        --backing-height: calc(100vh - 3.5rem);
+        position: sticky;
+        top: 0;
+        height: var(--backing-height);
+        /* Take up no room, so the card starts where it always did */
+        margin-bottom: calc(var(--backing-height) * -1);
+        background: var(--theme-color-content-bg);
+        /* Same corners as the card, so it never shows behind them */
+        @apply sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
+        @variant sm {
+            /* Less the scroller's padding */
+            --backing-height: calc(100vh - 3.5rem - 1rem);
+        }
+        .nav-closed & {
+            @apply sm:rounded-xl sm:dark:rounded-none;
+        }
+    }
+
     .content-card {
         @apply min-h-full px-2 sm:px-6 md:px-12 pb-6 border dark:border-y-0 dark:border-r-0 border-content-border sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
         background: var(--theme-color-content-bg);

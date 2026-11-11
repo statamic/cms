@@ -25,6 +25,51 @@ class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
     private bool $shouldBlinkEntryUris = true;
+    private int $makingItemsInBulk = 0;
+    private array $collectionsForBulk = [];
+
+    public function handleFileChanges()
+    {
+        // Entries get their uris, parents and order from the collection trees, so a tree file that
+        // changed on disk has to be picked up before this store's indexes are used. (Each store
+        // only checks once per request, so this can't loop.)
+        if (Stache::isWatcherEnabled() && ! $this->fileChangesHandled && $this->collection()?->hasStructure()) {
+            Stache::store('collection-trees')?->handleFileChanges();
+        }
+
+        $this->makeItemsInBulk(fn () => parent::handleFileChanges());
+    }
+
+    public function paths()
+    {
+        return $this->makeItemsInBulk(fn () => parent::paths());
+    }
+
+    /**
+     * While many files are being turned into entries at once, look up their
+     * collection once rather than once per file. They all share the same one.
+     */
+    private function makeItemsInBulk(callable $callback)
+    {
+        $this->makingItemsInBulk++;
+
+        try {
+            return $callback();
+        } finally {
+            if (--$this->makingItemsInBulk === 0) {
+                $this->collectionsForBulk = [];
+            }
+        }
+    }
+
+    private function findCollection($handle)
+    {
+        if (! $this->makingItemsInBulk) {
+            return Collection::findByHandle($handle);
+        }
+
+        return $this->collectionsForBulk[$handle] ??= Collection::findByHandle($handle);
+    }
 
     protected function collection()
     {
@@ -66,7 +111,7 @@ class CollectionEntriesStore extends ChildStore
         }
 
         $collectionHandle = $collection;
-        $collection = Collection::findByHandle($collectionHandle);
+        $collection = $this->findCollection($collectionHandle);
 
         $entry = Entry::make()
             ->id($id)

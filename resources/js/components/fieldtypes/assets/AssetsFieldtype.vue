@@ -1,8 +1,9 @@
 <template>
     <div
         data-asset-browser
-        :data-asset-picker-visible="pickerVisible || null"
-        class="@container relative w-full bg-gray-50 dark:bg-transparent rounded-xl [.link-fieldtype_&]:bg-transparent"
+        :data-asset-picker-visible="isCompact || pickerVisible || null"
+        class="relative rounded-xl dark:bg-transparent [.link-fieldtype_&]:bg-transparent"
+        :class="isCompact ? 'w-fit' : '@container w-full bg-gray-50'"
     >
         <div
             v-if="hasPendingDynamicFolder"
@@ -10,7 +11,84 @@
             v-html="pendingText"
         />
 
+        <div
+            v-if="isCompact"
+            data-asset-picker
+            class="flex flex-wrap items-center gap-2"
+            @dragover="ignoreFileDrop"
+            @drop="ignoreFileDrop"
+        >
+            <AssetCompact
+                v-for="asset in assets"
+                :key="asset.id"
+                :asset="asset"
+                :disabled="config.disabled || loading"
+                :read-only="isReadOnly"
+                :can-replace="canBrowse"
+                @replace="openReplacementSelector(asset)"
+                @removed="assetRemoved(asset)"
+            />
+
+            <AssetUpload
+                v-for="(upload, index) in uploads"
+                :key="upload.id"
+                :basename="upload.basename"
+                :extension="upload.extension"
+                :percent="upload.percent"
+                :error="upload.errorMessage"
+                :error-status="upload.errorStatus"
+                allow-selecting-existing
+                @clear="uploads.splice(index, 1)"
+                @retry="upload.retry($event)"
+                @existing-selected="uploadSelected(upload)"
+            />
+
+            <Uploader
+                ref="uploader"
+                v-show="!uploads.length && (!hasAssets || (!maxFilesReached && !isReadOnly))"
+                :container="container.id"
+                :enabled="canReceiveUpload"
+                :path="folder"
+                @updated="uploadsUpdated"
+                @upload-complete="uploadComplete"
+                @error="uploadError"
+                v-slot="{ dragging }"
+            >
+                <div class="relative size-10">
+                    <Button
+                        icon-only
+                        size="base"
+                        v-tooltip="__('Select Asset')"
+                        :aria-label="__('Select Asset')"
+                        :disabled="config.disabled || loading || (!canBrowse && !canUpload)"
+                        :read-only="isReadOnly"
+                        @click="canBrowse ? openSelector() : uploadFile()"
+                    >
+                        <ui-icon
+                            :name="loading ? 'loading' : 'plus'"
+                            class="opacity-40"
+                            :class="{ 'invisible': dragging && !showSelector }"
+                        />
+                        <span
+                            class="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden"
+                            aria-hidden="true"
+                        />
+                    </Button>
+
+                    <div
+                        v-show="dragging && !showSelector"
+                        role="status"
+                        :aria-label="__('Drop to Upload')"
+                        class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-lg border-2 border-dotted border-blue-400 bg-blue-50 text-blue-600 dark:border-blue-500 dark:bg-gray-850 dark:text-blue-400"
+                    >
+                        <ui-icon name="upload-cloud" class="size-5" />
+                    </div>
+                </div>
+            </Uploader>
+        </div>
+
         <uploader
+            v-else
             ref="uploader"
             :container="container.id"
             :enabled="canUpload"
@@ -202,7 +280,7 @@
                 :folder="folder"
                 :restrict-folder-navigation="restrictNavigation"
                 :selected="selectedAssets"
-                :max-files="maxFiles"
+                :max-files="selectorMaxFiles"
                 :query-scopes="queryScopes"
                 :columns="columns"
                 @selected="assetsSelected"
@@ -216,6 +294,8 @@
 import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
+import AssetCompact from './AssetCompact.vue';
+import AssetUpload from './AssetUpload.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
 import Uploads from '../../assets/Uploads.vue';
@@ -229,6 +309,8 @@ import { dedupeInFlight } from '@/util/dedupeInFlight.js';
 export default {
     components: {
         AssetTile,
+        AssetCompact,
+        AssetUpload,
         AssetRow,
         Button,
         Selector,
@@ -274,6 +356,7 @@ export default {
             loading: true,
             initializing: true,
             showSelector: false,
+            replacementAssetId: null,
             draggingFile: false,
             uploads: [],
             innerDragging: false,
@@ -373,12 +456,22 @@ export default {
             return this.maxFiles === 1;
         },
 
+        isCompact() {
+            return this.config.mode === 'compact';
+        },
+
+        selectorMaxFiles() {
+            return this.replacementAssetId ? 1 : this.maxFiles;
+        },
+
         /**
          * The selected assets.
          *
          * The asset browser expects an array of asset IDs to be passed in as a prop.
          */
         selectedAssets() {
+            if (this.replacementAssetId) return [this.replacementAssetId];
+
             return clone(this.value);
         },
 
@@ -433,7 +526,7 @@ export default {
         },
 
         pickerVisible() {
-            return !this.isReadOnly && this.showPicker;
+            return !this.isCompact && !this.isReadOnly && this.showPicker;
         },
 
         showSetAlt() {
@@ -452,6 +545,12 @@ export default {
             if (!this.container.can_upload) return false;
 
             return !this.hasPendingDynamicFolder;
+        },
+
+        canReceiveUpload() {
+            if (!this.canUpload || this.isReadOnly || this.config.disabled) return false;
+
+            return !this.loading && !this.maxFilesReached;
         },
 
         pendingText() {
@@ -494,6 +593,13 @@ export default {
     },
 
     methods: {
+        ignoreFileDrop(event) {
+            if (!Array.from(event.dataTransfer?.types ?? []).includes('Files')) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+        },
+
         initializeAssets() {
             if (!this.meta.data) {
                 this.loadAssets(this.value);
@@ -542,6 +648,13 @@ export default {
          * We should update the fieldtype with any selections.
          */
         assetsSelected(selections) {
+            if (this.replacementAssetId) {
+                selections = this.assetIds
+                    .map((id) => id === this.replacementAssetId ? selections[0] : id)
+                    .filter(Boolean);
+                selections = [...new Set(selections)];
+            }
+
             this.loadAssets(selections);
             this.lockDynamicFolder();
         },
@@ -550,7 +663,16 @@ export default {
          * Open the asset selector modal
          */
         openSelector() {
+            if (this.isReadOnly || this.config.disabled || !this.canBrowse) return;
+
             this.showSelector = true;
+        },
+
+        openReplacementSelector(asset) {
+            if (this.isReadOnly || this.config.disabled || !this.canBrowse) return;
+
+            this.replacementAssetId = asset.id;
+            this.openSelector();
         },
 
         /**
@@ -707,6 +829,8 @@ export default {
         },
 
         showSelector(selecting) {
+            if (!selecting) this.replacementAssetId = null;
+
             this.$emit(selecting ? 'focus' : 'blur');
         },
     },

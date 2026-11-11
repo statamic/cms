@@ -313,7 +313,9 @@ abstract class AbstractCacher implements Cacher
 
             $request = new GuzzleRequest('GET', $url);
 
-            StaticWarmJob::dispatch($request, [])
+            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
+
+            $job::dispatch($request, [])
                 ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
                 ->onQueue(config('statamic.static_caching.warm_queue'));
         });

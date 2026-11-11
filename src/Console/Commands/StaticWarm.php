@@ -95,7 +95,7 @@ class StaticWarm extends Command
 
             $jobClass = $this->option('uncached')
                 ? StaticWarmUncachedJob::class
-                : StaticWarmJob::class;
+                : (config('statamic.static_caching.warm_job') ?? StaticWarmJob::class);
 
             foreach ($requests as $request) {
                 $jobClass::dispatch($request, $this->clientConfig())

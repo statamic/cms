@@ -381,6 +381,13 @@ class Statamic
         }
 
         static::$bootedCallbacks = [];
+
+        app()->instance('statamic.booted', true);
+    }
+
+    public static function hasBooted(): bool
+    {
+        return app()->bound('statamic.booted');
     }
 
     public static function afterInstalled(Closure $callback)
