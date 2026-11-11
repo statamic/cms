@@ -107,8 +107,9 @@ class Structure extends Tags
     }
 
     /**
-     * A worker has no requests to mark where one page ends and the next begins,
-     * so what has been kept is dropped when it moves on to its next job.
+     * Dropped when an entry is saved, since the pages that have been kept carry
+     * its data. A worker has no requests to mark where one page ends and the
+     * next begins, so it drops them when it moves on to its next job.
      */
     public static function forgetTrees(): void
     {

@@ -778,22 +778,39 @@ EOT;
         $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
         $this->makeNav([['id' => 'a', 'entry' => 'one']]);
 
+        $template = '{{ nav:test }}[{{ title }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        // Changed without saving, the way another process's change would look.
+        $entry->set('title', 'New');
+
+        $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
+        // A job run synchronously during a request leaves what the request has kept alone.
+        event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        $request = request();
+        \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+        event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
+        \Illuminate\Support\Facades\Request::swap($request);
+        $this->assertEquals('[New]', (string) Antlers::parse($template, [], true));
+    }
+
+    #[Test]
+    public function an_entry_saved_after_the_nav_was_output_is_picked_up()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
         $template = '{{ nav:test }}[{{ title }} {{ url }}]{{ /nav:test }}';
 
         $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
 
         $entry->set('title', 'New')->slug('two')->save();
 
-        $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
-        $job->shouldReceive('payload')->andReturn([]);
-        // A job run synchronously during a request leaves what the request has kept alone.
-        event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
-        $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
-
-        $request = request();
-        \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
-        event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
-        \Illuminate\Support\Facades\Request::swap($request);
         $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
     }
 
