@@ -19,8 +19,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\AssetRepository;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Contracts\Assets\AssetRepository as AssetRepositoryContract;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
@@ -847,6 +849,28 @@ class AssetContainerTest extends TestCase
         $this->assertFalse($asset->exists());
         $this->assertFalse(Storage::disk('stale_assets')->exists('social_images/collection-events/.meta/missing.png.yaml'));
         $this->assertMissingPathWasDropped($container, $missing);
+    }
+
+    #[Test]
+    public function dropping_a_missing_file_leaves_the_asset_repository_alone()
+    {
+        $repository = $this->partialMock(AssetRepository::class);
+        $repository->shouldNotReceive('delete');
+        $this->instance(AssetRepositoryContract::class, $repository);
+
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        Storage::disk('stale_assets')->put(
+            'social_images/collection-events/.meta/missing.png.yaml',
+            "data:\n  alt: 'Event poster'\n"
+        );
+
+        $this->assertNull($container->asset($missing));
+        $this->assertMissingPathWasDropped($container, $missing);
+        $this->assertSame(
+            "data:\n  alt: 'Event poster'\n",
+            Storage::disk('stale_assets')->get('social_images/collection-events/.meta/missing.png.yaml')
+        );
     }
 
     #[Test]

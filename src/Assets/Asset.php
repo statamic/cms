@@ -39,6 +39,7 @@ use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\GraphQL\ResolvesValues;
@@ -346,15 +347,21 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     /**
      * The cached directory listing still names this path, but the file is gone.
-     * Drop the path so later reads treat it as missing instead of asking Flysystem
-     * for metadata and throwing.
+     * Drop the path from the listing and, when assets are indexed in the Stache,
+     * from that index. Stored asset data stays put: this does not go through the
+     * asset repository, whose eloquent implementation deletes the meta row.
      */
     private function forgetMissingFile(): void
     {
         $this->meta = null;
         $this->cacheStore()->forget($this->metaCacheKey());
 
-        Facades\Asset::delete($this);
+        $this->container()->contents()->forget($this->path())->save();
+
+        // The eloquent driver keeps asset data in the database and excludes this store.
+        if (config('statamic.eloquent-driver.assets.driver') !== 'eloquent') {
+            Stache::store('assets::'.$this->containerHandle())->delete($this);
+        }
     }
 
     public function metaPath()
