@@ -312,5 +312,6 @@ return [
     'user_wizard_invitation_subject' => 'Aktiviere dein neues Statamic-Konto auf :site',
     'user_wizard_roles_groups_intro' => 'Benutzer:innen können Rollen zugewiesen werden, die ihre Berechtigungen, Zugriffsrechte und Funktionen im gesamten Control Panel festlegen.',
     'user_wizard_super_admin_instructions' => 'Super-Administrator:innen haben uneingeschränkten Zugriff auf das Control Panel. Vergib diese Rolle sorgfältig.',
+    'video_fieldtype_cloudflare_manifest' => 'Manifest-URLs von Cloudflare Stream lassen sich nicht einbetten. Verwende stattdessen die URL des Buttons «Video Link» in Cloudflare.',
     'width_x_height' => ':width × :height',
 ];

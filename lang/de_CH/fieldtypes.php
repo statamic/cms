@@ -140,6 +140,7 @@ return [
     'list.title' => 'Liste',
     'markdown.config.automatic_line_breaks' => 'Aktiviert automatische Zeilenumbrüche.',
     'markdown.config.automatic_links' => 'Aktiviert die automatische Verlinkung beliebiger URLs.',
+    'markdown.config.buttons' => 'Buttons für die Symbolleiste auswählen. Zum Neuanordnen ziehen.',
     'markdown.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'markdown.config.escape_markup' => 'Entfernt Inline-HTML-Auszeichnung (z.B. `<div>` zu `&lt;div&gt;`).',
     'markdown.config.folder' => 'Anfangsverzeichnis festlegen.',
