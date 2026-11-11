@@ -87,10 +87,12 @@ class Structure extends Tags
 
         $trees = Blink::store('structure-tag-trees');
 
-        foreach ($trees->get($key, []) as $built) {
-            if ($built['complete'] || ($maxDepth && $built['max_depth'] >= $maxDepth)) {
-                return $this->limitDepth($built['tree'], $maxDepth);
-            }
+        $built = collect($trees->get($key))->first(function ($built) use ($maxDepth) {
+            return $built['complete'] || ($maxDepth && $built['max_depth'] >= $maxDepth);
+        });
+
+        if ($built) {
+            return $this->limitDepth($built['tree'], $maxDepth);
         }
 
         $tree = $this->buildTree($handle, $maxDepth);
@@ -122,10 +124,8 @@ class Structure extends Tags
             ->except(['for', 'as', 'scope', 'max_depth', 'offset', 'limit', 'select', 'include_parents'])
             ->all();
 
-        foreach ($params as $param) {
-            if (! is_null($param) && ! is_scalar($param)) {
-                return null;
-            }
+        if (collect($params)->contains(fn ($param) => ! is_null($param) && ! is_scalar($param))) {
+            return null;
         }
 
         ksort($params);
@@ -140,13 +140,11 @@ class Structure extends Tags
 
     private function wasCutShort(?array $tree, int $maxDepth): bool
     {
-        foreach ($tree ?? [] as $item) {
-            if ($item['depth'] >= $maxDepth ? $item['page']->hasChildren() : $this->wasCutShort($item['children'], $maxDepth)) {
-                return true;
-            }
-        }
-
-        return false;
+        return collect($tree)->contains(function ($item) use ($maxDepth) {
+            return $item['depth'] >= $maxDepth
+                ? $item['page']->hasChildren()
+                : $this->wasCutShort($item['children'], $maxDepth);
+        });
     }
 
     private function limitDepth(?array $tree, ?int $maxDepth): ?array
@@ -155,11 +153,11 @@ class Structure extends Tags
             return $tree;
         }
 
-        foreach ($tree as $i => $item) {
-            $tree[$i]['children'] = $item['depth'] >= $maxDepth ? [] : $this->limitDepth($item['children'], $maxDepth);
-        }
+        return collect($tree)->map(function ($item) use ($maxDepth) {
+            $item['children'] = $item['depth'] >= $maxDepth ? [] : $this->limitDepth($item['children'], $maxDepth);
 
-        return $tree;
+            return $item;
+        })->all();
     }
 
     protected function ensureStructureExists(string $handle): void
@@ -258,7 +256,7 @@ class Structure extends Tags
         $known = Blink::once('structure-tag-nodes', fn () => new \WeakMap);
 
         // Reindexed, because the augmentor numbers what it's given from zero.
-        $missing = array_values(array_filter($tree, fn ($item) => ! isset($known[$item['page']][$selected])));
+        $missing = collect($tree)->reject(fn ($item) => isset($known[$item['page']][$selected]))->values()->all();
 
         foreach (BulkAugmentor::tree($missing, $select)->toArray() as $index => $data) {
             $page = $missing[$index]['page'];
@@ -272,7 +270,7 @@ class Structure extends Tags
             ]];
         }
 
-        return array_map(fn ($item) => $known[$item['page']][$selected], $tree);
+        return collect($tree)->map(fn ($item) => $known[$item['page']][$selected])->all();
     }
 
     private function isParent(?string $url, ?string $absoluteUrl): bool
