@@ -92,6 +92,12 @@ class Associations extends Index
         $this->load();
 
         if ($this->grouped !== null && $this->groupedFrom === $this->items) {
+            // Associations that are loaded again (between queued jobs, say) come back
+            // as a different array with the same contents. Holding on to that one
+            // means the next comparison is of an array with itself, which is instant,
+            // rather than of every association in it.
+            $this->groupedFrom = $this->items;
+
             return $this->grouped;
         }
 
