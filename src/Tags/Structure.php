@@ -81,7 +81,7 @@ class Structure extends Tags
     {
         $maxDepth = (int) $this->params->get('max_depth') ?: null;
 
-        if (! $key = $this->treeCacheKey($handle)) {
+        if ($maxDepth < 0 || ! $key = $this->treeCacheKey($handle)) {
             return $this->buildTree($handle, $maxDepth);
         }
 

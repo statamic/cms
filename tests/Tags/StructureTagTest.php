@@ -686,7 +686,7 @@ EOT;
         Blink::flush();
         Blink::store('structure-tag-trees')->flush();
 
-        $this->assertNotSame('', $alone[0]);
+        $this->assertNotSame('', $alone[0].$alone[1]);
         $this->assertSame(
             $alone[0].'|'.$alone[1].'|'.$alone[0],
             (string) Antlers::parse($template($first).'|'.$template($second).'|'.$template($first), [], true)
@@ -711,6 +711,8 @@ EOT;
             'shown then hidden unpublished entries' => ['show_unpublished="true"', 'max_depth="1"'],
             'all fields then a selected star' => ['', 'select="*"'],
             'a selected star then all fields' => ['select="*"', ''],
+            'whole tree then a negative depth' => ['', 'max_depth="-1"'],
+            'a negative depth then whole tree' => ['max_depth="-1"', ''],
         ];
     }
 
