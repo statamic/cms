@@ -42,6 +42,7 @@ class ApplicationCacher extends AbstractCacher
         // Keep track of the URL and key the response content is about to be stored within.
         $this->cacheUrl($key, ...$this->getPathAndDomain($url));
 
+        $generatedAtKey = $this->normalizeKey('generated-at:'.$key);
         $key = $this->normalizeKey('responses:'.$key);
         $value = $this->normalizeContent($content);
 
@@ -51,7 +52,7 @@ class ApplicationCacher extends AbstractCacher
         // re-store this entry using later requests' statuses and headers.
         $handled = false;
 
-        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value, &$handled) {
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $generatedAtKey, $value, &$handled) {
             if ($handled) {
                 return;
             }
@@ -68,9 +69,10 @@ class ApplicationCacher extends AbstractCacher
                 'status' => $event->response->getStatusCode(),
             ];
 
-            $this->getDefaultExpiration()
-                ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
-                : $this->cache->forever($key, $cacheValue);
+            $this->cache->putMany([
+                $key => $cacheValue,
+                $generatedAtKey => now()->getTimestamp(),
+            ], $this->getDefaultExpiration() ? now()->addMinutes($this->getDefaultExpiration()) : null);
         });
     }
 
@@ -105,6 +107,13 @@ class ApplicationCacher extends AbstractCacher
         return $this->cache->get($this->normalizeKey('responses:'.$key));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $key = $this->makeHash($this->getUrl(Request::create($url)));
+
+        return $this->cache->get($this->normalizeKey('generated-at:'.$key));
+    }
+
     /**
      * Check if the cached response for a URL key is an error response.
      *
@@ -132,6 +141,7 @@ class ApplicationCacher extends AbstractCacher
         $this->getDomains()->each(function ($domain) {
             $this->getUrls($domain)->keys()->each(function ($key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
             });
         });
 
@@ -158,6 +168,7 @@ class ApplicationCacher extends AbstractCacher
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($domain) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
                 $this->forgetUrl($key, $domain);
             });
 
@@ -223,6 +234,7 @@ class ApplicationCacher extends AbstractCacher
 
             foreach ($keys as $key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
             }
 
             $this->forgetUrls($keys, $domain);

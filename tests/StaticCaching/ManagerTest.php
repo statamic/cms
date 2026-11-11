@@ -67,6 +67,7 @@ class ManagerTest extends TestCase
 
         Cache::shouldReceive('store')->andReturnSelf();
         Cache::shouldReceive('flush')->once();
+        Cache::shouldReceive('forget')->with('statamic:cache-utility:page-statuses')->once();
 
         StaticCache::flush();
     }
@@ -93,6 +94,7 @@ class ManagerTest extends TestCase
         Cache::shouldReceive('forget')->with('nocache::session.'.md5('/one'))->once();
         Cache::shouldReceive('forget')->with('nocache::session.'.md5('/two'))->once();
         Cache::shouldReceive('forget')->with('nocache::urls')->once();
+        Cache::shouldReceive('forget')->with('statamic:cache-utility:page-statuses')->once();
 
         StaticCache::flush();
     }
