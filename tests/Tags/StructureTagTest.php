@@ -827,6 +827,37 @@ EOT;
         $nav->save();
     }
 
+    #[Test]
+    public function a_subclass_builds_its_own_tree_each_time()
+    {
+        ContextualNavTag::register();
+
+        $this->makeNav([
+            ['id' => 'a', 'title' => 'A', 'url' => '/a'],
+            ['id' => 'b', 'title' => 'B', 'url' => '/b'],
+        ]);
+
+        $template = '{{ contextual_nav:test }}[{{ title }}]{{ /contextual_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, ['wanted' => 'A'], true));
+        $this->assertEquals('[B]', (string) Antlers::parse($template, ['wanted' => 'B'], true));
+        $this->assertCount(0, Blink::store('structure-tag-trees')->all());
+    }
+
+    #[Test]
+    public function a_subclass_that_reuses_trees_keeps_them()
+    {
+        ReusingNavTag::register();
+
+        $this->makeNav([['id' => 'a', 'title' => 'A', 'url' => '/a']]);
+
+        $template = '{{ reusing_nav:test }}[{{ title }}]{{ /reusing_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertCount(1, Blink::store('structure-tag-trees')->all());
+    }
+
     private function parseBasicTemplate($handle, $params = null)
     {
         return (string) Antlers::parse($this->createBasicTemplate($handle, $params), [], true);
@@ -893,5 +924,25 @@ EOT;
                 ['id' => '5-1', 'title' => 'URL only', 'url' => 'https://statamic.com'],
             ]],
         ]);
+    }
+}
+
+class ContextualNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'contextual_nav';
+
+    protected function queryForNav($query)
+    {
+        return parent::queryForNav($query)->where('title', $this->context->get('wanted'));
+    }
+}
+
+class ReusingNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'reusing_nav';
+
+    protected function reusesTrees(): bool
+    {
+        return true;
     }
 }

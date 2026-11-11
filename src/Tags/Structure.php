@@ -70,6 +70,11 @@ class Structure extends Tags
         return $value;
     }
 
+    protected function reusesTrees(): bool
+    {
+        return in_array(static::class, [self::class, \Statamic\Tags\Nav::class, Children::class]);
+    }
+
     /**
      * A page often outputs the same nav more than once (a desktop menu and a
      * mobile one, say), so a tree that has been built is kept for the rest of
@@ -81,7 +86,7 @@ class Structure extends Tags
     {
         $maxDepth = (int) $this->params->get('max_depth') ?: null;
 
-        if ($maxDepth < 0 || ! $key = $this->treeCacheKey($handle)) {
+        if (! $this->reusesTrees() || $maxDepth < 0 || ! $key = $this->treeCacheKey($handle)) {
             return $this->buildTree($handle, $maxDepth);
         }
 
