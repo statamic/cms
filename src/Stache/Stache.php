@@ -299,7 +299,7 @@ class Stache
 
             $closures = $chunks->map(function ($chunk) {
                 return function () use ($chunk) {
-                    return $chunk->each->warm()->keys()->all();
+                    return Store::duringWarm(fn () => $chunk->each->warm()->keys()->all());
                 };
             })->all();
 

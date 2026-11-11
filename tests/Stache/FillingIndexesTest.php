@@ -109,6 +109,34 @@ class FillingIndexesTest extends TestCase
     }
 
     #[Test]
+    public function a_computed_value_that_queries_the_collection_is_indexed_once_every_entry_exists()
+    {
+        // Registered first, as an app would in a service provider.
+        Collection::computed('blog', 'in_this_site', function ($entry) {
+            return Entry::query()->where('collection', 'blog')->where('site', $entry->locale())->count();
+        });
+
+        $this->createContent();
+
+        $store = $this->store('blog');
+        $store->cacheIndexUsage('in_this_site');
+
+        $this->assertEquals(['one' => 2, 'two' => 2, 'un' => 1], $store->index('in_this_site')->items()->all());
+        $this->assertEquals(['one' => 'en', 'two' => 'en', 'un' => 'fr'], $store->index('site')->items()->all());
+    }
+
+    #[Test]
+    public function warming_leaves_indexes_alone_when_updating_them_is_disabled()
+    {
+        $this->createContent();
+
+        Stache::disableUpdatingIndexes();
+        Stache::warm();
+
+        $this->assertFalse($this->store('blog')->resolveIndexes()->get('title')->isCached());
+    }
+
+    #[Test]
     public function term_associations_are_built_from_the_entries_indexes()
     {
         $this->createContent();

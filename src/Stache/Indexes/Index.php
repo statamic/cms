@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Indexes;
 
 use Statamic\Facades\Stache;
+use Statamic\Stache\Exceptions\ItemsNotReadyException;
 
 abstract class Index
 {
@@ -80,6 +81,11 @@ abstract class Index
             }
 
             $this->store->cacheIndexUsage($this);
+        } catch (ItemsNotReadyException $e) {
+            // Whatever asked will ask again once the items are there, and should get them.
+            $this->loaded = false;
+
+            throw $e;
         } finally {
             array_pop(static::$loadingStack);
         }

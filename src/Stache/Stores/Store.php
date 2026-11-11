@@ -515,6 +515,10 @@ abstract class Store
      */
     public function fillIndexes(?Index $for = null): bool
     {
+        if (! Stache::shouldUpdateIndexes()) {
+            return false;
+        }
+
         // An index asked for while the pass is running is one that an item's value depends on.
         if ($this->filling !== null) {
             return false;
