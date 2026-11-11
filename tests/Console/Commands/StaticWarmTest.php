@@ -370,6 +370,97 @@ class StaticWarmTest extends TestCase
         }
     }
 
+    #[Test]
+    public function it_warms_paginated_pages_after_the_other_urls()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $visited = collect($history)->map(function ($transaction) {
+            $uri = $transaction['request']->getUri();
+
+            return $uri->getPath().($uri->getQuery() ? '?'.$uri->getQuery() : '');
+        })->all();
+
+        $this->assertEquals(['/about', '/contact', '/about?page=1', '/about?page=2', '/about?page=3'], $visited);
+    }
+
+    #[Test]
+    public function it_doesnt_warm_paginated_pages_that_are_cached_under_the_same_url()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.ignore_query_strings' => true,
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $this->assertCount(2, $history);
+    }
+
+    #[Test]
+    public function it_only_warms_paginated_pages_whose_query_string_is_part_of_the_cached_url()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.allowed_query_strings' => ['page'],
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'page',
+            ]),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'p',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['page=1', 'page=2'], $queries);
+    }
+
     private function mockClient(array $responses, array &$history)
     {
         $handlerStack = HandlerStack::create(new MockHandler($responses));
