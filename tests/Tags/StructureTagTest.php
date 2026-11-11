@@ -709,6 +709,8 @@ EOT;
             'selected fields then all fields' => ['select="title"', ''],
             'hidden then shown unpublished entries' => ['', 'show_unpublished="true"'],
             'shown then hidden unpublished entries' => ['show_unpublished="true"', 'max_depth="1"'],
+            'all fields then a selected star' => ['', 'select="*"'],
+            'a selected star then all fields' => ['select="*"', ''],
         ];
     }
 

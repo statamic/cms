@@ -263,7 +263,7 @@ class Structure extends Tags
     private function nodes(array $tree): array
     {
         $select = $this->params->explode('select');
-        $selected = implode('|', $select ?? ['*']);
+        $selected = json_encode($select);
         $known = Blink::once('structure-tag-nodes', fn () => new \WeakMap);
 
         // Reindexed, because the augmentor numbers what it's given from zero.
