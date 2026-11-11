@@ -106,6 +106,16 @@ class Structure extends Tags
         return $tree;
     }
 
+    /**
+     * A worker has no requests to mark where one page ends and the next begins,
+     * so what has been kept is dropped when it moves on to its next job.
+     */
+    public static function forgetTrees(): void
+    {
+        Blink::store('structure-tag-trees')->flush();
+        Blink::forget('structure-tag-nodes');
+    }
+
     private function buildTree(string $handle, ?int $maxDepth)
     {
         return (new TreeBuilder)->build([

@@ -771,6 +771,26 @@ EOT;
         $this->assertEquals('[1][2]', $this->parseBasicTemplate('test'));
     }
 
+    #[Test]
+    public function a_queue_worker_doesnt_keep_a_tree_from_one_job_to_the_next()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
+        $template = '{{ nav:test }}[{{ title }} {{ url }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
+
+        $entry->set('title', 'New')->slug('two')->save();
+
+        $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
+        event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
+
+        $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
