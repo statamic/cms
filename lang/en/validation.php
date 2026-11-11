@@ -182,6 +182,7 @@ return [
     'handle' => 'Must contain only lowercase letters and numbers with underscores as separators.',
     'handle_starts_with_number' => 'Cannot start with a number.',
     'slug' => 'Must contain only letters and numbers with dashes or underscores as separators.',
+    'captcha' => 'The captcha could not be verified. Please try again.',
     'code_fieldtype_rulers' => 'This is invalid.',
     'composer_package' => 'Must be a valid composer package name (eg. hasselhoff/kung-fury).',
     'date_fieldtype_date_required' => 'Date is required.',

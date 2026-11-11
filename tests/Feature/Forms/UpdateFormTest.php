@@ -82,6 +82,25 @@ class UpdateFormTest extends TestCase
     }
 
     #[Test]
+    public function it_updates_the_captcha_settings()
+    {
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($form, [
+                'store' => true,
+                'captcha' => true,
+                'captcha_behavior' => 'mark_as_spam',
+            ])
+            ->assertOk();
+
+        $updated = Form::all()->first();
+        $this->assertTrue($updated->get('captcha'));
+        $this->assertEquals('mark_as_spam', $updated->get('captcha_behavior'));
+    }
+
+    #[Test]
     public function it_updates_data()
     {
         $form = tap(Form::make('test'))->save();

@@ -4,6 +4,7 @@ namespace Statamic\Forms\JsDrivers;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Captcha;
 use Statamic\Forms\Form;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -154,6 +155,7 @@ abstract class AbstractJsDriver implements JsDriver
             ->preProcess()
             ->values()
             ->when($this->form->honeypot(), fn ($fields, $honeypot) => $fields->merge([$honeypot => null]))
+            ->when(Captcha::forForm($this->form), fn ($fields, $captcha) => $fields->merge([$captcha->field() => null]))
             ->all();
     }
 
