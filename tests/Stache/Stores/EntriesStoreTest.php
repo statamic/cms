@@ -576,6 +576,71 @@ class EntriesStoreTest extends TestCase
         $this->assertEquals('Saved by another process', $item->get('title'));
     }
 
+    #[Test]
+    public function filling_indexes_in_one_pass_gives_what_each_index_builds_for_itself()
+    {
+        foreach (['alphabetical', 'blog', 'numeric', 'pages'] as $collection) {
+            $store = $this->parent->store($collection);
+
+            $store->warm();
+
+            foreach ($store->resolveIndexes() as $name => $index) {
+                $expected = $index->getItems();
+
+                $this->assertNotEmpty($expected, "{$collection}/{$name}");
+                $this->assertSame(array_keys($expected), $index->items()->keys()->all(), "{$collection}/{$name}");
+                $this->assertEquals($expected, $index->items()->all(), "{$collection}/{$name}");
+            }
+        }
+    }
+
+    #[Test]
+    public function a_queue_worker_fills_indexes_from_what_is_cached_at_the_time()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+
+        // A job needs an index, so the store's indexes are filled.
+        $this->assertEquals('Christmas', $store->index('title')->get('blog-christmas'));
+
+        // Another process saves the entry, and its indexes are cleared to be built again.
+        $this->saveAsAnotherProcessWould($store, 'blog-christmas', 'Saved by another process');
+
+        // The worker moves on to its next job. Blink is left as it was.
+        Stache::stores()->each->resetMemoizedState();
+        app('stache.indexes')->each->resetMemoizedState();
+
+        $this->assertEquals('Saved by another process', $store->index('title')->get('blog-christmas'));
+    }
+
+    #[Test]
+    public function a_later_request_in_the_same_process_fills_indexes_from_what_is_cached_at_the_time()
+    {
+        $this->useSerializingCacheStore();
+
+        $store = $this->parent->store('blog');
+        $this->assertEquals('Christmas', $store->index('title')->get('blog-christmas'));
+
+        $this->saveAsAnotherProcessWould($store, 'blog-christmas', 'Saved by another process');
+
+        // The next request gets a new Blink (Octane clears resolved facades), but the same store and indexes.
+        Blink::swap(new \Statamic\Support\Blink);
+        $store->resolveIndexes()->each->resetMemoizedState();
+
+        $this->assertEquals('Saved by another process', $store->index('title')->get('blog-christmas'));
+    }
+
+    private function saveAsAnotherProcessWould($store, $id, $title)
+    {
+        $key = (fn () => $this->getItemCacheKey($id))->call($store);
+
+        Stache::cacheStore()->forever($key, Stache::cacheStore()->get($key)->set('title', $title));
+
+        // The paths are kept under the path index's key, and haven't changed.
+        $store->resolveIndexes()->except('path')->each(fn ($index) => Stache::cacheStore()->forget($index->cacheKey()));
+    }
+
     private function useSerializingCacheStore()
     {
         config([
