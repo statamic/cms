@@ -25,8 +25,6 @@ class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
     private bool $shouldBlinkEntryUris = true;
-    private ?string $filterDirectory = null;
-    private ?array $filterSites = null;
     private int $makingItemsInBulk = 0;
     private array $collectionsForBulk = [];
 
@@ -78,26 +76,9 @@ class CollectionEntriesStore extends ChildStore
         return $this->collection ?? Collection::findByHandle($this->childKey);
     }
 
-    protected function traverseFiles()
-    {
-        // The filter runs once per file, so resolve anything that's the same
-        // for every file up front rather than repeating it for each one.
-        $this->filterDirectory = Str::finish($this->directory(), '/');
-        $this->filterSites = Site::multiEnabled() && ($collection = $this->collection())
-            ? $collection->sites()->flip()->all()
-            : null;
-
-        try {
-            return parent::traverseFiles();
-        } finally {
-            $this->filterDirectory = null;
-            $this->filterSites = null;
-        }
-    }
-
     public function getItemFilter(SplFileInfo $file)
     {
-        $dir = $this->filterDirectory ?? Str::finish($this->directory(), '/');
+        $dir = Str::finish($this->directory(), '/');
         $relative = Path::tidy($file->getPathname());
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
@@ -106,12 +87,9 @@ class CollectionEntriesStore extends ChildStore
 
         if (Site::multiEnabled()) {
             [$site, $relative] = explode('/', $relative, 2);
+            $collection = $this->collection ?? $this->findCollection($this->childKey);
 
-            $allowed = $this->filterSites !== null
-                ? isset($this->filterSites[$site])
-                : $this->collection()->sites()->contains($site);
-
-            if (! $allowed) {
+            if (! $collection->sites()->contains($site)) {
                 return false;
             }
         }
