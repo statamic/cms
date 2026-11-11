@@ -346,7 +346,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      * from that index. Stored asset data stays put: this does not go through the
      * asset repository, whose eloquent implementation deletes the meta row.
      */
-    private function forgetMissingFile(): void
+    public function forgetMissingFile(): void
     {
         $this->meta = null;
         $this->cacheStore()->forget($this->metaCacheKey());

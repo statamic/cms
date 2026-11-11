@@ -90,6 +90,7 @@ class ImageGenerator
 
     private function doGenerateByPath($path, array $params, $sourceFilesystemRoot = null)
     {
+        $this->asset = null;
         $this->path = $path;
         $this->setParams($params);
 
@@ -116,6 +117,7 @@ class ImageGenerator
 
     private function doGenerateByUrl($url, array $params)
     {
+        $this->asset = null;
         $this->skip_validation = true;
         $this->setParams($params);
 
@@ -318,6 +320,10 @@ class ImageGenerator
         try {
             $path = $this->server->makeImage($image, $this->params);
         } catch (GlideFileNotFoundException $e) {
+            if (! $this->asset?->disk()?->exists($this->asset->path())) {
+                $this->asset?->forgetMissingFile();
+            }
+
             throw UnableToReadFile::fromLocation($image);
         }
 
