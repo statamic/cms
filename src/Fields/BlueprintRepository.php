@@ -9,7 +9,6 @@ use Statamic\Exceptions\BlueprintNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -326,7 +325,7 @@ class BlueprintRepository
                 $handle = Str::of($path)->afterLast('/')->before('.');
             }
 
-            $contents = YAML::file($path)->parse();
+            $contents = ParsedYamlFiles::parse($path);
 
             return $this->make($handle)
                 ->setHidden(Arr::pull($contents, 'hide'))
