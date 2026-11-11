@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +16,7 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToRetrieveMetadata;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
@@ -852,6 +854,46 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function a_metadata_read_failure_keeps_a_file_that_still_exists()
+    {
+        $path = 'notes.txt';
+        $filesystem = \Mockery::mock(FilesystemAdapter::class);
+        $filesystem->shouldReceive('get')->andReturn(null);
+        $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('exists')->twice()->andReturn(true);
+        $filesystem->shouldReceive('put')->never();
+
+        [$container, $asset] = $this->containerWithListedFile($path, $filesystem);
+
+        $this->assertSame(['data' => []], $asset->meta());
+        $this->assertSame(['data' => []], $asset->meta());
+        $this->assertNull($asset->getRawMeta());
+        $this->assertNull(Cache::get($asset->metaCacheKey()));
+        $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
+    }
+
+    #[Test]
+    public function a_metadata_read_failure_throws_when_the_existence_check_fails()
+    {
+        $path = 'notes.txt';
+        $filesystem = \Mockery::mock(FilesystemAdapter::class);
+        $filesystem->shouldReceive('get')->andReturn(null);
+        $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('exists')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('put')->never();
+
+        [$container, $asset] = $this->containerWithListedFile($path, $filesystem);
+
+        try {
+            $asset->meta();
+            $this->fail('The existence check should throw.');
+        } catch (UnableToRetrieveMetadata) {
+            $this->assertNull(Cache::get($asset->metaCacheKey()));
+            $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
+        }
+    }
+
+    #[Test]
     public function dropping_a_missing_file_leaves_the_asset_repository_alone()
     {
         $repository = $this->partialMock(AssetRepository::class);
@@ -1156,6 +1198,30 @@ class AssetContainerTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->andReturn($container);
 
         return $container;
+    }
+
+    private function containerWithListedFile(string $path, FilesystemAdapter $filesystem): array
+    {
+        Blink::flush();
+
+        $handle = 'listed_'.md5($path.microtime());
+
+        Cache::put('asset-list-contents-'.$handle, collect([
+            $path => [
+                'type' => 'file',
+                'path' => $path,
+                'basename' => basename($path),
+                'filename' => pathinfo($path, PATHINFO_FILENAME),
+                'dirname' => '',
+                'extension' => pathinfo($path, PATHINFO_EXTENSION),
+            ],
+        ]));
+
+        $container = (new AssetContainer)->handle($handle)->disk($filesystem);
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with($handle)->andReturn($container);
+
+        return [$container, $container->makeAsset($path)];
     }
 
     private function containerWithStaleListedFile(): array

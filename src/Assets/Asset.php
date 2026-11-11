@@ -294,16 +294,26 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 return YAML::file($path)->parse($contents);
             }
 
-            $this->writeMeta($meta = $this->generateMeta());
+            $meta = $this->generateMeta();
+
+            if ($this->hasGeneratedMeta($meta)) {
+                $this->writeMeta($meta);
+            }
 
             return $meta;
         });
 
-        if (! $this->exists()) {
+        $generated = $this->hasGeneratedMeta($meta);
+
+        if (! $generated) {
             $this->cacheStore()->forget($this->metaCacheKey());
         }
 
-        return $this->meta = $meta;
+        if ($generated || ! $this->exists()) {
+            $this->meta = $meta;
+        }
+
+        return $meta;
     }
 
     private function metaValue($key)
@@ -316,7 +326,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->cacheStore()->forget($this->metaCacheKey());
 
-        $this->writeMeta($meta = $this->generateMeta());
+        $meta = $this->generateMeta();
+
+        if ($this->hasGeneratedMeta($meta)) {
+            $this->writeMeta($meta);
+        }
 
         return Arr::get($meta, $key);
     }
@@ -338,11 +352,18 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                     'duration' => Arr::get($attributes, 'duration'),
                 ]);
             } catch (UnableToRetrieveMetadata|UnableToReadFile) {
-                $this->forgetMissingFile();
+                if (! $this->disk()->exists($this->path())) {
+                    $this->forgetMissingFile();
+                }
             }
         }
 
         return $meta;
+    }
+
+    private function hasGeneratedMeta(array $meta): bool
+    {
+        return isset($meta['size']);
     }
 
     /**
