@@ -703,6 +703,8 @@ EOT;
             'two levels then one' => ['max_depth="2"', 'max_depth="1"'],
             'deeper than the tree, then all of it' => ['max_depth="5"', ''],
             'limited then offset' => ['limit="2"', 'offset="2"'],
+            'limited then whole tree' => ['limit="2"', ''],
+            'offset then whole tree' => ['offset="2"', ''],
             'with and without parents' => ['include_parents="false"', ''],
             'selected fields then all fields' => ['select="title"', ''],
             'hidden then shown unpublished entries' => ['', 'show_unpublished="true"'],

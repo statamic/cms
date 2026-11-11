@@ -257,10 +257,11 @@ class Structure extends Tags
         $selected = implode('|', $select ?? ['*']);
         $known = Blink::once('structure-tag-nodes', fn () => new \WeakMap);
 
-        $missing = array_filter($tree, fn ($item) => ! isset($known[$item['page']][$selected]));
+        // Reindexed, because the augmentor numbers what it's given from zero.
+        $missing = array_values(array_filter($tree, fn ($item) => ! isset($known[$item['page']][$selected])));
 
         foreach (BulkAugmentor::tree($missing, $select)->toArray() as $index => $data) {
-            $page = $tree[$index]['page'];
+            $page = $missing[$index]['page'];
             $absoluteUrl = $page->absoluteUrl();
 
             $known[$page] = [...($known[$page] ?? []), $selected => [
