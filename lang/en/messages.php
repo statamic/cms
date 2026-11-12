@@ -15,6 +15,7 @@ return [
     'asset_container_warm_intelligent_instructions' => 'Automatically generate appropriate presets on upload.',
     'asset_container_warm_presets_instructions' => 'Specify which presets to generate automatically on upload.',
     'asset_replace_confirmation' => 'References to this asset in content will be updated to the selected asset.',
+    'asset_replace_copy_data_instructions' => 'Copy the original asset\'s data (e.g. alt text, focal point) to the new asset.',
     'asset_reupload_confirmation' => 'Are you sure you want to re-upload this asset?',
     'asset_reupload_warning' => 'You may encounter browser or server caching issues. Consider replacing the asset instead.',
     'blueprints_hidden_instructions' => 'Hides the blueprint from create buttons in the Control Panel.',

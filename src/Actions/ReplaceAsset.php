@@ -49,6 +49,10 @@ class ReplaceAsset extends Action
 
         $newAsset = Facades\Asset::find($this->context['container'].'::'.$values['new_asset']);
 
+        if ($values['copy_data'] ?? false) {
+            $newAsset->merge($originalAsset->data()->all())->save();
+        }
+
         $newAsset->replace($originalAsset, $values['delete_original']);
 
         return [
@@ -70,6 +74,12 @@ class ReplaceAsset extends Action
                 'restrict' => true,
                 'allow_uploads' => true,
                 'show_filename' => true,
+            ],
+            'copy_data' => [
+                'display' => __('Copy Data'),
+                'instructions' => __('statamic::messages.asset_replace_copy_data_instructions'),
+                'type' => 'toggle',
+                'default' => true,
             ],
             'delete_original' => [
                 'display' => __('Delete Original Asset'),
