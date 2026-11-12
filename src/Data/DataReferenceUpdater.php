@@ -84,22 +84,42 @@ abstract class DataReferenceUpdater
 
     private function itemMayContainReferences(): bool
     {
-        if (! is_string($this->originalValue) || $this->originalValue === '') {
+        return static::encodedDataMayContain(static::encodeData($this->item), $this->originalValue);
+    }
+
+    /**
+     * Encode an item's data so it can be cheaply searched for references with encodedDataMayContain().
+     *
+     * @param  mixed  $item
+     */
+    public static function encodeData($item): ?string
+    {
+        try {
+            $data = json_encode($item->data()->all(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+            return is_string($data) ? $data : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Whether encoded data may contain a reference to the given value. When unsure, it may.
+     *
+     * @param  mixed  $value
+     */
+    public static function encodedDataMayContain(?string $encodedData, $value): bool
+    {
+        if ($encodedData === null || ! is_string($value) || $value === '') {
             return true;
         }
 
         try {
-            $flags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
-
-            if (! is_string($data = json_encode($this->item->data()->all(), $flags))) {
+            if (! is_string($needle = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))) {
                 return true;
             }
 
-            if (! is_string($needle = json_encode($this->originalValue, $flags))) {
-                return true;
-            }
-
-            return str_contains($data, substr($needle, 1, -1));
+            return str_contains($encodedData, substr($needle, 1, -1));
         } catch (\Throwable $e) {
             return true;
         }

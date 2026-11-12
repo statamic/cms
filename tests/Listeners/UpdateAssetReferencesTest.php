@@ -3,11 +3,13 @@
 namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
+use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Facades;
 use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Arr;
@@ -174,6 +176,289 @@ class UpdateAssetReferencesTest extends TestCase
         $folder->rename('folder-new');
 
         $this->assertEquals('folder-new/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    #[Test]
+    public function it_updates_references_for_every_asset_in_a_moved_folder_in_a_single_pass()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                ['handle' => 'hero', 'field' => ['type' => 'assets', 'container' => 'test_container', 'max_files' => 1]],
+                ['handle' => 'gallery', 'field' => ['type' => 'assets', 'container' => 'test_container']],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'hero' => 'folder/hoff.jpg',
+            'gallery' => ['folder/norris.jpg', 'folder/sub/hoff.jpg', 'elsewhere/hoff.jpg'],
+        ]))->save();
+
+        foreach (['folder/hoff.jpg', 'folder/norris.jpg', 'folder/sub/hoff.jpg'] as $path) {
+            Storage::disk('test')->put($path, '');
+            Facades\Asset::make()->container('test_container')->path($path)->save();
+        }
+
+        $scans = 0;
+
+        UpdateAssetReferences::hook('additional', function () use (&$scans) {
+            $scans++;
+
+            return LazyCollection::make();
+        });
+
+        Event::fake([AssetReferencesUpdated::class]);
+
+        $this->container->assetFolder('folder')->rename('renamed');
+
+        $this->assertEquals(1, $scans);
+        $this->assertEquals('renamed/hoff.jpg', $entry->fresh()->get('hero'));
+        $this->assertEquals(['renamed/norris.jpg', 'renamed/sub/hoff.jpg', 'elsewhere/hoff.jpg'], $entry->fresh()->get('gallery'));
+
+        Event::assertDispatchedTimes(AssetReferencesUpdated::class, 3);
+        foreach (['renamed/hoff.jpg', 'renamed/norris.jpg', 'renamed/sub/hoff.jpg'] as $path) {
+            Event::assertDispatched(AssetReferencesUpdated::class, fn ($event) => $event->asset->path() === $path);
+        }
+    }
+
+    #[Test]
+    public function it_still_updates_references_when_moving_a_single_asset_after_moving_a_folder()
+    {
+        $this->container->assetFolder('folder')->rename('renamed');
+
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assetHoff->move('destination');
+
+        $this->assertEquals('destination/hoff.jpg', $entry->fresh()->get('hero'));
+    }
+
+    #[Test]
+    public function it_removes_references_for_every_asset_in_a_deleted_folder_in_a_single_pass()
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                ['handle' => 'hero', 'field' => ['type' => 'assets', 'container' => 'test_container', 'max_files' => 1]],
+                ['handle' => 'gallery', 'field' => ['type' => 'assets', 'container' => 'test_container']],
+            ],
+        ]);
+
+        $entry = tap(Facades\Entry::make()->collection($collection)->data([
+            'hero' => 'folder/hoff.jpg',
+            'gallery' => ['folder/norris.jpg', 'folder/sub/hoff.jpg', 'elsewhere/hoff.jpg'],
+        ]))->save();
+
+        foreach (['folder/hoff.jpg', 'folder/norris.jpg', 'folder/sub/hoff.jpg'] as $path) {
+            Storage::disk('test')->put($path, '');
+            Facades\Asset::make()->container('test_container')->path($path)->save();
+        }
+
+        $scans = 0;
+
+        UpdateAssetReferences::hook('additional', function () use (&$scans) {
+            $scans++;
+
+            return LazyCollection::make();
+        });
+
+        Event::fake([AssetReferencesUpdated::class]);
+
+        $this->container->assetFolder('folder')->delete();
+
+        $this->assertEquals(1, $scans);
+        $this->assertFalse($entry->fresh()->has('hero'));
+        $this->assertEquals(['elsewhere/hoff.jpg'], $entry->fresh()->get('gallery'));
+
+        Event::assertDispatchedTimes(AssetReferencesUpdated::class, 3);
+        foreach (['folder/hoff.jpg', 'folder/norris.jpg', 'folder/sub/hoff.jpg'] as $path) {
+            Event::assertDispatched(AssetReferencesUpdated::class, fn ($event) => $event->asset->path() === $path);
+        }
+    }
+
+    #[Test]
+    public function it_still_updates_references_when_deleting_a_single_asset_after_deleting_a_folder()
+    {
+        $this->container->assetFolder('folder')->delete();
+
+        $entry = $this->createEntryWithHoffHeroImage();
+
+        $this->assetHoff->delete();
+
+        $this->assertFalse($entry->fresh()->has('hero'));
+    }
+
+    #[Test]
+    public function it_updates_references_for_assets_moved_by_the_bulk_move_action_in_a_single_pass()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg']);
+        $scans = $this->countScans();
+
+        (new \Statamic\Actions\MoveAsset)->run(collect([$this->assetHoff, $this->assetNorris]), ['folder' => 'destination']);
+
+        $this->assertEquals(1, $scans());
+        $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function it_removes_references_for_assets_deleted_by_the_bulk_delete_action_in_a_single_pass()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg', 'other.jpg']);
+        $scans = $this->countScans();
+
+        (new \Statamic\Actions\Delete)->run(collect([$this->assetHoff, $this->assetNorris]), []);
+
+        $this->assertEquals(1, $scans());
+        $this->assertEquals(['other.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function it_updates_references_for_folders_moved_by_the_bulk_move_folder_action_in_a_single_pass()
+    {
+        $entry = $this->createEntryWithGallery(['one/hoff.jpg', 'two/norris.jpg']);
+
+        foreach (['one/hoff.jpg', 'two/norris.jpg'] as $path) {
+            Storage::disk('test')->put($path, '');
+            Facades\Asset::make()->container('test_container')->path($path)->save();
+        }
+
+        $scans = $this->countScans();
+
+        (new \Statamic\Actions\MoveAssetFolder)->run(collect([
+            $this->container->assetFolder('one'),
+            $this->container->assetFolder('two'),
+        ]), ['folder' => 'destination']);
+
+        $this->assertEquals(1, $scans());
+        $this->assertEquals(['destination/one/hoff.jpg', 'destination/two/norris.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function it_applies_batched_moves_in_the_order_they_happened()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg']);
+
+        // Swap the two assets' paths by way of a temporary path.
+        UpdateAssetReferences::batch(function () {
+            $this->assetHoff->path('temp.jpg')->save();
+            $this->assetNorris->path('hoff.jpg')->save();
+            $this->assetHoff->path('norris.jpg')->save();
+        });
+
+        $this->assertEquals(['norris.jpg', 'hoff.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function nested_batches_are_handled_by_the_outermost_batch()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg']);
+        $scans = $this->countScans();
+
+        UpdateAssetReferences::batch(function () use ($scans, $entry) {
+            UpdateAssetReferences::batch(fn () => $this->assetHoff->move('destination'));
+
+            $this->assertEquals(0, $scans());
+            $this->assertEquals(['hoff.jpg', 'norris.jpg'], $entry->fresh()->get('gallery'));
+
+            $this->assetNorris->move('destination');
+        });
+
+        $this->assertEquals(1, $scans());
+        $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function it_splits_large_batches_into_chunks()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg', 'other.jpg']);
+        $other = tap(Facades\Asset::make()->container('test_container')->path('other.jpg'))->save();
+        $scans = $this->countScans();
+
+        UpdateAssetReferences::$batchChunkSize = 2;
+
+        try {
+            UpdateAssetReferences::batch(fn () => collect([$this->assetHoff, $this->assetNorris, $other])->each->move('destination'));
+        } finally {
+            UpdateAssetReferences::$batchChunkSize = 500;
+        }
+
+        $this->assertEquals(2, $scans());
+        $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg', 'destination/other.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function it_updates_references_for_the_assets_moved_before_a_batch_fails()
+    {
+        $entry = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg']);
+
+        try {
+            UpdateAssetReferences::batch(function () {
+                $this->assetHoff->move('destination');
+
+                throw new \Exception('Something went wrong');
+            });
+        } catch (\Exception $e) {
+            $this->assertEquals('Something went wrong', $e->getMessage());
+        }
+
+        $this->assertEquals(['destination/hoff.jpg', 'norris.jpg'], $entry->fresh()->get('gallery'));
+
+        // The batch is over, so the next move is handled on its own.
+        $this->assetNorris->move('destination');
+
+        $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function moving_a_folder_does_not_turn_the_reference_updater_back_on()
+    {
+        $entry = $this->createEntryWithGallery(['folder/hoff.jpg', 'norris.jpg']);
+        Storage::disk('test')->put('folder/hoff.jpg', '');
+        Facades\Asset::make()->container('test_container')->path('folder/hoff.jpg')->save();
+
+        UpdateAssetReferences::disable();
+
+        try {
+            $this->container->assetFolder('folder')->rename('renamed');
+            $this->assetNorris->move('destination');
+        } finally {
+            UpdateAssetReferences::enable();
+        }
+
+        $this->assertEquals(['folder/hoff.jpg', 'norris.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    private function createEntryWithGallery(array $paths)
+    {
+        $collection = tap(Facades\Collection::make('articles'))->save();
+
+        $this->setInBlueprints('collections/articles', [
+            'fields' => [
+                ['handle' => 'gallery', 'field' => ['type' => 'assets', 'container' => 'test_container']],
+            ],
+        ]);
+
+        return tap(Facades\Entry::make()->collection($collection)->data(['gallery' => $paths]))->save();
+    }
+
+    /**
+     * Count the passes over the content made by reference updates from here on.
+     */
+    private function countScans(): \Closure
+    {
+        $scans = 0;
+
+        UpdateAssetReferences::hook('additional', function () use (&$scans) {
+            $scans++;
+
+            return LazyCollection::make();
+        });
+
+        return function () use (&$scans) {
+            return $scans;
+        };
     }
 
     #[Test]

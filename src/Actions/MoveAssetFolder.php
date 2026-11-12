@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
+use Statamic\Listeners\UpdateAssetReferences;
 
 use function Statamic\trans as __;
 
@@ -41,7 +42,8 @@ class MoveAssetFolder extends Action
 
     public function run($folders, $values)
     {
-        $folders->each->move($values['folder']);
+        // Update the references to the assets in all the folders together, rather than one folder at a time.
+        UpdateAssetReferences::batch(fn () => $folders->each->move($values['folder']));
     }
 
     protected function fieldItems()
