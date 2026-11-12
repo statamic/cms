@@ -4,6 +4,7 @@ namespace Tests\Search;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 use Statamic\Search\Comb\Comb;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Tests\TestCase;
@@ -417,6 +418,64 @@ EOT;
         $results = $comb->lookUp('One two three');
 
         $this->assertEquals(['One two three'], collect($results['data'] ?? [])->pluck('data.title')->all());
+    }
+
+    #[Test]
+    public function phrase_weights_default_to_zero_and_do_not_change_scores()
+    {
+        $weights = (new ReflectionClass(Comb::class))->getDefaultProperties()['match_weights'];
+
+        $this->assertSame(0, $weights['phrase']);
+        $this->assertSame(0, $weights['phrase_start']);
+
+        $documents = [
+            ['title' => 'Two years in at Passive House Accelerator'],
+            ['title' => str_repeat('Passive House Accelerator ', 12)],
+        ];
+        $term = 'Two years in at Passive House Accelerator';
+
+        $this->assertSame(
+            $this->combScores($documents, $term),
+            $this->combScores($documents, $term, ['phrase' => 0, 'phrase_start' => 0])
+        );
+    }
+
+    #[Test]
+    public function a_title_containing_the_full_query_can_outrank_repeated_words()
+    {
+        $documents = [
+            ['title' => 'Two years in at Passive House Accelerator'],
+            ['title' => str_repeat('Passive House Accelerator ', 12)],
+        ];
+        $term = 'Two years in at Passive House Accelerator';
+
+        $baseline = $this->combScores($documents, $term);
+        $repeated = str_repeat('Passive House Accelerator ', 12);
+
+        $this->assertGreaterThan(
+            $baseline['Two years in at Passive House Accelerator'],
+            $baseline[$repeated]
+        );
+
+        $boosted = $this->combScores($documents, $term, ['phrase' => 500]);
+
+        $this->assertSame($baseline[$repeated], $boosted[$repeated]);
+        $this->assertGreaterThan($boosted[$repeated], $boosted['Two years in at Passive House Accelerator']);
+    }
+
+    private function combScores(array $documents, string $term, array $matchWeights = []): array
+    {
+        $settings = ['score_threshold' => 0];
+
+        if ($matchWeights !== []) {
+            $settings['match_weights'] = $matchWeights;
+        }
+
+        $results = (new Comb($documents, $settings))->lookUp($term);
+
+        return collect($results['data'])->mapWithKeys(fn ($result) => [
+            $result['data']['title'] => $result['score'],
+        ])->all();
     }
 
     public static function searchesProvider()

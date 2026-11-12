@@ -36,6 +36,8 @@ class Comb
         'partial_whole' => 2,
         'partial_whole_start' => 2,
         'whole' => 10,
+        'phrase' => 0,
+        'phrase_start' => 0,
     ];
 
     /**
@@ -530,6 +532,8 @@ class Comb
                 'partial_whole' => 0,
                 'partial_whole_start' => 0,
                 'whole' => 0,
+                'phrase' => 0,
+                'phrase_start' => 0,
             ];
 
             $snippets = [];
@@ -562,6 +566,9 @@ class Comb
                     if ($result) {
                         $matched = true;
                         $found['partial_whole'] += $strength * $result;
+                        if (! $chunk_is_word) {
+                            $found['phrase'] += $strength * $result;
+                        }
                         if ($chunk_is_word) {
                             $found['partial_word'] += $strength * $result;
                             if (preg_match_all($regex['partial_anywhere'], $first_word)) {
@@ -594,6 +601,9 @@ class Comb
                             if ($result) {
                                 $matched = true;
                                 $found['partial_whole_start'] += $strength * $result;
+                                if (! $chunk_is_word) {
+                                    $found['phrase_start'] += $strength * $result;
+                                }
 
                                 $result = preg_match_all($regex['whole'], $property);
                                 if ($result) {
