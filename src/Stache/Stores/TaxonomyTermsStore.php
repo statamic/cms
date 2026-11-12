@@ -24,6 +24,16 @@ class TaxonomyTermsStore extends ChildStore
         'site',
     ];
 
+    public function indexes($withUsages = true)
+    {
+        $indexes = parent::indexes($withUsages);
+
+        // The other indexes read the associations, and would build them if they aren't
+        // cached yet. Updating the associations first means they're only built once
+        // when the store is warmed, rather than by the first index and again on update.
+        return $indexes->only('associations')->merge($indexes->except('associations'));
+    }
+
     public function getItemFilter(SplFileInfo $file)
     {
         $dir = Str::finish($this->directory(), '/');
