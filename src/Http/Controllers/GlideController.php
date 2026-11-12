@@ -16,6 +16,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
 use Statamic\Facades\Glide;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
@@ -218,12 +219,31 @@ class GlideController extends Controller
             return;
         }
 
-        $path = Str::after($this->request->url(), Site::current()->absoluteUrl());
+        $url = $this->request->url();
+        $siteUrl = Site::current()->absoluteUrl();
+
+        $path = Str::startsWith(Str::ensureRight($url, '/'), Str::ensureRight($siteUrl, '/'))
+            ? Str::after($url, $siteUrl)
+            : $this->removeSitePrefix($this->request->getPathInfo());
 
         try {
             SignatureFactory::create(Config::getAppKey())->validateRequest($path, $this->request->query->all());
         } catch (SignatureException $e) {
             abort(400, $e->getMessage());
         }
+    }
+
+    /**
+     * Remove the longest site path prefix (e.g. /fr) from the path.
+     */
+    private function removeSitePrefix(string $path): string
+    {
+        $prefix = Site::all()
+            ->map(fn ($site) => Str::removeRight(URL::makeRelative($site->url()), '/'))
+            ->filter(fn ($prefix) => $prefix !== '' && Str::startsWith($path, $prefix.'/'))
+            ->sortByDesc(fn ($prefix) => strlen($prefix))
+            ->first();
+
+        return $prefix ? Str::after($path, $prefix) : $path;
     }
 }
