@@ -21,7 +21,7 @@ class BulkAugmentor
             return $key;
         }
 
-        return 'Ref::'.get_class($item).spl_object_hash($item);
+        return 'Ref::'.get_class($item).spl_object_id($item);
     }
 
     public static function make($items)
