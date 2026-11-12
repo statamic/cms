@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -166,6 +167,17 @@ abstract class AbstractCacher implements Cacher
         });
 
         $this->cache->forget($this->normalizeKey('domains'));
+    }
+
+    protected function flushDedicatedStore(): void
+    {
+        if (! config()->has('cache.stores.static_cache')) {
+            return;
+        }
+
+        if ($this->cache === Cache::store('static_cache')) {
+            $this->cache->flush();
+        }
     }
 
     /**

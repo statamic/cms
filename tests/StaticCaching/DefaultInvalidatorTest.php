@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,6 +54,24 @@ class DefaultInvalidatorTest extends TestCase
         $invalidator = new Invalidator($cacher, 'all');
 
         $this->assertNull($invalidator->invalidate($item));
+    }
+
+    #[Test]
+    public function specifying_all_as_invalidation_rule_flushes_the_dedicated_static_cache_store()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.driver' => 'application',
+            'cache.stores.static_cache' => ['driver' => 'array'],
+        ]);
+
+        Cache::store('static_cache')->forever('untracked', 'value');
+
+        $invalidator = new Invalidator(app(Cacher::class), 'all');
+
+        $invalidator->invalidate(Mockery::mock(Entry::class));
+
+        $this->assertNull(Cache::store('static_cache')->get('untracked'));
     }
 
     #[Test]

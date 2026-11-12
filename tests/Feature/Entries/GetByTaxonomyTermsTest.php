@@ -65,4 +65,26 @@ class GetByTaxonomyTermsTest extends TestCase
         $this->assertEquals([4], Entry::query()->whereTaxonomyNotIn(['tags::rad'])->whereTaxonomyNotIn(['categories::news'])->get()->map->id()->all());
         $this->assertEquals([4], Entry::query()->whereTaxonomyNotIn(['tags::rad', 'categories::news'])->get()->map->id()->all());
     }
+
+    #[Test]
+    public function it_only_applies_taxonomy_wheres_once_when_a_query_is_run_more_than_once()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+        EntryFactory::collection('blog')->id('1')->data(['tags' => ['rad']])->create();
+        EntryFactory::collection('blog')->id('2')->data(['tags' => ['rad']])->create();
+        EntryFactory::collection('blog')->id('3')->data(['tags' => ['meh']])->create();
+
+        $query = Entry::query()
+            ->whereTaxonomy('tags::rad')
+            ->whereTaxonomyNotIn(['tags::meh']);
+
+        $this->assertEquals(2, $query->count());
+        $this->assertEquals(2, $query->count());
+        $this->assertEquals([1, 2], $query->get()->map->id()->all());
+
+        $idWheres = collect($query->prepareForFakeQuery()['wheres'])->where('column', 'id');
+        $this->assertCount(1, $idWheres->where('type', 'In'));
+        $this->assertCount(1, $idWheres->where('type', 'NotIn'));
+    }
 }

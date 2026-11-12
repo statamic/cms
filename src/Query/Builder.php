@@ -198,7 +198,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower((string) $operator);
+        $loweredOperator = is_string($operator) ? strtolower($operator) : $operator;
 
         if ($useDefault) {
             return [$operator, '='];
@@ -217,7 +217,7 @@ abstract class Builder implements Contract
 
     protected function invalidOperator($operator)
     {
-        if (is_null($operator)) {
+        if (! is_string($operator)) {
             return true;
         }
 
@@ -774,6 +774,10 @@ abstract class Builder implements Contract
 
     protected function filterTestEquals($item, $value)
     {
+        if ($item instanceof DateTimeInterface && $value instanceof DateTimeInterface) {
+            return $item == $value;
+        }
+
         return strtolower($item ?? '') === strtolower($value ?? '');
     }
 
