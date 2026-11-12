@@ -133,6 +133,8 @@ class FileCacher extends AbstractCacher
         }
 
         $this->flushUrls();
+
+        $this->flushDedicatedStore();
     }
 
     /**

@@ -146,6 +146,8 @@ class ApplicationCacher extends AbstractCacher
         });
 
         $this->flushUrls();
+
+        $this->flushDedicatedStore();
     }
 
     /**

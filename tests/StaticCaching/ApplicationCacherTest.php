@@ -8,6 +8,7 @@ use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -608,6 +609,31 @@ class ApplicationCacherTest extends TestCase
         $this->assertNull($cache->get('static-cache:responses:four'));
         $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
         $this->assertEquals([], $cacher->getUrls('http://another.com')->all());
+    }
+
+    #[Test]
+    public function flushing_wipes_the_dedicated_static_cache_store()
+    {
+        config(['cache.stores.static_cache' => ['driver' => 'array']]);
+        $cache = Cache::store('static_cache');
+        $cache->forever('untracked', 'value');
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $cacher->flush();
+
+        $this->assertNull($cache->get('untracked'));
+    }
+
+    #[Test]
+    public function flushing_leaves_other_keys_in_a_shared_store()
+    {
+        $cache = app(Repository::class);
+        $cache->forever('untracked', 'value');
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $cacher->flush();
+
+        $this->assertEquals('value', $cache->get('untracked'));
     }
 
     #[Test]

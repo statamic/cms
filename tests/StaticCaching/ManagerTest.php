@@ -73,6 +73,21 @@ class ManagerTest extends TestCase
     }
 
     #[Test]
+    public function it_flushes_the_dedicated_store_for_drivers_that_do_not_flush_it_themselves()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'null',
+            'cache.stores.static_cache' => ['driver' => 'array'],
+        ]);
+
+        Cache::store('static_cache')->forever('nocache::urls', ['/one']);
+
+        StaticCache::flush();
+
+        $this->assertNull(Cache::store('static_cache')->get('nocache::urls'));
+    }
+
+    #[Test]
     public function it_flushes_without_static_cache_store()
     {
         config([
