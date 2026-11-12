@@ -181,7 +181,9 @@ class Terms extends Relationship
 
         $ids = $this->convertAugmentationValuesToIds($values);
 
-        $query = (new OrderedQueryBuilder(Term::query(), $ids))
+        $termQuery = Term::query();
+
+        $query = (new OrderedQueryBuilder($termQuery, $ids))
             ->whereIn('id', $ids)
             ->where('site', $site);
 
@@ -194,7 +196,13 @@ class Terms extends Relationship
             && $parent->collection()->taxonomies()->map->handle()->contains($this->field->handle());
 
         if ($shouldQueryCollection) {
-            $query->where('collection', $parent->collectionHandle());
+            // The ids come from the parent entry, so they're already "used" within its
+            // collection. We only need the collection supplied to the terms (for URLs),
+            // not the usage filter that where('collection') applies, which can be costly.
+            // Query builders that don't support this fall back to the previous behavior.
+            method_exists($termQuery, 'withCollectionContext')
+                ? $query->withCollectionContext($parent->collectionHandle())
+                : $query->where('collection', $parent->collectionHandle());
         }
 
         return $query;

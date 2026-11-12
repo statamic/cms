@@ -295,6 +295,33 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_supplies_collection_context_without_filtering_usage()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+
+        $terms = Term::query()
+            ->whereIn('id', ['tags::a', 'tags::b'])
+            ->withCollectionContext('blog')
+            ->get();
+
+        $this->assertEquals(['tags::a', 'tags::b'], $terms->map->id()->sort()->values()->all());
+        $this->assertEquals(['blog', 'blog'], $terms->map(fn ($term) => $term->collection()->handle())->all());
+
+        $this->assertEquals('blog', Term::query()
+            ->whereIn('id', ['tags::b'])
+            ->withCollectionContext('blog')
+            ->first()
+            ->collection()
+            ->handle());
+    }
+
+    #[Test]
     public function it_filters_by_entries_count_using_only_published_entries()
     {
         Taxonomy::make('tags')->save();
