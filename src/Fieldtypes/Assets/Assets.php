@@ -20,6 +20,7 @@ use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\AssetsFieldtypeAsset as AssetResource;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -107,7 +108,19 @@ class Assets extends Fieldtype
                             'grid' => __('Grid'),
                             'list' => __('List'),
                             'compact' => __('Compact'),
+                            'full' => __('Full'),
                         ],
+                        'width' => '50',
+                    ],
+                    'aspect_ratio' => [
+                        'display' => __('Preview Aspect Ratio'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.aspect_ratio'),
+                        'type' => 'select',
+                        'label_html' => true,
+                        'searchable' => false,
+                        'default' => '8/3',
+                        'options' => $this->aspectRatioOptions(),
+                        'if' => ['mode' => 'equals full'],
                         'width' => '50',
                     ],
                     'show_filename' => [
@@ -115,6 +128,7 @@ class Assets extends Fieldtype
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                        'unless' => ['mode' => 'equals full'],
                         'width' => '50',
                     ],
                     'show_set_alt' => [
@@ -161,6 +175,25 @@ class Assets extends Fieldtype
                 ],
             ],
         ];
+    }
+
+    protected function aspectRatioOptions(): array
+    {
+        return collect(['8/3', '2/1', '16/9', '3/2', '4/3', '1/1', '3/4', '2/3', '9/16'])
+            ->mapWithKeys(function (string $ratio) {
+                $label = str_replace('/', ':', $ratio);
+                $svg = Statamic::svg('aspect-ratios/'.str_replace('/', '-', $ratio), 'h-5 w-7 shrink-0');
+
+                return [
+                    $ratio => <<<HTML
+                        <span class="flex items-center gap-2" title="{$label}">
+                            {$svg}
+                            <span>{$label}</span>
+                        </span>
+                        HTML,
+                ];
+            })
+            ->all();
     }
 
     public function canHaveDefault()
