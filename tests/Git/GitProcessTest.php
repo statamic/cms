@@ -128,6 +128,18 @@ EOT;
         $this->assertEquals($expectedCombinedStatus, Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies']));
     }
 
+    #[Group('integration')]
+    #[Test]
+    public function it_lists_untracked_files()
+    {
+        $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
+
+        $output = Git::create($this->basePath('temp/content'))->untrackedFiles();
+
+        $this->assertStringContainsString('collections/new.yaml', $output);
+        $this->assertStringNotContainsString('pages.yaml', $output);
+    }
+
     #[Test]
     public function it_logs_error_output()
     {
