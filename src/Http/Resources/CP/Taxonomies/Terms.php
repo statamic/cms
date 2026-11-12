@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
+use ArrayObject;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
@@ -43,10 +44,13 @@ class Terms extends ResourceCollection
     {
         $this->setColumns();
 
-        return $this->collection->each(function ($term) {
+        $taxonomies = new ArrayObject;
+
+        return $this->collection->each(function ($term) use ($taxonomies) {
             $term
                 ->blueprint($this->blueprint)
-                ->columns($this->requestedColumns());
+                ->columns($this->requestedColumns())
+                ->taxonomies($taxonomies);
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
+use ArrayObject;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\User;
 
@@ -9,6 +10,7 @@ class ListedTerm extends JsonResource
 {
     protected $blueprint;
     protected $columns;
+    protected ?ArrayObject $taxonomies = null;
 
     public function blueprint($blueprint)
     {
@@ -20,6 +22,16 @@ class ListedTerm extends JsonResource
     public function columns($columns)
     {
         $this->columns = $columns;
+
+        return $this;
+    }
+
+    /**
+     * A place to keep each taxonomy's array, shared by every term in a listing.
+     */
+    public function taxonomies(ArrayObject $taxonomies)
+    {
+        $this->taxonomies = $taxonomies;
 
         return $this;
     }
@@ -41,10 +53,20 @@ class ListedTerm extends JsonResource
             'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
             'has_template' => view()->exists($term->template()),
-            'taxonomy' => $term->taxonomy()->toArray(),
+            'taxonomy' => $this->taxonomyArray($term->taxonomy()),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
         ];
+    }
+
+    protected function taxonomyArray($taxonomy)
+    {
+        // Every term in a listing would otherwise augment its taxonomy again, URLs and all.
+        if (! $this->taxonomies) {
+            return $taxonomy->toArray();
+        }
+
+        return $this->taxonomies[$taxonomy->handle()] ??= $taxonomy->toArray();
     }
 
     protected function values($extra = [])
