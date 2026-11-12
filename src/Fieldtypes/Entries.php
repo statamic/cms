@@ -516,6 +516,11 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
+        // Nothing selected, so there's nothing to go looking for.
+        if (empty(Arr::wrap($values))) {
+            return $this->collect([]);
+        }
+
         return $this->queryBuilder($values)->whereAnyStatus()->get();
     }
 
