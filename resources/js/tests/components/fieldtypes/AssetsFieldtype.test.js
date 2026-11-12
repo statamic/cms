@@ -4,8 +4,10 @@ import * as Globals from '@/bootstrap/globals';
 import { preferences } from '@api';
 import AssetsFieldtype from '@/components/fieldtypes/assets/AssetsFieldtype.vue';
 import AssetCompact from '@/components/fieldtypes/assets/AssetCompact.vue';
+import AssetFull from '@/components/fieldtypes/assets/AssetFull.vue';
 import AssetUpload from '@/components/fieldtypes/assets/AssetUpload.vue';
 import Uploader from '@/components/assets/Uploader.vue';
+import Upload from '@/components/assets/Upload.vue';
 import Uploads from '@/components/assets/Uploads.vue';
 import { Button } from '@/components/ui';
 
@@ -388,4 +390,57 @@ test.each([
     await flushPromises();
 
     expect(field.vm.canReceiveUpload).toBe(false);
+});
+
+test('full mode shows the first asset at full size and additional assets as compact thumbnails', async () => {
+    const assets = [{ id: 'main::a.jpg' }, { id: 'main::b.jpg' }];
+    const field = compactField({
+        assets,
+        config: { mode: 'full', max_files: 3, aspect_ratio: '4/3' },
+        stubs: { AssetFull: false, Uploader: false },
+    });
+    await flushPromises();
+
+    expect(field.findComponent(AssetFull).props()).toMatchObject({ asset: assets[0], aspectRatio: '4/3' });
+    expect(field.findAllComponents(AssetCompact).map((component) => component.props('asset'))).toEqual([assets[1]]);
+    expect(field.findComponent({ ref: 'uploader' }).isVisible()).toBe(true);
+
+    await field.setProps({ config: { mode: 'full', max_files: 2 } });
+
+    expect(field.findComponent({ ref: 'uploader' }).attributes('style')).toContain('display: none');
+});
+
+test('an empty full field keeps its large drop target visible during an upload', async () => {
+    const field = compactField({ config: { mode: 'full', allow_uploads: true } });
+    await flushPromises();
+
+    const uploader = field.findComponent({ ref: 'uploader' });
+
+    expect(uploader.element.style.display).not.toBe('none');
+    expect(uploader.find('[style]').element.style.getPropertyValue('--preview-aspect-ratio')).toBe('8/3');
+
+    field.vm.uploadsUpdated([{ id: 'upload-1', basename: 'new.jpg', percent: 45, retry: vi.fn() }]);
+    await field.vm.$nextTick();
+
+    expect(uploader.isVisible()).toBe(true);
+    expect(field.findComponent(Upload).props('percent')).toBe(45);
+    expect(field.findComponent(AssetUpload).exists()).toBe(false);
+});
+
+test('selecting an existing file in a full field preserves other pending uploads', async () => {
+    const field = compactField({ config: { mode: 'full', max_files: 3, allow_uploads: true } });
+    await flushPromises();
+
+    const pending = { id: 'upload-2', basename: 'next.jpg', percent: 45, retry: vi.fn() };
+
+    field.vm.uploadsUpdated([
+        { id: 'upload-1', basename: 'existing.jpg', existingId: 'main::existing.jpg', errorStatus: 409, retry: vi.fn() },
+        pending,
+    ]);
+    await field.vm.$nextTick();
+
+    field.findComponent(Upload).vm.$emit('existing-selected');
+    await flushPromises();
+
+    expect(field.vm.uploads).toEqual([pending]);
 });

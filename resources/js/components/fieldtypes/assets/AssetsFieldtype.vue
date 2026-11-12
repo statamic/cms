@@ -1,9 +1,13 @@
 <template>
     <div
         data-asset-browser
-        :data-asset-picker-visible="isCompact || pickerVisible || null"
+        :data-asset-picker-visible="assetPickerVisible"
         class="relative rounded-xl dark:bg-transparent [.link-fieldtype_&]:bg-transparent"
-        :class="isCompact ? 'w-fit' : '@container w-full bg-gray-50'"
+        :class="{
+            'w-fit': isCompact,
+            '@container w-full': !isCompact,
+            'bg-gray-50': !isCompact && !isFull,
+        }"
     >
         <div
             v-if="hasPendingDynamicFolder"
@@ -12,14 +16,30 @@
         />
 
         <div
-            v-if="isCompact"
+            v-if="isCompact || isFull"
             data-asset-picker
             class="flex flex-wrap items-center gap-2"
             @dragover="ignoreFileDrop"
             @drop="ignoreFileDrop"
         >
+            <AssetFull
+                v-if="isFull && hasAssets"
+                :asset="assets[0]"
+                :siblings="assets"
+                :aspect-ratio="previewAspectRatio"
+                :disabled="config.disabled || loading"
+                :read-only="isReadOnly"
+                :can-replace="canBrowse"
+                :show-set-alt="showSetAlt"
+                :checkerboard-mode="checkerboardMode"
+                @replace="openReplacementSelector(assets[0])"
+                @updated="assetUpdated"
+                @removed="assetRemoved"
+                @id-changed="idChanged"
+            />
+
             <AssetCompact
-                v-for="asset in assets"
+                v-for="asset in isFull ? assets.slice(1) : assets"
                 :key="asset.id"
                 :asset="asset"
                 :disabled="config.disabled || loading"
@@ -30,7 +50,7 @@
             />
 
             <AssetUpload
-                v-for="(upload, index) in uploads"
+                v-for="(upload, index) in isFull && !hasAssets ? [] : uploads"
                 :key="upload.id"
                 :basename="upload.basename"
                 :extension="upload.extension"
@@ -45,7 +65,8 @@
 
             <Uploader
                 ref="uploader"
-                v-show="!uploads.length && (!hasAssets || (!maxFilesReached && !isReadOnly))"
+                v-show="(isFull && !hasAssets) || (!uploads.length && (!hasAssets || (!maxFilesReached && !isReadOnly)))"
+                :class="{ 'w-full h-auto! [&>div]:h-auto!': isFull && !hasAssets }"
                 :container="container.id"
                 :enabled="canReceiveUpload"
                 :path="folder"
@@ -54,7 +75,50 @@
                 @error="uploadError"
                 v-slot="{ dragging }"
             >
-                <div class="relative size-10">
+                <div
+                    v-if="isFull && !hasAssets"
+                    class="relative flex w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-850 aspect-(--preview-aspect-ratio)"
+                    :style="{ '--preview-aspect-ratio': previewAspectRatio }"
+                >
+                    <div v-if="uploads.length" class="flex w-full min-w-0 flex-col gap-2 p-3">
+                        <Upload
+                            v-for="(upload, index) in uploads"
+                            :key="upload.id"
+                            :basename="upload.basename"
+                            :extension="upload.extension"
+                            :percent="upload.percent"
+                            :error="upload.errorMessage"
+                            :error-status="upload.errorStatus"
+                            allow-selecting-existing
+                            @clear="uploads.splice(index, 1)"
+                            @retry="upload.retry($event)"
+                            @existing-selected="uploadSelected(upload)"
+                        />
+                    </div>
+                    <button
+                        v-else
+                        type="button"
+                        class="absolute inset-0 flex size-full flex-col items-center justify-center gap-3 p-3 text-gray-600 enabled:cursor-pointer enabled:hover:bg-gray-100 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-50 dark:text-gray-400 dark:enabled:hover:bg-gray-800"
+                        :disabled="config.disabled || loading || isReadOnly || (!canBrowse && !canUpload)"
+                        @click="canBrowse ? openSelector() : uploadFile()"
+                    >
+                        <ui-icon :name="loading ? 'loading' : 'upload-cloud'" class="size-4 shrink-0" />
+                        <div class="text-base sm:text-sm">
+                            <span v-if="canUpload">{{ __('Drop asset here or') }}&nbsp;</span>
+                            <span class="underline underline-offset-2">{{ canBrowse ? __('select an asset') : __('choose a file') }}</span>
+                        </div>
+                    </button>
+                    <div
+                        v-show="dragging && !showSelector"
+                        role="status"
+                        class="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 rounded-xl border-2 border-dotted border-blue-400 bg-blue-50 text-sm text-blue-600 dark:border-blue-500 dark:bg-gray-850 dark:text-blue-400"
+                    >
+                        <ui-icon name="upload-cloud" class="size-4 shrink-0" />
+                        {{ __('Drop to Upload') }}
+                    </div>
+                </div>
+
+                <div v-else class="relative size-10">
                     <Button
                         icon-only
                         size="base"
@@ -141,7 +205,7 @@
                     <div class="min-w-0 grow basis-[min-content] hidden not-[.link-fieldtype_&]:flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400" v-if="canUpload">
                         <ui-icon name="upload-cloud" class="size-5 shrink-0 text-gray-500 hidden @sm:block" />
                         <div class="min-w-0">
-                            <span class="hidden @sm:inline">{{ __('Drag & drop here or') }}&nbsp;</span>
+                            <span class="hidden @sm:inline">{{ __('Drop asset here or') }}&nbsp;</span>
                             <span v-if="canBrowse" class="@sm:hidden">{{ __('or') }}&nbsp;</span>
                             <button type="button" class="underline underline-offset-2 cursor-pointer hover:text-gray-925 dark:hover:text-gray-200" @click.prevent="uploadFile">
                                 {{ __('choose a file') }}
@@ -295,9 +359,11 @@ import Fieldtype from '../Fieldtype.vue';
 import AssetRow from './AssetRow.vue';
 import AssetTile from './AssetTile.vue';
 import AssetCompact from './AssetCompact.vue';
+import AssetFull from './AssetFull.vue';
 import AssetUpload from './AssetUpload.vue';
 import Selector from '../../assets/Selector.vue';
 import Uploader from '../../assets/Uploader.vue';
+import Upload from '../../assets/Upload.vue';
 import Uploads from '../../assets/Uploads.vue';
 import { SortableList } from '../../sortable/Sortable';
 import { isEqual } from 'lodash-es';
@@ -310,11 +376,13 @@ export default {
     components: {
         AssetTile,
         AssetCompact,
+        AssetFull,
         AssetUpload,
         AssetRow,
         Button,
         Selector,
         Uploader,
+        Upload,
         Uploads,
         SortableList,
         Dropdown,
@@ -460,6 +528,14 @@ export default {
             return this.config.mode === 'compact';
         },
 
+        isFull() {
+            return this.config.mode === 'full';
+        },
+
+        previewAspectRatio() {
+            return this.config.aspect_ratio || '8/3';
+        },
+
         selectorMaxFiles() {
             return this.replacementAssetId ? 1 : this.maxFiles;
         },
@@ -526,7 +602,11 @@ export default {
         },
 
         pickerVisible() {
-            return !this.isCompact && !this.isReadOnly && this.showPicker;
+            return !this.isCompact && !this.isFull && !this.isReadOnly && this.showPicker;
+        },
+
+        assetPickerVisible() {
+            return this.isCompact || this.isFull || this.pickerVisible || null;
         },
 
         showSetAlt() {
@@ -573,7 +653,7 @@ export default {
                     title: __('Transparency'),
                     icon: this.checkerboardIcon,
                     run: () => this.cycleCheckerboard(),
-                    visible: this.displayMode === 'grid' && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
+                    visible: ['grid', 'full'].includes(this.displayMode) && (this.meta?.data ?? []).some((asset) => asset.can_be_transparent),
                     quick: true,
                 },
                 {
