@@ -68,7 +68,8 @@ trait QueriesTaxonomizedEntries
             ->reduce(function ($ids, $where) {
                 $keys = $this->getKeysForTaxonomyWhereIn($where);
 
-                return $ids ? $ids->intersect($keys)->values() : $keys;
+                // Each "not in" excludes its own entries, so an entry in any of them is excluded.
+                return $ids ? $ids->concat($keys)->unique()->values() : $keys;
             });
 
         if ($entryIds) {

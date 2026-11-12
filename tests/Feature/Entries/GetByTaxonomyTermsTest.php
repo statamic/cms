@@ -50,6 +50,23 @@ class GetByTaxonomyTermsTest extends TestCase
     }
 
     #[Test]
+    public function it_excludes_entries_in_any_of_multiple_taxonomy_not_in_wheres()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Collection::make('blog')->taxonomies(['tags', 'categories'])->save();
+        EntryFactory::collection('blog')->id('1')->data(['tags' => ['rad'], 'categories' => ['news']])->create();
+        EntryFactory::collection('blog')->id('2')->data(['tags' => ['rad']])->create();
+        EntryFactory::collection('blog')->id('3')->data(['categories' => ['news']])->create();
+        EntryFactory::collection('blog')->id('4')->data(['tags' => ['meh']])->create();
+
+        $this->assertEquals([3, 4], Entry::query()->whereTaxonomyNotIn(['tags::rad'])->get()->map->id()->all());
+        $this->assertEquals([2, 4], Entry::query()->whereTaxonomyNotIn(['categories::news'])->get()->map->id()->all());
+        $this->assertEquals([4], Entry::query()->whereTaxonomyNotIn(['tags::rad'])->whereTaxonomyNotIn(['categories::news'])->get()->map->id()->all());
+        $this->assertEquals([4], Entry::query()->whereTaxonomyNotIn(['tags::rad', 'categories::news'])->get()->map->id()->all());
+    }
+
+    #[Test]
     public function it_only_applies_taxonomy_wheres_once_when_a_query_is_run_more_than_once()
     {
         Taxonomy::make('tags')->save();
