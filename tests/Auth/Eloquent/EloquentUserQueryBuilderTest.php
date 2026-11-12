@@ -4,6 +4,7 @@ namespace Tests\Auth\Eloquent;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User as Users;
 use Statamic\Query\Scopes\Scope;
@@ -58,6 +59,21 @@ class EloquentUserQueryBuilderTest extends TestCase
         (new Filesystem)->deleteDirectory(static::migrationsDir().'/tmp');
 
         parent::tearDownAfterClass();
+    }
+
+    #[Test]
+    public function it_only_selects_one_row_when_getting_the_first_item()
+    {
+        User::create(['name' => 'Jack', 'email' => 'jack@statamic.com']);
+        User::create(['name' => 'Jason', 'email' => 'jason@statamic.com']);
+        User::create(['name' => 'Jesse', 'email' => 'jesse@statamic.com']);
+
+        DB::enableQueryLog();
+
+        $user = Users::query()->where('name', 'like', 'J%')->orderBy('name', 'desc')->first();
+
+        $this->assertEquals('Jesse', $user->name());
+        $this->assertStringContainsString('limit 1', DB::getQueryLog()[0]['query']);
     }
 
     #[Test]
