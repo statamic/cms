@@ -1840,7 +1840,7 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
-                            if (! $this->assigningAugmentable($output)) {
+                            if (! $this->assigningAugmentable($output) && ! $this->interpolatingValue($output)) {
                                 $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
                             }
                         }
@@ -2557,6 +2557,11 @@ class NodeProcessor
         return $this->isAssignmentProcessor
             && $output instanceof Augmentable
             && $output instanceof Stringable;
+    }
+
+    private function interpolatingValue($output): bool
+    {
+        return $this->isInterpolationProcessor && $output instanceof Value;
     }
 
     /**
