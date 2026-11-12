@@ -70,6 +70,12 @@ class StaticCacheManager extends Manager
 
         $this->flushNocache();
 
+        // The built-in cachers already wipe the dedicated store from their own flush(),
+        // but null and custom drivers don't, and flushNocache() relies on it being wiped.
+        if ($this->hasCustomStore()) {
+            $this->cacheStore()->flush();
+        }
+
         StaticCacheCleared::dispatch();
     }
 
