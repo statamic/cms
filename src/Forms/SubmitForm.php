@@ -20,6 +20,8 @@ use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class SubmitForm
 {
     use Localizable;
