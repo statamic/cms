@@ -21,6 +21,8 @@ use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+use function Statamic\trans as __;
+
 class SubmitForm
 {
     use Localizable;

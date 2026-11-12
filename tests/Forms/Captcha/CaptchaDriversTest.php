@@ -49,7 +49,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_when_the_provider_says_so($class, $endpoint)
+    public function it_fails_when_the_provider_says_so($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response(['success' => false, 'error-codes' => ['invalid-input-response']])]);
 
@@ -58,7 +58,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_when_success_isnt_exactly_true($class, $endpoint)
+    public function it_fails_when_success_isnt_exactly_true($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response(['success' => 'true'])]);
 
@@ -67,7 +67,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_when_the_provider_errors($class, $endpoint)
+    public function it_fails_when_the_provider_errors($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response(['success' => true], 500)]);
 
@@ -76,7 +76,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_when_the_provider_returns_something_other_than_json($class, $endpoint)
+    public function it_fails_when_the_provider_returns_something_other_than_json($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response('<html>nope</html>')]);
 
@@ -85,7 +85,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_when_the_provider_cant_be_reached($class, $endpoint)
+    public function it_fails_when_the_provider_cant_be_reached($class, $endpoint, $field)
     {
         Http::fake([$endpoint => fn () => throw new ConnectionException('Timed out')]);
 
@@ -94,7 +94,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_without_a_request_when_there_is_no_token($class)
+    public function it_fails_without_a_request_when_there_is_no_token($class, $endpoint, $field)
     {
         Http::fake();
 
@@ -108,7 +108,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_fails_without_a_request_when_the_token_is_too_long($class, $endpoint)
+    public function it_fails_without_a_request_when_the_token_is_too_long($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response(['success' => true])]);
 
@@ -122,7 +122,7 @@ class CaptchaDriversTest extends TestCase
 
     #[Test]
     #[DataProvider('driverProvider')]
-    public function it_leaves_out_the_ip_when_there_isnt_one($class, $endpoint)
+    public function it_leaves_out_the_ip_when_there_isnt_one($class, $endpoint, $field)
     {
         Http::fake([$endpoint => Http::response(['success' => true])]);
 
