@@ -28,7 +28,7 @@
                 v-if="preview"
                 :src="preview"
                 alt=""
-                class="absolute inset-0 size-full object-cover"
+                class="absolute top-0 left-0 size-full max-w-none object-cover"
                 :style="previewStyle"
                 :draggable="false"
                 @load="imageRatio = $event.target.naturalWidth / $event.target.naturalHeight"
@@ -143,17 +143,16 @@ export default {
             const [width, height] = this.aspectRatio.split('/').map(Number);
             const frameRatio = width / height;
             const [x = 50, y = 50, zoom = 1] = (this.asset.values?.focus || '50-50-1').split('-').map(Number);
-            const visibleWidth = Math.min(1, frameRatio / this.imageRatio);
-            const visibleHeight = Math.min(1, this.imageRatio / frameRatio);
+            const visibleWidth = Math.min(1, frameRatio / this.imageRatio) / zoom;
+            const visibleHeight = Math.min(1, this.imageRatio / frameRatio) / zoom;
             const left = Math.max(0, Math.min(x / 100 - visibleWidth / 2, 1 - visibleWidth));
             const top = Math.max(0, Math.min(y / 100 - visibleHeight / 2, 1 - visibleHeight));
-            const positionX = visibleWidth === 1 ? 50 : left / (1 - visibleWidth) * 100;
-            const positionY = visibleHeight === 1 ? 50 : top / (1 - visibleHeight) * 100;
 
             return {
-                objectPosition: `${positionX}% ${positionY}%`,
-                transform: `scale(${zoom})`,
-                transformOrigin: `${(x / 100 - left) / visibleWidth * 100}% ${(y / 100 - top) / visibleHeight * 100}%`,
+                width: `${100 / visibleWidth}%`,
+                height: `${100 / visibleHeight}%`,
+                left: `${-left / visibleWidth * 100}%`,
+                top: `${-top / visibleHeight * 100}%`,
             };
         },
     },
