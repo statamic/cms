@@ -152,12 +152,8 @@ class TermQueryBuilder extends Builder
     private function filterUsagesWithinCollections($taxonomies)
     {
         $this->whereIn('id', collect($taxonomies)->flatMap(function ($taxonomy) {
-            return $this->store->store($taxonomy)
-                ->index('associations')
-                ->items()->whereIn('collection', $this->collections)
-                ->map(function ($item) use ($taxonomy) {
-                    return $taxonomy.'::'.$item['slug'];
-                });
+            return collect($this->store->store($taxonomy)->index('associations')->slugsInCollections($this->collections))
+                ->map(fn ($slug) => $taxonomy.'::'.$slug);
         })->all());
     }
 
