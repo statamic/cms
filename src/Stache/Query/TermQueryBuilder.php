@@ -11,6 +11,7 @@ class TermQueryBuilder extends Builder
 {
     protected $taxonomies;
     protected $collections;
+    protected $collectionContext;
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -44,6 +45,18 @@ class TermQueryBuilder extends Builder
         }
 
         return parent::whereIn($column, $values, $boolean);
+    }
+
+    /**
+     * Supply a collection to the resulting terms, so things like URLs will be
+     * scoped to it, without limiting results to terms used in that collection
+     * the way where('collection', ...) does.
+     */
+    public function withCollectionContext($collection)
+    {
+        $this->collectionContext = $collection;
+
+        return $this;
     }
 
     protected function collect($items = [])
@@ -142,8 +155,12 @@ class TermQueryBuilder extends Builder
         // If a single collection has been queried, we'll supply it to the terms so
         // things like URLs will be scoped to the collection. We can't do it when
         // multiple collections are queried because it would be ambiguous.
-        if ($this->collections && count($this->collections) == 1) {
-            $items->each->collection(Collection::findByHandle($this->collections[0]));
+        $collection = $this->collections && count($this->collections) == 1
+            ? $this->collections[0]
+            : $this->collectionContext;
+
+        if ($collection) {
+            $items->each->collection(Collection::findByHandle($collection));
         }
 
         return $items;
