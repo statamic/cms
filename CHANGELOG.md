@@ -1,5 +1,50 @@
 # Release Notes
 
+## 6.41.0 (2026-11-11)
+
+### What's new
+- Add compact mode to the Assets fieldtype [#15819](https://github.com/statamic/cms/issues/15819) by @jackmcdade
+- Allow the static warm job class to be configured [#15800](https://github.com/statamic/cms/issues/15800) by @ryanmitchell
+- Add `Statamic::hasBooted()` [#15823](https://github.com/statamic/cms/issues/15823) by @edalzell
+- Add `cp.after_save` config option [#15824](https://github.com/statamic/cms/issues/15824) by @el-schneider
+- Add page and image explorers to Cache Manager [#15844](https://github.com/statamic/cms/issues/15844) by @jackmcdade
+
+### What's fixed
+- Fix Stache watcher missing file changes made right after a refresh [#15781](https://github.com/statamic/cms/issues/15781) by @lazerg
+- Fix Vue warning: v-tooltip on Switch in replicator and bard sets [#15786](https://github.com/statamic/cms/issues/15786) by @ionutrusenL
+- Fix onUnmounted warning in toggleArchitecturalBackground [#15791](https://github.com/statamic/cms/issues/15791) by @ionutrusenL
+- Fix Vue warning: v-tooltip on Badge overrides its children [#15792](https://github.com/statamic/cms/issues/15792) by @ionutrusenL
+- Fix Vue warning: v-text on Button overrides its children [#15790](https://github.com/statamic/cms/issues/15790) by @ionutrusenL
+- Let `bool_string` output `false` for null values [#15782](https://github.com/statamic/cms/issues/15782) by @shadetheory
+- Batch URL invalidation in the application static cacher [#15778](https://github.com/statamic/cms/issues/15778) by @ryanmitchell
+- Fix nocache pagination when ignoring query strings [#15788](https://github.com/statamic/cms/issues/15788) by @lazerg
+- Fix last login errors when the app uses CarbonImmutable [#15793](https://github.com/statamic/cms/issues/15793) by @jhhazelaar
+- Reset Antlers interpolated variables between requests [#15815](https://github.com/statamic/cms/issues/15815) by @lazerg
+- Hide seconds in date picker timezone hover card unless enabled [#15804](https://github.com/statamic/cms/issues/15804) by @joshuablum
+- Fix please not finding app commands on Laravel 13.36+ [#15809](https://github.com/statamic/cms/issues/15809) by @lazerg
+- Include unpublished entries in the command palette search [#15810](https://github.com/statamic/cms/issues/15810) by @lazerg
+- Speed up Stache file traversal [#15821](https://github.com/statamic/cms/issues/15821) by @ryanmitchell
+- Keep listing columns when the response doesn't include any [#15801](https://github.com/statamic/cms/issues/15801) by @duncanmcclean
+- Work out fieldtype config defaults once per request [#15805](https://github.com/statamic/cms/issues/15805) by @DanielDarrenJones
+- Fix entry URIs going stale when a tree file changes on disk [#15798](https://github.com/statamic/cms/issues/15798) by @DanielDarrenJones
+- Stop Safari flashing when scrolling the Control Panel quickly [#15831](https://github.com/statamic/cms/issues/15831) by @jaygeorge
+- Stop Safari clipping the corners of publish section cards [#15834](https://github.com/statamic/cms/issues/15834) by @jaygeorge
+- Speed up cold Stache entry builds [#15826](https://github.com/statamic/cms/issues/15826) by @ryanmitchell
+- Treat Outpost timeouts as failed requests [#15827](https://github.com/statamic/cms/issues/15827) by @duncanmcclean
+- Faster YAML parsing [#15838](https://github.com/statamic/cms/issues/15838) by @ryanmitchell
+- Look up each tree page's entry once when building the CP tree [#15812](https://github.com/statamic/cms/issues/15812) by @DanielDarrenJones
+- Build URLs for placeholder routes without creating an Antlers parser [#15841](https://github.com/statamic/cms/issues/15841) by @DanielDarrenJones
+- Speed up Stache entry file filtering on multisite [#15825](https://github.com/statamic/cms/issues/15825) by @ryanmitchell
+- Look term associations up instead of reading through all of them [#15846](https://github.com/statamic/cms/issues/15846) by @DanielDarrenJones
+- Don't keep two copies of every entry in memory while building the Stache [#15795](https://github.com/statamic/cms/issues/15795) by @DanielDarrenJones
+- Keep parsed blueprint and fieldset YAML between requests [#15813](https://github.com/statamic/cms/issues/15813) by @DanielDarrenJones
+- Reuse the nav tag's tree when a nav is output more than once [#15845](https://github.com/statamic/cms/issues/15845) by @DanielDarrenJones
+- Arabic translations [#15785](https://github.com/statamic/cms/issues/15785) by @rezbouchabou
+- Dutch translations [#15794](https://github.com/statamic/cms/issues/15794) by @wiegertschouten
+- German translations [#15848](https://github.com/statamic/cms/issues/15848) by @helloDanuk
+
+
+
 ## 6.40.0 (2026-11-03)
 
 ### What's new

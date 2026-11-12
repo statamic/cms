@@ -7,6 +7,8 @@ const props = defineProps({
     date: { type: [String, Date, Number, Object], required: true },
     /** Extra `{ timezone, label }` rows to render above the defaults. Forwarded to `<Timezones>`. */
     additionalTimezones: { type: Array, default: () => [] },
+    /** When `false`, times are displayed without seconds. Forwarded to `<Timezones>`. */
+    showSeconds: { type: Boolean, default: true },
 });
 </script>
 
@@ -15,6 +17,6 @@ const props = defineProps({
         <template #trigger>
             <slot />
         </template>
-        <Timezones :date :additional-timezones="additionalTimezones" />
+        <Timezones :date :additional-timezones="additionalTimezones" :show-seconds="showSeconds" />
     </HoverCard>
 </template>

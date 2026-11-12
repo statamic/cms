@@ -2,6 +2,9 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Events\KeyWritten;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Events\ResponsePrepared;
@@ -13,6 +16,7 @@ use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class ApplicationCacherTest extends TestCase
@@ -87,12 +91,104 @@ class ApplicationCacherTest extends TestCase
         $this->assertEquals($content, $cacher->getCachedPage($request)->content);
     }
 
+    #[Test]
+    public function reading_a_generation_date_does_not_load_the_cached_response()
+    {
+        $url = 'http://example.com/test?foo=bar';
+        $timestamp = now()->getTimestamp();
+        $cache = $this->mock(Repository::class);
+        $cache->shouldReceive('get')->with('static-cache:generated-at:'.md5($url))->once()->andReturn($timestamp);
+        $cache->shouldNotReceive('get')->with('static-cache:responses:'.md5($url));
+
+        $cacher = new ApplicationCacher($cache, []);
+
+        $this->assertSame($timestamp, $cacher->getGeneratedAt($url));
+    }
+
+    #[Test]
+    public function generation_dates_expire_with_their_responses()
+    {
+        $this->freezeTime();
+        $cacher = new ApplicationCacher(app(Repository::class), ['base_url' => 'http://example.com', 'expiry' => 1]);
+        $request = Request::create('http://example.com/one');
+        $response = response('Cached content');
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        $this->assertSame(now()->getTimestamp(), $cacher->getGeneratedAt($request->getUri()));
+        $this->assertTrue($cacher->hasCachedPage($request));
+
+        $this->travel(61)->seconds();
+
+        $this->assertNull($cacher->getGeneratedAt($request->getUri()));
+        $this->assertFalse($cacher->hasCachedPage($request));
+    }
+
+    #[Test]
+    #[DataProvider('generationDateInvalidationMethods')]
+    public function generation_dates_are_removed_with_their_responses(string $method)
+    {
+        $cacher = new ApplicationCacher(app(Repository::class), ['base_url' => 'http://example.com']);
+
+        foreach (['one', 'one?foo=bar', 'other'] as $path) {
+            $request = Request::create('http://example.com/'.$path);
+            $response = response('Cached content');
+            $cacher->cachePage($request, $response);
+            event(new ResponsePrepared($request, $response));
+            $this->assertNotNull($cacher->getGeneratedAt($request->getUri()));
+        }
+
+        match ($method) {
+            'invalidateUrl' => $cacher->invalidateUrl('/one'),
+            'invalidateUrls' => $cacher->invalidateUrls(['/one']),
+            'flush' => $cacher->flush(),
+        };
+
+        $this->assertNull($cacher->getGeneratedAt('http://example.com/one'));
+        $this->assertNull($cacher->getGeneratedAt('http://example.com/one?foo=bar'));
+
+        if ($method === 'flush') {
+            $this->assertNull($cacher->getGeneratedAt('http://example.com/other'));
+        } else {
+            $this->assertNotNull($cacher->getGeneratedAt('http://example.com/other'));
+        }
+    }
+
+    public static function generationDateInvalidationMethods(): array
+    {
+        return [
+            'single URL' => ['invalidateUrl'],
+            'multiple URLs' => ['invalidateUrls'],
+            'flush' => ['flush'],
+        ];
+    }
+
     public static function cachedResponseProvider()
     {
         return [
             'successful response' => [200, 'about page'],
             'error response' => [404, 'not found'],
         ];
+    }
+
+    #[Test]
+    public function refreshing_urls_dispatches_the_configured_warm_job()
+    {
+        Queue::fake();
+
+        config(['statamic.static_caching.warm_job' => CustomStaticWarmJob::class]);
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+        $request = Request::create('http://example.com/one', 'GET');
+        $cacher->cachePage($request, response('one', 200));
+
+        $cacher->refreshUrls(['/one']);
+
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return str_contains((string) $job->request->getUri(), '/one');
+        });
     }
 
     #[Test]
@@ -299,6 +395,192 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_multiple_urls_removes_the_html_and_the_urls()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one',
+            'oneqs' => '/one?foo=bar',
+            'onemore' => '/onemore',
+            'two' => '/two',
+            'three' => '/three',
+        ]);
+        $cache->forever('static-cache:'.md5('http://another.com').'.urls', [
+            'one' => '/one',
+            'two' => '/two',
+        ]);
+        foreach (['one', 'oneqs', 'onemore', 'two', 'three'] as $key) {
+            $cache->forever('static-cache:responses:'.$key, $key.' html content');
+        }
+
+        $cacher->invalidateUrls(['/one', 'two', 'http://another.com/two', '/one', '/not-cached']);
+
+        $this->assertEquals([
+            'onemore' => '/onemore',
+            'three' => '/three',
+        ], $cacher->getUrls()->all());
+        $this->assertEquals(['one' => '/one'], $cacher->getUrls('http://another.com')->all());
+        $this->assertNull($cache->get('static-cache:responses:one'));
+        $this->assertNull($cache->get('static-cache:responses:oneqs'));
+        $this->assertNull($cache->get('static-cache:responses:two'));
+        $this->assertNotNull($cache->get('static-cache:responses:onemore'));
+        $this->assertNotNull($cache->get('static-cache:responses:three'));
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_supports_wildcards()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'blog' => '/blog',
+            'one' => '/blog/one',
+            'two' => '/blog/two?page=2',
+            'about' => '/about',
+            'contact' => '/contact',
+        ]);
+
+        $cacher->invalidateUrls(['/blog/*', '/contact']);
+
+        $this->assertEquals([
+            'blog' => '/blog',
+            'about' => '/about',
+        ], $cacher->getUrls()->all());
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_rewrites_each_domains_url_index_once()
+    {
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $urls = collect(range(1, 50))->mapWithKeys(fn ($i) => ["key{$i}" => "/page/{$i}"])->all();
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', $urls);
+        $cache->forever('static-cache:'.md5('http://another.com').'.urls', $urls);
+
+        $writes = [];
+        Event::listen(KeyWritten::class, function ($event) use (&$writes) {
+            $writes[] = $event->key;
+        });
+
+        $cacher->invalidateUrls([
+            ...collect(range(1, 40))->map(fn ($i) => "/page/{$i}")->all(),
+            '/page/4*',
+            'http://another.com/page/1',
+            'http://another.com/page/2',
+        ]);
+
+        $this->assertEquals([
+            'static-cache:'.md5('http://example.com').'.urls',
+            'static-cache:'.md5('http://another.com').'.urls',
+        ], $writes);
+        $this->assertEquals(['key50' => '/page/50'], $cacher->getUrls()->all());
+        $this->assertCount(48, $cacher->getUrls('http://another.com'));
+    }
+
+    #[Test]
+    public function invalidating_multiple_urls_dispatches_an_event_for_each_url()
+    {
+        Event::fake([UrlInvalidated::class]);
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://base.com']);
+        $this->instance(Cacher::class, $cacher);
+        $cache->forever('static-cache:'.md5('http://base.com').'.urls', [
+            'one' => '/blog/one',
+            'two' => '/blog/two',
+        ]);
+
+        $cacher->invalidateUrls(['/foo', 'http://another.com/bar', '/blog/*']);
+
+        Event::assertDispatchedTimes(UrlInvalidated::class, 4);
+        foreach (['http://base.com/foo', 'http://another.com/bar', 'http://base.com/blog/one', 'http://base.com/blog/two'] as $url) {
+            Event::assertDispatched(UrlInvalidated::class, fn ($event) => $event->url === $url);
+        }
+    }
+
+    #[Test]
+    #[DataProvider('invalidateMultipleUrlsProvider')]
+    public function invalidating_multiple_urls_matches_invalidating_them_one_at_a_time($invalidate)
+    {
+        $indexes = [
+            'http://example.com' => [
+                'home' => '/',
+                'a' => '/product/a',
+                'avariant' => '/product/a', // e.g. a second response cached for the same url
+                'aqs' => '/product/a?ref=1',
+                'ab' => '/product/ab',
+                'b' => '/product/b',
+                'c' => '/category/books?page=2&sort=asc',
+                'cqs' => '/category/books?page=2&sort=asc?x',
+                'd' => '/category/books',
+            ],
+            'http://other.com' => [
+                'ox' => '/x',
+                'oy' => '/y',
+                'oyqs' => '/y?page=2',
+                'ob' => '/product/b',
+            ],
+        ];
+
+        $run = function (callable $invalidate) use ($indexes) {
+            $cache = new CacheRepository(new ArrayStore);
+            $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+
+            foreach ($indexes as $domain => $urls) {
+                $cache->forever('static-cache:'.md5($domain).'.urls', $urls);
+                foreach (array_keys($urls) as $key) {
+                    $cache->forever('static-cache:responses:'.$key, 'html content');
+                }
+            }
+
+            $events = [];
+            Event::listen(UrlInvalidated::class, function ($event) use (&$events) {
+                $events[] = $event->url;
+            });
+
+            $invalidate($cacher);
+
+            Event::forget(UrlInvalidated::class);
+
+            return [
+                'events' => $events,
+                'urls' => collect($indexes)->keys()->mapWithKeys(fn ($domain) => [$domain => $cacher->getUrls($domain)->all()])->all(),
+                'responses' => collect($indexes)->flatMap(fn ($urls) => array_keys($urls))->filter(fn ($key) => $cache->has('static-cache:responses:'.$key))->values()->all(),
+            ];
+        };
+
+        $batched = $run(fn ($cacher) => $cacher->invalidateUrls($invalidate));
+
+        // How invalidateUrls() behaved before it was batched.
+        $single = $run(fn ($cacher) => (function () use ($invalidate) {
+            foreach ($invalidate as $url) {
+                Str::contains($url, '*')
+                    ? $this->invalidateWildcardUrl($url)
+                    : $this->invalidateUrl(...$this->getPathAndDomain($url));
+            }
+        })->call($cacher));
+
+        $this->assertSame($single['urls'], $batched['urls']);
+        $this->assertSame($single['responses'], $batched['responses']);
+        $this->assertSame($single['events'], $batched['events']);
+    }
+
+    public static function invalidateMultipleUrlsProvider()
+    {
+        return [
+            'mixed' => [['/product/a', '/category/books?page=2&sort=asc', '/not-cached', 'http://other.com/product/b', '/categ*']],
+            'duplicates' => [['/product/a', '/product/a', 'http://example.com/product/a', '/not-cached', '/not-cached']],
+            'url then a wildcard covering it' => [['/product/a', '/product/a*']],
+            'wildcard then a url it covered' => [['/product/*', '/product/a']],
+            'wildcard matching a url and its query string versions' => [['/product/a*']],
+            'overlapping wildcards' => [['/product/*', '/product/a*', '/*']],
+            'interleaved domains' => [['http://other.com/x', '/product/b', 'http://other.com/y*', '/', 'http://other.com/y']],
+            'nothing cached' => [['/nope', '/nope*']],
+        ];
+    }
+
+    #[Test]
     public function it_flushes()
     {
         $cache = app(Repository::class);
@@ -397,4 +679,8 @@ class ApplicationCacherTest extends TestCase
             ],
         ];
     }
+}
+
+class CustomStaticWarmJob extends StaticWarmJob
+{
 }

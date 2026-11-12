@@ -149,6 +149,11 @@ abstract class AbstractCacher implements Cacher
         return collect($this->cache->get($key, []));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        return null;
+    }
+
     /**
      * Flush all the cached URLs.
      *
@@ -193,8 +198,24 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $this->withUrlsLock(function () use ($key, $domain) {
-            $urls = $this->getUrls($domain)->forget($key);
+        $this->forgetUrls([$key], $domain);
+    }
+
+    /**
+     * Forget / remove multiple URLs from the cache by their keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function forgetUrls($keys, $domain = null)
+    {
+        if (empty($keys)) {
+            return;
+        }
+
+        $this->withUrlsLock(function () use ($keys, $domain) {
+            $urls = $this->getUrls($domain)->except($keys);
 
             $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
         });
@@ -292,7 +313,9 @@ abstract class AbstractCacher implements Cacher
 
             $request = new GuzzleRequest('GET', $url);
 
-            StaticWarmJob::dispatch($request, [])
+            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
+
+            $job::dispatch($request, [])
                 ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
                 ->onQueue(config('statamic.static_caching.warm_queue'));
         });

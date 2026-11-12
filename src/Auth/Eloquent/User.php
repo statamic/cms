@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Eloquent;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -370,7 +371,7 @@ class User extends BaseUser
             return null;
         }
 
-        return $date instanceof Carbon ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
+        return $date instanceof CarbonInterface ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
     }
 
     public function setLastLogin($time)
