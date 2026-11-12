@@ -70,10 +70,6 @@ class StaticCacheManager extends Manager
 
         $this->flushNocache();
 
-        if ($this->hasCustomStore()) {
-            $this->cacheStore()->flush();
-        }
-
         StaticCacheCleared::dispatch();
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -166,6 +167,25 @@ abstract class AbstractCacher implements Cacher
         });
 
         $this->cache->forget($this->normalizeKey('domains'));
+    }
+
+    /**
+     * Wipe the dedicated static cache store, when one is in use.
+     *
+     * Only the URL index is tracked, so anything else in the store (nocache
+     * regions, orphaned responses) would otherwise survive a flush.
+     *
+     * @return void
+     */
+    protected function flushDedicatedStore()
+    {
+        if (! config()->has('cache.stores.static_cache')) {
+            return;
+        }
+
+        if ($this->cache === Cache::store('static_cache')) {
+            $this->cache->flush();
+        }
     }
 
     /**

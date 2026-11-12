@@ -51,7 +51,7 @@ class ManagerTest extends TestCase
     }
 
     #[Test]
-    public function it_flushes()
+    public function it_flushes_without_touching_the_static_cache_store_itself()
     {
         config([
             'statamic.static_caching.strategy' => 'test',
@@ -66,7 +66,7 @@ class ManagerTest extends TestCase
         StaticCache::extend('test', fn () => $mock);
 
         Cache::shouldReceive('store')->andReturnSelf();
-        Cache::shouldReceive('flush')->once();
+        Cache::shouldNotReceive('flush');
         Cache::shouldReceive('forget')->with('statamic:cache-utility:page-statuses')->once();
 
         StaticCache::flush();
