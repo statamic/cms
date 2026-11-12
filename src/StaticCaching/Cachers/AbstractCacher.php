@@ -169,15 +169,7 @@ abstract class AbstractCacher implements Cacher
         $this->cache->forget($this->normalizeKey('domains'));
     }
 
-    /**
-     * Wipe the dedicated static cache store, when one is in use.
-     *
-     * Only the URL index is tracked, so anything else in the store (nocache
-     * regions, orphaned responses) would otherwise survive a flush.
-     *
-     * @return void
-     */
-    protected function flushDedicatedStore()
+    protected function flushDedicatedStore(): void
     {
         if (! config()->has('cache.stores.static_cache')) {
             return;
