@@ -163,6 +163,27 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_where_with_dates_regardless_of_display_format()
+    {
+        $this->createWhereDateTestEntries();
+
+        Carbon::setToStringFormat('F jS, Y');
+        $this->beforeApplicationDestroyed(fn () => Carbon::resetToStringFormat());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T23:31:00+03:00'))
+            ->get();
+
+        $this->assertEquals(['1'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T20:31:01Z'))
+            ->get();
+
+        $this->assertCount(0, $entries);
+    }
+
+    #[Test]
     public function entries_are_found_using_where_date()
     {
         $this->createWhereDateTestEntries();
