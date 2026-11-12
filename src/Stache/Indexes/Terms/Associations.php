@@ -12,11 +12,38 @@ class Associations extends Index
     private ?array $grouped = null;
     private ?array $groupedFrom = null;
 
+    public function getItems()
+    {
+        if (config('statamic.stache.single_pass_indexing', false)) {
+            return $this->getItemsFromEntryIndexes();
+        }
+
+        return Taxonomy::findByHandle($handle = $this->store->childKey())
+            ->collections()
+            ->flatMap(function ($collection) use ($handle) {
+                return $collection->queryEntries()
+                    ->where($handle, '<>', null)
+                    ->get()
+                    ->flatMap(function ($entry) use ($handle) {
+                        return collect($entry->value($handle))
+                            ->map(function ($value) use ($entry) {
+                                return [
+                                    'value' => $value,
+                                    'slug' => Str::slug($value),
+                                    'entry' => $entry->id(),
+                                    'collection' => $entry->collectionHandle(),
+                                    'site' => $entry->locale(),
+                                ];
+                            });
+                    })->all();
+            })->all();
+    }
+
     /**
      * What each entry has in the taxonomy's field is already in its collection's
      * index for that field, so the entries themselves don't need to be loaded.
      */
-    public function getItems()
+    private function getItemsFromEntryIndexes()
     {
         return Taxonomy::findByHandle($handle = $this->store->childKey())
             ->collections()

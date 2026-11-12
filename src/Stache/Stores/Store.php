@@ -324,12 +324,16 @@ abstract class Store
 
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
-        $this->makingItems = true;
+        if ($this->usesSinglePassIndexing()) {
+            $this->makingItems = true;
 
-        try {
-            $paths = collect($this->makeAndCacheItemsOneAtATime($files));
-        } finally {
-            $this->makingItems = false;
+            try {
+                $paths = collect($this->makeAndCacheItemsOneAtATime($files));
+            } finally {
+                $this->makingItems = false;
+            }
+        } else {
+            $paths = $this->makeAndCacheItems($files);
         }
 
         $this->cachePaths($paths);
@@ -411,6 +415,37 @@ abstract class Store
         $this->keys()->clear();
 
         Stache::cacheStore()->forget("stache::timestamps::{$this->key()}");
+    }
+
+    protected function usesSinglePassIndexing(): bool
+    {
+        return (bool) config('statamic.stache.single_pass_indexing', false);
+    }
+
+    private function makeAndCacheItems($files)
+    {
+        $fileItems = $files->map(function ($timestamp, $path) {
+            return [
+                'item' => $item = $this->makeItemFromFile($path, File::get($path)),
+                'key' => $this->getItemKey($item),
+                'path' => $path,
+            ];
+        });
+
+        $items = $fileItems->reject(function ($item) {
+            try {
+                $this->keys()->add($item['key'], $item['path']);
+            } catch (DuplicateKeyException $e) {
+                $isDuplicate = true;
+                Stache::duplicates()->track($this, $e->getKey(), $e->getPath());
+            }
+
+            return $isDuplicate ?? false;
+        });
+
+        $items->each(fn ($item) => $this->cacheItem($item['item']));
+
+        return $items->pluck('path', 'key');
     }
 
     /**
@@ -515,7 +550,7 @@ abstract class Store
      */
     public function fillIndexes(?Index $for = null): bool
     {
-        if (! Stache::shouldUpdateIndexes()) {
+        if (! $this->usesSinglePassIndexing() || ! Stache::shouldUpdateIndexes()) {
             return false;
         }
 

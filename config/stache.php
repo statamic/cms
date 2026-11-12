@@ -131,6 +131,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Single Pass Indexing
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, a store's indexes are filled together in one pass over
+    | its items, an item at a time, rather than each index reading every
+    | item for itself. This uses far less memory on sites with a lot of
+    | content. Index values that depend on other items are still handled.
+    |
+    */
+
+    'single_pass_indexing' => env('STATAMIC_STACHE_SINGLE_PASS_INDEXING', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Locking
     |--------------------------------------------------------------------------
     |

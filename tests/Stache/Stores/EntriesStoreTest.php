@@ -579,6 +579,8 @@ class EntriesStoreTest extends TestCase
     #[Test]
     public function filling_indexes_in_one_pass_gives_what_each_index_builds_for_itself()
     {
+        config(['statamic.stache.single_pass_indexing' => true]);
+
         foreach (['alphabetical', 'blog', 'numeric', 'pages'] as $collection) {
             $store = $this->parent->store($collection);
 
@@ -597,6 +599,8 @@ class EntriesStoreTest extends TestCase
     #[Test]
     public function a_queue_worker_fills_indexes_from_what_is_cached_at_the_time()
     {
+        config(['statamic.stache.single_pass_indexing' => true]);
+
         $this->useSerializingCacheStore();
 
         $store = $this->parent->store('blog');
@@ -617,6 +621,8 @@ class EntriesStoreTest extends TestCase
     #[Test]
     public function a_later_request_in_the_same_process_fills_indexes_from_what_is_cached_at_the_time()
     {
+        config(['statamic.stache.single_pass_indexing' => true]);
+
         $this->useSerializingCacheStore();
 
         $store = $this->parent->store('blog');

@@ -16,6 +16,13 @@ class FillingIndexesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['statamic.stache.single_pass_indexing' => true]);
+    }
+
     private function store($collection)
     {
         return Stache::store('entries')->store($collection);
@@ -42,6 +49,25 @@ class FillingIndexesTest extends TestCase
         EntryFactory::id('a-propos')->locale('fr')->collection('pages')->slug('a-propos')->origin('about')->data(['title' => 'À propos'])->create();
 
         Stache::clear();
+    }
+
+    #[Test]
+    public function each_index_builds_itself_unless_single_pass_indexing_is_enabled()
+    {
+        config(['statamic.stache.single_pass_indexing' => false]);
+
+        $this->createContent();
+
+        $store = $this->store('blog');
+
+        $this->assertFalse($store->fillIndexes());
+        $this->assertSame(['one' => 'one', 'two' => 'two', 'un' => 'un'], $store->index('slug')->items()->all());
+        $this->assertFalse($store->resolveIndexes()->get('title')->isCached());
+
+        $store->warm();
+
+        $this->assertSame(['one' => 'One', 'two' => 'Two', 'un' => 'One'], $store->index('title')->items()->all());
+        $this->assertSame(['alfa', 'bravo', 'bravo'], collect(Stache::store('terms')->store('tags')->index('associations')->items())->where('site', 'en')->pluck('slug')->all());
     }
 
     #[Test]
