@@ -52,6 +52,11 @@ class CollectionEntriesStore extends ChildStore
      * While many files are being turned into entries at once, look up their
      * collection once rather than once per file. They all share the same one.
      */
+    public function fillIndexes(?Index $for = null): bool
+    {
+        return $this->makeItemsInBulk(fn () => parent::fillIndexes($for));
+    }
+
     private function makeItemsInBulk(callable $callback)
     {
         $this->makingItemsInBulk++;
@@ -177,13 +182,13 @@ class CollectionEntriesStore extends ChildStore
     {
         // Where an entry sits in a tree is found by querying the collection's
         // entries, which needs the rest of this store's indexes to be there.
-        return in_array($name, ['uri', 'parent', 'order']) && $this->collection()?->hasStructure();
+        return in_array($name, ['uri', 'parent', 'order']) && $this->findCollection($this->childKey)?->hasStructure();
     }
 
     protected function releaseItem($key, $item): void
     {
         // A structure's uri, parent and order indexes are still to be built from these.
-        if ($this->collection()?->hasStructure()) {
+        if ($this->findCollection($this->childKey)?->hasStructure()) {
             return;
         }
 
