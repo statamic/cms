@@ -11,6 +11,7 @@ return [
     'array.title' => 'Array',
     'asset_folders.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'assets.config.allow_uploads' => 'Neue Datei-Uploads erlauben.',
+    'assets.config.aspect_ratio' => 'Seitenverhältnis der Vorschau im Control Panel festlegen. Wirkt sich nicht auf die Originaldatei oder das Frontend aus.',
     'assets.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'assets.config.dynamic' => 'Legt Dateien in einem Unterordner ab, der dem Wert dieses Feldes entspricht.',
     'assets.config.folder' => 'Anfangsverzeichnis festlegen.',
