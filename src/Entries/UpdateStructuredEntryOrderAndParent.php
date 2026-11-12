@@ -16,12 +16,14 @@ class UpdateStructuredEntryOrderAndParent
         $moved = $diff->moved();
         $ids = array_merge($moved, $diff->added());
 
-        if (empty($ids)) {
-            return;
+        if (! empty($ids)) {
+            $collection->updateEntryParent($ids);
         }
 
-        $collection->updateEntryParent($ids);
-        $collection->updateEntryOrder($this->idsWithDescendants($tree, $moved, $ids));
+        // Moved entries and their descendants are kept since stale references in the raw tree can hide their shift.
+        if ($orderIds = $this->idsWithDescendants($tree, $moved, array_merge($moved, $diff->orderChanged()))) {
+            $collection->updateEntryOrder($orderIds);
+        }
     }
 
     private function idsWithDescendants(CollectionTree $tree, array $moved, array $ids): array

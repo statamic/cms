@@ -414,10 +414,15 @@ class CollectionEntriesStore extends ChildStore
             return $index->update();
         }
 
+        // Write the index to the cache once, rather than once per entry like updateItem() does.
+        $index->load();
+
         collect($ids)
             ->map(fn ($id) => Entry::find($id))
             ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
+            ->each(fn ($entry) => $index->put($this->getItemKey($entry), $index->getItemValue($entry)));
+
+        $index->cache();
     }
 
     private function updateEntriesWithinStore($ids)
