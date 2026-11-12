@@ -78,6 +78,39 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_ordered_the_way_a_data_collection_sorts_their_values()
+    {
+        $values = [
+            'a' => ['rank' => 3, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => ['b', 'z']],
+            'b' => ['rank' => null, 'published_on' => Carbon::parse('2024-01-01'), 'tags' => []],
+            'c' => ['rank' => 1, 'published_on' => null, 'tags' => ['a']],
+            'd' => ['rank' => 3, 'published_on' => Carbon::parse('2024-02-01'), 'tags' => 'c'],
+            'e' => ['rank' => 2, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => null],
+            'left-out' => ['rank' => 0, 'published_on' => Carbon::parse('2025-01-01'), 'tags' => ['a']],
+        ];
+
+        foreach ($values as $id => $data) {
+            EntryFactory::id($id)->slug($id)->collection('posts')->data($data + ['title' => $id, 'listed' => $id !== 'left-out'])->create();
+        }
+
+        $listed = collect($values)->except('left-out');
+
+        foreach (['rank', 'rank:desc', 'published_on', 'published_on:desc', 'tags', 'tags:desc', 'rank:desc|published_on', 'published_on:desc|rank'] as $sort) {
+            $query = Entry::query()->where('listed', true);
+
+            foreach (explode('|', $sort) as $orderBy) {
+                $query->orderBy(...explode(':', $orderBy.':asc'));
+            }
+
+            $this->assertSame(
+                \Statamic\Data\DataCollection::make($listed->all())->multisort($sort)->keys()->all(),
+                $query->get()->map->id()->all(),
+                $sort
+            );
+        }
+    }
+
+    #[Test]
     public function where_in_and_where_not_in_are_case_insensitive()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
