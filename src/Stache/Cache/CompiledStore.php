@@ -143,8 +143,13 @@ class CompiledStore implements Store
         // Whether it can be written as PHP is left until it's written. The Stache puts every index of a
         // collection back when one entry is saved, and most of them turn out not to need writing at all.
         $this->see($name = 'value:'.$key);
-        $this->values[$name] = $value;
-        $this->writeToFallback($key, $value === null ? $this->payload($value) : null);
+
+        // An object is serialized now, as any other store would, so that it's kept as it is at
+        // this moment and whoever passed it in can go on to change it.
+        $serialize = $value === null || is_object($value);
+
+        $this->values[$name] = $serialize ? null : $value;
+        $this->writeToFallback($key, $serialize ? $this->payload($value) : null);
 
         return true;
     }

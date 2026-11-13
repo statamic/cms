@@ -72,6 +72,27 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
+    public function what_it_is_given_is_kept_as_it_was_when_given()
+    {
+        $store = $this->store();
+
+        $store->forever('object', $object = (object) ['title' => 'Before']);
+        $store->forever('stache::items::entries::blog::one', $entry = $this->entry('one', 'Before'));
+
+        $object->title = 'After';
+        $entry->set('title', 'After');
+
+        $this->assertSame('Before', $store->get('object')->title);
+        $this->assertSame('Before', $store->get('stache::items::entries::blog::one')->get('title'));
+        $this->assertNotSame($store->get('object'), $store->get('object'));
+
+        $store->persist();
+
+        $this->assertSame('Before', $this->store()->get('object')->title);
+        $this->assertSame('Before', $this->store()->get('stache::items::entries::blog::one')->get('title'));
+    }
+
+    #[Test]
     public function nothing_is_written_until_it_persists()
     {
         $store = $this->store();
