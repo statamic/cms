@@ -9,6 +9,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\YAML;
+use Statamic\Stache\Cache\CompiledStore;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Support\Arr;
@@ -226,6 +227,8 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->cacheItem($item);
         }
+
+        CompiledStore::persistAll();
     }
 
     public function delete($term)
@@ -241,6 +244,8 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
         }
+
+        CompiledStore::persistAll();
     }
 
     protected function getItemFromModifiedPath($path)

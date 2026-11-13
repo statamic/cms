@@ -140,11 +140,11 @@ class CompiledStore implements Store
             return true;
         }
 
-        $plain = ItemCodec::isPlain($value) && $value !== null;
-
+        // Whether it can be written as PHP is left until it's written. The Stache puts every index of a
+        // collection back when one entry is saved, and most of them turn out not to need writing at all.
         $this->see($name = 'value:'.$key);
-        $this->values[$name] = $plain ? $value : null;
-        $this->writeToFallback($key, $plain ? null : $this->payload($value));
+        $this->values[$name] = $value;
+        $this->writeToFallback($key, $value === null ? $this->payload($value) : null);
 
         return true;
     }
@@ -236,8 +236,12 @@ class CompiledStore implements Store
 
             $pointer = $this->pointer();
 
+            $written = [];
+
             foreach ($this->entries as $file => $rows) {
-                $pointer = $this->write($pointer, $file, $this->mergeEntries($pointer, $file, $rows) ?: null, 'entries');
+                $written[$file] = $this->mergeEntries($pointer, $file, $rows) ?: null;
+
+                $pointer = $this->write($pointer, $file, $written[$file], 'entries');
             }
 
             foreach ($this->values as $name => $value) {
@@ -249,18 +253,33 @@ class CompiledStore implements Store
                     && $pointer[$name] === ($readFrom[$name] ?? null)
                     && $read[$name] === $value;
 
-                if (! $unchanged) {
-                    $pointer = $this->write($pointer, $name, $this->mergeValue($pointer, $name, $value), 'values');
+                if ($unchanged) {
+                    continue;
                 }
+
+                if ($value !== null && ! ItemCodec::isPlain($value)) {
+                    $this->fallbackWrites[substr($name, strlen('value:'))] = $this->payload($value);
+                    $value = null;
+                }
+
+                $written[$name] = $this->mergeValue($pointer, $name, $value);
+
+                $pointer = $this->write($pointer, $name, $written[$name], 'values');
             }
 
             $this->persistFallback();
 
             $this->writeAtomically($this->directory.'/pointer.json', json_encode($pointer, JSON_UNESCAPED_SLASHES));
 
+            // What was read before and hasn't been replaced since is still what's there, and so is what
+            // was just written. A process that saves many times doesn't have to read it all back each time.
+            $this->loaded = $written + array_filter($read, function ($name) use ($pointer, $readFrom) {
+                return ($pointer[$name] ?? null) === ($readFrom[$name] ?? null);
+            }, ARRAY_FILTER_USE_KEY);
+
             $this->pointer = $pointer;
             $this->pointerWas = $this->pointerFileDetails();
-            $this->loaded = $this->entries = $this->values = $this->fallbackRead = $this->fallbackWrites = [];
+            $this->entries = $this->values = $this->fallbackRead = $this->fallbackWrites = [];
             $this->seen = $this->fallbackSeen = [];
         } finally {
             flock($lock, LOCK_UN);

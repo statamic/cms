@@ -23,6 +23,8 @@ class CompiledStoreTest extends TestCase
         parent::setUp();
 
         $this->directory = sys_get_temp_dir().'/statamic-compiled-store-'.bin2hex(random_bytes(6));
+
+        Collection::make('blog')->dated(true)->save();
     }
 
     public function tearDown(): void
@@ -40,8 +42,6 @@ class CompiledStoreTest extends TestCase
 
     private function entry($id, $title = 'Title')
     {
-        Collection::make('blog')->dated(true)->save();
-
         return EntryFactory::id($id)->collection('blog')->slug($id)->date('2024-03-01')->data([
             'title' => $title,
             'tags' => ['one', 'two'],

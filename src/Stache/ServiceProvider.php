@@ -91,7 +91,12 @@ class ServiceProvider extends LaravelServiceProvider
     {
         $this->app->terminating(fn () => CompiledStore::persistAll());
 
-        Event::listen([JobProcessed::class, JobFailed::class], fn () => CompiledStore::persistAll());
+        // A job run by a worker, that is. One run in the middle of a request is part of the request.
+        Event::listen([JobProcessed::class, JobFailed::class], function () {
+            if (Statamic::isWorker()) {
+                CompiledStore::persistAll();
+            }
+        });
 
         if (! self::$persistsAtShutdown) {
             self::$persistsAtShutdown = true;
