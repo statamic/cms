@@ -867,6 +867,45 @@ class CompiledStoreTest extends TestCase
         $this->assertNull($this->store()->get('thing'));
     }
 
+    #[Test]
+    public function a_file_is_read_once_however_often_what_was_read_is_forgotten()
+    {
+        $writer = $this->store();
+        $writer->forever('index', ['a' => 1]);
+        $writer->forever('other', ['b' => 2]);
+        $writer->persist();
+
+        $worker = $this->store();
+        $this->assertSame(['a' => 1], $worker->get('index'));
+
+        $pointer = json_decode(file_get_contents($this->directory.'/pointer.json'), true);
+        $file = $this->directory.'/'.$pointer['value:index'];
+        $contents = file_get_contents($file);
+
+        // Were the file read again, this is what would come back.
+        file_put_contents($file, '<?php return ["a" => "read again"];');
+
+        $worker->resetMemoizedState();
+        $this->assertSame(['a' => 1], $worker->get('index'));
+
+        // Another process writing something else doesn't change that...
+        $writer->forever('other', ['b' => 3]);
+        $writer->persist();
+        usleep(15000);
+
+        $this->assertSame(['b' => 3], $worker->get('other'));
+        $this->assertSame(['a' => 1], $worker->get('index'));
+
+        // ...and once nothing points at the file, it's let go of.
+        file_put_contents($file, $contents);
+        $writer->forever('index', ['a' => 2]);
+        $writer->persist();
+        usleep(15000);
+
+        $this->assertSame(['a' => 2], $worker->get('index'));
+        $this->assertCount(2, (fn () => $this->files)->call($worker));
+    }
+
     public static function rebuilds(): array
     {
         return [

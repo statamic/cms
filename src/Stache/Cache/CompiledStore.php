@@ -45,6 +45,7 @@ class CompiledStore implements Store
     private FileStore $fallback;
     private ?array $pointer = null;
     private array $loaded = [];
+    private array $files = [];
     private array $values = [];
     private array $entries = [];
     private array $fallbackRead = [];
@@ -214,7 +215,7 @@ class CompiledStore implements Store
 
     public function flush()
     {
-        $this->entries = $this->values = $this->loaded = $this->fallbackRead = $this->fallbackWrites = [];
+        $this->entries = $this->values = $this->loaded = $this->files = $this->fallbackRead = $this->fallbackWrites = [];
         $this->seen = $this->spreadOver = $this->fallbackSeen = $this->conflicted = [];
         $this->forgotten = $this->seenForgotten = [];
         $this->pointer = [];
@@ -843,6 +844,10 @@ class CompiledStore implements Store
 
             $this->generation = substr($contents, 0, self::GENERATION_LENGTH);
             $this->pointer = $contents ? json_decode($contents, true) : [];
+
+            if ($this->files) {
+                $this->files = array_intersect_key($this->files, array_flip(array_filter($this->pointer, 'is_string')));
+            }
         }
 
         return $this->pointer;
@@ -884,10 +889,21 @@ class CompiledStore implements Store
             return $this->loaded[$name] = null;
         }
 
+        // A file never changes, so one this process has read is kept for as long as anything points at
+        // it. Where OPcache is on that saves little. Where it's off, as it usually is on the command
+        // line, it's the difference between a queue worker compiling each file once and once per job.
+        if (array_key_exists($file, $this->files)) {
+            return $this->loaded[$name] = $this->files[$file];
+        }
+
         // A file that has gone since the pointer was read (the store was flushed) is a miss.
         $value = @include $this->directory.'/'.$file;
 
-        return $this->loaded[$name] = $value === false ? null : $value;
+        if ($value === false) {
+            return $this->loaded[$name] = null;
+        }
+
+        return $this->loaded[$name] = $this->files[$file] = $value;
     }
 
     private function write(array $pointer, string $name, $value, string $folder): array
