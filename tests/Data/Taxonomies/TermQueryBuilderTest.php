@@ -49,6 +49,57 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_finds_terms_by_id_across_taxonomies()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Taxonomy::make('keywords')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Bravo'])->save();
+        Term::make('a')->taxonomy('categories')->data(['title' => 'Category Alfa'])->save();
+        Term::make('a')->taxonomy('keywords')->data(['title' => 'Keyword Alfa'])->save();
+
+        $ids = fn ($query) => $query->get()->map->id()->all();
+
+        // In the order the taxonomies and their terms are stored, not the order asked for.
+        $this->assertSame(['tags::a', 'categories::a'], $ids(Term::query()->whereIn('id', ['categories::a', 'tags::a'])));
+        $this->assertSame(['tags::b'], $ids(Term::query()->where('id', 'tags::b')));
+        $this->assertSame(['tags::a'], $ids(Term::query()->whereIn('id', ['tags::a', 'tags::b'])->whereIn('id', ['tags::a', 'keywords::a'])));
+        $this->assertSame([], $ids(Term::query()->whereIn('id', ['tags::a'])->whereIn('id', ['keywords::a'])));
+        $this->assertSame([], $ids(Term::query()->whereIn('id', ['tags::missing', 'nowhere::a'])));
+        $this->assertSame('Keyword Alfa', Term::find('keywords::a')->title());
+    }
+
+    #[Test]
+    public function ids_name_their_taxonomy_without_regard_to_case()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('a')->taxonomy('categories')->data(['title' => 'Category Alfa'])->save();
+
+        $this->assertSame(['tags::a'], Term::query()->whereIn('id', ['TAGS::A'])->get()->map->id()->all());
+        $this->assertSame(['categories::a'], Term::query()->where('id', 'Categories::a')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function an_or_where_can_still_reach_a_taxonomy_the_ids_dont_name()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('b')->taxonomy('categories')->data(['title' => 'Bravo'])->save();
+
+        $this->assertSame(
+            ['tags::a', 'categories::b'],
+            Term::query()->whereIn('id', ['tags::a'])->orWhere('title', 'Bravo')->get()->map->id()->all()
+        );
+
+        // An id with no taxonomy in it matches nothing, and doesn't stop the others being found.
+        $this->assertSame(['tags::a'], Term::query()->whereIn('id', ['tags::a', 'a'])->get()->map->id()->all());
+    }
+
+    #[Test]
     public function it_filters_using_wheres()
     {
         Taxonomy::make('tags')->save();
@@ -292,6 +343,33 @@ class TermQueryBuilderTest extends TestCase
                 ->where('taxonomy', 'tags')
                 ->get()->map->id()->sort()->values()->all()
         );
+    }
+
+    #[Test]
+    public function it_supplies_collection_context_without_filtering_usage()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+
+        $terms = Term::query()
+            ->whereIn('id', ['tags::a', 'tags::b'])
+            ->withCollectionContext('blog')
+            ->get();
+
+        $this->assertEquals(['tags::a', 'tags::b'], $terms->map->id()->sort()->values()->all());
+        $this->assertEquals(['blog', 'blog'], $terms->map(fn ($term) => $term->collection()->handle())->all());
+
+        $this->assertEquals('blog', Term::query()
+            ->whereIn('id', ['tags::b'])
+            ->withCollectionContext('blog')
+            ->first()
+            ->collection()
+            ->handle());
     }
 
     #[Test]

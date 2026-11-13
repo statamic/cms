@@ -5,6 +5,7 @@ namespace Tests\Tags\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as SupportCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
@@ -435,6 +436,46 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Banana'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
         $this->assertEquals(['Danish'], $this->runTagAndGetTitles('newer')); // Alias of next when date:asc
+    }
+
+    #[Test]
+    #[DataProvider('datedNavigationOrders')]
+    public function it_navigates_entries_on_the_same_day_regardless_of_display_format($orderBy, $titles)
+    {
+        $this->foods->dated(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->date(Carbon::parse('2023-01-01 11:00'))->set('title', 'apple')->save();
+        $this->makeEntry($this->foods, 'b')->date(Carbon::parse('2023-01-01 12:00'))->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->date(Carbon::parse('2023-01-01 11:00'))->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->date(Carbon::parse('2023-01-01 10:00'))->set('title', 'Danish')->save();
+
+        Carbon::setToStringFormat('F jS, Y');
+        $this->beforeApplicationDestroyed(fn () => Carbon::resetToStringFormat());
+
+        foreach ($titles as $index => $title) {
+            $this->setTagParameters([
+                'in' => 'foods',
+                'current' => $this->findEntryByTitle($title)->id(),
+                'order_by' => $orderBy,
+                'limit' => 1,
+            ]);
+
+            $previous = isset($titles[$index - 1]) ? [$titles[$index - 1]] : [];
+            $next = isset($titles[$index + 1]) ? [$titles[$index + 1]] : [];
+
+            $this->assertEquals($previous, $this->runTagAndGetTitles('previous'), $title);
+            $this->assertEquals($next, $this->runTagAndGetTitles('next'), $title);
+        }
+    }
+
+    public static function datedNavigationOrders()
+    {
+        return [
+            'descending' => ['date:desc', ['Banana', 'apple', 'Carrot', 'Danish']],
+            'ascending' => ['date:asc', ['Danish', 'apple', 'Carrot', 'Banana']],
+            'descending with reversed titles' => ['date:desc|title:desc', ['Banana', 'Carrot', 'apple', 'Danish']],
+            'ascending with reversed titles' => ['date:asc|title:desc', ['Danish', 'Carrot', 'apple', 'Banana']],
+        ];
     }
 
     #[Test]

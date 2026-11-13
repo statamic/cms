@@ -11,6 +11,7 @@ class TermQueryBuilder extends Builder
 {
     protected $taxonomies;
     protected $collections;
+    protected $collectionContext;
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -46,6 +47,18 @@ class TermQueryBuilder extends Builder
         return parent::whereIn($column, $values, $boolean);
     }
 
+    /**
+     * Supply a collection to the resulting terms, so things like URLs will be
+     * scoped to it, without limiting results to terms used in that collection
+     * the way where('collection', ...) does.
+     */
+    public function withCollectionContext($collection)
+    {
+        $this->collectionContext = $collection;
+
+        return $this;
+    }
+
     protected function collect($items = [])
     {
         return TermCollection::make($items);
@@ -64,6 +77,10 @@ class TermQueryBuilder extends Builder
 
         if ($this->collections) {
             $this->filterUsagesWithinCollections($taxonomies);
+        }
+
+        if (empty($this->taxonomies)) {
+            $taxonomies = $this->taxonomiesNamedByIds($taxonomies);
         }
 
         return empty($this->wheres)
@@ -93,13 +110,71 @@ class TermQueryBuilder extends Builder
         });
     }
 
+    /**
+     * A term's id starts with its taxonomy. When the query can only return terms
+     * with certain ids, the other taxonomies don't need to be looked through.
+     */
+    private function taxonomiesNamedByIds($taxonomies)
+    {
+        $named = null;
+
+        foreach ($this->wheres as $where) {
+            if (($where['boolean'] ?? 'and') !== 'and') {
+                return $taxonomies;
+            }
+
+            if (($where['column'] ?? null) !== 'id') {
+                continue;
+            }
+
+            $ids = match (true) {
+                $where['type'] === 'In' => $where['values'],
+                $where['type'] === 'Basic' && $where['operator'] === '=' => [$where['value']],
+                default => null,
+            };
+
+            if ($ids === null) {
+                continue;
+            }
+
+            $prefixes = [];
+
+            foreach ($ids as $id) {
+                if (! is_string($id) || ! str_contains($id, '::')) {
+                    return $taxonomies;
+                }
+
+                $prefixes[strtolower(explode('::', $id, 2)[0])] = true;
+            }
+
+            $named = $named === null ? $prefixes : array_intersect_key($named, $prefixes);
+        }
+
+        if ($named === null) {
+            return $taxonomies;
+        }
+
+        // Ids are compared without regard to case, so the handles are too.
+        return collect($taxonomies)->filter(fn ($taxonomy) => isset($named[strtolower($taxonomy)]))->values()->all();
+    }
+
     protected function getKeysFromTaxonomiesWithWhere($taxonomies, $where)
     {
+        $method = 'filterWhere'.$where['type'];
+
+        // These filters only look at values, so each store's index can be filtered
+        // before its keys are prefixed, instead of prefixing every key first.
+        if (in_array($where['type'], ['Basic', 'In'])) {
+            return collect($taxonomies)->unique()->values()->flatMap(function ($taxonomy) use ($where, $method) {
+                $items = $this->store->store($taxonomy)->index($where['column'])->items();
+
+                return $this->{$method}($items, $where)->keys()->map(fn ($key) => "{$taxonomy}::{$key}");
+            })->values();
+        }
+
         $items = collect($taxonomies)->flatMap(function ($taxonomy) use ($where) {
             return $this->getWhereColumnKeysFromStore($taxonomy, $where);
         });
-
-        $method = 'filterWhere'.$where['type'];
 
         return $this->{$method}($items, $where)->keys();
     }
@@ -142,8 +217,12 @@ class TermQueryBuilder extends Builder
         // If a single collection has been queried, we'll supply it to the terms so
         // things like URLs will be scoped to the collection. We can't do it when
         // multiple collections are queried because it would be ambiguous.
-        if ($this->collections && count($this->collections) == 1) {
-            $items->each->collection(Collection::findByHandle($this->collections[0]));
+        $collection = $this->collections && count($this->collections) == 1
+            ? $this->collections[0]
+            : $this->collectionContext;
+
+        if ($collection) {
+            $items->each->collection(Collection::findByHandle($collection));
         }
 
         return $items;

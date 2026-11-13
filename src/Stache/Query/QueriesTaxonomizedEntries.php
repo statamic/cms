@@ -44,7 +44,13 @@ trait QueriesTaxonomizedEntries
             return;
         }
 
-        $entryIds = collect($this->taxonomyWheres)
+        $taxonomyWheres = $this->taxonomyWheres;
+
+        // They become regular wheres below, so they only need to be applied once,
+        // even when the query is run more than once (e.g. count then get).
+        $this->taxonomyWheres = [];
+
+        $entryIds = collect($taxonomyWheres)
             ->reject(function ($where) {
                 return $where['type'] === 'NotIn';
             })
@@ -55,14 +61,15 @@ trait QueriesTaxonomizedEntries
                 return $ids ? $ids->intersect($keys)->values() : $keys;
             });
 
-        $excludedEntryIds = collect($this->taxonomyWheres)
+        $excludedEntryIds = collect($taxonomyWheres)
             ->filter(function ($where) {
                 return $where['type'] === 'NotIn';
             })
             ->reduce(function ($ids, $where) {
                 $keys = $this->getKeysForTaxonomyWhereIn($where);
 
-                return $ids ? $ids->intersect($keys)->values() : $keys;
+                // Each "not in" excludes its own entries, so an entry in any of them is excluded.
+                return $ids ? $ids->concat($keys)->unique()->values() : $keys;
             });
 
         if ($entryIds) {

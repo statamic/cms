@@ -7,20 +7,33 @@ use Statamic\Support\Arr;
 abstract class IteratorBuilder extends Builder
 {
     protected $randomize = false;
+    private $itemsBeingPaginated;
 
     public function count()
     {
         return $this->getFilteredAndLimitedItems()->count();
     }
 
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    {
+        // The total and the page are both taken from the same items, so they only need working out once.
+        $this->itemsBeingPaginated = $this->getFilteredItems();
+
+        try {
+            return parent::paginate($perPage, $columns, $pageName, $page);
+        } finally {
+            $this->itemsBeingPaginated = null;
+        }
+    }
+
     protected function getCountForPagination()
     {
-        return $this->getFilteredItems()->count();
+        return ($this->itemsBeingPaginated ?? $this->getFilteredItems())->count();
     }
 
     public function get($columns = ['*'])
     {
-        $items = $this->getFilteredItems();
+        $items = $this->itemsBeingPaginated ?? $this->getFilteredItems();
 
         if ($this->randomize) {
             $items = $items->shuffle();
@@ -108,9 +121,16 @@ abstract class IteratorBuilder extends Builder
 
     private function intersectItems($entries, $filteredEntries)
     {
-        return $entries->filter(function ($entry) use ($filteredEntries) {
-            return $filteredEntries->contains($entry);
-        });
+        if ($filteredEntries->contains(fn ($entry) => ! is_object($entry))) {
+            return $entries->filter(fn ($entry) => $filteredEntries->contains($entry));
+        }
+
+        // Both are taken from the same items, so an object can be looked up rather than compared with each of the others.
+        $filtered = $filteredEntries->mapWithKeys(fn ($entry) => [spl_object_id($entry) => true])->all();
+
+        return $entries->filter(fn ($entry) => is_object($entry)
+            ? isset($filtered[spl_object_id($entry)])
+            : $filteredEntries->contains($entry));
     }
 
     protected function filterWhereIn($entries, $where)

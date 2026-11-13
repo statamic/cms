@@ -51,6 +51,8 @@ class StaticWarm extends Command
 
     private $uris;
 
+    private $paginated = [];
+
     public function handle()
     {
         if (! config('statamic.static_caching.strategy')) {
@@ -114,20 +116,22 @@ class StaticWarm extends Command
             $promise = $pool->promise();
 
             $promise->wait();
+
+            $this->warmPaginatedPages();
         }
     }
 
-    private function warmPaginatedPages(string $url, int $currentPage, int $totalPages, string $pageName): void
+    /**
+     * Paginated pages are only known about once their first page has responded. They're
+     * warmed together afterwards, so the pool of other URLs is never left waiting on them.
+     */
+    private function warmPaginatedPages(): void
     {
-        $urls = collect(range($currentPage, $totalPages))->map(function ($page) use ($url, $pageName) {
-            $url = "{$url}?{$pageName}={$page}";
+        $urls = $this->paginatedUrls();
 
-            if (config('statamic.static_caching.background_recache', false)) {
-                $url = RecacheToken::addToUrl($url);
-            }
-
-            return $url;
-        });
+        if ($urls->isEmpty()) {
+            return;
+        }
 
         $headers = $this->parseHeaders($this->option('header'));
 
@@ -175,10 +179,30 @@ class StaticWarm extends Command
         $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
 
         if ($response->hasHeader('X-Statamic-Pagination')) {
-            [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
-
-            $this->warmPaginatedPages($this->uris()->get($index), $currentPage, $totalPages, $pageName);
+            $this->paginated[] = [$this->uris()->get($index), ...$this->paginationHeader($response)];
         }
+    }
+
+    private function paginatedUrls(): Collection
+    {
+        $cacher = app(StaticCacher::class);
+
+        return collect($this->paginated)->flatMap(function ($paginated) use ($cacher) {
+            [$url, $currentPage, $totalPages, $pageName] = $paginated;
+
+            $cachedAs = $cacher->getUrl(HttpRequest::create($url));
+
+            return collect(range($currentPage, $totalPages))
+                ->map(fn ($page) => $url.(str_contains($url, '?') ? '&' : '?')."{$pageName}={$page}")
+                // When query strings are ignored, a page is cached under the same URL
+                // as the one that has just been warmed, so there's nothing left to warm.
+                ->reject(fn ($pageUrl) => $cacher->getUrl(HttpRequest::create($pageUrl)) === $cachedAs)
+                ->map(function ($pageUrl) {
+                    return config('statamic.static_caching.background_recache', false)
+                        ? RecacheToken::addToUrl($pageUrl)
+                        : $pageUrl;
+                });
+        })->values();
     }
 
     public function outputFailureLine($exception, $index): void

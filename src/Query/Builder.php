@@ -42,6 +42,7 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+    protected $likePatterns = [];
 
     public function __call($method, $args)
     {
@@ -198,7 +199,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower((string) $operator);
+        $loweredOperator = is_string($operator) ? strtolower($operator) : $operator;
 
         if ($useDefault) {
             return [$operator, '='];
@@ -217,7 +218,7 @@ abstract class Builder implements Contract
 
     protected function invalidOperator($operator)
     {
-        if (is_null($operator)) {
+        if (! is_string($operator)) {
             return true;
         }
 
@@ -774,6 +775,10 @@ abstract class Builder implements Contract
 
     protected function filterTestEquals($item, $value)
     {
+        if ($item instanceof DateTimeInterface && $value instanceof DateTimeInterface) {
+            return $item == $value;
+        }
+
         return strtolower($item ?? '') === strtolower($value ?? '');
     }
 
@@ -812,7 +817,10 @@ abstract class Builder implements Contract
             $item = json_encode($item);
         }
 
-        $pattern = Pattern::sqlLikeToRegex($like);
+        // What's being looked for is the same for every item, so its pattern is only worked out for the first.
+        $pattern = is_string($like)
+            ? $this->likePatterns[$like] ??= Pattern::sqlLikeToRegex($like)
+            : Pattern::sqlLikeToRegex($like);
 
         return preg_match('/'.$pattern.'/imu', (string) $item);
     }
