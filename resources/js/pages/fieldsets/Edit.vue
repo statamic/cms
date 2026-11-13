@@ -54,8 +54,16 @@ export default {
 
     props: ['action', 'initialFieldset'],
 
-    provide: {
-        isInsideFieldset: true,
+    provide() {
+        return {
+            isInsideFieldset: true,
+            fieldtypeContext: {
+                view: 'fieldset',
+                fieldset: this.initialFieldset.handle,
+                field_path: [],
+                nested: false,
+            },
+        };
     },
 
     data() {

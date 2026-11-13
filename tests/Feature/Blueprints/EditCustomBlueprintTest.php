@@ -53,7 +53,9 @@ class EditCustomBlueprintTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('blueprints.additional.edit', [$namespace, $handle]))
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->component('blueprints/Edit'));
+            ->assertInertia(fn ($page) => $page
+                ->component('blueprints/Edit')
+                ->where('blueprint.fullyQualifiedHandle', 'foo::bar'));
     }
 
     private function createBlueprint($namespace, $handle)

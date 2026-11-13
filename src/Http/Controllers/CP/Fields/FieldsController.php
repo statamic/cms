@@ -32,9 +32,10 @@ class FieldsController extends CpController
         $request->validate([
             'type' => 'required',
             'values' => 'array',
+            'context' => 'sometimes|array',
         ]);
 
-        $fieldtype = FieldtypeRepository::find($request->type);
+        $fieldtype = FieldtypeRepository::find($request->type)->context($request->input('context', []));
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
@@ -73,9 +74,10 @@ class FieldsController extends CpController
             'values' => 'required|array',
             'fields' => 'sometimes|array',
             'isInsideSet' => 'sometimes|boolean',
+            'context' => 'sometimes|array',
         ]);
 
-        $fieldtype = FieldtypeRepository::find($request->type);
+        $fieldtype = FieldtypeRepository::find($request->type)->context($request->input('context', []));
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
