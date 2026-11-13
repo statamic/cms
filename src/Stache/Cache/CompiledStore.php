@@ -303,6 +303,8 @@ class CompiledStore implements Store
                     continue;
                 }
 
+                $value = $this->turnDownIfTheOtherKindHasChanged($pointer, $name, $value);
+
                 $combined[$name] = $value !== null && ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null);
 
                 $written[$name] = $this->mergeValue($pointer, $name, $value);
@@ -414,25 +416,21 @@ class CompiledStore implements Store
             return null;
         }
 
-        if (($pointer[$name] ?? null) === ($this->seen[$name] ?? null) && ! isset($this->conflicted[$name])) {
+        // Disagreements are noted under the key the Stache uses, whichever way the value is kept.
+        $key = substr($name, strlen('value:'));
+
+        if (($pointer[$name] ?? null) === ($this->seen[$name] ?? null) && ! isset($this->conflicted[$key])) {
             return $ours;
         }
 
         $theirs = $this->load($name);
 
-        // The list of a store's indexes is the one thing that can't be forgotten and worked out again:
-        // an index the Stache doesn't know it has is never updated or cleared. It's a list of names
-        // that only grows, so two versions of it are both right, and it's kept as the Stache keeps it.
-        if (str_ends_with($name, '::_indexes') && is_array($ours) && is_array($theirs)) {
-            $names = array_values(array_unique([...array_values($theirs), ...array_values($ours)]));
-
-            sort($names);
-
-            return $names;
+        if (is_array($ours) && is_array($theirs) && ($both = $this->keepBoth($key, $theirs, $ours)) !== null) {
+            return $both;
         }
 
         // As with an entry: after one disagreement, nothing more this process writes is trusted.
-        if (isset($this->conflicted[$name])) {
+        if (isset($this->conflicted[$key])) {
             return null;
         }
 
@@ -447,10 +445,73 @@ class CompiledStore implements Store
             : null;
 
         if ($merged === null) {
-            $this->conflicted[$name] = true;
+            $this->conflicted[$key] = true;
         }
 
         return $merged;
+    }
+
+    /**
+     * A value is kept either as PHP or serialized, and the two are compared with what was first seen
+     * separately. That misses one process writing it one way while another wrote it the other, so
+     * that's looked for here: a write of one kind where the other kind has changed is turned down.
+     */
+    private function turnDownIfTheOtherKindHasChanged(array $pointer, string $name, $value)
+    {
+        $key = substr($name, strlen('value:'));
+
+        $serialized = $this->fallbackWrites[$key] ?? null;
+
+        if ($value === null && $serialized === null) {
+            return null;
+        }
+
+        $theirs = @file_get_contents($this->fallback->path($key)) ?: '';
+
+        $otherKindChanged = $value !== null
+            ? isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== ''
+            : ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null) && isset($pointer[$name]);
+
+        if (! $otherKindChanged || $this->keepBoth($key, [], []) !== null) {
+            return $value;
+        }
+
+        $this->conflicted[$key] = true;
+        $this->fallbackWrites[$key] = null;
+
+        return null;
+    }
+
+    /**
+     * Two things can't be forgotten and worked out again from the content files, because nothing goes
+     * looking for them: the list of a store's indexes (an index the Stache doesn't know it has is never
+     * updated or cleared), and the duplicate ids that were found while the paths were being built (the
+     * paths are kept, so they aren't built again). Both only ever have things added to them, so two
+     * versions are both right, and are put together.
+     */
+    private function keepBoth(string $key, array $theirs, array $ours): ?array
+    {
+        if (str_ends_with($key, '::_indexes')) {
+            // As the Stache keeps it: each name once, in order.
+            $names = array_values(array_unique([...array_values($theirs), ...array_values($ours)]));
+
+            sort($names);
+
+            return $names;
+        }
+
+        if ($key === 'stache::duplicates') {
+            // [store => [id => [paths]]]
+            foreach ($ours as $store => $ids) {
+                foreach ((array) $ids as $id => $paths) {
+                    $theirs[$store][$id] = array_values(array_unique([...(array) ($theirs[$store][$id] ?? []), ...(array) $paths]));
+                }
+            }
+
+            return $theirs;
+        }
+
+        return null;
     }
 
     private function mergeKeys(array $was, array $theirs, array $ours): ?array

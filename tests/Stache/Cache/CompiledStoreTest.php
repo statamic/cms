@@ -596,6 +596,55 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
+    public function duplicate_ids_two_processes_found_are_all_kept()
+    {
+        $key = 'stache::duplicates';
+
+        $one = $this->store();
+        $two = $this->store();
+        $this->assertNull($one->get($key));
+        $this->assertNull($two->get($key));
+
+        $one->forever($key, ['entries::blog' => ['a' => ['one.md']], 'entries::pages' => ['c' => ['three.md']]]);
+        $two->forever($key, ['entries::blog' => ['a' => ['two.md'], 'b' => ['four.md']]]);
+
+        $two->persist();
+        $one->persist();
+
+        $this->assertSame([
+            'entries::blog' => ['a' => ['two.md', 'one.md'], 'b' => ['four.md']],
+            'entries::pages' => ['c' => ['three.md']],
+        ], $this->store()->get($key));
+    }
+
+    #[Test]
+    public function a_disagreement_is_remembered_whichever_way_the_value_is_kept()
+    {
+        $key = 'stache::indexes::entries::blog::date';
+
+        foreach ([[['a' => 'plain'], ['a' => Carbon::parse('2024-03-01')]], [['a' => Carbon::parse('2024-03-01')], ['a' => 'plain']]] as [$first, $second]) {
+            (new Filesystem)->deleteDirectory($this->directory);
+
+            $process = $this->store();
+            $this->assertNull($process->get($key));
+
+            tap($this->store())->forever($key, ['a' => 'saved elsewhere'])->persist();
+
+            // Turned down as one kind of value...
+            $process->forever($key, $first);
+            $process->persist();
+
+            $this->assertNull($this->store()->get($key));
+
+            // ...and so turned down as the other.
+            $process->forever($key, $second);
+            $process->persist();
+
+            $this->assertNull($this->store()->get($key));
+        }
+    }
+
+    #[Test]
     public function false_and_zero_come_back_as_they_went_in()
     {
         $store = $this->store();
