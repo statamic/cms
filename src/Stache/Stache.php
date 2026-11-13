@@ -117,6 +117,9 @@ class Stache
         Blink::forget('collection-structure-tree*');
         Blink::forget('structure-*');
 
+        // Cleared means cleared now, as it is with any other store, and not when the request ends.
+        CompiledStore::persistAll();
+
         StacheCleared::dispatch();
 
         return $this;

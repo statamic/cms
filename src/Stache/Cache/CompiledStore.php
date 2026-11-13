@@ -13,6 +13,8 @@ use WeakReference;
  * holds in shared memory, so reading them costs neither a file read nor unserializing.
  *
  * - Entries go into a number of files per collection, each returning [id => entry as an array].
+ *   How many depends on how many entries the collection had when it was built, so that
+ *   saving an entry rewrites a handful of others rather than a fixed share of them all.
  * - Plain values (indexes, paths, keys, timestamps) get a file each, returning the value.
  * - Anything else, and anything with a time to live, goes to an ordinary file store underneath.
  *
@@ -33,6 +35,8 @@ class CompiledStore implements Store
 
     private const ENTRY_PREFIX = 'stache::items::entries::';
     private const FOREVER = 9999999999;
+    private const ENTRIES_PER_FILE = 8;
+    private const MOST_FILES_PER_COLLECTION = 1024;
 
     private static array $instances = [];
 
@@ -88,12 +92,12 @@ class CompiledStore implements Store
         $this->forgetWhatWasReadIfAnotherProcessHasWritten();
 
         if ($entry = $this->entryKey($key)) {
-            [$file, $id] = $entry;
+            [$collection, $id] = $entry;
 
-            $this->see($file);
+            $this->see($file = $this->entriesFile($collection, $id));
 
-            $row = array_key_exists($id, $this->entries[$file] ?? [])
-                ? $this->entries[$file][$id]
+            $row = array_key_exists($id, $this->entries[$collection] ?? [])
+                ? $this->entries[$collection][$id]
                 : ($this->load($file)[$id] ?? null);
 
             // False marks an entry that couldn't be written as an array, and is in the file store.
@@ -129,12 +133,12 @@ class CompiledStore implements Store
     public function forever($key, $value)
     {
         if ($entry = $this->entryKey($key)) {
-            [$file, $id] = $entry;
+            [$collection, $id] = $entry;
 
             $row = is_object($value) ? ItemCodec::encode($value) : null;
 
-            $this->see($file);
-            $this->entries[$file][$id] = $row ?? false;
+            $this->see($this->entriesFile($collection, $id));
+            $this->entries[$collection][$id] = $row ?? false;
             $this->writeToFallback($key, $row === null ? $this->payload($value) : null);
 
             return true;
@@ -207,7 +211,7 @@ class CompiledStore implements Store
     {
         $this->forgetWhatWasRead();
 
-        $this->seen = array_intersect_key($this->seen, $this->entries + $this->values);
+        $this->seen = $this->entries ? $this->seen : array_intersect_key($this->seen, $this->values);
         $this->fallbackSeen = array_intersect_key($this->fallbackSeen, $this->fallbackWrites);
     }
 
@@ -237,16 +241,30 @@ class CompiledStore implements Store
             // another process may have written since this one started.
             [$read, $readFrom] = [$this->loaded, $this->pointer ?? []];
 
-            $this->forgetWhatWasRead();
+            // Read again only if another process has written. Usually none has, and
+            // what this one read is still what's there.
+            if ($this->pointer === null || $this->pointerFileDetails() !== $this->pointerWas) {
+                $this->forgetWhatWasRead();
+            }
 
             $pointer = $this->pointer();
 
             $written = [];
 
-            foreach ($this->entries as $file => $rows) {
-                $written[$file] = $this->mergeEntries($pointer, $file, $rows) ?: null;
+            foreach ($this->entries as $collection => $rows) {
+                $pointer = $this->decideHowManyFiles($pointer, $collection, $rows);
 
-                $pointer = $this->write($pointer, $file, $written[$file], 'entries');
+                $files = [];
+
+                foreach ($rows as $id => $row) {
+                    $files[$this->entriesFile($collection, $id, $pointer)][$id] = $row;
+                }
+
+                foreach ($files as $file => $rows) {
+                    $written[$file] = $this->mergeEntries($pointer, $collection, $file, $rows) ?: null;
+
+                    $pointer = $this->write($pointer, $file, $written[$file], 'entries');
+                }
             }
 
             foreach ($this->values as $name => $value) {
@@ -297,7 +315,7 @@ class CompiledStore implements Store
      * has written since this one first looked, and written differently, is left out altogether:
      * either could be the stale one, and the content file says which is right.
      */
-    private function mergeEntries(array $pointer, string $file, array $rows): array
+    private function mergeEntries(array $pointer, string $collection, string $file, array $rows): array
     {
         $theirs = $this->load($file) ?? [];
 
@@ -312,7 +330,7 @@ class CompiledStore implements Store
 
             if ($changedByAnother && $theirRow !== $row) {
                 unset($theirs[$id]);
-                $this->fallbackWrites[$this->entryCacheKey($file, $id)] = null;
+                $this->fallbackWrites[self::ENTRY_PREFIX.$collection.'::'.$id] = null;
             } elseif ($row === null) {
                 unset($theirs[$id]);
             } else {
@@ -417,20 +435,13 @@ class CompiledStore implements Store
         return $value === false ? null : $value;
     }
 
-    private function entryCacheKey(string $file, $id): string
-    {
-        $collection = substr($file, strlen('entries:'), strrpos($file, '#') - strlen('entries:'));
-
-        return self::ENTRY_PREFIX.$collection.'::'.$id;
-    }
-
     /**
      * Deletes the files nothing points at any more. One that was only just written is
      * left, since a process that read the pointer a moment ago may be about to read it.
      */
     public function collectGarbage(int $olderThanSeconds = 600): int
     {
-        $live = array_flip($this->pointer());
+        $live = array_flip(array_filter($this->pointer(), 'is_string'));
         $deleted = 0;
 
         foreach (['entries', 'values'] as $folder) {
@@ -448,9 +459,7 @@ class CompiledStore implements Store
     }
 
     /**
-     * The file an entry is kept in, and its id. A collection's entries are spread over
-     * a number of files, so that reading one entry loads a fraction of the collection,
-     * and saving one writes a fraction of it.
+     * The collection and id of an entry, from the key the Stache keeps it under.
      */
     private function entryKey(string $key): ?array
     {
@@ -464,15 +473,52 @@ class CompiledStore implements Store
             return null;
         }
 
-        $id = substr($rest, $position + 2);
+        return [substr($rest, 0, $position), substr($rest, $position + 2)];
+    }
 
-        return ['entries:'.substr($rest, 0, $position).'#'.(crc32($id) % $this->buckets), $id];
+    /**
+     * The file an entry is kept in. A collection's entries are spread over a number of
+     * files, so that reading one loads a fraction of the collection and saving one
+     * writes a fraction of it.
+     */
+    private function entriesFile(string $collection, string $id, ?array $pointer = null): string
+    {
+        $files = ($pointer ?? $this->pointer())['files:'.$collection] ?? $this->buckets;
+
+        return 'entries:'.$collection.'#'.(crc32($id) % $files);
+    }
+
+    /**
+     * Settles how many files a collection's entries are spread over, when it has none yet.
+     * That's when the collection is being built, so all of its entries are here to be counted.
+     * It then stays as it is until the collection is built again.
+     */
+    private function decideHowManyFiles(array $pointer, string $collection, array $rows): array
+    {
+        $prefix = 'entries:'.$collection.'#';
+
+        foreach ($pointer as $name => $file) {
+            if (str_starts_with($name, $prefix)) {
+                return $pointer;
+            }
+        }
+
+        $files = $this->buckets;
+        $entries = count(array_filter($rows, fn ($row) => $row !== null));
+
+        while ($files < self::MOST_FILES_PER_COLLECTION && $files * self::ENTRIES_PER_FILE < $entries) {
+            $files *= 2;
+        }
+
+        $pointer['files:'.$collection] = $files;
+
+        return $pointer;
     }
 
     private function forgetCompiled(string $key): void
     {
         if ($entry = $this->entryKey($key)) {
-            $this->see($entry[0]);
+            $this->see($this->entriesFile(...$entry));
             $this->entries[$entry[0]][$entry[1]] = null;
         } else {
             $this->see($name = 'value:'.$key);
@@ -622,6 +668,11 @@ class CompiledStore implements Store
             if ($payload === null) {
                 @unlink($path);
 
+                continue;
+            }
+
+            // Put back just as it was, which is what happens to most indexes when an entry is saved.
+            if ($payload === $theirs) {
                 continue;
             }
 

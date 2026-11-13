@@ -118,7 +118,7 @@ class CompiledStoreTest extends TestCase
 
         $pointer = json_decode(file_get_contents($this->directory.'/pointer.json'), true);
 
-        $this->assertEqualsCanonicalizing(['value:plain', 'entries:blog#'.(crc32('closure') % 32)], array_keys($pointer));
+        $this->assertEqualsCanonicalizing(['value:plain', 'files:blog', 'entries:blog#'.(crc32('closure') % 32)], array_keys($pointer));
         $this->assertSame(['a' => [1, 'two', null, false, 3.5]], include $this->directory.'/'.$pointer['value:plain']);
         $this->assertEquals(collect([1]), $this->store()->get('object'));
         $this->assertNull($this->store()->get('nothing'));
@@ -357,6 +357,86 @@ class CompiledStoreTest extends TestCase
         $stale->persist();
 
         $this->assertNull($this->store()->get($key));
+    }
+
+    #[Test]
+    public function a_collection_is_spread_over_more_files_the_more_entries_it_is_built_with()
+    {
+        $pointer = fn () => json_decode(file_get_contents($this->directory.'/pointer.json'), true);
+        $row = fn ($i) => (object) ['id' => $i];
+
+        $store = $this->store();
+
+        foreach (range(1, 40) as $i) {
+            $store->forever("stache::items::entries::small::$i", $row($i));
+        }
+
+        foreach (range(1, 600) as $i) {
+            $store->forever("stache::items::entries::large::$i", $row($i));
+        }
+
+        $store->persist();
+
+        $this->assertSame(32, $pointer()['files:small']);
+        $this->assertSame(128, $pointer()['files:large']);
+        $this->assertEquals($row(600), $this->store()->get('stache::items::entries::large::600'));
+
+        // It stays as it is while the collection is added to...
+        $another = $this->store();
+
+        foreach (range(601, 2000) as $i) {
+            $another->forever("stache::items::entries::large::$i", $row($i));
+        }
+
+        $another->persist();
+
+        $this->assertSame(128, $pointer()['files:large']);
+        $this->assertEquals($row(1), $this->store()->get('stache::items::entries::large::1'));
+        $this->assertEquals($row(2000), $this->store()->get('stache::items::entries::large::2000'));
+
+        // ...and is settled again when it's built from nothing.
+        $rebuilt = $this->store();
+
+        foreach (range(1, 2000) as $i) {
+            $rebuilt->forget("stache::items::entries::large::$i");
+        }
+
+        $rebuilt->persist();
+
+        foreach (range(1, 2000) as $i) {
+            $rebuilt->forever("stache::items::entries::large::$i", $row($i));
+        }
+
+        $rebuilt->persist();
+
+        $this->assertSame(256, $pointer()['files:large']);
+        $this->assertEquals($row(1234), $this->store()->get('stache::items::entries::large::1234'));
+        $this->assertNull($this->store()->get('stache::items::entries::large::2001'));
+    }
+
+    #[Test]
+    public function something_put_back_as_it_was_isnt_written_again()
+    {
+        $store = $this->store();
+        $store->forever('plain', ['a' => 1]);
+        $store->forever('dates', ['a' => Carbon::parse('2024-03-01')]);
+        $store->persist();
+
+        $files = fn () => collect((new Filesystem)->allFiles($this->directory))
+            ->reject(fn ($file) => $file->getFilename() === 'pointer.json')
+            ->mapWithKeys(fn ($file) => [$file->getRelativePathname() => [$file->getInode(), $file->getMTime()]])
+            ->all();
+
+        $before = $files();
+
+        sleep(1);
+
+        $again = $this->store();
+        $again->forever('plain', $again->get('plain'));
+        $again->forever('dates', $again->get('dates'));
+        $again->persist();
+
+        $this->assertSame($before, $files());
     }
 
     #[Test]
