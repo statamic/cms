@@ -326,7 +326,7 @@ class CompiledStoreTest extends TestCase
     #[Test]
     public function a_list_is_combined_position_by_position()
     {
-        $key = 'stache::indexes::entries::blog::_indexes';
+        $key = 'stache::indexes::entries::blog::positions';
 
         tap($this->store())->forever($key, ['id', 'path', 'old'])->persist();
 
@@ -503,6 +503,96 @@ class CompiledStoreTest extends TestCase
         $process->persist();
 
         $this->assertNull($this->store()->get($key));
+    }
+
+    #[Test]
+    public function after_a_disagreement_nothing_more_a_process_writes_for_that_thing_is_kept()
+    {
+        $term = 'stache::items::terms::tags::en::news';
+        $entry = 'stache::items::entries::blog::one';
+        $index = 'stache::indexes::entries::blog::title';
+
+        // None of them is there when the process first looks.
+        $process = $this->store();
+        $this->assertNull($process->get($term));
+        $this->assertNull($process->get($entry));
+        $this->assertNull($process->get($index));
+
+        $stale = $this->entry('one', 'Stale');
+        $saved = $this->entry('one', 'Saved elsewhere');
+
+        $other = $this->store();
+        $other->forever($term, (object) ['title' => 'Saved elsewhere']);
+        $other->forever($entry, $saved);
+        $other->forever($index, ['one' => 'Saved elsewhere']);
+        $other->persist();
+
+        foreach (['Stale', 'Still stale'] as $title) {
+            $process->forever($term, (object) ['title' => $title]);
+            $process->forever($entry, $stale);
+            $process->forever($index, ['one' => $title]);
+            $process->persist();
+
+            $this->assertNull($this->store()->get($term), $title);
+            $this->assertNull($this->store()->get($entry), $title);
+            $this->assertNull($this->store()->get($index), $title);
+        }
+
+        // Until it starts afresh, as it does for its next request or job.
+        $process->resetMemoizedState();
+        $process->forever($index, ['one' => 'Fresh']);
+        $process->persist();
+
+        $this->assertSame(['one' => 'Fresh'], $this->store()->get($index));
+    }
+
+    #[Test]
+    public function an_array_that_refers_to_part_of_itself_is_serialized()
+    {
+        $store = $this->store();
+        $store->forever('plain', ['a' => ['x' => 1], 'b' => ['x' => 1]]);
+        $store->persist();
+
+        $again = $this->store();
+        $value = $again->get('plain');
+        $value['b'] = &$value['a'];
+        $again->forever('plain', $value);
+        $again->persist();
+
+        $this->assertArrayNotHasKey('value:plain', json_decode(file_get_contents($this->directory.'/pointer.json'), true));
+
+        $read = $this->store()->get('plain');
+        $read['a']['x'] = 2;
+
+        $this->assertSame(2, $read['b']['x']);
+    }
+
+    #[Test]
+    public function the_list_of_a_stores_indexes_is_added_to_and_never_forgotten()
+    {
+        $key = 'stache::indexes::entries::blog::_indexes';
+
+        tap($this->store())->forever($key, ['id', 'path'])->persist();
+
+        $one = $this->store();
+        $two = $this->store();
+        $three = $this->store();
+
+        $one->forever($key, ['id', 'path', 'title']);
+        $two->forever($key, ['id', 'path', 'date']);
+        $three->forever($key, ['author', 'id', 'path']);
+
+        $two->persist();
+        $one->persist();
+        $three->persist();
+
+        $this->assertSame(['author', 'date', 'id', 'path', 'title'], $this->store()->get($key));
+
+        // And again from the one that has already had to combine its list with another's.
+        $one->forever($key, ['id', 'path', 'title', 'slug']);
+        $one->persist();
+
+        $this->assertSame(['author', 'date', 'id', 'path', 'slug', 'title'], $this->store()->get($key));
     }
 
     #[Test]
@@ -747,16 +837,6 @@ class CompiledStoreTest extends TestCase
             public function unserialize($data)
             {
                 $this->a = 2;
-            }
-
-            public function __serialize(): array
-            {
-                return ['a' => 3];
-            }
-
-            public function __unserialize(array $data): void
-            {
-                $this->a = 4;
             }
         }));
 

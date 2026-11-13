@@ -53,6 +53,7 @@ class CompiledStore implements Store
     private array $seen = [];
     private array $fallbackSeen = [];
     private array $fallbackConflicts = [];
+    private array $conflicted = [];
 
     public function __construct(private string $directory, private int $buckets = 32)
     {
@@ -149,14 +150,12 @@ class CompiledStore implements Store
         $this->see($name = 'value:'.$key);
 
         // Anything with an object in it is serialized now, as any other store would, so that it's kept
-        // as it is at this moment and whoever passed it in can go on to change it. An array is looked
-        // through for one unless it's exactly what was read from here, which is how most of a
-        // collection's indexes come back when one entry is saved. False is serialized too, since
-        // it's what reading a compiled file that has gone away looks like.
+        // as it is at this moment and whoever passed it in can go on to change it. False is serialized
+        // too, since it's what reading a compiled file that has gone away looks like.
         $serialized = null;
 
         $plain = is_array($value)
-            ? (array_key_exists($name, $this->loaded) && $this->loaded[$name] === $value) || ItemCodec::isPlain($value, $serialized)
+            ? ItemCodec::isPlain($value, $serialized)
             : is_scalar($value) && $value !== false;
 
         $this->values[$name] = $plain ? $value : null;
@@ -207,7 +206,7 @@ class CompiledStore implements Store
     public function flush()
     {
         $this->entries = $this->values = $this->loaded = $this->fallbackRead = $this->fallbackWrites = [];
-        $this->seen = $this->fallbackSeen = [];
+        $this->seen = $this->fallbackSeen = $this->conflicted = [];
         $this->pointer = [];
         $this->generation = '';
 
@@ -237,6 +236,7 @@ class CompiledStore implements Store
 
         $this->seen = $this->entries ? $this->seen : array_intersect_key($this->seen, $this->values);
         $this->fallbackSeen = array_intersect_key($this->fallbackSeen, $this->fallbackWrites);
+        $this->conflicted = [];
     }
 
     private function forgetWhatWasRead(): void
@@ -385,9 +385,15 @@ class CompiledStore implements Store
 
             $changedByAnother = $moved && (! is_array($was) || $theirRow !== ($was[$id] ?? null));
 
-            if ($changedByAnother && $theirRow !== $row) {
+            $key = self::ENTRY_PREFIX.$collection.'::'.$id;
+
+            // Once there has been a disagreement about an entry, nothing this process goes on to write for
+            // it is trusted: what it's holding is as likely to be the stale copy the second time as the first.
+            if (($changedByAnother && $theirRow !== $row) || isset($this->conflicted[$key])) {
+                $this->conflicted[$key] = true;
+
                 unset($theirs[$id]);
-                $this->fallbackWrites[self::ENTRY_PREFIX.$collection.'::'.$id] = null;
+                $this->fallbackWrites[$key] = null;
             } elseif ($row === null) {
                 unset($theirs[$id]);
             } else {
@@ -404,11 +410,31 @@ class CompiledStore implements Store
      */
     private function mergeValue(array $pointer, string $name, $ours)
     {
-        if ($ours === null || ($pointer[$name] ?? null) === ($this->seen[$name] ?? null)) {
+        if ($ours === null) {
+            return null;
+        }
+
+        if (($pointer[$name] ?? null) === ($this->seen[$name] ?? null) && ! isset($this->conflicted[$name])) {
             return $ours;
         }
 
         $theirs = $this->load($name);
+
+        // The list of a store's indexes is the one thing that can't be forgotten and worked out again:
+        // an index the Stache doesn't know it has is never updated or cleared. It's a list of names
+        // that only grows, so two versions of it are both right, and it's kept as the Stache keeps it.
+        if (str_ends_with($name, '::_indexes') && is_array($ours) && is_array($theirs)) {
+            $names = array_values(array_unique([...array_values($theirs), ...array_values($ours)]));
+
+            sort($names);
+
+            return $names;
+        }
+
+        // As with an entry: after one disagreement, nothing more this process writes is trusted.
+        if (isset($this->conflicted[$name])) {
+            return null;
+        }
 
         if ($theirs === $ours || $theirs === null) {
             return $ours;
@@ -416,11 +442,15 @@ class CompiledStore implements Store
 
         $was = $this->read($this->seen[$name] ?? null);
 
-        if (! is_array($ours) || ! is_array($theirs) || ! is_array($was ??= [])) {
-            return null;
+        $merged = is_array($ours) && is_array($theirs) && is_array($was ??= [])
+            ? $this->mergeKeys($was, $theirs, $ours)
+            : null;
+
+        if ($merged === null) {
+            $this->conflicted[$name] = true;
         }
 
-        return $this->mergeKeys($was, $theirs, $ours);
+        return $merged;
     }
 
     private function mergeKeys(array $was, array $theirs, array $ours): ?array
@@ -718,8 +748,12 @@ class CompiledStore implements Store
             // As with entries: written differently by another process since this one first looked.
             $theirs = @file_get_contents($path) ?: '';
 
-            if (isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== (string) $payload) {
+            $conflicts = isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== (string) $payload;
+
+            if (($conflicts && $payload !== null) || isset($this->conflicted[$key])) {
                 $payload = null;
+                $this->fallbackConflicts[$key] = $this->conflicted[$key] = true;
+            } elseif ($conflicts) {
                 $this->fallbackConflicts[$key] = true;
             }
 

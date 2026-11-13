@@ -86,6 +86,12 @@ class ItemCodec
             return false;
         }
 
+        // Most values have nothing in them that could even begin one, and that's quick to see.
+        if (! str_contains($serialized, 'O:') && ! str_contains($serialized, 'C:') && ! str_contains($serialized, 'E:')
+            && ! str_contains($serialized, 'R:') && ! str_contains($serialized, 'r:')) {
+            return true;
+        }
+
         // An object, an enum, or a reference to another part of the value, where one can begin.
         return ! preg_match('/(?:^|[;{])(?:[OCE]:\d+:"|[Rr]:\d+;)/', $serialized);
     }
