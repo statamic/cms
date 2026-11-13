@@ -135,6 +135,17 @@ class EntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_an_empty_collection_when_preprocessing_index_and_nothing_is_selected()
+    {
+        foreach ([null, []] as $value) {
+            $preProcessed = $this->fieldtype()->preProcessIndex($value);
+
+            $this->assertInstanceOf(Collection::class, $preProcessed);
+            $this->assertCount(0, $preProcessed);
+        }
+    }
+
+    #[Test]
     public function it_includes_drafts_when_pre_processing_for_index()
     {
         $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);

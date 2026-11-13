@@ -519,6 +519,11 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
+        // Nothing selected, so there's nothing to go looking for.
+        if (empty(Arr::wrap($values))) {
+            return $this->collect([]);
+        }
+
         // These are the entries a query for them in any status would find, so they aren't looked for a second time.
         return Entry::applySubstitutions($this->entriesInTheirSite($values)->unique->id()->values());
     }

@@ -78,6 +78,17 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function nothing_is_found_in_an_empty_list()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame([], Entry::query()->whereIn('id', [])->get()->map->id()->all());
+        $this->assertSame([], Entry::query()->whereIn('title', [])->get()->map->id()->all());
+        $this->assertSame(['id-1'], Entry::query()->where('title', 'Post 1')->orWhereIn('id', [])->get()->map->id()->all());
+        $this->assertSame(['id-1', 'id-2', 'id-3'], Entry::query()->whereNotIn('id', [])->get()->map->id()->all());
+    }
+
+    #[Test]
     public function entries_are_ordered_the_way_a_data_collection_sorts_their_values()
     {
         $values = [

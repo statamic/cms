@@ -191,6 +191,11 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereIn($values, $where)
     {
+        // Nothing can be in an empty list.
+        if (empty($where['values'])) {
+            return $values->take(0);
+        }
+
         $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
 
         return $values->filter(
