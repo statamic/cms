@@ -108,18 +108,41 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         });
     }
 
-    protected function getKeysFromCollectionsWithWheres($collections, $wheres)
+    protected function getKeysFromCollectionsWithWheres($collections, $wheres, $within = null)
     {
-        return collect($wheres)->reduce(function ($ids, $where) use ($collections) {
+        return collect($wheres)->reduce(function ($ids, $where) use ($collections, $within) {
+            // What an "and" finds is only kept where it's among the keys there are so far,
+            // so once those are few, they're all that needs looking through.
+            $among = $this->keysToLookAmong($ids, $where, $within);
+
             $keys = $where['type'] == 'Nested'
-                ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres)
-                : $this->getKeysFromCollectionsWithWhere($collections, $where);
+                ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres, $among)
+                : $this->getKeysFromCollectionsWithWhere($collections, $where, $among);
 
             return $this->intersectKeysFromWhereClause($ids, $keys, $where);
         });
     }
 
-    protected function getKeysFromCollectionsWithWhere($collections, $where)
+    private function keysToLookAmong($ids, $where, $within)
+    {
+        if (! $ids || ($where['boolean'] === 'or' && $where['type'] !== 'NotIn')) {
+            return $within;
+        }
+
+        if ($ids->count() > 250) {
+            return $within;
+        }
+
+        return $ids
+            ->mapToGroups(function ($id) {
+                [$collection, $key] = explode('::', $id, 2);
+
+                return [$collection => $key];
+            })
+            ->map(fn ($keys) => $keys->flip());
+    }
+
+    protected function getKeysFromCollectionsWithWhere($collections, $where, $within = null)
     {
         // A collection can be queried twice (e.g. by a status query), but its keys must only appear once.
         $collections = collect($collections)->unique()->values();
@@ -133,8 +156,16 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         // These filters only look at values, so each store's index can be filtered
         // before its keys are prefixed, instead of prefixing every key first.
         if (in_array($where['type'], ['Basic', 'In'])) {
-            return $collections->flatMap(function ($collection) use ($where, $method) {
+            return $collections->flatMap(function ($collection) use ($where, $method, $within) {
+                if ($within && ! $within->has($collection)) {
+                    return [];
+                }
+
                 $items = $this->store->store($collection)->index($where['column'])->items();
+
+                if ($within) {
+                    $items = $items->intersectByKeys($within[$collection]);
+                }
 
                 return $this->{$method}($items, $where)->keys()->map(fn ($key) => "{$collection}::{$key}");
             })->values();

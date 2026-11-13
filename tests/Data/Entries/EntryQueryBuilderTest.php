@@ -1700,6 +1700,65 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount($count, Entry::all());
     }
+
+    #[Test]
+    public function a_where_after_a_few_entries_have_been_found_only_looks_at_those()
+    {
+        Collection::make('posts')->save();
+        collect(range(1, 20))->each(fn ($i) => EntryFactory::id('id-'.$i)->slug('post-'.$i)->collection('posts')->data(['title' => 'Post '.$i, 'colour' => $i % 2 ? 'red' : 'blue'])->create());
+
+        $query = new CountingEntryQueryBuilder(app(\Statamic\Stache\Stache::class)->store('entries'));
+
+        $entries = $query->where('collection', 'posts')->whereIn('id', ['id-3', 'id-4', 'id-5'])->where('colour', 'red')->get();
+
+        $this->assertEquals(['id-3', 'id-5'], $entries->map->id()->all());
+        $this->assertSame(3, $query->tested);
+    }
+
+    #[Test]
+    #[DataProvider('narrowedQueryProvider')]
+    public function wheres_after_a_few_entries_have_been_found_find_what_they_would_among_all_of_them($expected, $callback)
+    {
+        Collection::make('posts')->save();
+        Collection::make('things')->save();
+        collect(range(1, 12))->each(fn ($i) => EntryFactory::id('id-'.$i)->slug('post-'.$i)->collection($i > 9 ? 'things' : 'posts')->data(['title' => 'Post '.$i, 'colour' => $i % 2 ? 'red' : 'blue', 'size' => $i % 3 ? 'big' : 'small'])->create());
+
+        $query = Entry::query()->whereIn('id', ['id-6', 'id-3', 'id-4', 'id-5', 'id-11', 'id-12']);
+
+        $this->assertEquals($expected, $callback($query)->get()->map->id()->all());
+    }
+
+    public static function narrowedQueryProvider()
+    {
+        return [
+            'and' => [['id-3', 'id-5', 'id-11'], fn ($q) => $q->where('colour', 'red')],
+            'and, and' => [['id-5', 'id-11'], fn ($q) => $q->where('colour', 'red')->where('size', 'big')],
+            'and in' => [['id-3', 'id-6', 'id-12'], fn ($q) => $q->whereIn('size', ['small'])],
+            'and not in' => [['id-4', 'id-5', 'id-11'], fn ($q) => $q->whereNotIn('size', ['small'])],
+            'and, or' => [['id-3', 'id-5', 'id-11', 'id-1'], fn ($q) => $q->where('colour', 'red')->orWhere('title', 'Post 1')],
+            'and, or, and' => [['id-3', 'id-5', 'id-11', 'id-2'], fn ($q) => $q->where('colour', 'red')->orWhere('colour', 'blue')->whereIn('title', ['Post 3', 'Post 5', 'Post 11', 'Post 2'])],
+            'and, or not in' => [['id-5', 'id-11'], fn ($q) => $q->where('colour', 'red')->orWhereNotIn('size', ['small'])],
+            'and nested' => [['id-3', 'id-4', 'id-5', 'id-11'], fn ($q) => $q->where(fn ($q) => $q->where('colour', 'red')->orWhere('title', 'Post 4')->orWhere('title', 'Post 1'))],
+            'and nested with an and inside' => [['id-5', 'id-11'], fn ($q) => $q->where(fn ($q) => $q->where('colour', 'red')->where('size', 'big'))],
+            'or nested' => [['id-3', 'id-4', 'id-5', 'id-6', 'id-11', 'id-12', 'id-1', 'id-7'], fn ($q) => $q->orWhere(fn ($q) => $q->where('colour', 'red')->where('size', 'big'))],
+            'and collection' => [['id-11', 'id-12'], fn ($q) => $q->where('collection', 'things')],
+            'and status' => [['id-3', 'id-4', 'id-5', 'id-6', 'id-11', 'id-12'], fn ($q) => $q->whereStatus('published')],
+            'and like' => [['id-11', 'id-12'], fn ($q) => $q->where('title', 'like', 'Post 1%')],
+            'ordered' => [['id-3', 'id-5', 'id-11'], fn ($q) => $q->where('colour', 'red')->orderBy('title', 'asc')],
+        ];
+    }
+}
+
+class CountingEntryQueryBuilder extends \Statamic\Stache\Query\EntryQueryBuilder
+{
+    public $tested = 0;
+
+    protected function filterTestEquals($item, $value)
+    {
+        $this->tested++;
+
+        return parent::filterTestEquals($item, $value);
+    }
 }
 
 class CustomScope extends Scope
