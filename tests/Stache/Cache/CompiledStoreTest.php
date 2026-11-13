@@ -779,6 +779,94 @@ class CompiledStoreTest extends TestCase
         $this->assertLessThan(300, count($pointer));
     }
 
+    public static function thingsThatAreOnlyAddedTo(): array
+    {
+        return [
+            'a list of indexes' => ['stache::indexes::entries::blog::_indexes', ['title'], ['title', 'slug']],
+            'duplicates' => ['stache::duplicates', ['entries::blog' => ['1' => ['a.md']]], ['entries::blog' => ['1' => ['a.md', 'b.md']]]],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('thingsThatAreOnlyAddedTo')]
+    public function something_only_ever_added_to_still_isnt_put_back_once_another_process_has_forgotten_it($key, $was, $stale)
+    {
+        foreach ([true, false] as $wasThere) {
+            $this->store()->flush();
+
+            if ($wasThere) {
+                $first = $this->store();
+                $first->forever($key, $was);
+                $first->persist();
+            }
+
+            $holder = $this->store();
+            $holder->get($key);
+            $holder->forever($key, $stale);
+
+            $forgetter = $this->store();
+            $forgetter->forget($key);
+            $forgetter->persist();
+
+            $holder->persist();
+
+            $this->assertNull($this->store()->get($key));
+        }
+    }
+
+    #[Test]
+    public function an_index_isnt_written_when_the_list_it_would_be_found_through_was_forgotten()
+    {
+        $list = 'stache::indexes::entries::blog::_indexes';
+
+        $holder = $this->store();
+        $holder->get($list);
+        $holder->forever('stache::indexes::entries::blog::title', ['a' => 'Alfa']);
+        $holder->forever('stache::indexes::entries::blog::date', ['a' => now()]);
+        $holder->forever('stache::indexes::entries::pages::title', ['b' => 'Bravo']);
+        $holder->forever($list, ['title', 'date']);
+
+        // Another process clears the store, knowing nothing of those indexes.
+        $clearer = $this->store();
+        $clearer->forget($list);
+        $clearer->persist();
+
+        $holder->persist();
+
+        $this->assertNull($this->store()->get($list));
+        $this->assertNull($this->store()->get('stache::indexes::entries::blog::title'));
+        $this->assertNull($this->store()->get('stache::indexes::entries::blog::date'));
+        $this->assertSame(['b' => 'Bravo'], $this->store()->get('stache::indexes::entries::pages::title'));
+    }
+
+    #[Test]
+    public function something_turned_down_a_second_time_shows_to_a_process_that_began_after_the_first()
+    {
+        $one = $this->store();
+        $this->assertNull($one->get('thing'));
+        $one->forever('thing', ['v' => 1]);
+
+        $two = $this->store();
+        $two->forever('thing', ['v' => 'other']);
+        $two->persist();
+
+        // Turned down, and so forgotten.
+        $one->persist();
+
+        // A third process finds nothing, and works it out...
+        $three = $this->store();
+        $this->assertNull($three->get('thing'));
+        $three->forever('thing', ['v' => 2]);
+
+        // ...before the first writes again, and is turned down again.
+        $one->forever('thing', ['v' => 3]);
+        $one->persist();
+
+        $three->persist();
+
+        $this->assertNull($this->store()->get('thing'));
+    }
+
     public static function rebuilds(): array
     {
         return [

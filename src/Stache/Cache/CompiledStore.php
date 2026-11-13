@@ -286,7 +286,7 @@ class CompiledStore implements Store
 
             $written = $combined = [];
 
-            $alreadyTurnedDown = $this->conflicted;
+            $this->turnDownIndexesWhoseListWasForgotten($pointer);
 
             foreach ($this->entries as $collection => $rows) {
                 // A collection built again by another process may be spread over a different number of
@@ -350,8 +350,8 @@ class CompiledStore implements Store
             // process that stops part way through leaves the store as it was, or as it was going to be.
             $unneeded = $this->persistFallback();
 
-            // Whatever was turned down is forgotten, as far as any other process is concerned.
-            $this->forgotten += array_diff_key($this->conflicted, $alreadyTurnedDown);
+            // Whatever was turned down is forgotten, as far as any other process is concerned,
+            // each time it happens: a process that began after the last time needs to know too.
 
             $pointer = $this->markWhatWasForgotten($pointer);
 
@@ -438,7 +438,7 @@ class CompiledStore implements Store
             // it is trusted: what it's holding is as likely to be the stale copy the second time as the first.
             // Forgetting is always safe, so it's never a disagreement.
             if (($changedByAnother && ! $agreed && $row !== null) || isset($this->conflicted[$key])) {
-                $this->conflicted[$key] = true;
+                $this->conflicted[$key] = $this->forgotten[$key] = true;
 
                 unset($theirs[$id]);
                 $this->fallbackWrites[$key] = null;
@@ -473,12 +473,16 @@ class CompiledStore implements Store
 
         $theirs = $this->load($name);
 
-        if (is_array($ours) && is_array($theirs ?? []) && ($both = $this->keepBoth($key, $theirs ?? [], $ours)) !== null) {
+        // Put together with what's there. With nothing there, another process has forgotten it, and
+        // putting back what this one had would undo that: it's turned down like anything else.
+        if (is_array($ours) && is_array($theirs) && ($both = $this->keepBoth($key, $theirs, $ours)) !== null) {
             return $both;
         }
 
         // As with an entry: after one disagreement, nothing more this process writes is trusted.
         if (isset($this->conflicted[$key])) {
+            $this->forgotten[$key] = true;
+
             return null;
         }
 
@@ -495,10 +499,43 @@ class CompiledStore implements Store
             : null;
 
         if ($merged === null) {
-            $this->conflicted[$key] = true;
+            $this->conflicted[$key] = $this->forgotten[$key] = true;
         }
 
         return $merged;
+    }
+
+    /**
+     * A store's indexes are found through the list of them. If another process has forgotten the
+     * list (clearing the store, say) it didn't know about any index this process was about to add,
+     * and writing one now would leave it where nothing would ever update it or clear it. So when
+     * the list is going to be turned down, so is every index of that store.
+     */
+    private function turnDownIndexesWhoseListWasForgotten(array $pointer): void
+    {
+        foreach ($this->values as $name => $value) {
+            if (! is_array($value) || ! str_ends_with($name, '::_indexes')) {
+                continue;
+            }
+
+            $key = substr($name, strlen('value:'));
+
+            $touched = ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null)
+                || $this->mayHaveBeenForgotten($key)
+                || isset($this->conflicted[$key]);
+
+            if (! $touched || $this->load($name) !== null) {
+                continue;
+            }
+
+            $prefix = substr($name, 0, -strlen('_indexes'));
+
+            foreach ($this->values as $other => $ignored) {
+                if (str_starts_with($other, $prefix)) {
+                    $this->conflicted[substr($other, strlen('value:'))] = true;
+                }
+            }
+        }
     }
 
     /**
@@ -527,7 +564,7 @@ class CompiledStore implements Store
             return $value;
         }
 
-        $this->conflicted[$key] = true;
+        $this->conflicted[$key] = $this->forgotten[$key] = true;
         $this->fallbackWrites[$key] = null;
 
         return null;
@@ -946,7 +983,7 @@ class CompiledStore implements Store
 
             if (($conflicts && $payload !== null) || isset($this->conflicted[$key])) {
                 $payload = null;
-                $this->fallbackConflicts[$key] = $this->conflicted[$key] = true;
+                $this->fallbackConflicts[$key] = $this->conflicted[$key] = $this->forgotten[$key] = true;
             } elseif ($conflicts) {
                 $this->fallbackConflicts[$key] = true;
             }
