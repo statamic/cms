@@ -88,6 +88,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Captcha
+    |--------------------------------------------------------------------------
+    |
+    | A captcha can be added to any form from its settings. Supported drivers
+    | are "turnstile", "hcaptcha", "recaptcha" (v2 checkbox), "recaptcha_v3"
+    | and "null". Captchas stay off until both of the keys have been set.
+    |
+    | The score and action only apply to reCAPTCHA v3. Visits scoring under
+    | the score are refused. The timeout is in seconds, and a provider that
+    | can't be reached in time counts as a failed check.
+    |
+    */
+
+    'captcha' => [
+        'driver' => env('STATAMIC_CAPTCHA_DRIVER', 'turnstile'),
+        'site_key' => env('STATAMIC_CAPTCHA_SITE_KEY'),
+        'secret_key' => env('STATAMIC_CAPTCHA_SECRET_KEY'),
+        'score' => 0.5,
+        'action' => 'submit',
+        'timeout' => 5,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Exporters
     |--------------------------------------------------------------------------
     |

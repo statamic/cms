@@ -11,6 +11,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Captcha;
 use Statamic\Facades\Form;
 use Statamic\Fields\Tab;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
@@ -92,6 +93,8 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
+        $data['captcha'] = $this->captchaWidget();
+
         $data['button_label'] = Arr::get($data['page'], 'button_label');
 
         if (! $this->isFirstPage()) {
@@ -156,7 +159,13 @@ class Tags extends BaseTags
 
         $html .= $this->formMetaFields($params);
 
-        $html .= $this->parse($data);
+        $html .= $contents = $this->parse($data);
+
+        // Templates can place the captcha themselves with {{ captcha }} or {{ form:captcha }}.
+        // When they haven't, it goes at the end of the form so it can't be forgotten.
+        if ($data['captcha'] && ! str_contains($contents, 'data-captcha')) {
+            $html .= $data['captcha'];
+        }
 
         $html = $this->runHooks('before-close', ['html' => $html, 'data' => $data])['html'];
         $html .= $this->formClose();
@@ -211,6 +220,24 @@ class Tags extends BaseTags
         }
 
         return Antlers::parse('{{ fields '.$params.' }}'.$this->content.'{{ /fields }}', $context, ! GlobalRuntimeState::$isEvaluatingUserData);
+    }
+
+    /**
+     * Maps to {{ form:captcha }}.
+     *
+     * Outputs the captcha widget, for templates that want to place it themselves.
+     *
+     * @return string
+     */
+    public function captcha()
+    {
+        if ($this->context->has('captcha') && ! $this->params->hasAny(static::HANDLE_PARAM)) {
+            return $this->context->get('captcha');
+        }
+
+        $this->getForm();
+
+        return $this->captchaWidget();
     }
 
     /**
@@ -536,6 +563,24 @@ class Tags extends BaseTags
         }
 
         return $form;
+    }
+
+    /**
+     * The captcha only goes on the last page, since that's where it's checked.
+     */
+    private function captchaWidget(): string
+    {
+        if (! $captcha = Captcha::forForm($this->form())) {
+            return '';
+        }
+
+        $pages = $this->form()->formFields()->pages();
+
+        if (Arr::get($pages->last(), 'id') !== Arr::get($this->currentPage(), 'id')) {
+            return '';
+        }
+
+        return $captcha->widget();
     }
 
     private function isFirstPage(): bool

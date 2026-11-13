@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Captcha;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormConnector;
 use Statamic\Facades\Site;
@@ -222,6 +223,27 @@ class FormsController extends CpController
                             'store' => 'equals true',
                         ],
                         'instructions' => __('statamic::messages.form_configure_honeypot_behavior_instructions'),
+                    ],
+                    'captcha' => [
+                        'display' => __('Captcha'),
+                        'type' => 'toggle',
+                        'instructions' => Captcha::enabled()
+                            ? __('statamic::messages.form_configure_captcha_instructions')
+                            : __('statamic::messages.form_configure_captcha_not_configured_instructions'),
+                    ],
+                    'captcha_behavior' => [
+                        'display' => __('Captcha Behavior'),
+                        'type' => 'button_group',
+                        'default' => 'reject',
+                        'options' => [
+                            'reject' => __('Show an Error'),
+                            'mark_as_spam' => __('Save as Spam'),
+                        ],
+                        'if' => [
+                            'captcha' => 'equals true',
+                            'store' => 'equals true',
+                        ],
+                        'instructions' => __('statamic::messages.form_configure_captcha_behavior_instructions'),
                     ],
                 ],
             ],

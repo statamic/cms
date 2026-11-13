@@ -184,6 +184,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(IconManager::class);
 
+        $this->app->singleton(\Statamic\Forms\Captcha\CaptchaManager::class, function ($app) {
+            return new \Statamic\Forms\Captcha\CaptchaManager($app);
+        });
+
         collect([
             \Statamic\Contracts\Entries\EntryRepository::class => \Statamic\Stache\Repositories\EntryRepository::class,
             \Statamic\Contracts\Taxonomies\TermRepository::class => \Statamic\Stache\Repositories\TermRepository::class,

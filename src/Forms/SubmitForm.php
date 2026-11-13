@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\Validator as FieldValidator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
+use Statamic\Contracts\Forms\Captcha as CaptchaContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
@@ -13,10 +14,13 @@ use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Captcha;
 use Statamic\Facades\Site;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class SubmitForm
 {
@@ -89,6 +93,10 @@ class SubmitForm
             if ($this->shouldFinalize($nextPage)) {
                 if (Arr::get($values, $this->form->honeypot())) {
                     $this->rejectHoneypotSubmission();
+                }
+
+                if ($captcha = Captcha::forForm($this->form)) {
+                    $this->verifyCaptcha($captcha, $data);
                 }
 
                 $accepted = FormSubmitted::dispatch($this->submission) !== false;
@@ -193,6 +201,25 @@ class SubmitForm
         }
 
         $this->rejectSpamSubmission();
+    }
+
+    private function verifyCaptcha(CaptchaContract $captcha, array $data): void
+    {
+        $token = $data[$captcha->field()] ?? null;
+
+        if ($captcha->verify(is_string($token) ? $token : null, request()->ip())) {
+            return;
+        }
+
+        if ($this->form->store() && $this->form->get('captcha_behavior', 'reject') === 'mark_as_spam') {
+            $this->submission->markAsSpam();
+
+            $this->rejectSpamSubmission();
+        }
+
+        throw ValidationException::withMessages([
+            'captcha' => $this->withLocale($this->site()?->lang(), fn () => __('statamic::validation.captcha')),
+        ]);
     }
 
     private function rejectSpamSubmission(): void
