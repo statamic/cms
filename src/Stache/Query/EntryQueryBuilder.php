@@ -16,6 +16,7 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected $collections = [];
     protected $nested = false;
+    private $lookingAmong;
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -108,19 +109,25 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         });
     }
 
-    protected function getKeysFromCollectionsWithWheres($collections, $wheres, $within = null)
+    protected function getKeysFromCollectionsWithWheres($collections, $wheres)
     {
-        return collect($wheres)->reduce(function ($ids, $where) use ($collections, $within) {
-            // What an "and" finds is only kept where it's among the keys there are so far,
-            // so once those are few, they're all that needs looking through.
-            $among = $this->keysToLookAmong($ids, $where, $within);
+        $within = $this->lookingAmong;
 
-            $keys = $where['type'] == 'Nested'
-                ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres, $among)
-                : $this->getKeysFromCollectionsWithWhere($collections, $where, $among);
+        try {
+            return collect($wheres)->reduce(function ($ids, $where) use ($collections, $within) {
+                // What an "and" finds is only kept where it's among the keys there are so far,
+                // so once those are few, they're all that needs looking through.
+                $this->lookingAmong = $this->keysToLookAmong($ids, $where, $within);
 
-            return $this->intersectKeysFromWhereClause($ids, $keys, $where);
-        });
+                $keys = $where['type'] == 'Nested'
+                    ? $this->getKeysFromCollectionsWithWheres($collections, $where['query']->wheres)
+                    : $this->getKeysFromCollectionsWithWhere($collections, $where);
+
+                return $this->intersectKeysFromWhereClause($ids, $keys, $where);
+            });
+        } finally {
+            $this->lookingAmong = $within;
+        }
     }
 
     private function keysToLookAmong($ids, $where, $within)
@@ -142,8 +149,10 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
             ->map(fn ($keys) => $keys->flip());
     }
 
-    protected function getKeysFromCollectionsWithWhere($collections, $where, $within = null)
+    protected function getKeysFromCollectionsWithWhere($collections, $where)
     {
+        $within = $this->lookingAmong;
+
         // A collection can be queried twice (e.g. by a status query), but its keys must only appear once.
         $collections = collect($collections)->unique()->values();
 
