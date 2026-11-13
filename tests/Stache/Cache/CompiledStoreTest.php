@@ -118,7 +118,7 @@ class CompiledStoreTest extends TestCase
 
         $pointer = json_decode(file_get_contents($this->directory.'/pointer.json'), true);
 
-        $this->assertEqualsCanonicalizing(['value:plain', 'files:blog', 'entries:blog#'.(crc32('closure') % 32)], array_keys($pointer));
+        $this->assertEqualsCanonicalizing(['generation', 'value:plain', 'files:blog', 'entries:blog#'.(crc32('closure') % 32)], array_keys($pointer));
         $this->assertSame(['a' => [1, 'two', null, false, 3.5]], include $this->directory.'/'.$pointer['value:plain']);
         $this->assertEquals(collect([1]), $this->store()->get('object'));
         $this->assertNull($this->store()->get('nothing'));
@@ -433,7 +433,7 @@ class CompiledStoreTest extends TestCase
         $store->persist();
 
         $files = fn () => collect((new Filesystem)->allFiles($this->directory))
-            ->reject(fn ($file) => in_array($file->getFilename(), ['pointer.json', 'generation']))
+            ->reject(fn ($file) => $file->getFilename() === 'pointer.json')
             ->mapWithKeys(fn ($file) => [$file->getRelativePathname() => [$file->getInode(), $file->getMTime()]])
             ->all();
 
@@ -478,6 +478,34 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
+    public function a_second_write_of_something_serialized_is_still_compared_with_what_it_first_saw()
+    {
+        $key = 'stache::items::terms::tags::en::news';
+
+        tap($this->store())->forever($key, (object) ['title' => 'First'])->persist();
+
+        // A process reads a term and holds on to it...
+        $process = $this->store();
+        $held = $process->get($key);
+
+        // ...another process saves it...
+        tap($this->store())->forever($key, (object) ['title' => 'Saved elsewhere'])->persist();
+
+        // ...and the first writes what it's holding, twice. Neither write is to be trusted.
+        $held->title = 'Stale';
+        $process->forever($key, $held);
+        $process->persist();
+
+        $this->assertNull($this->store()->get($key));
+
+        $held->title = 'Still stale';
+        $process->forever($key, $held);
+        $process->persist();
+
+        $this->assertNull($this->store()->get($key));
+    }
+
+    #[Test]
     public function false_and_zero_come_back_as_they_went_in()
     {
         $store = $this->store();
@@ -499,11 +527,15 @@ class CompiledStoreTest extends TestCase
         $store = $this->store();
         $store->forever('dates', $dates = ['a' => Carbon::parse('2024-03-01')->toMutable()]);
 
+        $store->forever('nested', $nested = ['a' => ['b' => ['c' => Carbon::parse('2024-03-01')->toMutable()]]]);
+
         $dates['a']->addYear();
+        $nested['a']['b']['c']->addYear();
 
         $store->persist();
 
         $this->assertSame('2024-03-01', $this->store()->get('dates')['a']->format('Y-m-d'));
+        $this->assertSame('2024-03-01', $this->store()->get('nested')['a']['b']['c']->format('Y-m-d'));
     }
 
     #[Test]
@@ -521,6 +553,27 @@ class CompiledStoreTest extends TestCase
 
         $this->assertSame(2, $this->store()->get('hits'));
         $this->assertEqualsWithDelta(time() + 60, (int) substr(file_get_contents($path), 0, 10), 2);
+    }
+
+    #[Test]
+    public function a_process_stopped_before_it_replaced_the_pointer_leaves_the_store_as_it_was()
+    {
+        $store = $this->store();
+        $store->forever('one', ['version' => 1]);
+        $store->persist();
+
+        $pointer = file_get_contents($this->directory.'/pointer.json');
+
+        // Everything a second write does, and then the pointer put back: as if it never got that far.
+        $writer = $this->store();
+        $writer->forever('one', ['version' => 2]);
+        $writer->persist();
+        file_put_contents($this->directory.'/pointer.json', $pointer);
+
+        usleep(15000);
+
+        $this->assertSame(['version' => 1], $store->get('one'));
+        $this->assertSame(['version' => 1], $this->store()->get('one'));
     }
 
     #[Test]
@@ -674,6 +727,36 @@ class CompiledStoreTest extends TestCase
             public function __wakeup()
             {
                 $this->a = 2;
+            }
+        }));
+
+        $this->assertNull(ItemCodec::encode(new class implements \Serializable
+        {
+            public $a = 1;
+
+            public function __sleep()
+            {
+                return ['a'];
+            }
+
+            public function serialize()
+            {
+                return 'custom';
+            }
+
+            public function unserialize($data)
+            {
+                $this->a = 2;
+            }
+
+            public function __serialize(): array
+            {
+                return ['a' => 3];
+            }
+
+            public function __unserialize(array $data): void
+            {
+                $this->a = 4;
             }
         }));
 

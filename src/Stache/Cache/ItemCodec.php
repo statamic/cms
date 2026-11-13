@@ -5,6 +5,7 @@ namespace Statamic\Stache\Cache;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use ReflectionClass;
+use Serializable;
 use Throwable;
 
 /**
@@ -99,6 +100,7 @@ class ItemCodec
         static $classes = [];
 
         return $classes[get_class($item)] ??= method_exists($item, '__sleep')
+            && ! $item instanceof Serializable
             && ! method_exists($item, '__serialize')
             && ! method_exists($item, '__unserialize')
             && ! method_exists($item, '__wakeup');

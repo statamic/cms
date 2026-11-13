@@ -37,6 +37,7 @@ class CompiledStore implements Store
     private const FOREVER = 9999999999;
     private const ENTRIES_PER_FILE = 8;
     private const MOST_FILES_PER_COLLECTION = 1024;
+    private const GENERATION_LENGTH = 40;
 
     private static array $instances = [];
 
@@ -51,6 +52,7 @@ class CompiledStore implements Store
     private int $generationCheckedAt = 0;
     private array $seen = [];
     private array $fallbackSeen = [];
+    private array $fallbackConflicts = [];
 
     public function __construct(private string $directory, private int $buckets = 32)
     {
@@ -144,19 +146,21 @@ class CompiledStore implements Store
             return true;
         }
 
-        // Whether it can be written as PHP is left until it's written. The Stache puts every index of a
-        // collection back when one entry is saved, and most of them turn out not to need writing at all.
         $this->see($name = 'value:'.$key);
 
-        // An object is serialized now, as any other store would, so that it's kept as it is at
-        // this moment and whoever passed it in can go on to change it.
-        // The same goes for an array with objects in it, like an index of dates. False is kept
-        // that way too, since it's what reading a compiled file that has gone away looks like.
-        $serialize = $value === null || $value === false || is_object($value)
-            || (is_array($value) && array_filter($value, 'is_object'));
+        // Anything with an object in it is serialized now, as any other store would, so that it's kept
+        // as it is at this moment and whoever passed it in can go on to change it. An array is looked
+        // through for one unless it's exactly what was read from here, which is how most of a
+        // collection's indexes come back when one entry is saved. False is serialized too, since
+        // it's what reading a compiled file that has gone away looks like.
+        $serialized = null;
 
-        $this->values[$name] = $serialize ? null : $value;
-        $this->writeToFallback($key, $serialize ? $this->payload($value) : null);
+        $plain = is_array($value)
+            ? (array_key_exists($name, $this->loaded) && $this->loaded[$name] === $value) || ItemCodec::isPlain($value, $serialized)
+            : is_scalar($value) && $value !== false;
+
+        $this->values[$name] = $plain ? $value : null;
+        $this->writeToFallback($key, $plain ? null : self::FOREVER.($serialized ?? serialize($value)));
 
         return true;
     }
@@ -299,11 +303,6 @@ class CompiledStore implements Store
                     continue;
                 }
 
-                if ($value !== null && ! ItemCodec::isPlain($value, $serialized)) {
-                    $this->fallbackWrites[substr($name, strlen('value:'))] = self::FOREVER.($serialized ?? serialize($value));
-                    $value = null;
-                }
-
                 $combined[$name] = $value !== null && ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null);
 
                 $written[$name] = $this->mergeValue($pointer, $name, $value);
@@ -315,8 +314,9 @@ class CompiledStore implements Store
             // process that stops part way through leaves the store as it was, or as it was going to be.
             $unneeded = $this->persistFallback();
 
-            $this->writeAtomically($this->directory.'/pointer.json', json_encode($pointer, JSON_UNESCAPED_SLASHES));
-            $this->writeAtomically($this->directory.'/generation', $generation = bin2hex(random_bytes(8)));
+            $pointer = ['generation' => bin2hex(random_bytes(8))] + array_diff_key($pointer, ['generation' => true]);
+
+            $this->writeAtomically($this->directory.'/pointer.json', $json = json_encode($pointer, JSON_UNESCAPED_SLASHES));
 
             array_map(fn ($path) => @unlink($path), $unneeded);
 
@@ -335,12 +335,12 @@ class CompiledStore implements Store
                 }
             }
 
-            foreach ($this->fallbackWrites as $key => $payload) {
+            foreach (array_diff_key($this->fallbackWrites, $this->fallbackConflicts) as $key => $payload) {
                 $this->fallbackSeen[$key] = hash('xxh3', (string) $payload);
             }
 
             $this->pointer = $pointer;
-            $this->generation = $generation;
+            $this->generation = substr($json, 0, self::GENERATION_LENGTH);
             $this->entries = $this->values = $this->fallbackRead = $this->fallbackWrites = [];
         } finally {
             $this->unlock($lock);
@@ -578,10 +578,9 @@ class CompiledStore implements Store
     private function pointer(): array
     {
         if ($this->pointer === null) {
-            $this->generation = $this->currentGeneration();
+            $contents = (string) @file_get_contents($this->directory.'/pointer.json');
 
-            $contents = @file_get_contents($this->directory.'/pointer.json');
-
+            $this->generation = substr($contents, 0, self::GENERATION_LENGTH);
             $this->pointer = $contents ? json_decode($contents, true) : [];
         }
 
@@ -589,9 +588,9 @@ class CompiledStore implements Store
     }
 
     /**
-     * Every write ends by giving the store a new generation, so reading that one small file says
-     * whether another process has written anything. It's read no more than a hundred times a second,
-     * which costs a request nothing, and means a process that runs for a long time is never far behind.
+     * Every write ends by replacing the pointer file, which begins differently each time, so reading the
+     * start of it says whether another process has written anything. It's read no more than a hundred times
+     * a second, which costs a request nothing, and means a process that runs for a long time is never far behind.
      */
     private function forgetWhatWasReadIfAnotherProcessHasWritten(): void
     {
@@ -606,9 +605,12 @@ class CompiledStore implements Store
         }
     }
 
+    /**
+     * The pointer file begins with something that is different every time it's written.
+     */
     private function currentGeneration(): string
     {
-        return (string) @file_get_contents($this->directory.'/generation');
+        return (string) @file_get_contents($this->directory.'/pointer.json', false, null, 0, self::GENERATION_LENGTH);
     }
 
     private function load(string $name)
@@ -708,7 +710,7 @@ class CompiledStore implements Store
      */
     private function persistFallback(): array
     {
-        $unneeded = [];
+        $unneeded = $this->fallbackConflicts = [];
 
         foreach ($this->fallbackWrites as $key => $payload) {
             $path = $this->fallback->path($key);
@@ -717,7 +719,8 @@ class CompiledStore implements Store
             $theirs = @file_get_contents($path) ?: '';
 
             if (isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== (string) $payload) {
-                $payload = $this->fallbackWrites[$key] = null;
+                $payload = null;
+                $this->fallbackConflicts[$key] = true;
             }
 
             if ($payload === null) {
