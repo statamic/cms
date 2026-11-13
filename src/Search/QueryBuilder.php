@@ -16,6 +16,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
     protected $query;
     protected $index;
     protected $withData = true;
+    protected bool $naturalLanguage = false;
 
     public function __construct(Index $index)
     {
@@ -41,6 +42,18 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $this->withData = false;
 
         return $this;
+    }
+
+    public function naturalLanguage(bool $enabled = true)
+    {
+        $this->naturalLanguage = $enabled;
+
+        return $this;
+    }
+
+    public function naturalLanguageParams(): array
+    {
+        return [];
     }
 
     public function get($columns = ['*'])

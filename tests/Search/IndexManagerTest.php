@@ -7,6 +7,8 @@ use Statamic\Facades\Site;
 use Statamic\Search\Comb\Index as CombIndex;
 use Statamic\Search\IndexManager;
 use Statamic\Search\Null\NullIndex;
+use Statamic\Search\Typesense\Index as TypesenseIndex;
+use Tests\Search\Typesense\FakeHttpClient;
 use Tests\TestCase;
 
 class IndexManagerTest extends TestCase
@@ -125,5 +127,70 @@ class IndexManagerTest extends TestCase
             'driver' => 'local',
             'searchables' => ['collections:pages', 'collections:blog'],
         ], $manager->index('cp')->config());
+    }
+
+    #[Test]
+    public function it_builds_a_typesense_driver()
+    {
+        config([
+            'statamic.search.indexes.typesense' => [
+                'driver' => 'typesense',
+                'searchables' => [],
+                'fields' => ['title'],
+            ],
+            'statamic.search.drivers.typesense' => [
+                'credentials' => [
+                    'api_key' => 'admin-key',
+                    'search_only_api_key' => 'search-key',
+                ],
+                'nodes' => [
+                    [
+                        'host' => 'typesense.test',
+                        'port' => '8108',
+                        'protocol' => 'http',
+                    ],
+                ],
+                'client' => [
+                    'client' => new FakeHttpClient,
+                    'num_retries' => 0,
+                    'randomize_nodes' => false,
+                ],
+            ],
+        ]);
+
+        $manager = new IndexManager($this->app);
+
+        $this->assertInstanceOf(TypesenseIndex::class, $manager->index('typesense'));
+    }
+
+    #[Test]
+    public function it_accepts_the_rad_pack_typesense_client_configuration()
+    {
+        config([
+            'statamic.search.indexes.typesense' => [
+                'driver' => 'typesense',
+                'searchables' => [],
+                'fields' => ['title'],
+            ],
+            'statamic.search.drivers.typesense' => [
+                'client' => [
+                    'api_key' => 'admin-key',
+                    'nodes' => [
+                        [
+                            'host' => 'typesense.test',
+                            'port' => '8108',
+                            'protocol' => 'http',
+                        ],
+                    ],
+                    'client' => new FakeHttpClient,
+                    'num_retries' => 0,
+                    'randomize_nodes' => false,
+                ],
+            ],
+        ]);
+
+        $manager = new IndexManager($this->app);
+
+        $this->assertInstanceOf(TypesenseIndex::class, $manager->index('typesense'));
     }
 }
