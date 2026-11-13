@@ -644,7 +644,7 @@ class Bard extends Replicator
             'existing' => $existing,
             'new' => $new ?? null,
             'defaults' => $defaults ?? null,
-            'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
+            'collapsed' => $this->initialCollapsedSetIds($existing),
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkData' => (object) $this->getLinkData($value),

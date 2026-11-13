@@ -1,3 +1,9 @@
 /* ==========================================================================
    REPLICATOR FIELDTYPE
    ========================================================================== */
+
+/* Collapse set bodies to header bars while dragging so swaps only relayout
+   header-height rows instead of full expanded field trees. */
+.replicator-dragging [data-replicator-set] > [data-set-body] {
+    display: none;
+}

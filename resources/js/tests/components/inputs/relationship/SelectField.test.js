@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils';
-import { describe, expect, test, vi } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { describe, expect, test, vi, beforeEach } from 'vitest';
 
 vi.mock('@inertiajs/vue3', () => ({
     router: { on: () => () => {} },
@@ -17,16 +17,28 @@ const stubs = {
     StatusIndicator: true,
 };
 
-function mountSelectField({ items = [], config = {} } = {}) {
+function deferred() {
+    let resolve, reject;
+    const promise = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+    return { promise, resolve, reject };
+}
+
+function mountSelectField({ items = [], config = {}, axiosGet, url = '/test/select-field', site } = {}) {
     return mount(SelectField, {
         props: {
             items,
-            url: '/test/select-field',
+            url,
             config,
+            site,
         },
         global: {
             mocks: {
-                $axios: { get: () => Promise.resolve({ data: { data: [] } }) },
+                $axios: {
+                    get: axiosGet || (() => Promise.resolve({ data: { data: [] } })),
+                },
             },
             stubs,
         },
@@ -65,6 +77,73 @@ describe('SelectField searchKeys', () => {
         const wrapper = mountSelectField({ config: { type: 'entries' } });
 
         expect(wrapper.vm.searchKeys).toBeNull();
+
+        wrapper.unmount();
+    });
+});
+
+describe('SelectField options request deduplication', () => {
+    beforeEach(() => {
+        // Force a unique url per test so module-level caches from prior tests don't interfere.
+    });
+
+    test('shares a single in-flight request across instances with the same cache key', async () => {
+        const d = deferred();
+        const get = vi.fn(() => d.promise);
+        const url = '/test/select-inflight-' + Math.random();
+
+        const a = mountSelectField({ axiosGet: get, url });
+        const b = mountSelectField({ axiosGet: get, url });
+
+        await flushPromises();
+        expect(get).toHaveBeenCalledTimes(1);
+
+        d.resolve({ data: { data: [{ id: '1', title: 'One' }] } });
+        await flushPromises();
+
+        expect(a.vm.options).toEqual([{ id: '1', title: 'One' }]);
+        expect(b.vm.options).toEqual([{ id: '1', title: 'One' }]);
+
+        a.unmount();
+        b.unmount();
+    });
+
+    test('reuses settled options for a later instance without a second request', async () => {
+        const d = deferred();
+        const get = vi.fn(() => d.promise);
+        const url = '/test/select-settled-' + Math.random();
+
+        const a = mountSelectField({ axiosGet: get, url });
+        await flushPromises();
+        expect(get).toHaveBeenCalledTimes(1);
+
+        d.resolve({ data: { data: [{ id: '1', title: 'One' }] } });
+        await flushPromises();
+
+        const b = mountSelectField({ axiosGet: get, url });
+        await flushPromises();
+
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(b.vm.options).toEqual([{ id: '1', title: 'One' }]);
+        expect(b.vm.requested).toBe(true);
+
+        a.unmount();
+        b.unmount();
+    });
+
+    test('does not re-request when the parent re-renders without a site/url change', async () => {
+        const get = vi.fn(() => Promise.resolve({ data: { data: [{ id: '1', title: 'One' }] } }));
+        const url = '/test/select-rerender-' + Math.random();
+
+        const wrapper = mountSelectField({ axiosGet: get, url, site: 'default' });
+        await flushPromises();
+        expect(get).toHaveBeenCalledTimes(1);
+
+        // Re-evaluate the parameters computed (fresh object identity) without changing cacheKey.
+        await wrapper.vm.$forceUpdate();
+        await flushPromises();
+
+        expect(get).toHaveBeenCalledTimes(1);
 
         wrapper.unmount();
     });

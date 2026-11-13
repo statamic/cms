@@ -214,26 +214,26 @@ describe('RelationshipInput in-flight request deduplication', () => {
         await expect(d.promise).rejects.toMatchObject({ __CANCEL__: true });
     });
 
-    test('cache entry clears after settle so a later identical request fires fresh', async () => {
+    test('reuses settled responses for later identical requests', async () => {
         const d1 = deferred();
-        const d2 = deferred();
-        const post = vi.fn().mockReturnValueOnce(d1.promise).mockReturnValueOnce(d2.promise);
+        const post = vi.fn().mockReturnValueOnce(d1.promise);
 
-        const a = mountInput({ axiosPost: post, itemDataUrl: '/test/dedup-cleanup' });
+        const a = mountInput({ axiosPost: post, itemDataUrl: '/test/settled-reuse' });
         a.vm.getDataForSelections(['1']);
         await flushPromises();
         expect(post).toHaveBeenCalledTimes(1);
 
-        d1.resolve({ data: { data: [] } });
+        d1.resolve({ data: { data: [{ id: '1' }] } });
         await flushPromises();
 
-        const b = mountInput({ axiosPost: post, itemDataUrl: '/test/dedup-cleanup' });
+        const b = mountInput({ axiosPost: post, itemDataUrl: '/test/settled-reuse' });
         b.vm.getDataForSelections(['1']);
         await flushPromises();
-        expect(post).toHaveBeenCalledTimes(2);
 
-        d2.resolve({ data: { data: [] } });
-        await flushPromises();
+        // Settled cache — no second network request.
+        expect(post).toHaveBeenCalledTimes(1);
+        expect(b.emitted('item-data-updated')).toBeTruthy();
+        expect(b.emitted('item-data-updated')[0]).toEqual([[{ id: '1' }]]);
 
         a.unmount();
         b.unmount();
