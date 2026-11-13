@@ -1755,6 +1755,30 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertEquals(['b'], $query->where('thing', 'red')->get()->map->id()->all());
     }
+
+    #[Test]
+    public function the_pattern_for_a_like_is_worked_out_once_for_all_the_entries_it_is_tested_against()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        \Statamic\Facades\Pattern::partialMock()->shouldReceive('sqlLikeToRegex')->with('%post 1%')->once()->passthru();
+
+        $this->assertEquals(['Post 1'], Entry::query()->where('title', 'like', '%post 1%')->get()->map->title->all());
+    }
+
+    #[Test]
+    public function each_like_in_a_query_looks_for_its_own_thing()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()
+            ->where('title', 'like', 'post%')
+            ->where('title', 'not like', '%2')
+            ->where(fn ($query) => $query->where('title', 'like', '%1')->orWhere('title', 'like', '%3'))
+            ->get();
+
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
 }
 
 class CaseSensitiveEntryQueryBuilder extends \Statamic\Stache\Query\EntryQueryBuilder
