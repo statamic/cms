@@ -96,6 +96,18 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function a_config_value_holding_a_component_tag_still_goes_through_antlers()
+    {
+        config(['app.name' => 'before <s:the_tag /> after']);
+
+        $parser = \Mockery::mock(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class);
+        $parser->shouldReceive('parse')->once()->withArgs(fn ($value) => $value === 'before <s:the_tag /> after')->andReturn('parsed');
+        $this->app->instance(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class, $parser);
+
+        $this->assertSame(['name' => 'parsed'], (new Site('en', []))->resolveAntlers(['name' => '{{ config:app.name }}']));
+    }
+
+    #[Test]
     public function a_value_that_is_only_config_is_resolved_without_antlers()
     {
         config(['app.name' => 'My Site', 'app.url' => 'https://example.com']);
