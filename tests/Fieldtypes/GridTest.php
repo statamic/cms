@@ -642,4 +642,14 @@ class GridTest extends TestCase
         $this->assertEquals('test.-1.words', $value['new']['words']['fieldPathPrefix']);
         $this->assertEquals('test.-1.words', $value['defaults']['words']);
     }
+
+    #[Test]
+    public function it_preprocesses_for_the_index_without_the_contents()
+    {
+        $fieldtype = new Grid;
+
+        $this->assertSame([['id' => 'a'], []], $fieldtype->preProcessIndex([['id' => 'a', 'words' => 'Hello'], ['words' => 'Hi']]));
+        $this->assertNull($fieldtype->preProcessIndex(null));
+        $this->assertSame('not an array', $fieldtype->preProcessIndex('not an array'));
+    }
 }

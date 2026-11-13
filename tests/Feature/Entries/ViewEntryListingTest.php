@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Entries\Collection;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -89,5 +91,49 @@ class ViewEntryListingTest extends TestCase
         ];
 
         $this->assertEquals($expected, $entries->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function it_only_lists_the_ids_and_types_of_replicator_sets_and_grid_rows()
+    {
+        $collection = tap(Collection::make('test'))->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'sets' => ['type' => 'replicator', 'listable' => true, 'sets' => ['main' => ['sets' => [
+                'text' => ['fields' => [['handle' => 'words', 'field' => ['type' => 'text']]]],
+            ]]]],
+            'rows' => ['type' => 'grid', 'listable' => true, 'fields' => [
+                ['handle' => 'words', 'field' => ['type' => 'text']],
+            ]],
+        ])->setHandle('test');
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([$blueprint]));
+
+        EntryFactory::collection($collection)->slug('one')->data([
+            'sets' => [
+                ['id' => 'set-a', 'type' => 'text', 'words' => 'Lots of words'],
+                ['id' => 'set-b', 'type' => 'text', 'words' => 'More words', 'enabled' => false],
+            ],
+            'rows' => [
+                ['id' => 'row-a', 'words' => 'Lots of words'],
+                ['id' => 'row-b', 'words' => 'More words'],
+                ['id' => 'row-c', 'words' => 'Even more words'],
+            ],
+        ])->create();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->get(cp_route('collections.entries.index', ['collection' => 'test', 'columns' => 'title,sets,rows']))
+            ->assertOk();
+
+        $entry = $response->json('data.0');
+
+        $this->assertSame([
+            ['id' => 'set-a', 'type' => 'text'],
+            ['id' => 'set-b', 'type' => 'text', 'enabled' => false],
+        ], $entry['sets']);
+
+        $this->assertSame([['id' => 'row-a'], ['id' => 'row-b'], ['id' => 'row-c']], $entry['rows']);
     }
 }
