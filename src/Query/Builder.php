@@ -28,7 +28,6 @@ abstract class Builder implements Contract
     protected $offset = 0;
     protected $wheres = [];
     protected $with = [];
-    private $likePatterns = [];
     protected $orderBys = [];
     protected $operators = [
         '=' => 'Equals',
@@ -43,6 +42,7 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+    protected $likePatterns = [];
 
     public function __call($method, $args)
     {
