@@ -329,6 +329,50 @@ class PageTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_a_hardcoded_link_to_an_entry()
+    {
+        // The navigation blueprint can use a link field for the url, which stores entry references.
+        Collections::make('pages')->routes('{slug}')->save();
+        EntryFactory::collection('pages')->id('123')->slug('contact')->create();
+
+        $nav = $this->mock(Nav::class);
+        $nav->shouldReceive('canSelectAcrossSites')->andReturnFalse();
+
+        $tree = $this->newTree()->setStructure($nav);
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setUrl('entry::123');
+
+        $this->assertEquals('/contact', $page->uri());
+        $this->assertEquals('/contact', $page->url());
+        $this->assertEquals('/contact', $page->urlWithoutRedirect());
+        $this->assertEquals('http://localhost/contact', $page->absoluteUrl());
+        $this->assertEquals('http://localhost/contact', $page->absoluteUrlWithoutRedirect());
+        $this->assertEquals('entry::123', $page->customUrl());
+        $this->assertTrue($page->hasCustomUrl());
+    }
+
+    #[Test]
+    public function a_hardcoded_link_to_a_missing_entry_has_no_url()
+    {
+        $nav = $this->mock(Nav::class);
+        $nav->shouldReceive('canSelectAcrossSites')->andReturnFalse();
+
+        $tree = $this->newTree()->setStructure($nav);
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setUrl('entry::unknown');
+
+        $this->assertNull($page->uri());
+        $this->assertNull($page->url());
+        $this->assertNull($page->urlWithoutRedirect());
+        $this->assertNull($page->absoluteUrl());
+        $this->assertNull($page->absoluteUrlWithoutRedirect());
+    }
+
+    #[Test]
     public function it_gets_the_uri_of_a_hardcoded_text_only_page()
     {
         $tree = $this->newTree()->setStructure(
