@@ -61,6 +61,58 @@ class SiteTest extends TestCase
     }
 
     #[Test]
+    public function config_values_come_out_the_same_whether_or_not_antlers_is_needed_for_them()
+    {
+        config([
+            'app.name' => 'A <?php echo 1; ?> & <b>B</b> é',
+            'app.other' => 'has {{ config:app.locale }} in it',
+            'app.at' => 'me@example.com',
+            'app.n' => 5,
+            'app.empty' => '',
+            'app.locale' => 'en',
+        ]);
+
+        $resolved = (new Site('en', []))->resolveAntlers([
+            'a' => '{{ config:app.name }}',
+            'b' => '{{ config:app.other }}',
+            'c' => '{{ config:app.at }}',
+            'd' => 'x {{ config:app.n }} y',
+            'e' => '{{ config:app.empty }}',
+            'f' => '{{ config:app.missing }}',
+            'g' => '  {{ config:app:n }}  ',
+            'h' => "{{ config:app.n }}\n",
+        ]);
+
+        $this->assertSame([
+            'a' => 'A &lt;?php echo 1; ?> & <b>B</b> é',
+            'b' => 'has en in it',
+            'c' => 'me@example.com',
+            'd' => 'x 5 y',
+            'e' => '',
+            'f' => '',
+            'g' => '  5  ',
+            'h' => "5\n",
+        ], $resolved);
+    }
+
+    #[Test]
+    public function a_value_that_is_only_config_is_resolved_without_antlers()
+    {
+        config(['app.name' => 'My Site', 'app.url' => 'https://example.com']);
+
+        $this->app->bind(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class, function () {
+            $this->fail('Antlers was asked to parse a value with nothing left in it to parse.');
+        });
+
+        $resolved = (new Site('en', []))->resolveAntlers([
+            'name' => '{{ config:app.name }}',
+            'url' => '{{ config:app.url }}/fr/',
+        ]);
+
+        $this->assertSame(['name' => 'My Site', 'url' => 'https://example.com/fr/'], $resolved);
+    }
+
+    #[Test]
     public function sanitizes_php_tags_in_config_values()
     {
         $site = new Site('en', ['name' => '<?php echo "hacked"; ?>']);
