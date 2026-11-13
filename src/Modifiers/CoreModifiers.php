@@ -345,6 +345,7 @@ class CoreModifiers extends Modifier
         return (new Augmentor(new Bard()))->augment($items);
     }
 
+    #[AcceptsNull]
     public function boolString($value)
     {
         if ($value == true) {
@@ -1296,6 +1297,7 @@ class CoreModifiers extends Modifier
      *
      * @return bool
      */
+    #[AcceptsNull]
     public function isBlank($value)
     {
         return Stringy::isBlank($value);
@@ -2802,6 +2804,7 @@ class CoreModifiers extends Modifier
      *
      * @return string
      */
+    #[AcceptsNull]
     public function toJson($value, $params)
     {
         $options = 0;
