@@ -28,6 +28,7 @@ abstract class Builder implements Contract
     protected $offset = 0;
     protected $wheres = [];
     protected $with = [];
+    private $likePatterns = [];
     protected $orderBys = [];
     protected $operators = [
         '=' => 'Equals',
@@ -816,7 +817,10 @@ abstract class Builder implements Contract
             $item = json_encode($item);
         }
 
-        $pattern = Pattern::sqlLikeToRegex($like);
+        // What's being looked for is the same for every item, so its pattern is only worked out for the first.
+        $pattern = is_string($like)
+            ? $this->likePatterns[$like] ??= Pattern::sqlLikeToRegex($like)
+            : Pattern::sqlLikeToRegex($like);
 
         return preg_match('/'.$pattern.'/imu', (string) $item);
     }
