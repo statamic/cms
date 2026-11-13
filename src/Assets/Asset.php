@@ -8,6 +8,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\UnableToRetrieveMetadata;
 use Statamic\Assets\AssetUploader as Uploader;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -37,6 +39,7 @@ use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\GraphQL\ResolvesValues;
@@ -260,15 +263,31 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return $meta;
         }
 
-        return $this->meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
+        $meta = $this->cacheStore()->rememberForever($this->metaCacheKey(), function () {
             if ($contents = $this->disk()->get($path = $this->metaPath())) {
                 return YAML::file($path)->parse($contents);
             }
 
-            $this->writeMeta($meta = $this->generateMeta());
+            $meta = $this->generateMeta();
+
+            if ($this->hasGeneratedMeta($meta)) {
+                $this->writeMeta($meta);
+            }
 
             return $meta;
         });
+
+        $generated = $this->hasGeneratedMeta($meta);
+
+        if (! $generated) {
+            $this->cacheStore()->forget($this->metaCacheKey());
+        }
+
+        if ($generated || ! $this->exists()) {
+            $this->meta = $meta;
+        }
+
+        return $meta;
     }
 
     private function metaValue($key)
@@ -281,7 +300,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
         $this->cacheStore()->forget($this->metaCacheKey());
 
-        $this->writeMeta($meta = $this->generateMeta());
+        $meta = $this->generateMeta();
+
+        if ($this->hasGeneratedMeta($meta)) {
+            $this->writeMeta($meta);
+        }
 
         return Arr::get($meta, $key);
     }
@@ -291,19 +314,49 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
-            $attributes = Attributes::asset($this)->get();
+            try {
+                $attributes = Attributes::asset($this)->get();
 
-            $meta = array_merge($meta, [
-                'size' => $this->disk()->size($this->path()),
-                'last_modified' => $this->disk()->lastModified($this->path()),
-                'width' => Arr::get($attributes, 'width'),
-                'height' => Arr::get($attributes, 'height'),
-                'mime_type' => $this->disk()->mimeType($this->path()),
-                'duration' => Arr::get($attributes, 'duration'),
-            ]);
+                $meta = array_merge($meta, [
+                    'size' => $this->disk()->size($this->path()),
+                    'last_modified' => $this->disk()->lastModified($this->path()),
+                    'width' => Arr::get($attributes, 'width'),
+                    'height' => Arr::get($attributes, 'height'),
+                    'mime_type' => $this->disk()->mimeType($this->path()),
+                    'duration' => Arr::get($attributes, 'duration'),
+                ]);
+            } catch (UnableToRetrieveMetadata|UnableToReadFile) {
+                if (! $this->disk()->exists($this->path())) {
+                    $this->forgetMissingFile();
+                }
+            }
         }
 
         return $meta;
+    }
+
+    private function hasGeneratedMeta(array $meta): bool
+    {
+        return isset($meta['size']);
+    }
+
+    /**
+     * The cached directory listing still names this path, but the file is gone.
+     * Drop the path from the listing and, when assets are indexed in the Stache,
+     * from that index. Stored asset data stays put: this does not go through the
+     * asset repository, whose eloquent implementation deletes the meta row.
+     */
+    private function forgetMissingFile(): void
+    {
+        $this->meta = null;
+        $this->cacheStore()->forget($this->metaCacheKey());
+
+        $this->container()->contents()->forget($this->path())->save();
+
+        // The eloquent driver keeps asset data in the database and excludes this store.
+        if (config('statamic.eloquent-driver.assets.driver') !== 'eloquent') {
+            Stache::store('assets::'.$this->containerHandle())->delete($this);
+        }
     }
 
     public function metaPath()
@@ -320,6 +373,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function writeMeta($meta)
     {
+        if (! $this->exists()) {
+            return;
+        }
+
         $meta['data'] = Arr::removeNullValues($meta['data']);
 
         $contents = YAML::dump($meta);
