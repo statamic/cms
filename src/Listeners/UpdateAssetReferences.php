@@ -3,16 +3,35 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Bus;
 use Statamic\Assets\AssetReferenceUpdater;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetReferencesUpdated;
 use Statamic\Events\AssetReplaced;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\Subscriber;
+use Statamic\Facades\Asset;
+use Statamic\Git\Subscriber as GitSubscriber;
+use Statamic\Jobs\UpdateBatchedAssetReferences;
 
 class UpdateAssetReferences extends Subscriber implements ShouldQueue
 {
     use Concerns\GetsItemsContainingData;
+
+    /**
+     * The most asset moves handled by a single job, which scans all the content once.
+     *
+     * @var int
+     */
+    public static $batchChunkSize = 500;
+
+    /**
+     * The asset moves recorded by the batch in progress, grouped by container handle, in the
+     * order they happened. A null new path means the asset was deleted.
+     *
+     * @var array<string, array<int, array{0: string, 1: string|null}>>|null
+     */
+    protected static $batch = null;
 
     protected $listeners = [
         AssetSaved::class => 'handleSaved',
@@ -32,6 +51,89 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
         }
 
         parent::subscribe($events);
+    }
+
+    /**
+     * Run a callback that moves or deletes many assets, updating their references together.
+     *
+     * Every reference update scans all the content on the site. Rather than queueing one
+     * update per asset, the moves made inside the callback are collected and handled by
+     * a single job (or one per chunk) once the callback has finished.
+     *
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
+     */
+    public static function batch(callable $callback)
+    {
+        if (static::$batch !== null) {
+            return $callback();
+        }
+
+        static::$batch = [];
+
+        try {
+            return $callback();
+        } finally {
+            $batch = static::$batch;
+            static::$batch = null;
+
+            // Dispatched even if the callback failed partway, so the assets that did move keep their references.
+            static::dispatchBatch($batch);
+        }
+    }
+
+    /**
+     * Queue the jobs that update the references for a finished batch.
+     *
+     * @param  array<string, array<int, array{0: string, 1: string|null}>>  $batch
+     */
+    protected static function dispatchBatch(array $batch): void
+    {
+        $jobs = collect($batch)
+            ->flatMap(fn ($moves, $container) => collect($moves)
+                ->chunk(static::$batchChunkSize)
+                ->map(fn ($chunk) => new UpdateBatchedAssetReferences($container, $chunk->values()->all())))
+            ->values();
+
+        if ($jobs->isEmpty()) {
+            return;
+        }
+
+        // Chained so the chunks run one after another, in the order the assets were moved.
+        Bus::chain($jobs->all())->dispatch();
+    }
+
+    /**
+     * Determine whether a reference update should be queued for the event.
+     *
+     * Laravel calls this when the event is dispatched. While a batch is in progress,
+     * saved and deleted assets are added to the batch instead of being queued.
+     */
+    public function shouldQueue($event): bool
+    {
+        if (static::$batch === null) {
+            return true;
+        }
+
+        if ($event instanceof AssetSaved) {
+            $asset = $event->asset;
+            $newPath = $asset->path();
+        } elseif ($event instanceof AssetDeleted) {
+            $asset = $event->asset;
+            $newPath = null;
+        } else {
+            return true;
+        }
+
+        $originalPath = $asset->getOriginal('path');
+
+        if ($originalPath && $originalPath !== $newPath) {
+            static::$batch[$asset->container()->handle()][] = [$originalPath, $newPath];
+        }
+
+        return false;
     }
 
     /**
@@ -71,6 +173,22 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
     }
 
     /**
+     * Update the references for the asset moves collected by a batch.
+     *
+     * @param  array<int, array{0: string, 1: string|null}>  $moves  Original path and new path (null when deleted), in the order they happened.
+     */
+    public function handleBatch(string $container, array $moves)
+    {
+        foreach ($this->replaceManyReferences($container, $moves) as [$originalPath, $newPath]) {
+            // A deleted asset, or one that's been moved again since, gets a stand-in for the event.
+            $asset = ($newPath ? Asset::find($container.'::'.$newPath) : null)
+                ?? Asset::make()->container($container)->path($newPath ?? $originalPath);
+
+            AssetReferencesUpdated::dispatch($asset);
+        }
+    }
+
+    /**
      * Replace asset references.
      *
      * @param  \Statamic\Assets\Asset  $asset
@@ -79,41 +197,84 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
      */
     protected function replaceReferences($asset, $originalPath, $newPath)
     {
-        if (! $originalPath || $originalPath === $newPath) {
-            return;
+        if ($this->replaceManyReferences($asset->container()->handle(), [[$originalPath, $newPath]])) {
+            AssetReferencesUpdated::dispatch($asset);
+        }
+    }
+
+    /**
+     * Replace the references for many asset moves in a single pass over the content.
+     *
+     * The moves are applied to each item in order, so a path can be moved more than once
+     * (or two assets can swap paths) and each item still ends up with the right references.
+     *
+     * @param  array<int, array{0: string, 1: string|null}>  $moves  Original path and new path (null when removing).
+     * @return array<int, array{0: string, 1: string|null}> The moves that updated at least one item.
+     */
+    protected function replaceManyReferences(string $container, array $moves): array
+    {
+        $moves = array_filter($moves, fn ($move) => $move[0] && $move[0] !== $move[1]);
+
+        if (! $moves) {
+            return [];
         }
 
-        $container = $asset->container()->handle();
-
-        $hasUpdatedItems = false;
+        $updatedMoves = [];
 
         $this
             ->getItemsContainingData()
-            ->each(function ($item) use ($container, $originalPath, $newPath, &$hasUpdatedItems) {
-                $updated = AssetReferenceUpdater::item($item)
-                    ->filterByContainer($container)
-                    ->updateReferences($originalPath, $newPath);
-
-                if ($updated) {
-                    $hasUpdatedItems = true;
+            ->each(function ($item) use ($container, $moves, &$updatedMoves) {
+                if ($this->updateItemReferences($item, $container, $moves, $updatedMoves)) {
+                    GitSubscriber::withoutListeners(fn () => $item->save());
                 }
 
                 if (method_exists($item, 'hasWorkingCopy') && $item->hasWorkingCopy()) {
                     $workingCopyEntry = $item->makeFromRevision($item->workingCopy());
 
-                    $workingCopyUpdated = AssetReferenceUpdater::item($workingCopyEntry)
-                        ->filterByContainer($container)
-                        ->withoutSaving()
-                        ->updateReferences($originalPath, $newPath);
+                    // Only updates to saved items count towards the AssetReferencesUpdated events.
+                    $workingCopyUpdatedMoves = [];
 
-                    if ($workingCopyUpdated) {
+                    if ($this->updateItemReferences($workingCopyEntry, $container, $moves, $workingCopyUpdatedMoves)) {
                         $workingCopyEntry->saveToWorkingCopy();
                     }
                 }
             });
 
-        if ($hasUpdatedItems) {
-            AssetReferencesUpdated::dispatch($asset);
+        ksort($updatedMoves);
+
+        return array_values($updatedMoves);
+    }
+
+    /**
+     * Apply each move to an item, in order, without saving it.
+     *
+     * @return bool Whether the item was updated.
+     */
+    private function updateItemReferences($item, string $container, array $moves, array &$updatedMoves): bool
+    {
+        $updated = false;
+
+        // Encode the item's data once rather than once per move, re-encoding only after it changes,
+        // since an earlier move can introduce a path that a later move then replaces.
+        $encodedData = AssetReferenceUpdater::encodeData($item);
+
+        foreach ($moves as $index => [$originalPath, $newPath]) {
+            if (! AssetReferenceUpdater::encodedDataMayContain($encodedData, $originalPath)) {
+                continue;
+            }
+
+            $itemUpdated = AssetReferenceUpdater::item($item)
+                ->filterByContainer($container)
+                ->withoutSaving()
+                ->updateReferences($originalPath, $newPath);
+
+            if ($itemUpdated) {
+                $updated = true;
+                $updatedMoves[$index] = [$originalPath, $newPath];
+                $encodedData = AssetReferenceUpdater::encodeData($item);
+            }
         }
+
+        return $updated;
     }
 }
