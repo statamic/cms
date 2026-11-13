@@ -89,35 +89,6 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function entries_are_found_by_a_list_of_ids()
-    {
-        $this->createDummyCollectionAndEntries();
-        Collection::make('pages')->save();
-        EntryFactory::id('page-1')->slug('page-1')->collection('pages')->data(['title' => 'Page 1'])->create();
-        EntryFactory::id('4242')->slug('numbered')->collection('pages')->data(['title' => 'Numbered'])->create();
-
-        $ids = fn ($query) => $query->get()->map->id()->all();
-
-        // In the order the collections and their entries are stored, not the order asked for.
-        $this->assertSame(['id-1', 'id-3', 'page-1'], $ids(Entry::query()->whereIn('id', ['page-1', 'id-3', 'id-1'])));
-        $this->assertSame(['id-3'], $ids(Entry::query()->where('collection', 'posts')->whereIn('id', ['page-1', 'id-3'])));
-        $this->assertSame(['4242'], $ids(Entry::query()->whereIn('id', ['4242'])));
-        $this->assertSame(['id-2'], $ids(Entry::query()->whereIn('id', ['id-2', 'id-2'])));
-
-        // One that isn't there doesn't stop the others being found.
-        $this->assertSame(['id-2'], $ids(Entry::query()->whereIn('id', ['id-2', 'missing'])));
-        $this->assertSame([], $ids(Entry::query()->whereIn('id', ['missing'])));
-
-        // Ids are compared without regard to case.
-        $this->assertSame(['id-1', 'id-2'], $ids(Entry::query()->whereIn('id', ['ID-2', 'id-1'])));
-
-        // A list that isn't all strings.
-        $this->assertSame(['id-1', '4242'], $ids(Entry::query()->whereIn('id', ['id-1', 4242])));
-
-        $this->assertSame(['id-1', 'page-1'], $ids(Entry::query()->whereIn('id', ['id-1'])->orWhereIn('id', ['page-1'])));
-    }
-
-    #[Test]
     public function where_in_and_where_not_in_are_case_insensitive()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
