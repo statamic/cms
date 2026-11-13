@@ -125,6 +125,22 @@ class StoreTest extends TestCase
 
         $this->assertEquals(['path', 'site', 'uri'], Cache::get($cacheKey));
     }
+
+    #[Test]
+    public function clearing_keeps_which_indexes_are_used_so_the_next_warm_builds_them()
+    {
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+
+        $this->store->cacheIndexUsage('title');
+
+        $this->store->clear();
+
+        $this->assertEquals(['title'], Cache::get($cacheKey));
+        $this->assertTrue($this->store->indexes()->has('title'));
+
+        // A process that starts after the clear, as the one that warms usually is.
+        $this->assertTrue((new TestStore)->indexes()->has('title'));
+    }
 }
 
 class TestStore extends Store
