@@ -1,0 +1,417 @@
+[data-ui-input-group] {
+    /* Lock in logic icons */
+    position: relative;
+}
+
+/* GROUP MAIN COLUMN / FIELD BACKGROUND DECORATION
+=================================================== */
+[data-editing-field] {
+    position: relative;
+    scroll-margin-top: 7rem;
+    > * {
+        /* Pull everything inside above */
+        position: relative;
+    }
+    /* Field Editing */
+    &:not(button) {
+        &::before {
+            content: '';
+            position: absolute;
+            /* Bit of optical alignment here */
+            inset: -0.5rem calc(-1rem - 2px) -0.75rem;
+            border: 1px dashed var(--color-blue-400);
+            border-radius: 10px;
+            @apply bg-blue-50;
+        }
+        &:has([data-form-banner]) {
+            &::before {
+                /* Exception for the banner since it's more uniform */
+                inset-block-end: -0.5rem;
+            }
+            &::before,
+            [data-editing-field-actions] {
+                background: transparent;
+            }
+        }
+        &[data-first-row]::before {
+            inset-block-start: -1.25rem;
+        }
+        &[data-last-row]::before {
+            inset-block-end: -1.25rem;
+        }
+        :where(.dark) &::before {
+            @apply bg-blue-950 border-blue-500/75;
+        }
+    }
+    /* Pull the field actions up a bit for the first row */
+    &[data-first-row] {
+        [data-editing-field-actions] {
+            top: -0.85rem;
+        }
+    }
+    /* Editing a button like "Next page" and "Submit" */
+    :has(> button&) {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -1rem calc(-1rem - 2px) -1.25rem;
+            border: 1px dashed var(--color-blue-400);
+            border-radius: 10px;
+            @apply bg-blue-50;
+        }
+        :where(.dark) &::before {
+            @apply bg-blue-950 border-blue-500/75;
+        }
+    }
+}
+
+
+/* GROUP MAIN COLUMN / FIELDSETS
+=================================================== */
+[data-fieldset-group] {
+    anchor-scope: --fieldset-start, --fieldset-end;
+}
+
+[data-fieldset-label] {
+    @apply bg-content-bg text-indigo-800 dark:text-indigo-400/85;
+    position: absolute;
+    display: inline-flex;
+    top: calc(anchor(--fieldset-start top) + 2rem);
+    left: calc(anchor(--fieldset-start left) - 2.5rem);
+    width: 0.75rem;
+    svg {
+        rotate: 90deg;
+    }
+}
+
+#fieldset-start {
+    anchor-name: --fieldset-start;
+
+    /* The connector */
+    &::before {
+        @apply border border-dashed border-indigo-500;
+        content: '';
+        position: absolute;
+        width: 3rem;
+        top: calc(anchor(--fieldset-start top) + 0.5rem);
+        left: calc(anchor(--fieldset-start left) - 2rem);
+        bottom: anchor(--fieldset-end bottom);
+        border-radius: 10px;
+        clip-path: polygon(0 0, 30% 0, 30% 100%, 0 100%);
+    }
+}
+
+:where(.dark) #fieldset-start::before {
+    @apply border-indigo-400/50;
+}
+
+#fieldset-end {
+    anchor-name: --fieldset-end;
+}
+
+/* Hide anchors and absolutely positioned logic icons unless the panel is open. When the panel collapses, elements like anchors are slow to hide because of the way they're rendered. */
+[data-panel-collapsed="true"] {
+    [data-fieldset-label],
+    [data-logic-attached],
+    #fieldset-start::before {
+        opacity: 0;
+        transition: opacity 0.05s ease-in;
+    }
+}
+
+
+/* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS
+=================================================== */
+/* Field Icons (hide by default) */
+[data-collapsed-field-icon] {
+    display: none;
+}
+
+/* GROUP MAIN COLUMN / COLLAPSIBLE FIELDS / COLLAPSED STATE
+=================================================== */
+[data-fields-collapsed="true"] {
+    /* Hide the inputs */
+    [data-ui-input-group] {
+        [data-ui-description],
+        > :not(:first-child, :has([data-logic-attached])) {
+            display: none;
+        }
+
+        * {
+            margin-bottom: 0;
+        }
+    }
+
+    [data-editing-item] {
+        /* Tweak the actions position since the surrounding space is different */
+        [data-editing-field-actions] {
+            top: 50%;
+            transform: translateY(calc(-50% - 0.5px));
+            @apply pe-3;
+        }
+
+        &[data-first-row]::before,
+        &[data-last-row]::before,
+        &::before {
+            inset: calc(0% - 1px);
+        }
+    }
+
+    /* Field Icons */
+    [data-collapsed-field-icon] {
+        display: inline-flex;
+    }
+
+    /* Compress spacing for fieldsets when the fields are collapsed */
+    [data-fieldset-group] {
+        @apply space-y-5;
+    }
+
+    /* Wrapper/white background */
+    [data-section-drop-zone]:has(&) {
+        background: unset;
+        box-shadow: unset;
+        padding: 0;
+    }
+
+    [data-field-item] {
+        @apply px-3 sm:px-5 py-2.75 bg-white dark:bg-gray-850 rounded-xl ring ring-gray-200 dark:ring-gray-700/80 shadow-ui-md;
+    }
+
+    ~ [data-pagination] {
+        @apply mt-4;
+        /* Editing a button like "Next page" and "Submit" */
+        :has(> button)::before {
+            inset: calc(0% - 1px);
+        }
+    }
+}
+
+
+/* GROUP SIDEBAR / EDITING ITEM DIRECTION
+=================================================== */
+/* No decoration of the editing item itself, just a hook to handle the editing item direction indicators. */
+#main-content {
+    timeline-scope: --editing-field-scroll;
+}
+[data-editing-item] {
+    view-timeline-name: --editing-field-scroll;
+}
+
+/* Page 1 of 2, etc. */
+[data-form-page-label],
+/* Next/previous page buttons */
+[data-pagination] {
+    scroll-margin-top: 7rem;
+}
+
+[data-field-direction-down],
+[data-field-direction-up] {
+    @apply p-1 size-4.75! ms-1 text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 border-1 border-dotted border-blue-400 dark:border-blue-700 rounded-full;
+}
+
+@keyframes field-direction-fade-in {
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+[data-field-direction-up] {
+    opacity: 0;
+    animation: field-direction-fade-in linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: exit 0%, exit 100%;
+}
+
+@keyframes field-direction-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+[data-field-direction-down] {
+    animation: field-direction-fade-out linear both;
+    animation-timeline: --editing-field-scroll;
+    animation-range: entry 50%, entry 100%;
+}
+
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / LAYOUT
+=================================================== */
+.logic-text {
+    --inner-indent: 1.75rem;
+    :where(.dark) & {
+        --logic-line: var(--color-gray-600);
+    }
+
+    /* Outer structure */
+    > ol {
+        /* Optically align */
+        margin-inline-start: -0.1rem;
+        /* Inner structure */
+        ol {
+            display: grid;
+            grid-template-columns: 100%;
+            @apply gap-2 mb-2.5;
+            &:not(.indented-condition *) {
+                margin-inline-start: var(--inner-indent);
+            }
+            li {
+                /* Prevent full-width comboboxes */
+                > .w-full {
+                    display: inline-flex;
+                    width: unset;
+                    min-width: unset;
+                    max-width: 100%;
+                }
+            }
+        }
+    }
+    /* Make the input field automatically adjust to the content size */
+    [data-ui-input] input {
+        field-sizing: content;
+    }
+}
+
+.logic-text-badge {
+    @apply
+        py-1.5 px-3
+        bg-content-bg
+        text-gray-800 dark:text-gray-300
+        rounded-full
+        text-sm
+        shadow-ui-sm
+        border-1
+        border-gray-300 dark:border-gray-600
+    ;
+    display: inline-block;
+    user-select: none;
+    text-align: center;
+}
+
+.logic-text__pill {
+    display: flex;
+    max-width: fit-content;
+    align-items: center;
+    @apply
+        gap-1
+        rounded-full
+        bg-content-bg
+        px-3 py-1
+        shadow-ui-sm
+        text-gray-900 dark:text-gray-100
+        border-1
+        border-gray-300
+        dark:border-1 dark:border-gray-600
+    ;
+}
+
+.logic-text__pill-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.logic-text__pill-text {
+    @apply
+        text-sm
+        text-gray-900 dark:text-gray-100
+    ;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / CONNECTORS
+=================================================== */
+.logic-text {
+    --logic-line: 1px dashed var(--color-gray-400);
+    --outer-indent-connector: calc(1rem - 2px);
+    @apply mb-0;
+    /* Inner structure */
+    ol ol {
+        position: relative;
+        &::before {
+            content: '';
+            position: absolute;
+            z-index: var(--z-index-below);
+            inset-inline-start: 1.15rem;
+            border-inline-start: var(--logic-line);
+            height: 100%;
+        }
+    }
+    /* Exit "If" */
+    > ol > li {
+        &:not(:last-child) {
+            + li {
+                position: relative;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    z-index: var(--z-index-below);
+                    top: -1.5rem;
+                    left: calc(0% + var(--inner-indent) / 2);
+                    width: calc(var(--spacing) * 4);
+                    height: 3.5rem;
+                    border: var(--logic-line);
+                    border-inline-end: 0;
+                    border-block-end: 0;
+                    border-start-start-radius: 100vw;
+                }
+            }
+        }
+    }
+}
+.logic-text__condition {
+    position: relative;
+    /* e.g. not a "to" badge inside a calculation condition */
+    &:not(ol ol *) {
+        @apply mb-2.5;
+        &::after {
+            content: '';
+            position: absolute;
+            left: var(--outer-indent-connector);
+            border: var(--logic-line);
+            border-inline-end: 0;
+            border-block-start: 0;
+            border-end-start-radius: 100vw;
+            top: 100%;
+            width: calc(var(--spacing) * 4);
+            /* Don't overlap/clash with subsequent connectors */
+            height: 85%;
+        }
+    }
+}
+
+/* GROUP SIDEBAR / LOGIC TEXT / VERTICAL / HORIZONTAL ORIENTATION
+=================================================== */
+@container (width >= 500px) {
+    .logic-text {
+        /* Outer structure */
+        > ol {
+            > li {
+                &:not(:last-child) {
+                    li:last-child {
+                        /* Pull logic connectors back to the left */
+                        position: unset;
+                    }
+                }
+            }
+            /* Inner structure */
+            ol {
+                display: flex;
+                flex-wrap: wrap;
+                &::before {
+                    /* Hide connectors for now-horizontal logic */
+                    content: unset;
+                }
+            }
+        }
+    }
+}

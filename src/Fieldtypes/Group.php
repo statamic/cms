@@ -2,11 +2,16 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
+use Illuminate\Support\Collection;
 use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
+use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fields\FormFields;
 use Statamic\GraphQL\Types\GroupType;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -174,8 +179,12 @@ class Group extends Fieldtype
     {
         $field = $this->field();
 
+        $formFields = new FormFields([
+            'sections' => [['fields' => $this->config('fields')]],
+        ]);
+
         $data['fields'] = collect($this->fields()->all())
-            ->map(fn ($child) => $child->setForm($field->form())->setHandle($field->handle().'.'.$child->handle()))
+            ->map(fn ($child) => $child->setForm($field->form())->setFormField($formFields->field($child->handle()))->setHandle($field->handle().'.'.$child->handle()))
             ->map(fn ($child) => $recursiveCallback($child))
             ->values()
             ->all();
@@ -218,5 +227,29 @@ class Group extends Fieldtype
         }
 
         $updater->update(new Fields($fieldsConfig));
+    }
+
+    public function previewValue(): mixed
+    {
+        return $this->sampleFields()
+            ->map(fn (Field $field) => $field->fieldtype()->previewValue())
+            ->all();
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $this->sampleFields()
+            ->map(fn (Field $field) => $field->fieldtype()->fakeValue($faker))
+            ->all();
+    }
+
+    private function sampleFields(): Collection
+    {
+        // TODO: Use $this->fields() once the form Group fieldtype converts its nested fields to core fieldtypes.
+        return collect($this->field()->get('fields', []))
+            ->filter(fn ($config) => is_array($config) && isset($config['handle'], $config['field']))
+            ->mapWithKeys(fn (array $config) => [
+                $config['handle'] => new Field($config['handle'], (new FormField($config['handle'], $config['field']))->toFieldArray()),
+            ]);
     }
 }

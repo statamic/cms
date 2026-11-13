@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Toggle as ToggleFilter;
@@ -83,5 +84,15 @@ class Toggle extends Fieldtype
     public function toQueryableValue($value)
     {
         return (bool) $value;
+    }
+
+    public function previewValue(): mixed
+    {
+        return true;
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->boolean();
     }
 }

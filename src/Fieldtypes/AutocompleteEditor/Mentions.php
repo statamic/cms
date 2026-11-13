@@ -26,6 +26,13 @@ class Mentions
         return (bool) preg_match('/^'.self::VALUE.'$/D', $value);
     }
 
+    public static function handles(string $content): array
+    {
+        preg_match_all(self::RESOLVABLE, $content, $matches, PREG_UNMATCHED_AS_NULL);
+
+        return array_values(array_unique(array_filter($matches[2], fn ($handle) => $handle !== null)));
+    }
+
     // Pass `$using` to run a template pass (e.g. Antlers) over the content. Neither
     // order is safe without it: parsing first lets submitted values be read as
     // mentions or have their backslashes eaten, and resolving first turns them
