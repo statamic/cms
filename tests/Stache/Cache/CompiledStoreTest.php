@@ -742,6 +742,43 @@ class CompiledStoreTest extends TestCase
         $this->assertNull($this->store()->get($key));
     }
 
+    #[Test]
+    public function a_process_doesnt_take_its_own_forgetting_for_another_processs()
+    {
+        $store = $this->store();
+
+        $this->assertNull($store->get('thing'));
+        $this->assertNull($store->get('stache::items::entries::blog::one'));
+
+        $store->forget('thing');
+        $store->forget('stache::items::entries::blog::one');
+        $store->persist();
+
+        $store->forever('thing', ['a' => 1]);
+        $store->forever('stache::items::entries::blog::one', $this->entry('one'));
+        $store->persist();
+
+        $this->assertSame(['a' => 1], $this->store()->get('thing'));
+        $this->assertSame('one', $this->store()->get('stache::items::entries::blog::one')->id());
+    }
+
+    #[Test]
+    public function forgetting_a_great_many_things_leaves_little_behind()
+    {
+        $store = $this->store();
+
+        foreach (range(1, 5000) as $i) {
+            $store->forget("stache::items::assets::main::$i");
+            $store->forget("stache::items::entries::blog::$i");
+        }
+
+        $store->persist();
+
+        $pointer = json_decode(file_get_contents($this->directory.'/pointer.json'), true);
+
+        $this->assertLessThan(300, count($pointer));
+    }
+
     public static function rebuilds(): array
     {
         return [

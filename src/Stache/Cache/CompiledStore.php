@@ -38,6 +38,7 @@ class CompiledStore implements Store
     private const ENTRIES_PER_FILE = 8;
     private const MOST_FILES_PER_COLLECTION = 1024;
     private const GENERATION_LENGTH = 40;
+    private const FORGOTTEN_MARKERS = 256;
 
     private static array $instances = [];
 
@@ -52,6 +53,9 @@ class CompiledStore implements Store
     private int $generationCheckedAt = 0;
     private array $seen = [];
     private array $spreadOver = [];
+    private array $forgotten = [];
+    private array $seenForgotten = [];
+    private array $forgottenNow = [];
     private array $fallbackSeen = [];
     private array $fallbackConflicts = [];
     private array $conflicted = [];
@@ -109,12 +113,13 @@ class CompiledStore implements Store
         }
 
         $this->see($name = 'value:'.$key);
+        $this->seeWhatWasForgotten($key);
 
         if (array_key_exists($name, $this->values)) {
             return $this->values[$name] ?: $this->valueOrFallback($this->values[$name], $key);
         }
 
-        if ($this->fileOf($this->pointer()[$name] ?? null) !== null) {
+        if (isset($this->pointer()[$name])) {
             return $this->load($name);
         }
 
@@ -149,6 +154,7 @@ class CompiledStore implements Store
         }
 
         $this->see($name = 'value:'.$key);
+        $this->seeWhatWasForgotten($key);
 
         // Anything with an object in it is serialized now, as any other store would, so that it's kept
         // as it is at this moment and whoever passed it in can go on to change it. False is serialized
@@ -201,6 +207,8 @@ class CompiledStore implements Store
         $this->forgetCompiled($key);
         $this->writeToFallback($key, null);
 
+        $this->forgotten[$key] = true;
+
         return true;
     }
 
@@ -208,6 +216,7 @@ class CompiledStore implements Store
     {
         $this->entries = $this->values = $this->loaded = $this->fallbackRead = $this->fallbackWrites = [];
         $this->seen = $this->spreadOver = $this->fallbackSeen = $this->conflicted = [];
+        $this->forgotten = $this->seenForgotten = [];
         $this->pointer = [];
         $this->generation = '';
 
@@ -237,6 +246,7 @@ class CompiledStore implements Store
 
         $this->seen = $this->entries ? $this->seen : array_intersect_key($this->seen, $this->values);
         $this->spreadOver = array_intersect_key($this->spreadOver, $this->entries);
+        $this->seenForgotten = $this->entries || $this->values || $this->fallbackWrites ? $this->seenForgotten : [];
         $this->fallbackSeen = array_intersect_key($this->fallbackSeen, $this->fallbackWrites);
         $this->conflicted = [];
     }
@@ -272,7 +282,11 @@ class CompiledStore implements Store
 
             $pointer = $this->pointer();
 
+            $this->forgottenNow = array_filter($pointer, fn ($name) => str_starts_with($name, 'forgotten:'), ARRAY_FILTER_USE_KEY);
+
             $written = $combined = [];
+
+            $alreadyTurnedDown = $this->conflicted;
 
             foreach ($this->entries as $collection => $rows) {
                 // A collection built again by another process may be spread over a different number of
@@ -301,10 +315,7 @@ class CompiledStore implements Store
                 foreach ($files as $file => $rows) {
                     $combined[$file] = ($pointer[$file] ?? null) !== ($this->seen[$file] ?? null);
 
-                    $merged = $this->mergeEntries($pointer, $collection, $file, $rows);
-
-                    // With nothing left in it but what has been forgotten, the file itself is forgotten.
-                    $written[$file] = array_filter($merged, fn ($row) => ! is_string($row)) ? $merged : null;
+                    $written[$file] = $this->mergeEntries($pointer, $collection, $file, $rows) ?: null;
 
                     $pointer = $this->write($pointer, $file, $written[$file], 'entries');
                 }
@@ -314,9 +325,8 @@ class CompiledStore implements Store
                 // The Stache puts every index of a collection back whenever an entry is saved, and most
                 // come back just as they were read. Comparing them is far cheaper than writing them out
                 // again only to find that the file is already there.
-                // Kept in the file store, which is where another process will see that it has changed.
-                // Forgotten is different: that has to show here, even for something that wasn't here.
-                [$keptElsewhere, $value] = [$value === false, $value === false ? null : $value];
+                // False is something kept in the file store, which here is the same as not being kept.
+                $value = $value === false ? null : $value;
 
                 $unchanged = $value !== null
                     && isset($read[$name], $pointer[$name])
@@ -333,14 +343,17 @@ class CompiledStore implements Store
 
                 $written[$name] = $this->mergeValue($pointer, $name, $value);
 
-                $leaveNoTrace = $keptElsewhere && ! isset($this->conflicted[substr($name, strlen('value:'))]);
-
-                $pointer = $this->write($pointer, $name, $written[$name], 'values', $leaveNoTrace);
+                $pointer = $this->write($pointer, $name, $written[$name], 'values');
             }
 
             // New files, then the pointer to them, then away with what the pointer no longer needs: a
             // process that stops part way through leaves the store as it was, or as it was going to be.
             $unneeded = $this->persistFallback();
+
+            // Whatever was turned down is forgotten, as far as any other process is concerned.
+            $this->forgotten += array_diff_key($this->conflicted, $alreadyTurnedDown);
+
+            $pointer = $this->markWhatWasForgotten($pointer);
 
             $pointer = ['generation' => bin2hex(random_bytes(8))] + array_diff_key($pointer, ['generation' => true]);
 
@@ -406,32 +419,31 @@ class CompiledStore implements Store
 
         $moved = ($pointer[$file] ?? null) !== ($this->seen[$file] ?? null);
 
-        $was = $moved ? $this->read($this->fileOf($this->seen[$file] ?? null)) : null;
+        $was = $moved ? $this->read($this->seen[$file] ?? null) : null;
 
-        $gone = $this->fileOf($pointer[$file] ?? null) === null;
+        $gone = ! isset($pointer[$file]);
 
         foreach ($rows as $id => $row) {
             $theirRow = $theirs[$id] ?? null;
 
-            // A file that has gone altogether says nothing about which of its entries were forgotten.
-            $changedByAnother = $moved && (! is_array($was) || $gone || $theirRow !== ($was[$id] ?? null));
-
-            // Both forgetting it is no disagreement.
-            $agreed = $theirRow === $row || ($row === null && ($theirRow === null || is_string($theirRow)));
-
             $key = self::ENTRY_PREFIX.$collection.'::'.$id;
+
+            // A file that has gone altogether says nothing about which of its entries were forgotten.
+            $changedByAnother = ($moved && (! is_array($was) || $gone || $theirRow !== ($was[$id] ?? null)))
+                || $this->mayHaveBeenForgotten($key);
+
+            $agreed = $theirRow === $row;
 
             // Once there has been a disagreement about an entry, nothing this process goes on to write for
             // it is trusted: what it's holding is as likely to be the stale copy the second time as the first.
-            if (($changedByAnother && ! $agreed) || isset($this->conflicted[$key])) {
+            // Forgetting is always safe, so it's never a disagreement.
+            if (($changedByAnother && ! $agreed && $row !== null) || isset($this->conflicted[$key])) {
                 $this->conflicted[$key] = true;
 
-                $theirs[$id] = $this->forgotten();
+                unset($theirs[$id]);
                 $this->fallbackWrites[$key] = null;
             } elseif ($row === null) {
-                // Something is left behind to say it was forgotten, even if it wasn't there, so that a
-                // process holding on to what it worked out before this can tell that it's out of date.
-                $theirs[$id] = $this->forgotten();
+                unset($theirs[$id]);
             } else {
                 $theirs[$id] = $row;
             }
@@ -453,7 +465,9 @@ class CompiledStore implements Store
         // Disagreements are noted under the key the Stache uses, whichever way the value is kept.
         $key = substr($name, strlen('value:'));
 
-        if (($pointer[$name] ?? null) === ($this->seen[$name] ?? null) && ! isset($this->conflicted[$key])) {
+        $untouched = ($pointer[$name] ?? null) === ($this->seen[$name] ?? null) && ! $this->mayHaveBeenForgotten($key);
+
+        if ($untouched && ! isset($this->conflicted[$key])) {
             return $ours;
         }
 
@@ -474,7 +488,7 @@ class CompiledStore implements Store
 
         // Forgotten by another process, or no longer readable, as is what this process first saw of it
         // if that has been cleared away: either way there's nothing to say whose is right.
-        $was = $theirs === null ? null : $this->read($this->fileOf($this->seen[$name] ?? null));
+        $was = $theirs === null ? null : $this->read($this->seen[$name] ?? null);
 
         $merged = is_array($ours) && is_array($theirs) && is_array($was)
             ? $this->mergeKeys($was, $theirs, $ours)
@@ -506,7 +520,8 @@ class CompiledStore implements Store
 
         $otherKindChanged = $value !== null
             ? isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== ''
-            : ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null) && $theirs !== $serialized;
+            : (($pointer[$name] ?? null) !== ($this->seen[$name] ?? null) && $theirs !== $serialized)
+                || ($theirs === '' && $this->mayHaveBeenForgotten($key));
 
         if (! $otherKindChanged || $this->keepBoth($key, [], []) !== null) {
             return $value;
@@ -602,25 +617,67 @@ class CompiledStore implements Store
         }
 
         $this->see($file = $this->entriesFile($collection, $id));
+        $this->seeWhatWasForgotten(self::ENTRY_PREFIX.$collection.'::'.$id);
 
         return $file;
     }
 
     /**
-     * What's left in place of something that has been forgotten. It's different every time, so
-     * forgetting something shows, even when it's forgotten twice or was never there.
+     * Forgetting something that isn't there changes nothing, and so wouldn't show. But a process that
+     * found nothing, and worked the thing out from the content files, needs to know that another has
+     * since had reason to forget it. So each time anything is forgotten, one of a fixed number of markers
+     * is changed: which one depends on the key. A changed marker doesn't say that this key was forgotten,
+     * only that it may have been, which is enough to stop something being written where there was nothing.
      */
-    private function forgotten(): string
+    private function forgottenMarker(string $key): string
     {
-        return '@'.bin2hex(random_bytes(4));
+        return 'forgotten:'.(crc32($key) % self::FORGOTTEN_MARKERS);
+    }
+
+    private function seeWhatWasForgotten(string $key): void
+    {
+        $marker = $this->forgottenMarker($key);
+
+        if (! array_key_exists($key, $this->seenForgotten[$marker] ?? [])) {
+            $this->seenForgotten[$marker][$key] = $this->pointer()[$marker] ?? null;
+        }
     }
 
     /**
-     * The file the pointer has for a name, or null where it says the name was forgotten.
+     * Whether anything that shares this key's marker has been forgotten by another process since this one
+     * first had anything to do with the key.
      */
-    private function fileOf($pointed): ?string
+    private function mayHaveBeenForgotten(string $key): bool
     {
-        return is_string($pointed) && $pointed !== '' && $pointed[0] !== '@' ? $pointed : null;
+        $marker = $this->forgottenMarker($key);
+
+        return ($this->forgottenNow[$marker] ?? null) !== ($this->seenForgotten[$marker][$key] ?? null);
+    }
+
+    /**
+     * Changes the marker of everything this process has forgotten, or turned down, since it last wrote.
+     * What it first saw of the other keys that share a marker moves on with it, unless another process
+     * had already changed that marker, so that it doesn't take its own forgetting for someone else's.
+     */
+    private function markWhatWasForgotten(array $pointer): array
+    {
+        $markers = array_unique(array_map(fn ($key) => $this->forgottenMarker($key), array_keys($this->forgotten)));
+
+        foreach ($markers as $marker) {
+            $was = $pointer[$marker] ?? null;
+
+            $pointer[$marker] = bin2hex(random_bytes(4));
+
+            foreach ($this->seenForgotten[$marker] ?? [] as $key => $seen) {
+                if ($seen === $was) {
+                    $this->seenForgotten[$marker][$key] = $pointer[$marker];
+                }
+            }
+        }
+
+        $this->forgotten = [];
+
+        return $pointer;
     }
 
     private function read(?string $file)
@@ -645,7 +702,7 @@ class CompiledStore implements Store
         try {
             $this->forgetWhatWasRead();
 
-            $live = array_flip(array_filter(array_map(fn ($pointed) => $this->fileOf($pointed), $this->pointer())));
+            $live = array_flip(array_filter($this->pointer(), 'is_string'));
             $deleted = 0;
 
             foreach (['entries', 'values'] as $folder) {
@@ -705,7 +762,7 @@ class CompiledStore implements Store
         $prefix = 'entries:'.$collection.'#';
 
         foreach ($pointer as $name => $file) {
-            if (str_starts_with($name, $prefix) && $this->fileOf($file) !== null) {
+            if (str_starts_with($name, $prefix)) {
                 return $pointer;
             }
         }
@@ -732,6 +789,7 @@ class CompiledStore implements Store
             $this->entries[$entry[0]][$entry[1]] = $keptElsewhere ? false : null;
         } else {
             $this->see($name = 'value:'.$key);
+            $this->seeWhatWasForgotten($key);
             $this->values[$name] = $keptElsewhere ? false : null;
         }
     }
@@ -785,7 +843,7 @@ class CompiledStore implements Store
             return $this->loaded[$name];
         }
 
-        if (! $file = $this->fileOf($this->pointer()[$name] ?? null)) {
+        if (! $file = $this->pointer()[$name] ?? null) {
             return $this->loaded[$name] = null;
         }
 
@@ -795,14 +853,12 @@ class CompiledStore implements Store
         return $this->loaded[$name] = $value === false ? null : $value;
     }
 
-    private function write(array $pointer, string $name, $value, string $folder, bool $leaveNoTrace = false): array
+    private function write(array $pointer, string $name, $value, string $folder): array
     {
-        $was = $this->fileOf($pointer[$name] ?? null);
+        $was = $pointer[$name] ?? null;
 
-        if ($value === null && $leaveNoTrace) {
+        if ($value === null) {
             unset($pointer[$name]);
-        } elseif ($value === null) {
-            $pointer[$name] = $this->forgotten();
         } else {
             $php = '<?php return '.var_export($value, true).";\n";
 
