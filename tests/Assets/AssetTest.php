@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Imaging\ImageValidator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -538,6 +539,58 @@ class AssetTest extends TestCase
         $this->assertTrue($existing->exists());
         $this->assertFalse($nonExistent->exists());
         $this->assertFalse($noPath->exists());
+    }
+
+    #[Test]
+    public function exists_checks_the_disk_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $asset = (new Asset)->container($this->container)->path('yes.txt');
+
+        $this->assertTrue($asset->exists());
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
+    }
+
+    #[Test]
+    public function exists_checks_the_disk_once_per_path()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        Storage::disk('test')->put('.meta/yes.txt.yaml', "width: 10\nsize: 20\n");
+
+        $fake = Storage::disk('test');
+        $disk = Mockery::mock(FilesystemAdapter::class, [$fake->getDriver(), $fake->getAdapter(), $fake->getConfig()])->makePartial();
+        $disk->shouldReceive('exists')->with('yes.txt')->once()->andReturn(true);
+        $disk->shouldReceive('exists')->with('other.txt')->once()->andReturn(false);
+        Storage::set('test', $disk);
+
+        $asset = (new Asset)->container($this->container)->path('yes.txt');
+
+        $this->assertTrue($asset->exists());
+        $this->assertEquals(10, $asset->meta('width'));
+        $this->assertEquals(20, $asset->meta('size'));
+        $this->assertFalse($asset->path('other.txt')->exists());
+    }
+
+    #[Test]
+    public function exists_uses_the_container_listing_when_it_is_already_loaded()
+    {
+        Storage::disk('test')->put('yes.txt', '');
+        $this->container->files();
+        Storage::disk('test')->put('later.txt', '');
+
+        $this->assertTrue((new Asset)->container($this->container)->path('yes.txt')->exists());
+        $this->assertFalse((new Asset)->container($this->container)->path('later.txt')->exists());
+    }
+
+    #[Test]
+    public function it_resolves_original_data_from_meta_without_loading_the_container_listing()
+    {
+        Storage::disk('test')->put('path/to/test.txt', '');
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  foo: bar");
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+
+        $this->assertEquals(['foo' => 'bar'], $asset->getOriginal()['data']);
+        $this->assertFalse(Cache::has('asset-list-contents-test_container'));
     }
 
     #[Test]
@@ -2902,6 +2955,22 @@ YAML;
                 'echo' => 'foxtrot',
             ],
         ], $asset->getRawOriginal());
+    }
+
+    #[Test]
+    public function it_resolves_pending_original_meta_values_from_disk_when_the_listing_is_loaded()
+    {
+        Storage::disk('test')->put('path/to/test.txt', '');
+
+        // Warm the container listing before the meta file exists.
+        $this->container->files();
+
+        Storage::disk('test')->put('path/to/.meta/test.txt.yaml', "data:\n  alfa: bravo");
+
+        $asset = (new Asset)->container($this->container)->path('path/to/test.txt');
+        $asset->syncOriginal();
+
+        $this->assertEquals(['alfa' => 'bravo'], $asset->getOriginal('data'));
     }
 
     #[Test]
