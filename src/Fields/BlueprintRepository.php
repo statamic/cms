@@ -318,6 +318,8 @@ class BlueprintRepository
 
     protected function makeBlueprintFromFile($path, $namespace = null)
     {
+        $namespace = $namespace ? str_replace('/', '.', $namespace) : $namespace;
+
         return Blink::store(self::BLINK_FROM_FILE)->once($path, function () use ($path, $namespace) {
             if (! $namespace || ! isset($this->additionalNamespaces[$namespace])) {
                 [$namespace, $handle] = $this->getNamespaceAndHandleFromPath($path);
