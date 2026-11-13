@@ -3,14 +3,14 @@
 namespace Tests\Stache\Indexes;
 
 use Facades\Tests\Factories\EntryFactory;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Taxonomies\TermRepository as TermRepositoryContract;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Stache\Repositories\EntryRepository;
 use Statamic\Stache\Repositories\TermRepository;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -82,15 +82,22 @@ class TermEntriesCountTest extends TestCase
 
         Stache::store('terms')->store('tags')->index('associations')->items();
 
-        config(['statamic.system.fake_sql_queries' => true]);
-        $queries = [];
-        Event::listen(QueryExecuted::class, function ($event) use (&$queries) {
-            $queries[] = $event->sql;
-        });
+        $repository = new class(app('stache')) extends EntryRepository
+        {
+            public $queries = 0;
 
-        $this->index();
+            public function query()
+            {
+                $this->queries++;
 
-        $this->assertCount(1, $queries, implode("\n", $queries));
+                return parent::query();
+            }
+        };
+
+        Entry::swap($repository);
+
+        $this->assertCount(9, $this->index()->items());
+        $this->assertSame(1, $repository->queries);
     }
 
     #[Test]
