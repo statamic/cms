@@ -149,10 +149,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getKeysFromCollectionsById($collections, $where)
     {
-        if ($where['type'] === 'In' && $where['column'] === 'id') {
-            return $this->getKeysFromCollectionsByIds($collections, $where['values']);
-        }
-
         if ($where['type'] !== 'Basic' || $where['column'] !== 'id' || $where['operator'] !== '=' || ! is_string($where['value'])) {
             return null;
         }
@@ -164,29 +160,6 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
         // Ids are compared case-insensitively, so a miss falls back to filtering.
         return $keys->isEmpty() ? null : $keys;
-    }
-
-    private function getKeysFromCollectionsByIds($collections, $ids)
-    {
-        if (empty($ids) || count(array_filter($ids, 'is_string')) !== count($ids)) {
-            return null;
-        }
-
-        $wanted = array_flip($ids);
-        $found = [];
-
-        // An entry's key in its collection's id index is its id, so the ones asked for
-        // can be picked out, in the order the index holds them, without testing the rest.
-        $keys = $collections->flatMap(function ($collection) use ($wanted, &$found) {
-            $ids = array_keys(array_intersect_key($this->store->store($collection)->index('id')->items()->all(), $wanted));
-
-            $found += array_flip($ids);
-
-            return array_map(fn ($id) => "{$collection}::{$id}", $ids);
-        })->values();
-
-        // Ids are compared case-insensitively, so if any weren't found this way, fall back to filtering.
-        return count($found) === count($wanted) ? $keys : null;
     }
 
     protected function getOrderKeyValuesByIndex()
