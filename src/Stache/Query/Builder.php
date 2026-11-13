@@ -11,6 +11,7 @@ abstract class Builder extends BaseBuilder
 {
     protected $store;
     protected $randomize = false;
+    private static $hasOwnEqualityTest = [];
 
     public function __construct(Store $store)
     {
@@ -148,11 +149,29 @@ abstract class Builder extends BaseBuilder
 
     protected function filterWhereBasic($values, $where)
     {
+        if ($this->comparesEqualityAsStrings($where)) {
+            // What's being looked for is the same for every value, so it's lowercased once rather than for each of them.
+            $needle = strtolower($where['value'] ?? '');
+
+            return $values->filter(fn ($value) => strtolower($value ?? '') === $needle);
+        }
+
         return $values->filter(function ($value) use ($where) {
             $method = 'filterTest'.$this->operators[$where['operator']];
 
             return $this->{$method}($value, $where['value']);
         });
+    }
+
+    private function comparesEqualityAsStrings($where)
+    {
+        if ($where['operator'] !== '=' || ! (is_null($where['value']) || is_scalar($where['value']))) {
+            return false;
+        }
+
+        // A builder with its own idea of what equal means gets to use it.
+        return ! (self::$hasOwnEqualityTest[static::class]
+            ??= (new \ReflectionMethod($this, 'filterTestEquals'))->getDeclaringClass()->getName() !== BaseBuilder::class);
     }
 
     protected function filterWhereIn($values, $where)

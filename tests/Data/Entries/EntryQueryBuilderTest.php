@@ -1702,6 +1702,61 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('equalsProvider')]
+    public function entries_are_found_by_what_a_value_equals($value, $expected)
+    {
+        Collection::make('posts')->save();
+        collect([
+            'a' => 'Red', 'b' => 'red', 'c' => 'RED ', 'd' => null, 'e' => '', 'f' => true, 'g' => false,
+            'h' => 1, 'i' => '1', 'j' => 0, 'k' => 1.5, 'l' => '1.5', 'm' => 'Ünï',
+        ])->each(fn ($thing, $id) => EntryFactory::id($id)->slug($id)->collection('posts')->data(['thing' => $thing])->create());
+
+        $this->assertEquals($expected, Entry::query()->where('thing', $value)->get()->map->id()->all());
+        $this->assertEquals($expected, Entry::query()->where('thing', '=', $value)->get()->map->id()->all());
+    }
+
+    public static function equalsProvider()
+    {
+        return [
+            'string' => ['red', ['a', 'b']],
+            'string in another case' => ['RED', ['a', 'b']],
+            'string with a space' => ['red ', ['c']],
+            'empty string' => ['', ['d', 'e', 'g']],
+            'null' => [null, ['d', 'e', 'g']],
+            'true' => [true, ['f', 'h', 'i']],
+            'false' => [false, ['d', 'e', 'g']],
+            'one' => [1, ['f', 'h', 'i']],
+            'one as a string' => ['1', ['f', 'h', 'i']],
+            'zero' => [0, ['j']],
+            'float' => [1.5, ['k', 'l']],
+            'accented' => ['Ünï', ['m']],
+        ];
+    }
+
+    #[Test]
+    public function a_date_is_found_by_the_date_it_equals()
+    {
+        Collection::make('posts')->dated(true)->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->date('2021-11-15')->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->date('2021-11-14')->create();
+
+        $this->assertEquals(['a'], Entry::query()->where('date', \Illuminate\Support\Carbon::parse('2021-11-15'))->get()->map->id()->all());
+        $this->assertEquals(['a'], Entry::query()->where('date', '2021-11-15 00:00:00')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function a_query_builder_with_its_own_idea_of_equal_gets_to_use_it()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['thing' => 'Red'])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['thing' => 'red'])->create();
+
+        $query = new CaseSensitiveEntryQueryBuilder(app(\Statamic\Stache\Stache::class)->store('entries'));
+
+        $this->assertEquals(['b'], $query->where('thing', 'red')->get()->map->id()->all());
+    }
+
+    #[Test]
     public function the_pattern_for_a_like_is_worked_out_once_for_all_the_entries_it_is_tested_against()
     {
         $this->createDummyCollectionAndEntries();
@@ -1723,6 +1778,14 @@ class EntryQueryBuilderTest extends TestCase
             ->get();
 
         $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+}
+
+class CaseSensitiveEntryQueryBuilder extends \Statamic\Stache\Query\EntryQueryBuilder
+{
+    protected function filterTestEquals($item, $value)
+    {
+        return $item === $value;
     }
 }
 
