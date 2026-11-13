@@ -98,7 +98,7 @@ abstract class Builder extends BaseBuilder
         foreach ($indexes as $sort => $values) {
             foreach ($values as $key => $value) {
                 if (isset($filtered[$key])) {
-                    $items[$key][$sort] = $this->sortableValue($value);
+                    $items[$key] = array_merge($items[$key] ?? [], [$sort => $this->sortableValue($value)]);
                 }
             }
         }

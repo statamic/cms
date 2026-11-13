@@ -111,6 +111,17 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function ordering_by_a_field_whose_handle_is_a_number_leaves_entries_as_they_were()
+    {
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['title' => 'a', '1' => 3])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['title' => 'b', '1' => 1])->create();
+        EntryFactory::id('c')->slug('c')->collection('posts')->data(['title' => 'c', '1' => 2])->create();
+
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1')->get()->map->id()->all());
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1', 'desc')->get()->map->id()->all());
+    }
+
+    #[Test]
     public function where_in_and_where_not_in_are_case_insensitive()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
