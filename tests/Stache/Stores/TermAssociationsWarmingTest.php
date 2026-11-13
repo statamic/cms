@@ -78,6 +78,27 @@ class TermAssociationsWarmingTest extends TestCase
     }
 
     #[Test]
+    public function terms_whose_slugs_are_numbers_are_recognised_as_unchanged_too()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+        $entry = EntryFactory::collection('blog')->id('1')->data(['title' => 'One', 'tags' => ['2024', 'alfa']])->create();
+
+        // Built from the entries, as a warm does, rather than by the save above.
+        Stache::clear();
+
+        $associations = fn () => Stache::store('terms')->store('tags')->index('associations')->items()->all();
+
+        $before = $associations();
+
+        $this->assertSame(['2024', 'alfa'], array_column($before, 'slug'));
+
+        $entry->set('title', 'One, edited')->save();
+
+        $this->assertSame($before, $associations());
+    }
+
+    #[Test]
     public function a_terms_indexes_are_still_updated_when_an_entrys_terms_havent_changed()
     {
         Taxonomy::make('tags')->save();

@@ -133,7 +133,12 @@ class TaxonomyTermsStore extends ChildStore
         // put there, the associations are left as they are rather than taken out, put back under
         // new keys and written again. The terms' own indexes are still updated, since what they
         // hold (how many published entries a term has, say) can change without the terms changing.
-        if ($associations->forEntry($entry->id()) !== $rows) {
+        //
+        // A slug made of digits is a number here, having been an array key, and a string where the
+        // associations were built from the entries, so slugs are compared as strings.
+        $comparable = fn ($rows) => array_map(fn ($row) => ['slug' => (string) $row['slug']] + $row, $rows);
+
+        if ($comparable($associations->forEntry($entry->id())) !== $comparable($rows)) {
             $associations->forgetEntry($entry->id());
 
             foreach ($rows as $row) {
