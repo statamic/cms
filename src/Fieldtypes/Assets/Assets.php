@@ -238,27 +238,39 @@ class Assets extends Fieldtype
 
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => [
-                'id' => $container->id(),
-                'title' => $container->title(),
-                'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl(),
-                'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
-                'can_view' => User::current()->can('view', $container),
-                'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
-                'can_edit' => User::current()->can('edit', $container),
-                'can_delete' => User::current()->can('delete', $container),
-                'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
-                'sort_field' => $container->sortField(),
-                'sort_direction' => $container->sortDirection(),
-            ],
+            'container' => $this->containerForPreload($container),
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
             'columns' => $this->getColumns(),
         ];
     }
 
+    private function containerForPreload($container)
+    {
+        // It's the same for every assets field that uses the container, and a page can have a lot of them.
+        return Blink::once('assets-fieldtype-container-'.$container->handle().'-'.User::current()?->id(), fn () => [
+            'id' => $container->id(),
+            'title' => $container->title(),
+            'edit_url' => $container->editUrl(),
+            'delete_url' => $container->deleteUrl(),
+            'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+            'can_view' => User::current()->can('view', $container),
+            'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+            'can_edit' => User::current()->can('edit', $container),
+            'can_delete' => User::current()->can('delete', $container),
+            'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
+            'sort_field' => $container->sortField(),
+            'sort_direction' => $container->sortDirection(),
+        ]);
+    }
+
     protected function getColumns()
+    {
+        return Blink::once('assets-fieldtype-columns-'.$this->container()->handle().'-'.User::current()?->id(), fn () => $this->makeColumns())
+            ->map(fn ($column) => clone $column);
+    }
+
+    private function makeColumns()
     {
         $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
 
