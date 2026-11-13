@@ -105,6 +105,40 @@ class EntriesStoreTest extends TestCase
     }
 
     #[Test]
+    public function the_watcher_removes_an_entry_whose_file_was_deleted()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        $path = $this->directory.'/blog/2026-01-01.watcher-test.md';
+        file_put_contents($path, "---\nid: watcher-test\ntitle: 'Watcher test'\n---\n");
+
+        try {
+            $this->assertNotNull(Facades\Entry::find('watcher-test'));
+
+            unlink($path);
+            $this->nextRequest();
+
+            $this->assertNull(Facades\Entry::find('watcher-test'));
+            $this->assertNotContains('watcher-test', Facades\Entry::query()->where('collection', 'blog')->get()->map->id()->all());
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    /**
+     * Fresh stores and indexes with nothing memoized, as the next request would get.
+     * The cache (where the Stache keeps its data between requests) is untouched.
+     */
+    private function nextRequest()
+    {
+        app('stache.indexes')->each->resetMemoizedState();
+        app()->forgetInstance('stache.indexes');
+
+        $this->parent = (new EntriesStore)->directory($this->directory);
+        Stache::registerStore($this->parent);
+    }
+
+    #[Test]
     public function it_gets_nested_files()
     {
         $dir = Path::tidy($this->directory);

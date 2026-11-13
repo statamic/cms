@@ -115,6 +115,71 @@ class BasicStoreTest extends TestCase
 
         $this->assertEquals([$this->tempDir.'/foo.yaml' => 1234567890], Cache::get('stache::timestamps::test'));
     }
+
+    #[Test]
+    public function the_watcher_removes_an_item_whose_file_was_deleted()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+        $this->store->paths();
+
+        unlink($this->tempDir.'/bar.yaml');
+        $store = $this->nextRequest();
+
+        $this->assertNull($store->getItem('bar'));
+        $this->assertEquals(['foo'], $store->paths()->keys()->all());
+        $this->assertEquals(['foo'], $store->index('path')->keys());
+    }
+
+    #[Test]
+    public function the_watcher_keeps_an_item_whose_file_was_renamed()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        $this->store = (new TestBasicStoreWithIds)->directory($this->tempDir);
+        file_put_contents($this->tempDir.'/a.yaml', "id: one\ntitle: First");
+        $this->store->paths();
+
+        rename($this->tempDir.'/a.yaml', $this->tempDir.'/b.yaml');
+        $store = $this->nextRequest();
+
+        $this->assertNotNull($item = $store->getItem('one'));
+        $this->assertEquals('First', $item->data()['title']);
+        $this->assertEquals(['one' => $this->tempDir.'/b.yaml'], $store->paths()->all());
+    }
+
+    #[Test]
+    public function the_watcher_handles_a_deleted_and_an_added_file_in_the_same_request()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+        $this->store->paths();
+
+        unlink($this->tempDir.'/bar.yaml');
+        file_put_contents($this->tempDir.'/baz.yaml', '');
+        $store = $this->nextRequest();
+
+        $this->assertNull($store->getItem('bar'));
+        $this->assertNotNull($store->getItem('baz'));
+        $this->assertEquals(['baz', 'foo'], $store->paths()->keys()->sort()->values()->all());
+    }
+
+    /**
+     * A new store instance with nothing memoized, as the next request would get.
+     * The cache (where the Stache keeps its data between requests) is untouched.
+     */
+    private function nextRequest()
+    {
+        $class = get_class($this->store);
+        app('stache.indexes')->each->resetMemoizedState();
+        app()->forgetInstance('stache.indexes');
+
+        return $this->store = (new $class)->directory($this->tempDir);
+    }
 }
 
 class TestBasicStore extends BasicStore
@@ -134,7 +199,17 @@ class TestBasicStore extends BasicStore
         $id = Str::after($path, Path::tidy(__DIR__.'/tmp/'));
         $id = Str::before($id, '.yaml');
 
-        return new TestBasicStoreItem($id, $data);
+        return new TestBasicStoreItem($id, $data, $path);
+    }
+}
+
+class TestBasicStoreWithIds extends TestBasicStore
+{
+    public function makeItemFromFile($path, $contents)
+    {
+        $data = YAML::parse($contents);
+
+        return new TestBasicStoreItem($data['id'], $data, $path);
     }
 }
 
@@ -142,15 +217,27 @@ class TestBasicStoreItem
 {
     private $id;
     private $data;
+    private $path;
 
-    public function __construct($id, $data)
+    public function __construct($id, $data, $path = null)
     {
         $this->id = $id;
         $this->data = $data;
+        $this->path = $path;
     }
 
     public function id()
     {
         return $this->id;
+    }
+
+    public function data()
+    {
+        return $this->data;
+    }
+
+    public function path()
+    {
+        return $this->path;
     }
 }
