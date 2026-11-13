@@ -1,5 +1,40 @@
 # Release Notes
 
+## 6.42.0 (2026-11-13)
+
+### What's new
+- Add Full mode to the Assets fieldtype [#15873](https://github.com/statamic/cms/issues/15873) by @jackmcdade
+
+### What's fixed
+- Warm paginated pages without holding up the rest of static:warm [#15852](https://github.com/statamic/cms/issues/15852) by @DanielDarrenJones
+- Don't make the directory before every write to a Flysystem disk [#15855](https://github.com/statamic/cms/issues/15855) by @DanielDarrenJones
+- Flush the dedicated static_cache store on invalidation [#15861](https://github.com/statamic/cms/issues/15861) by @edalzell
+- Fix `collection:next` and `collection:previous` tags with dated collection entries [#15864](https://github.com/statamic/cms/issues/15864) by @duncanmcclean
+- Reset memoized Stache state when an Octane request arrives [#15858](https://github.com/statamic/cms/issues/15858) by @DanielDarrenJones
+- Only apply taxonomy wheres to an entry query once [#15867](https://github.com/statamic/cms/issues/15867) by @ryanmitchell
+- Fix chained whereTaxonomyNotIn only excluding entries in all of them [#15868](https://github.com/statamic/cms/issues/15868) by @ryanmitchell
+- Only select one row in Eloquent query builder first() [#15869](https://github.com/statamic/cms/issues/15869) by @ryanmitchell
+- Don't filter Terms fieldtype values by collection usage [#15870](https://github.com/statamic/cms/issues/15870) by @ryanmitchell
+- Make each term once when building term indexes [#15871](https://github.com/statamic/cms/issues/15871) by @ryanmitchell
+- Build term associations once when warming the Stache [#15872](https://github.com/statamic/cms/issues/15872) by @ryanmitchell
+- Fix files outside the root being treated as within it [#15886](https://github.com/statamic/cms/issues/15886) by @jasonvarga
+- Skip Antlers for site values that are only config [#15887](https://github.com/statamic/cms/issues/15887) by @DanielDarrenJones
+- Work search results out once when paginating [#15889](https://github.com/statamic/cms/issues/15889) by @DanielDarrenJones
+- Look an entries field's entries up once in listings [#15890](https://github.com/statamic/cms/issues/15890) by @DanielDarrenJones
+- Work out what an assets field preloads about its container once [#15893](https://github.com/statamic/cms/issues/15893) by @DanielDarrenJones
+- Bring back month/year navigation in the date picker [#15892](https://github.com/statamic/cms/issues/15892) by @duncanmcclean
+- Lowercase what an equals where is looking for once [#15894](https://github.com/statamic/cms/issues/15894) by @DanielDarrenJones
+- Work the pattern for a like where out once [#15895](https://github.com/statamic/cms/issues/15895) by @DanielDarrenJones
+- Prepare Stache sort values once instead of on every comparison [#15877](https://github.com/statamic/cms/issues/15877) by @DanielDarrenJones
+- Write each index once when a structured collection is reordered [#15888](https://github.com/statamic/cms/issues/15888) by @DanielDarrenJones
+- Leave term associations alone when a saved entry's terms haven't changed [#15882](https://github.com/statamic/cms/issues/15882) by @DanielDarrenJones
+- Only look through the taxonomies a term query's ids name [#15878](https://github.com/statamic/cms/issues/15878) by @DanielDarrenJones
+- Fix duplicate ids being lost when the Stache is cleared and warmed in one process [#15883](https://github.com/statamic/cms/issues/15883) by @DanielDarrenJones
+- Skip empty-list lookups in the Entries fieldtype and Stache whereIn [#15879](https://github.com/statamic/cms/issues/15879) by @DanielDarrenJones
+- German translations [#15875](https://github.com/statamic/cms/issues/15875) by @helloDanuk
+
+
+
 ## 6.41.0 (2026-11-11)
 
 ### What's new
