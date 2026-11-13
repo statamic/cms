@@ -106,6 +106,10 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFalse($this->adapter->isWithinRoot($this->tempDir.'\\..\\outside.txt'));
         $this->assertFalse($this->adapter->isWithinRoot('/../../../../../../../../../../../../outside.txt'));
         $this->assertFalse($this->adapter->isWithinRoot(str_repeat('../', 50).'outside.txt'));
+        $this->assertTrue($this->adapter->isWithinRoot("family\u{200D}emoji.txt"));
+        $this->assertTrue($this->adapter->isWithinRoot("soft\u{00AD}hyphen.txt"));
+        $this->assertTrue($this->adapter->isWithinRoot("tab\tchar.txt"));
+        $this->assertFalse($this->adapter->isWithinRoot("../family\u{200D}emoji.txt"));
 
         // test with the root with backslashes just to be sure.
         $this->assertTrue($this->adapter->isWithinRoot(

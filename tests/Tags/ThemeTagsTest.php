@@ -160,6 +160,17 @@ class ThemeTagsTest extends TestCase
         }
     }
 
+    public function testOutputsFileContentsWithControlCharactersInFilename()
+    {
+        file_put_contents($path = resource_path("theme-output-\u{200D}test.txt"), 'inside');
+
+        try {
+            $this->assertEquals('inside', $this->tag("{{ theme:output src=\"theme-output-\u{200D}test.txt\" }}"));
+        } finally {
+            unlink($path);
+        }
+    }
+
     public function testDoesntOutputFileContentsFromOutsideResourcesDisk()
     {
         file_put_contents($outside = base_path('theme-output-test.txt'), 'outside');

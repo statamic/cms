@@ -3,7 +3,6 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
-use League\Flysystem\PathTraversalDetected;
 use RuntimeException;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
@@ -48,14 +47,39 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function isWithinRoot($path)
     {
-        try {
-            $path = Path::resolve($this->normalizePath($path));
-            $root = Path::resolve(Path::tidy($this->root));
-        } catch (PathTraversalDetected) {
+        $path = $this->resolveDotSegments($this->normalizePath($path));
+        $root = $this->resolveDotSegments(Path::tidy($this->root));
+
+        if ($path === null || $root === null) {
             return false;
         }
 
         return $path === $root || Str::startsWith($path, Str::finish($root, '/'));
+    }
+
+    private function resolveDotSegments(string $path): ?string
+    {
+        $segments = [];
+
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+
+            if ($segment === '..') {
+                if (empty($segments)) {
+                    return null;
+                }
+
+                array_pop($segments);
+
+                continue;
+            }
+
+            $segments[] = $segment;
+        }
+
+        return (Str::startsWith($path, '/') ? '/' : '').implode('/', $segments);
     }
 
     protected function relativePath($path)
