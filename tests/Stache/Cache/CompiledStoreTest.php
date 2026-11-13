@@ -5,6 +5,7 @@ namespace Tests\Stache\Cache;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
 use Statamic\Stache\Cache\CompiledStore;
@@ -642,6 +643,183 @@ class CompiledStoreTest extends TestCase
 
             $this->assertNull($this->store()->get($key));
         }
+    }
+
+    public static function kinds(): array
+    {
+        return [
+            'plain, then plain' => [['a' => 1], ['a' => 2]],
+            'serialized, then plain' => ['object', ['a' => 2]],
+            'plain, then serialized' => [['a' => 1], 'object'],
+            'serialized, then serialized' => ['object', 'another object'],
+        ];
+    }
+
+    private function kind($value)
+    {
+        return is_string($value) ? (object) ['is' => $value] : $value;
+    }
+
+    #[Test]
+    #[DataProvider('kinds')]
+    public function something_another_process_has_since_forgotten_isnt_put_back($was, $stale)
+    {
+        $first = $this->store();
+        $first->forever('thing', $this->kind($was));
+        $first->persist();
+
+        $holder = $this->store();
+        $holder->get('thing');
+        $holder->forever('thing', $this->kind($stale));
+
+        $forgetter = $this->store();
+        $forgetter->forget('thing');
+        $forgetter->persist();
+
+        $holder->persist();
+
+        $this->assertNull($this->store()->get('thing'));
+    }
+
+    #[Test]
+    #[DataProvider('kinds')]
+    public function forgetting_something_that_wasnt_there_still_shows($ignored, $stale)
+    {
+        // A process finds nothing there, and works the thing out from the content files...
+        $holder = $this->store();
+        $this->assertNull($holder->get('thing'));
+        $holder->forever('thing', $this->kind($stale));
+
+        // ...which another process then changes, forgetting what was never kept.
+        $forgetter = $this->store();
+        $forgetter->forget('thing');
+        $forgetter->persist();
+
+        $holder->persist();
+
+        $this->assertNull($this->store()->get('thing'));
+    }
+
+    #[Test]
+    public function forgetting_an_entry_that_wasnt_there_still_shows()
+    {
+        $key = 'stache::items::entries::blog::one';
+
+        // Another entry in the same file, so that the file is there before and after.
+        $first = $this->store(1);
+        $first->forever('stache::items::entries::blog::two', $this->entry('two'));
+        $first->persist();
+
+        $holder = $this->store(1);
+        $this->assertNull($holder->get($key));
+        $holder->forever($key, $this->entry('one', 'As it was'));
+
+        $forgetter = $this->store(1);
+        $forgetter->forget($key);
+        $forgetter->persist();
+
+        $holder->persist();
+
+        $this->assertNull($this->store(1)->get($key));
+        $this->assertSame('two', $this->store(1)->get('stache::items::entries::blog::two')->id());
+    }
+
+    #[Test]
+    public function forgetting_the_only_entry_of_a_file_that_wasnt_there_still_shows()
+    {
+        $key = 'stache::items::entries::blog::one';
+
+        $holder = $this->store();
+        $this->assertNull($holder->get($key));
+        $holder->forever($key, $this->entry('one', 'As it was'));
+
+        $forgetter = $this->store();
+        $forgetter->forget($key);
+        $forgetter->persist();
+
+        $holder->persist();
+
+        $this->assertNull($this->store()->get($key));
+    }
+
+    public static function rebuilds(): array
+    {
+        return [
+            'into more files' => [100, 2000],
+            'into fewer files' => [2000, 100],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('rebuilds')]
+    public function an_entry_held_while_its_collection_was_built_again_differently_isnt_kept($before, $after)
+    {
+        $row = fn ($i) => ['title' => "Entry $i"];
+        $key = fn ($i) => "stache::items::entries::large::$i";
+
+        $build = function ($count) use ($row, $key) {
+            $store = $this->store();
+
+            foreach (range(1, 2000) as $i) {
+                $store->forget($key($i));
+            }
+
+            $store->persist();
+
+            foreach (range(1, $count) as $i) {
+                $store->forever($key($i), (object) $row($i));
+            }
+
+            $store->persist();
+        };
+
+        $build($before);
+
+        $pointer = fn () => json_decode(file_get_contents($this->directory.'/pointer.json'), true);
+        $files = $pointer()['files:large'];
+
+        // Looks for an entry that isn't there, and works it out from the content file.
+        $holder = $this->store();
+        $this->assertNull($holder->get($key(5000)));
+        $holder->forever($key(5000), (object) ['title' => 'As it was']);
+
+        $build($after);
+
+        $this->assertNotSame($files, $pointer()['files:large']);
+
+        $holder->persist();
+
+        $this->assertNull($this->store()->get($key(5000)));
+        $this->assertEquals((object) $row(1), $this->store()->get($key(1)));
+
+        // Nor is anything else it goes on to write for that collection.
+        $holder->forever($key(5001), (object) ['title' => 'As it was']);
+        $holder->persist();
+
+        $this->assertNull($this->store()->get($key(5001)));
+    }
+
+    #[Test]
+    public function without_what_it_first_saw_two_versions_arent_combined()
+    {
+        $first = $this->store();
+        $first->forever('index', ['a' => 1, 'b' => 2]);
+        $first->persist();
+
+        $holder = $this->store();
+        $holder->get('index');
+        $holder->forever('index', ['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // Another process takes a key away, and what was there before is cleared out.
+        $another = $this->store();
+        $another->forever('index', ['a' => 1]);
+        $another->persist();
+        $another->collectGarbage(-1);
+
+        $holder->persist();
+
+        // Combining them from nothing would have put "b" back.
+        $this->assertNull($this->store()->get('index'));
     }
 
     #[Test]
