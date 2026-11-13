@@ -1,0 +1,19 @@
+/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
+@layer properties {
+@supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {
+*, :before, :after, ::backdrop {
+      --tw-border-style: solid;
+}
+}
+}
+#connectors-listing tbody td {
+  border-inline-style: var(--tw-border-style);
+  border-inline-width: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
