@@ -134,11 +134,13 @@ class Stache
 
         $stores = $this->stores()->except($this->exclude);
 
-        if ($this->shouldUseParallelWarming($stores)) {
-            $this->warmInParallel($stores);
-        } else {
-            $stores->each->warm();
-        }
+        Store::duringWarm(function () use ($stores) {
+            if ($this->shouldUseParallelWarming($stores)) {
+                $this->warmInParallel($stores);
+            } else {
+                $stores->each->warm();
+            }
+        });
 
         $this->stopTimer();
 
@@ -297,7 +299,7 @@ class Stache
 
             $closures = $chunks->map(function ($chunk) {
                 return function () use ($chunk) {
-                    return $chunk->each->warm()->keys()->all();
+                    return Store::duringWarm(fn () => $chunk->each->warm()->keys()->all());
                 };
             })->all();
 
