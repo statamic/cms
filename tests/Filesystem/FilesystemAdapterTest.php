@@ -95,6 +95,18 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFalse($this->adapter->isWithinRoot('C:\windows\path\test.txt'));
         $this->assertFalse($this->adapter->isWithinRoot('C:/windows/path/test.txt'));
 
+        $this->assertTrue($this->adapter->isWithinRoot('relative/../inside.txt'));
+        $this->assertTrue($this->adapter->isWithinRoot($this->tempDir));
+        $this->assertTrue($this->adapter->isWithinRoot($this->tempDir.'/'));
+        $this->assertTrue($this->adapter->isWithinRoot('/'));
+        $this->assertFalse($this->adapter->isWithinRoot('../outside.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot('relative/../../outside.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot($this->tempDir.'-old/test.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot($this->tempDir.'/../outside.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot($this->tempDir.'\\..\\outside.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot('/../../../../../../../../../../../../outside.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot(str_repeat('../', 50).'outside.txt'));
+
         // test with the root with backslashes just to be sure.
         $this->assertTrue($this->adapter->isWithinRoot(
             str_replace('/', '\\', $this->tempDir).'/test.txt')

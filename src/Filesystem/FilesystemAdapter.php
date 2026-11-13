@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Illuminate\Filesystem\Filesystem;
+use League\Flysystem\PathTraversalDetected;
 use RuntimeException;
 use Statamic\Facades\Path;
 use Statamic\Support\Str;
@@ -47,9 +48,14 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function isWithinRoot($path)
     {
-        $path = $this->normalizePath($path);
+        try {
+            $path = Path::resolve($this->normalizePath($path));
+            $root = Path::resolve(Path::tidy($this->root));
+        } catch (PathTraversalDetected) {
+            return false;
+        }
 
-        return Str::startsWith($path, Path::tidy($this->root));
+        return $path === $root || Str::startsWith($path, Str::finish($root, '/'));
     }
 
     protected function relativePath($path)
