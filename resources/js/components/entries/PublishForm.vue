@@ -242,6 +242,17 @@
         </confirmation-modal>
 
         <confirmation-modal
+            :open="!!conflict"
+            :title="__('Entry Changed')"
+            :body-text="conflict?.message"
+            :button-text="__('Save Anyway')"
+            :cancel-text="__('Keep Editing')"
+            :danger="true"
+            @confirm="saveAnyway"
+            @cancel="conflict = null"
+        />
+
+        <confirmation-modal
             :open="pendingLocalization"
             :title="__('Unsaved Changes')"
             :body-text="__('Are you sure? Unsaved changes will be lost.')"
@@ -406,6 +417,7 @@ export default {
             autosaveIntervalInstance: null,
             syncFieldConfirmationText: __('messages.sync_entry_field_confirmation_text'),
             pendingLocalization: null,
+            conflict: null,
         };
     },
 
@@ -637,6 +649,15 @@ export default {
                 })
                 .catch((e) => {
                     this.closeAfterSave = false;
+                    this.isAutosave = false;
+
+                    if (e instanceof PipelineStopped && e.payload?.version) {
+                        // Someone else saved in the meantime. Autosave would hit the same conflict every interval.
+                        clearInterval(this.autosaveIntervalInstance);
+                        this.autosaveIntervalInstance = null;
+                        this.conflict = e.payload;
+                        return;
+                    }
 
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
@@ -854,6 +875,13 @@ export default {
             if (this.hasOrigin) this.$refs.container.desyncField(handle);
 
             this.$refs.container.setFieldValue(handle, value);
+        },
+
+        saveAnyway() {
+            this.$refs.container.setFieldValue('_version', this.conflict.version);
+            this.conflict = null;
+            if (typeof this.autosaveInterval === 'number' && !this.autosaveIntervalInstance) this.setAutosaveInterval();
+            this.save();
         },
 
         setAutosaveInterval() {
