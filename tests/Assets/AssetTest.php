@@ -541,6 +541,96 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function checking_existence_does_not_filter_the_whole_container_listing()
+    {
+        $disk = Storage::fake('test');
+        $disk->put('yes.txt', '');
+        $disk->put('.meta/yes.txt.yaml', '');
+        $disk->put('sub/.meta/nested.txt.yaml', '');
+        $disk->put('sub/.gitkeep', '');
+
+        $contents = new class extends \Statamic\Assets\AssetContainerContents
+        {
+            public $filtered = 0;
+
+            public function filteredFilesIn($folder, $recursive)
+            {
+                $this->filtered++;
+
+                return parent::filteredFilesIn($folder, $recursive);
+            }
+
+            public function metaFilesIn($folder, $recursive)
+            {
+                $this->filtered++;
+
+                return parent::metaFilesIn($folder, $recursive);
+            }
+        };
+
+        $this->app->bind(\Statamic\Assets\AssetContainerContents::class, fn () => $contents);
+
+        $asset = fn ($path) => (new Asset)->container($this->container)->path($path);
+
+        $this->assertTrue($asset('yes.txt')->exists());
+        $this->assertFalse($asset('no.txt')->exists());
+        $this->assertFalse($asset('sub')->exists());
+        $this->assertFalse($asset('.meta/yes.txt.yaml')->exists());
+        $this->assertFalse($asset('sub/.meta/nested.txt.yaml')->exists());
+        $this->assertFalse($asset('sub/.gitkeep')->exists());
+
+        $this->assertTrue($contents->hasMetaFile('.meta/yes.txt.yaml'));
+        $this->assertTrue($contents->hasMetaFile('sub/.meta/nested.txt.yaml'));
+        $this->assertFalse($contents->hasMetaFile('yes.txt'));
+        $this->assertFalse($contents->hasMetaFile('.meta/no.txt.yaml'));
+
+        $this->assertSame(0, $contents->filtered);
+    }
+
+    #[Test]
+    public function it_gets_size_and_last_modified_from_the_container_listing_without_touching_meta()
+    {
+        Carbon::setTestNow('2017-01-02 14:35:00');
+        $disk = Storage::fake('test');
+        $disk->put('foo/test.txt', 'four');
+        touch($disk->path('foo/test.txt'), Carbon::now()->timestamp);
+
+        $asset = (new Asset)->container($this->container)->path('foo/test.txt');
+
+        $this->assertSame(4, $asset->size());
+        $this->assertEquals(Carbon::now()->timestamp, $asset->lastModified()->timestamp);
+        $this->assertSame(4, $asset->getQueryableValue('size'));
+
+        // Neither needed the meta, so it was not read, generated or written.
+        $disk->assertMissing('foo/.meta/test.txt.yaml');
+        $this->assertNull($asset->getRawMeta());
+    }
+
+    #[Test]
+    public function generating_meta_uses_the_size_and_timestamp_the_listing_already_has()
+    {
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
+        touch(Storage::disk('test')->path('foo/image.jpg'), $listed = Carbon::parse('2021-02-22 09:41:42')->timestamp);
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/image.jpg');
+        $container->contents()->all();
+
+        // If the disk were asked again it would report this newer time.
+        touch(Storage::disk('test')->path('foo/image.jpg'), $listed + 100);
+        clearstatcache();
+
+        $meta = $asset->generateMeta();
+
+        $this->assertSame($listed, $meta['last_modified']);
+        $this->assertSame(Storage::disk('test')->size('foo/image.jpg'), $meta['size']);
+        $this->assertSame(30, $meta['width']);
+        $this->assertSame('image/jpeg', $meta['mime_type']);
+    }
+
+    #[Test]
     public function it_gets_the_filename()
     {
         $this->assertEquals('asset', (new Asset)->path('path/to/asset.jpg')->filename());
@@ -911,7 +1001,7 @@ class AssetTest extends TestCase
 
         Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
 
-        $asset->size();
+        $asset->mimeType();
 
         $this->assertEquals($completeMeta, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
     }
