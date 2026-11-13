@@ -280,8 +280,8 @@ class CompiledStore implements Store
                     continue;
                 }
 
-                if ($value !== null && ! ItemCodec::isPlain($value)) {
-                    $this->fallbackWrites[substr($name, strlen('value:'))] = $this->payload($value);
+                if ($value !== null && ! ItemCodec::isPlain($value, $serialized)) {
+                    $this->fallbackWrites[substr($name, strlen('value:'))] = self::FOREVER.($serialized ?? serialize($value));
                     $value = null;
                 }
 

@@ -5,6 +5,7 @@ namespace Statamic\Stache\Cache;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use ReflectionClass;
+use Throwable;
 
 /**
  * Turns an entry into a plain array and back, holding the same properties serializing it
@@ -59,20 +60,27 @@ class ItemCodec
 
     /**
      * Whether a value is made up of nothing but scalars, nulls, and arrays of them.
+     *
+     * A large array is serialized and looked through for an object, which is one pass in
+     * PHP's own code where walking it here would be a function call for every value in it.
+     * Something that only looks like one (a string that happens to hold the same characters)
+     * is taken for one, which is the safe way to be wrong: it's kept as it would have been
+     * by any other store. The serialized value is handed back for whoever needs it next.
      */
-    public static function isPlain($value): bool
+    public static function isPlain($value, ?string &$serialized = null): bool
     {
         if (! is_array($value)) {
             return $value === null || is_scalar($value);
         }
 
-        foreach ($value as $item) {
-            if (! self::isPlain($item)) {
-                return false;
-            }
+        try {
+            $serialized = serialize($value);
+        } catch (Throwable) {
+            return false;
         }
 
-        return true;
+        // An object, an enum, or a reference to another part of the value, where one can begin.
+        return ! preg_match('/(?:^|[;{])(?:[OCE]:\d+:"|[Rr]:\d+;)/', $serialized);
     }
 
     private static function encodeValue($value): array

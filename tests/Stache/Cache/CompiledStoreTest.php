@@ -497,6 +497,33 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
+    public function it_tells_plain_values_from_ones_holding_objects()
+    {
+        $plain = [1, 2.5, 'three', true, null, ['nested' => ['deeper' => ['x' => "a\0b", 'y' => 'O:8:"stdClass":0:{}']]]];
+
+        foreach ([null, 1, 'string', [], $plain, ['a' => ['b' => ['c' => NAN]]]] as $value) {
+            $this->assertTrue(ItemCodec::isPlain($value));
+        }
+
+        $shared = ['x' => 1];
+        $referencing = ['a' => &$shared, 'b' => &$shared];
+
+        foreach ([new \stdClass, ['a' => new \stdClass], ['a' => ['b' => Carbon::now()]], ['a' => fn () => true], [\Statamic\Fields\Value::class => collect()], $referencing] as $value) {
+            $this->assertFalse(ItemCodec::isPlain($value));
+        }
+
+        // A string that looks like the start of a serialized object, right where one could begin, is
+        // taken for one. That only means it's kept the way any other store would keep it.
+        $store = $this->store();
+        $store->forever('lookalike', ['a' => 'x', 'b' => 'O:8:"stdClass":0:{}']);
+        $store->forever('tricky', $tricky = ['a";O:8:"stdClass":0:{}' => 1]);
+        $store->persist();
+
+        $this->assertSame(['a' => 'x', 'b' => 'O:8:"stdClass":0:{}'], $this->store()->get('lookalike'));
+        $this->assertSame($tricky, $this->store()->get('tricky'));
+    }
+
+    #[Test]
     public function an_entry_holding_something_that_isnt_plain_isnt_encoded()
     {
         $this->assertNull(ItemCodec::encode($this->entry('one')->set('object', new \stdClass)));
