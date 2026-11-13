@@ -9,6 +9,7 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\YAML;
+use Statamic\Stache\Cache\CompiledStore;
 use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Terms\Value;
 use Statamic\Support\Arr;
@@ -121,18 +122,32 @@ class TaxonomyTermsStore extends ChildStore
         $indexes = $this->resolveIndexes()->except('associations');
         $associations = $this->index('associations');
 
-        $associations->forgetEntry($entry->id());
+        $rows = $terms->map(fn ($value, $slug) => [
+            'value' => $value,
+            'slug' => $slug,
+            'entry' => $entry->id(),
+            'collection' => $entry->collectionHandle(),
+            'site' => $entry->locale(),
+        ])->values()->all();
 
-        foreach ($terms as $slug => $value) {
-            $associations->push([
-                'value' => $value,
-                'slug' => $slug,
-                'entry' => $entry->id(),
-                'collection' => $entry->collectionHandle(),
-                'site' => $entry->locale(),
-            ]);
+        // Most saves don't touch an entry's terms. When what's there for the entry is what would be
+        // put there, the associations are left as they are rather than taken out, put back under
+        // new keys and written again. The terms' own indexes are still updated, since what they
+        // hold (how many published entries a term has, say) can change without the terms changing.
+        //
+        // A slug made of digits is a number here, having been an array key, and a string where the
+        // associations were built from the entries, so slugs are compared as strings.
+        $comparable = fn ($rows) => array_map(fn ($row) => ['slug' => (string) $row['slug']] + $row, $rows);
+
+        if ($comparable($associations->forEntry($entry->id())) !== $comparable($rows)) {
+            $associations->forgetEntry($entry->id());
+
+            foreach ($rows as $row) {
+                $associations->push($row);
+            }
+
+            $associations->cache();
         }
-        $associations->cache();
 
         foreach ($terms as $slug => $value) {
             $term = Term::find("$taxonomy::$slug") ?? $this->makeTerm($taxonomy, $slug);
@@ -226,6 +241,8 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->cacheItem($item);
         }
+
+        CompiledStore::persistAll();
     }
 
     public function delete($term)
@@ -241,6 +258,8 @@ class TaxonomyTermsStore extends ChildStore
 
             $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
         }
+
+        CompiledStore::persistAll();
     }
 
     protected function getItemFromModifiedPath($path)

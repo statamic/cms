@@ -4,6 +4,7 @@ namespace Statamic\Stache\Stores;
 
 use Statamic\Facades\File;
 use Statamic\Facades\Stache;
+use Statamic\Stache\Cache\CompiledStore;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
@@ -126,6 +127,11 @@ abstract class BasicStore extends Store
         $this->resolveIndexes()->each->updateItem($item);
 
         $this->cacheItem($item);
+
+        // The compiled store keeps what it's given until the end of the request, which suits filling the
+        // cache. A save is written straight away, so other processes aren't left working from what was
+        // there before for any longer than they would be with another store.
+        CompiledStore::persistAll();
     }
 
     public function delete($item)
@@ -139,6 +145,8 @@ abstract class BasicStore extends Store
         $this->forgetPath($key);
 
         $this->resolveIndexes()->filter->isCached()->each->forgetItem($key);
+
+        CompiledStore::persistAll();
     }
 
     protected function writeItemToDisk($item)

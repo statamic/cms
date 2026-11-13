@@ -114,6 +114,14 @@ class Associations extends Index
         return $this->grouped = $grouped;
     }
 
+    /**
+     * The associations an entry has, in the order they are stored.
+     */
+    public function forEntry($id): array
+    {
+        return $this->items()->filter(fn ($association) => $association['entry'] === $id)->values()->all();
+    }
+
     public function forgetEntry($id)
     {
         $this->items = $this->items()->reject(function ($association) use ($id) {
