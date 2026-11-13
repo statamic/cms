@@ -414,10 +414,7 @@ class CollectionEntriesStore extends ChildStore
             return $index->update();
         }
 
-        collect($ids)
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
+        $index->updateItems(collect($ids)->map(fn ($id) => Entry::find($id))->filter());
     }
 
     private function updateEntriesWithinStore($ids)
