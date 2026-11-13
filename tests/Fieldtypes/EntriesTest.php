@@ -143,6 +143,57 @@ class EntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_looks_the_entries_up_once_when_pre_processing_for_index()
+    {
+        config(['statamic.system.fake_sql_queries' => true]);
+
+        $queries = 0;
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Database\Events\QueryExecuted::class, function () use (&$queries) {
+            $queries++;
+        });
+
+        $this->fieldtype()->preProcessIndex([456, '123', 'draft']);
+
+        $this->assertSame(1, $queries);
+    }
+
+    #[Test]
+    public function it_lists_an_entry_once_when_pre_processing_for_index()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(['123', 456, '123']);
+
+        $this->assertEquals(['123', 456], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    #[Test]
+    public function it_localizes_and_includes_drafts_when_pre_processing_for_index()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->date('2021-01-02')->create();
+        EntryFactory::id('789-fr')->origin('789')->locale('fr')->collection('blog')->slug('three-fr')->data(['title' => 'Le Three'])->date('2021-01-02')->published(false)->create();
+
+        $preProcessed = $this->fieldtype([], $parent)->preProcessIndex(['789', 'invalid', 456, '123', '123-fr']);
+
+        $this->assertEquals(['789-fr', '123-fr'], $preProcessed->map(fn ($entry) => $entry['id'])->all()); // 456 isn't localized.
+        $this->assertEquals(['Le Three', 'Le One'], $preProcessed->map(fn ($entry) => $entry['title'])->all());
+    }
+
+    #[Test]
+    public function it_uses_a_substituted_entry_when_pre_processing_for_index()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->date('2021-01-02')->create();
+
+        Facades\Entry::substitute((clone Facades\Entry::find('456'))->set('title', 'Two, being previewed'));
+        Facades\Entry::substitute((clone Facades\Entry::find('123-fr'))->set('title', 'Le One, being previewed'));
+
+        $this->assertEquals(['Two, being previewed'], $this->fieldtype()->preProcessIndex([456])->map(fn ($entry) => $entry['title'])->all());
+        $this->assertEquals(['Le One, being previewed'], $this->fieldtype([], $parent)->preProcessIndex(['123'])->map(fn ($entry) => $entry['title'])->all());
+    }
+
+    #[Test]
     public function it_localizes_the_augmented_items_to_the_parent_entrys_locale()
     {
         $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
