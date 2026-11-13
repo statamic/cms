@@ -1722,6 +1722,7 @@ class EntryQueryBuilderTest extends TestCase
             'string in another case' => ['RED', ['a', 'b']],
             'string with a space' => ['red ', ['c']],
             'empty string' => ['', ['d', 'e', 'g']],
+            'null' => [null, ['d', 'e', 'g']],
             'true' => [true, ['f', 'h', 'i']],
             'false' => [false, ['d', 'e', 'g']],
             'one' => [1, ['f', 'h', 'i']],
