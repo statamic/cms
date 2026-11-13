@@ -18,7 +18,7 @@ class ItemCodec
      */
     public static function encode(object $item): ?array
     {
-        if (! method_exists($item, '__sleep')) {
+        if (! self::serializesTheOrdinaryWay($item)) {
             return null;
         }
 
@@ -30,7 +30,13 @@ class ItemCodec
         $encoded = [];
 
         foreach ($keep as $property) {
-            [$encodable, $value] = self::encodeValue($properties[$property] ?? null);
+            // Named but not there: a typed property nothing has been put in yet, which
+            // serializing would leave that way.
+            if (! array_key_exists($property, $properties)) {
+                return null;
+            }
+
+            [$encodable, $value] = self::encodeValue($properties[$property]);
 
             if (! $encodable) {
                 return null;
@@ -83,10 +89,26 @@ class ItemCodec
         return ! preg_match('/(?:^|[;{])(?:[OCE]:\d+:"|[Rr]:\d+;)/', $serialized);
     }
 
+    /**
+     * Whether an item is serialized by naming its properties and unserialized by having them
+     * put back, which is what this class does in its place. One that takes a hand in either
+     * (an entry class of an addon's, say) is left to be serialized.
+     */
+    private static function serializesTheOrdinaryWay(object $item): bool
+    {
+        static $classes = [];
+
+        return $classes[get_class($item)] ??= method_exists($item, '__sleep')
+            && ! method_exists($item, '__serialize')
+            && ! method_exists($item, '__unserialize')
+            && ! method_exists($item, '__wakeup');
+    }
+
     private static function encodeValue($value): array
     {
+        // A date keeps more than its time (its timezone, its locale), so it's kept serialized.
         if ($value instanceof CarbonInterface) {
-            return [true, ['__carbon' => [get_class($value), $value->format('Y-m-d H:i:s.u'), $value->getTimezone()->getName()]]];
+            return [true, ['__serialized' => serialize($value)]];
         }
 
         // Only a plain collection: a subclass would come back as something else.
@@ -107,10 +129,8 @@ class ItemCodec
             return $value;
         }
 
-        if (isset($value['__carbon'])) {
-            [$class, $time, $timezone] = $value['__carbon'];
-
-            return $class::createFromFormat('Y-m-d H:i:s.u', $time, $timezone);
+        if (isset($value['__serialized'])) {
+            return unserialize($value['__serialized']);
         }
 
         return new Collection($value['__collection']);
@@ -124,6 +144,6 @@ class ItemCodec
     {
         return is_array($value)
             && count($value) === 1
-            && (array_key_exists('__carbon', $value) || array_key_exists('__collection', $value));
+            && (array_key_exists('__serialized', $value) || array_key_exists('__collection', $value));
     }
 }

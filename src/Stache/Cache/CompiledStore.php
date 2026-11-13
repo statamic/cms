@@ -47,8 +47,8 @@ class CompiledStore implements Store
     private array $entries = [];
     private array $fallbackRead = [];
     private array $fallbackWrites = [];
-    private ?array $pointerWas = null;
-    private int $pointerCheckedAt = 0;
+    private ?string $generation = null;
+    private int $generationCheckedAt = 0;
     private array $seen = [];
     private array $fallbackSeen = [];
 
@@ -150,7 +150,10 @@ class CompiledStore implements Store
 
         // An object is serialized now, as any other store would, so that it's kept as it is at
         // this moment and whoever passed it in can go on to change it.
-        $serialize = $value === null || is_object($value);
+        // The same goes for an array with objects in it, like an index of dates. False is kept
+        // that way too, since it's what reading a compiled file that has gone away looks like.
+        $serialize = $value === null || $value === false || is_object($value)
+            || (is_array($value) && array_filter($value, 'is_object'));
 
         $this->values[$name] = $serialize ? null : $value;
         $this->writeToFallback($key, $serialize ? $this->payload($value) : null);
@@ -160,7 +163,17 @@ class CompiledStore implements Store
 
     public function increment($key, $value = 1)
     {
-        $this->forever($key, $new = ((int) $this->get($key)) + $value);
+        $new = ((int) $this->get($key)) + $value;
+
+        // Something that was going to expire still does.
+        $payload = array_key_exists($key, $this->fallbackWrites) ? $this->fallbackWrites[$key] : $this->readFallback($key);
+        $expires = strlen((string) $payload) >= 10 ? (int) substr($payload, 0, 10) : self::FOREVER;
+
+        if ($expires < self::FOREVER && $expires > time()) {
+            $this->put($key, $new, $expires - time());
+        } else {
+            $this->forever($key, $new);
+        }
 
         return $new;
     }
@@ -192,8 +205,15 @@ class CompiledStore implements Store
         $this->entries = $this->values = $this->loaded = $this->fallbackRead = $this->fallbackWrites = [];
         $this->seen = $this->fallbackSeen = [];
         $this->pointer = [];
+        $this->generation = '';
 
-        (new Filesystem)->deleteDirectory($this->directory);
+        $lock = $this->lock();
+
+        try {
+            (new Filesystem)->deleteDirectory($this->directory);
+        } finally {
+            $this->unlock($lock);
+        }
 
         return true;
     }
@@ -231,10 +251,7 @@ class CompiledStore implements Store
             return;
         }
 
-        @mkdir($this->directory, 0775, true);
-
-        $lock = fopen($this->directory.'/.lock', 'c');
-        flock($lock, LOCK_EX);
+        $lock = $this->lock();
 
         try {
             // What this process read, and where from, before reading it again:
@@ -243,13 +260,13 @@ class CompiledStore implements Store
 
             // Read again only if another process has written. Usually none has, and
             // what this one read is still what's there.
-            if ($this->pointer === null || $this->pointerFileDetails() !== $this->pointerWas) {
+            if ($this->pointer === null || $this->currentGeneration() !== $this->generation) {
                 $this->forgetWhatWasRead();
             }
 
             $pointer = $this->pointer();
 
-            $written = [];
+            $written = $combined = [];
 
             foreach ($this->entries as $collection => $rows) {
                 $pointer = $this->decideHowManyFiles($pointer, $collection, $rows);
@@ -261,6 +278,8 @@ class CompiledStore implements Store
                 }
 
                 foreach ($files as $file => $rows) {
+                    $combined[$file] = ($pointer[$file] ?? null) !== ($this->seen[$file] ?? null);
+
                     $written[$file] = $this->mergeEntries($pointer, $collection, $file, $rows) ?: null;
 
                     $pointer = $this->write($pointer, $file, $written[$file], 'entries');
@@ -285,14 +304,21 @@ class CompiledStore implements Store
                     $value = null;
                 }
 
+                $combined[$name] = $value !== null && ($pointer[$name] ?? null) !== ($this->seen[$name] ?? null);
+
                 $written[$name] = $this->mergeValue($pointer, $name, $value);
 
                 $pointer = $this->write($pointer, $name, $written[$name], 'values');
             }
 
-            $this->persistFallback();
+            // New files, then the pointer to them, then away with what the pointer no longer needs: a
+            // process that stops part way through leaves the store as it was, or as it was going to be.
+            $unneeded = $this->persistFallback();
 
             $this->writeAtomically($this->directory.'/pointer.json', json_encode($pointer, JSON_UNESCAPED_SLASHES));
+            $this->writeAtomically($this->directory.'/generation', $generation = bin2hex(random_bytes(8)));
+
+            array_map(fn ($path) => @unlink($path), $unneeded);
 
             // What was read before and hasn't been replaced since is still what's there, and so is what
             // was just written. A process that saves many times doesn't have to read it all back each time.
@@ -300,14 +326,45 @@ class CompiledStore implements Store
                 return ($pointer[$name] ?? null) === ($readFrom[$name] ?? null);
             }, ARRAY_FILTER_USE_KEY);
 
+            // What this process first saw is still what the Stache, which remembers what it has read, is
+            // working from, and so still what its next write should be compared with. Unless that write
+            // went in just as it was: then what's there now is exactly what the Stache has.
+            foreach ($combined as $name => $wasCombined) {
+                if (! $wasCombined) {
+                    $this->seen[$name] = $pointer[$name] ?? null;
+                }
+            }
+
+            foreach ($this->fallbackWrites as $key => $payload) {
+                $this->fallbackSeen[$key] = hash('xxh3', (string) $payload);
+            }
+
             $this->pointer = $pointer;
-            $this->pointerWas = $this->pointerFileDetails();
+            $this->generation = $generation;
             $this->entries = $this->values = $this->fallbackRead = $this->fallbackWrites = [];
-            $this->seen = $this->fallbackSeen = [];
         } finally {
-            flock($lock, LOCK_UN);
-            fclose($lock);
+            $this->unlock($lock);
         }
+    }
+
+    /**
+     * Held by whoever is writing, clearing out or flushing. It's kept beside the
+     * store's directory and not in it, so that flushing doesn't take it away.
+     */
+    private function lock()
+    {
+        @mkdir($this->directory, 0775, true);
+
+        $lock = fopen($this->directory.'.lock', 'c');
+        flock($lock, LOCK_EX);
+
+        return $lock;
+    }
+
+    private function unlock($lock): void
+    {
+        flock($lock, LOCK_UN);
+        fclose($lock);
     }
 
     /**
@@ -363,9 +420,7 @@ class CompiledStore implements Store
             return null;
         }
 
-        return array_is_list($ours) && array_is_list($theirs) && array_is_list($was)
-            ? $this->mergeLists($was, $theirs, $ours)
-            : $this->mergeKeys($was, $theirs, $ours);
+        return $this->mergeKeys($was, $theirs, $ours);
     }
 
     private function mergeKeys(array $was, array $theirs, array $ours): ?array
@@ -399,20 +454,6 @@ class CompiledStore implements Store
         return $merged;
     }
 
-    private function mergeLists(array $was, array $theirs, array $ours): ?array
-    {
-        foreach ([$was, $theirs, $ours] as $list) {
-            if (! ItemCodec::isPlain($list) || array_filter($list, 'is_array')) {
-                return null;
-            }
-        }
-
-        $removed = array_diff($was, $ours);
-        $added = array_diff($ours, $was, $theirs);
-
-        return array_values(array_merge(array_diff($theirs, $removed), $added));
-    }
-
     /**
      * Notes which file something was in the first time this process had anything to
      * do with it, so that it can tell later whether another process has replaced it.
@@ -441,21 +482,29 @@ class CompiledStore implements Store
      */
     public function collectGarbage(int $olderThanSeconds = 600): int
     {
-        $live = array_flip(array_filter($this->pointer(), 'is_string'));
-        $deleted = 0;
+        $lock = $this->lock();
 
-        foreach (['entries', 'values'] as $folder) {
-            foreach (glob($this->directory.'/'.$folder.'/*.php') ?: [] as $file) {
-                if (isset($live[$folder.'/'.basename($file)]) || filemtime($file) > time() - $olderThanSeconds) {
-                    continue;
+        try {
+            $this->forgetWhatWasRead();
+
+            $live = array_flip(array_filter($this->pointer(), 'is_string'));
+            $deleted = 0;
+
+            foreach (['entries', 'values'] as $folder) {
+                foreach (glob($this->directory.'/'.$folder.'/*.php') ?: [] as $file) {
+                    if (isset($live[$folder.'/'.basename($file)]) || filemtime($file) > time() - $olderThanSeconds) {
+                        continue;
+                    }
+
+                    @unlink($file);
+                    $deleted++;
                 }
-
-                @unlink($file);
-                $deleted++;
             }
-        }
 
-        return $deleted;
+            return $deleted;
+        } finally {
+            $this->unlock($lock);
+        }
     }
 
     /**
@@ -529,7 +578,7 @@ class CompiledStore implements Store
     private function pointer(): array
     {
         if ($this->pointer === null) {
-            $this->pointerWas = $this->pointerFileDetails();
+            $this->generation = $this->currentGeneration();
 
             $contents = @file_get_contents($this->directory.'/pointer.json');
 
@@ -540,30 +589,26 @@ class CompiledStore implements Store
     }
 
     /**
-     * Every write ends by replacing the pointer file, so a look at the file says whether another
-     * process has written anything. It's looked at no more than a hundred times a second, which
-     * costs a request nothing, and means a process that runs for a long time is never far behind.
+     * Every write ends by giving the store a new generation, so reading that one small file says
+     * whether another process has written anything. It's read no more than a hundred times a second,
+     * which costs a request nothing, and means a process that runs for a long time is never far behind.
      */
     private function forgetWhatWasReadIfAnotherProcessHasWritten(): void
     {
-        if ($this->pointer === null || ($now = hrtime(true)) - $this->pointerCheckedAt < 10_000_000) {
+        if ($this->pointer === null || ($now = hrtime(true)) - $this->generationCheckedAt < 10_000_000) {
             return;
         }
 
-        $this->pointerCheckedAt = $now;
+        $this->generationCheckedAt = $now;
 
-        if ($this->pointerFileDetails() !== $this->pointerWas) {
+        if ($this->currentGeneration() !== $this->generation) {
             $this->forgetWhatWasRead();
         }
     }
 
-    private function pointerFileDetails(): ?array
+    private function currentGeneration(): string
     {
-        clearstatcache(true, $file = $this->directory.'/pointer.json');
-
-        $details = @stat($file);
-
-        return $details ? [$details['ino'], $details['mtime'], $details['size']] : null;
+        return (string) @file_get_contents($this->directory.'/generation');
     }
 
     private function load(string $name)
@@ -584,20 +629,24 @@ class CompiledStore implements Store
 
     private function write(array $pointer, string $name, $value, string $folder): array
     {
+        $was = $pointer[$name] ?? null;
+
         if ($value === null) {
             unset($pointer[$name]);
+        } else {
+            $php = '<?php return '.var_export($value, true).";\n";
 
-            return $pointer;
+            $pointer[$name] = $folder.'/'.hash('xxh3', $php).'.php';
+
+            if (! is_file($this->directory.'/'.$pointer[$name])) {
+                $this->writeAtomically($this->directory.'/'.$pointer[$name], $php);
+            }
         }
 
-        $php = '<?php return '.var_export($value, true).";\n";
-        $file = $folder.'/'.hash('xxh3', $php).'.php';
-
-        if (! is_file($this->directory.'/'.$file)) {
-            $this->writeAtomically($this->directory.'/'.$file, $php);
+        // A file is cleared out some time after it was last needed, so that's when its clock starts.
+        if ($was !== null && $was !== ($pointer[$name] ?? null)) {
+            @touch($this->directory.'/'.$was);
         }
-
-        $pointer[$name] = $file;
 
         return $pointer;
     }
@@ -653,8 +702,14 @@ class CompiledStore implements Store
         $this->fallbackWrites[$key] = $payload;
     }
 
-    private function persistFallback(): void
+    /**
+     * Writes what belongs in the file store, and returns the paths of what no longer does,
+     * for deleting once the pointer has been replaced.
+     */
+    private function persistFallback(): array
     {
+        $unneeded = [];
+
         foreach ($this->fallbackWrites as $key => $payload) {
             $path = $this->fallback->path($key);
 
@@ -662,11 +717,13 @@ class CompiledStore implements Store
             $theirs = @file_get_contents($path) ?: '';
 
             if (isset($this->fallbackSeen[$key]) && hash('xxh3', $theirs) !== $this->fallbackSeen[$key] && $theirs !== (string) $payload) {
-                $payload = null;
+                $payload = $this->fallbackWrites[$key] = null;
             }
 
             if ($payload === null) {
-                @unlink($path);
+                if ($theirs !== '') {
+                    $unneeded[] = $path;
+                }
 
                 continue;
             }
@@ -680,5 +737,7 @@ class CompiledStore implements Store
 
             file_put_contents($path, $payload, LOCK_EX);
         }
+
+        return $unneeded;
     }
 }

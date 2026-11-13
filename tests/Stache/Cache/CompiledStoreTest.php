@@ -324,7 +324,7 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
-    public function lists_two_processes_added_to_are_combined()
+    public function a_list_is_combined_position_by_position()
     {
         $key = 'stache::indexes::entries::blog::_indexes';
 
@@ -333,14 +333,24 @@ class CompiledStoreTest extends TestCase
         $one = $this->store();
         $two = $this->store();
 
-        // One adds to the list and takes something off it, the other adds something else.
+        // One changes what's at a position, the other adds a position.
         $one->forever($key, ['id', 'path', 'title']);
         $two->forever($key, ['id', 'path', 'old', 'date']);
 
         $two->persist();
         $one->persist();
 
-        $this->assertSame(['id', 'path', 'date', 'title'], $this->store()->get($key));
+        $this->assertSame(['id', 'path', 'title', 'date'], $this->store()->get($key));
+
+        // Two that put different things at the same position can't both be right.
+        $three = $this->store();
+        $four = $this->store();
+        $three->forever($key, [...$three->get($key), 'slug']);
+        $four->forever($key, [...$four->get($key), 'uri']);
+        $four->persist();
+        $three->persist();
+
+        $this->assertNull($this->store()->get($key));
     }
 
     #[Test]
@@ -423,7 +433,7 @@ class CompiledStoreTest extends TestCase
         $store->persist();
 
         $files = fn () => collect((new Filesystem)->allFiles($this->directory))
-            ->reject(fn ($file) => $file->getFilename() === 'pointer.json')
+            ->reject(fn ($file) => in_array($file->getFilename(), ['pointer.json', 'generation']))
             ->mapWithKeys(fn ($file) => [$file->getRelativePathname() => [$file->getInode(), $file->getMTime()]])
             ->all();
 
@@ -437,6 +447,120 @@ class CompiledStoreTest extends TestCase
         $again->persist();
 
         $this->assertSame($before, $files());
+    }
+
+    #[Test]
+    public function a_second_write_in_one_process_is_still_compared_with_what_it_first_saw()
+    {
+        $index = 'stache::indexes::entries::blog::title';
+
+        tap($this->store())->forever($index, ['a' => 'Alfa', 'b' => 'Bravo'])->persist();
+
+        // A process reads an index, as the Stache does, and keeps it...
+        $process = $this->store();
+        $held = $process->get($index);
+
+        // ...another process changes one key...
+        $other = $this->store();
+        $other->forever($index, ['a' => 'Changed elsewhere'] + $other->get($index));
+        $other->persist();
+
+        // ...and the first writes twice, each time from what it's still holding.
+        $held['c'] = 'Charlie';
+        $process->forever($index, $held);
+        $process->persist();
+
+        $held['d'] = 'Delta';
+        $process->forever($index, $held);
+        $process->persist();
+
+        $this->assertSame(['a' => 'Changed elsewhere', 'b' => 'Bravo', 'c' => 'Charlie', 'd' => 'Delta'], $this->store()->get($index));
+    }
+
+    #[Test]
+    public function false_and_zero_come_back_as_they_went_in()
+    {
+        $store = $this->store();
+        $store->forever('false', false);
+        $store->forever('zero', 0);
+        $store->forever('empty', []);
+        $store->forever('string', '');
+        $store->persist();
+
+        $this->assertFalse($this->store()->get('false'));
+        $this->assertSame(0, $this->store()->get('zero'));
+        $this->assertSame([], $this->store()->get('empty'));
+        $this->assertSame('', $this->store()->get('string'));
+    }
+
+    #[Test]
+    public function an_array_of_objects_is_kept_as_it_was_when_given()
+    {
+        $store = $this->store();
+        $store->forever('dates', $dates = ['a' => Carbon::parse('2024-03-01')->toMutable()]);
+
+        $dates['a']->addYear();
+
+        $store->persist();
+
+        $this->assertSame('2024-03-01', $this->store()->get('dates')['a']->format('Y-m-d'));
+    }
+
+    #[Test]
+    public function incrementing_something_that_expires_leaves_it_expiring()
+    {
+        $store = $this->store();
+        $store->put('hits', 1, 60);
+        $store->persist();
+
+        $again = $this->store();
+        $this->assertSame(2, $again->increment('hits'));
+        $again->persist();
+
+        $path = (fn () => $this->fallback->path('hits'))->call($again);
+
+        $this->assertSame(2, $this->store()->get('hits'));
+        $this->assertEqualsWithDelta(time() + 60, (int) substr(file_get_contents($path), 0, 10), 2);
+    }
+
+    #[Test]
+    public function flushing_leaves_the_lock_where_it_is()
+    {
+        $store = $this->store();
+        $store->forever('one', 1);
+        $store->persist();
+
+        $this->assertFileExists($this->directory.'.lock');
+
+        $store->flush();
+
+        $this->assertFileExists($this->directory.'.lock');
+        $this->assertDirectoryDoesNotExist($this->directory);
+
+        $store->forever('two', 2);
+        $store->persist();
+
+        $this->assertSame(2, $this->store()->get('two'));
+        $this->assertNull($this->store()->get('one'));
+    }
+
+    #[Test]
+    public function a_file_is_cleared_out_some_time_after_it_was_last_needed_however_old_it_is()
+    {
+        $store = $this->store();
+        $store->forever('one', ['version' => 1]);
+        $store->persist();
+
+        foreach (glob($this->directory.'/values/*.php') as $file) {
+            touch($file, time() - 86400);
+        }
+
+        // Replaced a moment ago, so a process that read the pointer before that may still want it.
+        $store->forever('one', ['version' => 2]);
+        $store->persist();
+
+        $this->assertSame(0, $store->collectGarbage());
+        $this->assertCount(2, glob($this->directory.'/values/*.php'));
     }
 
     #[Test]
@@ -524,10 +648,51 @@ class CompiledStoreTest extends TestCase
     }
 
     #[Test]
+    public function a_date_keeps_everything_serializing_it_would()
+    {
+        $entry = $this->entry('one');
+        $entry->date(Carbon::parse('2024-03-01 10:30', 'Europe/Paris')->locale('fr'));
+
+        $decoded = ItemCodec::decode(ItemCodec::encode($entry));
+
+        $this->assertEquals(unserialize(serialize($entry)), $decoded);
+        $this->assertSame(unserialize(serialize($entry))->date()->locale, $decoded->date()->locale);
+    }
+
+    #[Test]
+    public function an_item_that_takes_a_hand_in_its_own_serializing_isnt_encoded()
+    {
+        $this->assertNull(ItemCodec::encode(new class
+        {
+            public $a = 1;
+
+            public function __sleep()
+            {
+                return ['a'];
+            }
+
+            public function __wakeup()
+            {
+                $this->a = 2;
+            }
+        }));
+
+        $this->assertNull(ItemCodec::encode(new class
+        {
+            public int $unset;
+
+            public function __sleep()
+            {
+                return ['unset'];
+            }
+        }));
+    }
+
+    #[Test]
     public function an_entry_holding_something_that_isnt_plain_isnt_encoded()
     {
         $this->assertNull(ItemCodec::encode($this->entry('one')->set('object', new \stdClass)));
         $this->assertNull(ItemCodec::encode($this->entry('one')->set('closure', fn () => true)));
-        $this->assertNotNull(ItemCodec::encode($this->entry('one')->set('lookalike', ['__carbon' => 'not a date'])));
+        $this->assertNotNull(ItemCodec::encode($this->entry('one')->set('lookalike', ['__serialized' => 'not a date'])));
     }
 }
