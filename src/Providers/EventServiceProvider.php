@@ -27,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
             \Statamic\Listeners\ClearState::class,
         ],
         \Illuminate\Foundation\Http\Events\RequestHandled::class => [
+            \Statamic\View\Instrumentation\RemoveMisplacedMarkersFromResponse::class,
             \Statamic\Listeners\ClearState::class,
         ],
         \Illuminate\Console\Events\CommandFinished::class => [

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cache as LaraCache;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
+use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
 use Statamic\View\State\CachesOutput;
 
@@ -65,6 +66,10 @@ class Cache extends Tags implements CachesOutput
         }
 
         if (request()->isLivePreview()) {
+            return false;
+        }
+
+        if ($this->parser instanceof RuntimeParser && $this->parser->instrumenting()) {
             return false;
         }
 

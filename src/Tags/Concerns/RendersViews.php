@@ -3,9 +3,14 @@
 namespace Statamic\Tags\Concerns;
 
 use Illuminate\Support\HtmlString;
+use Statamic\View\Antlers\AntlersString;
+use Statamic\View\Antlers\Language\Facades\Runtime;
+use Statamic\View\Instrumentation\InstrumentationState;
 
 trait RendersViews
 {
+    protected ?string $instrumentedSlotContent = null;
+
     protected function viewName($partial)
     {
         $partial = str_replace('/', '.', $partial);
@@ -49,13 +54,35 @@ trait RendersViews
 
     protected function getSlotContent(): HtmlString|string
     {
-        $content = trim($this->parse());
+        $parsed = $this->parse();
+
+        [$content, $this->instrumentedSlotContent] = Runtime::splitMarkers(
+            $parsed instanceof AntlersString ? $parsed->instrumented() : (string) $parsed
+        );
 
         if ($this->isAntlersBladeComponent()) {
             return new HtmlString($content);
         }
 
         return $content;
+    }
+
+    protected function withInstrumentedSlot(array $variables): array
+    {
+        $key = InstrumentationState::twinsKey();
+        $outputs = $variables[$key] ?? [];
+
+        unset($outputs['slot'], $variables[$key]);
+
+        if ($this->instrumentedSlotContent !== null && is_string($variables['slot'] ?? null)) {
+            $outputs['slot'] = [$variables['slot'], $this->instrumentedSlotContent];
+        }
+
+        if ($outputs !== []) {
+            $variables[$key] = $outputs;
+        }
+
+        return $variables;
     }
 
     /**

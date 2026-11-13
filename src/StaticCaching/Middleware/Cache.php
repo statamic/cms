@@ -22,6 +22,7 @@ use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\Replacer;
 use Statamic\StaticCaching\ResponseStatus;
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 use function Statamic\trans as __;
@@ -213,11 +214,19 @@ class Cache
             return false;
         }
 
+        if (Runtime::instrumenting()) {
+            return false;
+        }
+
         return true;
     }
 
     private function shouldBeCached($request, $response)
     {
+        if (Runtime::instrumenting()) {
+            return false;
+        }
+
         // Only GET requests should be cached. For instance, Live Preview hits frontend URLs as
         // POST requests to preview the changes. We don't want those to trigger any caching,
         // or else pending changes will be shown immediately, even without hitting save.

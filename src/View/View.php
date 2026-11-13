@@ -10,6 +10,7 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Engine as AntlersEngine;
+use Statamic\View\Antlers\Language\Facades\Runtime;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\LiteralReplacementManager;
 use Statamic\View\Antlers\Language\Runtime\StackReplacementManager;
@@ -139,7 +140,7 @@ class View
         $renderedContents = LiteralReplacementManager::processReplacements($renderedContents);
         $renderedContents = StackReplacementManager::processReplacements($renderedContents);
 
-        return $renderedContents;
+        return Runtime::removeMisplacedMarkers($renderedContents);
     }
 
     protected function shouldUseLayout()

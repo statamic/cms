@@ -135,7 +135,7 @@ class CoreModifiers extends Modifier
     {
         $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
 
-        return (string) Antlers::parse($value, $context, $trusted);
+        return (string) Antlers::parseWithoutInstrumentation($value, $context, $trusted);
     }
 
     /**
