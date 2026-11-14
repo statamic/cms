@@ -295,7 +295,19 @@ abstract class Store
 
     protected function getItemFromModifiedPath($path)
     {
-        return $this->makeItemFromFile($path, File::get($path));
+        $contents = File::get($path);
+
+        // A file a fresh listing shows was removed after the traversal stat'ed it is
+        // skipped, rather than rebuilt from no contents as a new, empty item
+        if ($contents === null) {
+            $listing = @scandir(dirname($path));
+
+            if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                return null;
+            }
+        }
+
+        return $this->makeItemFromFile($path, $contents);
     }
 
     public function paths()
@@ -313,12 +325,24 @@ abstract class Store
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $fileItems = $files->map(function ($timestamp, $path) {
+            $contents = File::get($path);
+
+            // A file a fresh listing shows was removed after the traversal stat'ed it is
+            // skipped, rather than rebuilt from no contents as a new, empty item
+            if ($contents === null) {
+                $listing = @scandir(dirname($path));
+
+                if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                    return null;
+                }
+            }
+
             return [
-                'item' => $item = $this->makeItemFromFile($path, File::get($path)),
+                'item' => $item = $this->makeItemFromFile($path, $contents),
                 'key' => $this->getItemKey($item),
                 'path' => $path,
             ];
-        });
+        })->filter();
 
         $items = $fileItems->reject(function ($item) {
             try {
