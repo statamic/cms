@@ -141,6 +141,23 @@ class StoreTest extends TestCase
         // A process that starts after the clear, as the one that warms usually is.
         $this->assertTrue((new TestStore)->indexes()->has('title'));
     }
+
+    #[Test]
+    public function an_index_used_again_after_clearing_is_still_recorded()
+    {
+        // Asset containers are cleared on every request when the watcher is on, and use
+        // their path index straight after. See https://github.com/statamic/cms/issues/3476
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+
+        $this->store->cacheIndexUsage('path');
+
+        $this->store->clear();
+
+        $this->store->cacheIndexUsage('path');
+
+        $this->assertEquals(['path'], Cache::get($cacheKey));
+        $this->assertTrue((new TestStore)->indexes()->has('path'));
+    }
 }
 
 class TestStore extends Store
