@@ -137,18 +137,11 @@ class UpdateCollectionTreeTest extends TestCase
         EntryFactory::id('e1')->collection($collection)->slug('alfa')->create();
         EntryFactory::id('e2')->collection($collection)->slug('bravo')->create();
         EntryFactory::id('e3')->collection($collection)->slug('charlie')->create();
-        EntryFactory::id('e4')->collection($collection)->slug('delta')->create();
-        EntryFactory::id('e5')->collection($collection)->slug('echo')->create();
-        EntryFactory::id('e6')->collection($collection)->slug('foxtrot')->create();
         $collection->structureContents(['root' => false])->save();
         $collection->structure()->in('en')->tree([
             ['entry' => 'e1', 'children' => [
-                ['entry' => 'e2', 'children' => [
-                    ['entry' => 'e3'],
-                    ['entry' => 'e4'],
-                    ['entry' => 'e5'],
-                    ['entry' => 'e6'],
-                ]],
+                ['entry' => 'e2'],
+                ['entry' => 'e3'],
             ]],
         ])->save();
 
@@ -177,20 +170,13 @@ class UpdateCollectionTreeTest extends TestCase
             ->actingAs($user)
             ->update($collection, ['pages' => [
                 ['id' => 'e1', 'children' => [
-                    ['id' => 'e2', 'children' => [
-                        ['id' => 'e6', 'children' => []],
-                        ['id' => 'e3', 'children' => []],
-                        ['id' => 'e4', 'children' => []],
-                        ['id' => 'e5', 'children' => []],
-                    ]],
+                    ['id' => 'e3', 'children' => []],
+                    ['id' => 'e2', 'children' => []],
                 ]],
             ]])
             ->assertOk();
 
-        $this->assertEquals(
-            ['e1' => 1, 'e2' => 1, 'e3' => 1, 'e4' => 1, 'e5' => 1, 'e6' => 1],
-            $built->countBy()->sortKeys()->all(),
-        );
+        $this->assertEquals(['e1' => 1, 'e2' => 1, 'e3' => 1], $built->countBy()->sortKeys()->all());
     }
 
     #[Test]

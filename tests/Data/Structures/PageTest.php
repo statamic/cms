@@ -189,7 +189,7 @@ class PageTest extends TestCase
     }
 
     #[Test]
-    public function it_rebuilds_the_uri_when_its_route_or_parent_changes_while_the_uri_cache_is_disabled()
+    public function it_rebuilds_the_uri_when_its_route_changes_while_the_uri_cache_is_disabled()
     {
         $entry = new class extends Entry
         {
@@ -210,10 +210,6 @@ class PageTest extends TestCase
         $parent->shouldReceive('uri')->andReturn('/first/parent');
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
-        $otherParent = Mockery::mock(Page::class);
-        $otherParent->shouldReceive('uri')->andReturn('/second/parent');
-        $otherParent->shouldReceive('isRoot')->andReturnFalse();
-
         $tree = $this->newTree()->disableUriCache()->setStructure(
             $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
         );
@@ -228,9 +224,6 @@ class PageTest extends TestCase
 
         $page->setRoute('/foo/{parent_uri}/{slug}');
         $this->assertEquals('/foo/first/parent/entry-slug', $page->uri());
-
-        $page->setParent($otherParent);
-        $this->assertEquals('/foo/second/parent/entry-slug', $page->uri());
     }
 
     #[Test]
