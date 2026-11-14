@@ -249,6 +249,8 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             return $cached;
         }
 
+        // With the shared cache off, a page still keeps its own URI,
+        // so siblings don't each rebuild their parent's.
         if (! $this->tree->uriCacheEnabled() && ! is_null($this->uri)) {
             return $this->uri;
         }

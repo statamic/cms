@@ -84,9 +84,11 @@ class CollectionTreeController extends CpController
             $isTopLevel = ! $parent || $parent->isRoot();
             $key = $isTopLevel ? '' : $parent->id();
 
+            // Moved pages under the same parent share siblings, so build that list once.
             $siblingUris[$key] ??= ($isTopLevel ? $tree->pages()->all()->slice(1) : $parent->pages()->all())
                 ->mapWithKeys(fn ($sibling) => [$sibling->reference() => $sibling->uri()]);
 
+            // The root is sliced off the top-level siblings, so it won't be in the list.
             $uri = $siblingUris[$key][$id] ?? $page->uri();
 
             if ($siblingUris[$key]->except($id)->contains($uri)) {
