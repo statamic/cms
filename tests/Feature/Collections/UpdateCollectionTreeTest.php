@@ -188,8 +188,8 @@ class UpdateCollectionTreeTest extends TestCase
             ->assertOk();
 
         $this->assertEquals(
-            ['e3' => 1, 'e4' => 1, 'e5' => 1, 'e6' => 1],
-            $built->countBy()->only(['e3', 'e4', 'e5', 'e6'])->sortKeys()->all(),
+            ['e1' => 1, 'e2' => 1, 'e3' => 1, 'e4' => 1, 'e5' => 1, 'e6' => 1],
+            $built->countBy()->sortKeys()->all(),
         );
     }
 
