@@ -367,6 +367,10 @@ class Date extends Fieldtype
 
     public function toQueryableValue($value)
     {
+        if ($value === 'now') {
+            return null;
+        }
+
         return $this->augment($value);
     }
 
