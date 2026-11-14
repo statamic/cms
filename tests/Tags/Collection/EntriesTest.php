@@ -254,6 +254,20 @@ class EntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_filters_by_a_fields_default_value()
+    {
+        $blueprint = Blueprint::makeFromFields(['my_toggle' => ['type' => 'toggle', 'default' => true]])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect([$blueprint]));
+
+        $this->makeEntry('unsaved')->save();
+        $this->makeEntry('explicit-true')->set('my_toggle', true)->save();
+        $this->makeEntry('explicit-false')->set('my_toggle', false)->save();
+
+        $this->assertEqualsCanonicalizing(['unsaved', 'explicit-true'], $this->getEntryIds(['my_toggle:is' => 'true']));
+        $this->assertEquals(['explicit-false'], $this->getEntryIds(['my_toggle:is' => 'false']));
+    }
+
+    #[Test]
     public function it_filters_by_future_and_past()
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00:12'));

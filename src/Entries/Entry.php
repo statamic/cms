@@ -1176,7 +1176,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             return $value;
         }
 
-        return $field->fieldtype()->toQueryableValue($value);
+        return $field->toQueryableValue($value);
     }
 
     private function queryableMethods(): array

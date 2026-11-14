@@ -488,7 +488,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             return $value;
         }
 
-        return $field->fieldtype()->toQueryableValue($value);
+        return $field->toQueryableValue($value);
     }
 
     private function queryableMethods(): array
