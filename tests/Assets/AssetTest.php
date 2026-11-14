@@ -3075,4 +3075,19 @@ YAML;
         $this->assertEquals('A', $asset->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
     }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'toggle', 'default' => true]]);
+        BlueprintRepository::shouldReceive('find')->with('assets/test_container')->andReturn($blueprint);
+
+        $asset = (new Asset)->path('test.txt')->container($this->container);
+
+        $this->assertTrue($asset->getQueryableValue('foo'));
+
+        $asset->set('foo', false);
+
+        $this->assertFalse($asset->getQueryableValue('foo'));
+    }
 }

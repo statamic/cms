@@ -11,6 +11,7 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
@@ -290,5 +291,20 @@ class FormTest extends TestCase
 
         $this->assertEquals('A', $form->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Facades\Blueprint::makeFromFields(['foo' => ['type' => 'toggle', 'default' => true]]);
+        Facades\Blueprint::shouldReceive('find')->with('forms.test')->andReturn($blueprint);
+
+        $form = Form::make('test');
+
+        $this->assertTrue($form->getQueryableValue('foo'));
+
+        $form->set('foo', false);
+
+        $this->assertFalse($form->getQueryableValue('foo'));
     }
 }
