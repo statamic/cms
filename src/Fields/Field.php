@@ -315,6 +315,15 @@ class Field implements Arrayable
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
     }
 
+    public function toQueryableValue($value)
+    {
+        if ($value === null && ! $this->hasComputedDefault()) {
+            $value = $this->defaultValue();
+        }
+
+        return $this->fieldtype()->toQueryableValue($value);
+    }
+
     public function hasComputedDefault(): bool
     {
         if (! isset($this->config['default'])) {

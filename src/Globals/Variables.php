@@ -304,7 +304,7 @@ class Variables implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
             return $value;
         }
 
-        return $field->fieldtype()->toQueryableValue($value);
+        return $field->toQueryableValue($value);
     }
 
     private function queryableMethods(): array

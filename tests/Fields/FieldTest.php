@@ -748,4 +748,32 @@ class FieldTest extends TestCase
         $this->assertEquals($field, $return);
         $this->assertEquals($form, $field->form());
     }
+
+    #[Test]
+    public function it_uses_the_default_when_converting_a_null_value_to_a_queryable_value()
+    {
+        $field = new Field('test', ['type' => 'toggle', 'default' => true]);
+
+        $this->assertTrue($field->toQueryableValue(null));
+        $this->assertTrue($field->toQueryableValue(true));
+        $this->assertFalse($field->toQueryableValue(false));
+    }
+
+    #[Test]
+    public function it_converts_a_null_value_to_a_queryable_value_when_there_is_no_default()
+    {
+        $this->assertFalse((new Field('test', ['type' => 'toggle']))->toQueryableValue(null));
+        $this->assertNull((new Field('test', ['type' => 'text']))->toQueryableValue(null));
+        $this->assertEquals('foo', (new Field('test', ['type' => 'text', 'default' => 'bar']))->toQueryableValue('foo'));
+    }
+
+    #[Test]
+    public function it_does_not_use_a_computed_default_when_converting_to_a_queryable_value()
+    {
+        Fields::computedDefault('computed-value', fn () => 'computed defined default');
+
+        $field = new Field('test', ['type' => 'text', 'default' => 'computed:computed-value']);
+
+        $this->assertNull($field->toQueryableValue(null));
+    }
 }

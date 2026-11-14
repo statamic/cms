@@ -278,7 +278,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $value;
         }
 
-        return $field->fieldtype()->toQueryableValue($value);
+        return $field->toQueryableValue($value);
     }
 
     private function queryableMethods(): array
