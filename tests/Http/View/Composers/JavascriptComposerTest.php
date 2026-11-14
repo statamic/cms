@@ -45,6 +45,18 @@ class JavascriptComposerTest extends TestCase
     }
 
     #[Test]
+    public function it_provides_the_after_save_default_to_script_config()
+    {
+        config()->set('statamic.cp.after_save', 'create_another');
+
+        $this->actingAs(User::make()->makeSuper()->save());
+
+        (new JavascriptComposer)->compose(app('view')->make('statamic::partials.scripts'));
+
+        $this->assertSame('create_another', Statamic::jsonVariables(request())['afterSave']);
+    }
+
+    #[Test]
     public function it_does_not_leak_fallback_locale_json_translations_when_locale_is_english()
     {
         app()->setFallbackLocale('de');

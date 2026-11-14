@@ -48,7 +48,7 @@
                         :disabled="!canSave"
                         :variant="!revisionsEnabled ? 'primary' : 'default'"
                         @click.prevent="save"
-                        v-text="saveText"
+                        :text="saveText"
                         v-tooltip="saveAndCloseTooltip"
                     />
                 </save-button-options>
@@ -529,7 +529,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save') ?? 'listing';
+            return this.getPreference('after_save') ?? this.$config.get('afterSave');
         },
 
         originOptions() {

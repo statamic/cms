@@ -420,7 +420,7 @@ function request() {
             signal: source.signal,
         })
         .then((response) => {
-            setColumns(response.data.meta.columns);
+            if (response.data.meta.columns) setColumns(response.data.meta.columns);
             activeFilterBadges.value = { ...response.data.meta.activeFilterBadges };
             items.value = Object.values(response.data.data);
             meta.value = response.data.meta;

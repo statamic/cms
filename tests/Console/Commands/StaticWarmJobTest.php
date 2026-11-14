@@ -31,6 +31,51 @@ class StaticWarmJobTest extends TestCase
     }
 
     #[Test]
+    public function it_dispatches_paginated_pages_with_the_same_job_class()
+    {
+        Queue::fake();
+
+        $mock = new MockHandler([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'page',
+            ]),
+        ]);
+
+        $job = new CustomPaginatedStaticWarmJob(new Request('GET', 'http://localhost/blog'), ['handler' => HandlerStack::create($mock)]);
+
+        $job->handle();
+
+        Queue::assertPushed(CustomPaginatedStaticWarmJob::class, 2);
+    }
+
+    #[Test]
+    public function it_doesnt_dispatch_paginated_pages_that_are_cached_under_the_same_url()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.ignore_query_strings' => true,
+        ]);
+
+        Queue::fake();
+
+        $mock = new MockHandler([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+        ]);
+
+        $job = new StaticWarmJob(new Request('GET', 'http://localhost/blog'), ['handler' => HandlerStack::create($mock)]);
+
+        $job->handle();
+
+        Queue::assertNothingPushed();
+    }
+
+    #[Test]
     public function it_sends_a_get_request_and_dispatches_static_warm_job_for_page_with_pagination()
     {
         Queue::fake();
@@ -172,4 +217,8 @@ class StaticWarmJobTest extends TestCase
         $folded = (new Response(200))->withHeader('X-Statamic-Pagination', '1, 3, pa,ge');
         $this->assertSame([1, 3, 'pa,ge'], $parser->parse($folded));
     }
+}
+
+class CustomPaginatedStaticWarmJob extends StaticWarmJob
+{
 }

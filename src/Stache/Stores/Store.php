@@ -337,6 +337,8 @@ abstract class Store
 
         $this->cachePaths($paths);
 
+        Stache::cacheStore()->forever("stache::timestamps::{$this->key()}", $files->all());
+
         $this->keys()->cache();
 
         Stache::duplicates()->cache();
@@ -393,7 +395,9 @@ abstract class Store
 
     public function clear()
     {
-        $this->paths()->keys()->each(function ($key) {
+        $cachedPaths = $this->paths ?? Stache::cacheStore()->get($this->pathsCacheKey(), []);
+
+        collect($cachedPaths)->keys()->each(function ($key) {
             $this->forgetItem($key);
         });
 

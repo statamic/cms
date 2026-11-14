@@ -1,7 +1,7 @@
 <template>
     <Modal v-model:open="open" :title="__('Change Password')">
         <template #trigger>
-            <Button v-text="__('Change Password')" ref="trigger" />
+            <Button :text="__('Change Password')" ref="trigger" />
         </template>
 
         <div class="publish-fields">

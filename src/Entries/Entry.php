@@ -52,6 +52,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Tags\Structure as StructureTag;
 use Statamic\View\Cascade;
 
 class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Contract, Localization, Protectable, ResolvesValuesContract, Responsable, SearchableContract
@@ -442,6 +443,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             Blink::store('structure-entries')->forget($this->id());
             Blink::forget($this->getOriginBlinkKey());
             Blink::store('collection-mounts')->flush();
+            StructureTag::forgetTrees();
         }
 
         if ($origin = $this->origin()) {
@@ -452,11 +454,14 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             $this->flushDescendantsCache($previousOrigin);
         }
 
-        if ($isNew && $this->collection()->orderable()) {
+        if ($isNew && $this->collection()->hasStructure()) {
             // The entry only gets appended to the tree when it's read, so anything that
             // read it before now would have cached a version without this entry in it.
             $this->collection()->structure()->flushCache($this->locale());
-            $this->collection()->updateEntryOrder([$this->id()]);
+
+            if ($this->collection()->orderable()) {
+                $this->collection()->updateEntryOrder([$this->id()]);
+            }
         }
 
         $stack = InitiatorStack::entry($this)->push();

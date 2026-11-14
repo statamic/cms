@@ -10,6 +10,7 @@ return [
     'array.config.mode' => 'The **dynamic** mode gives the user free control of the data, while **keyed** and **single** modes enforce strict keys.',
     'array.title' => 'Array',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
+    'assets.config.aspect_ratio' => 'The preview ratio in the Control Panel. Does not affect the original asset or your front end.',
     'assets.config.container' => 'Choose which asset container to use for this field.',
     'assets.config.dynamic' => 'Assets will be placed in a subfolder based on the value of this field.',
     'assets.config.folder' => 'Specify the initial directory.',

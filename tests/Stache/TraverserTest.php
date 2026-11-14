@@ -92,6 +92,31 @@ class TraverserTest extends TestCase
     }
 
     #[Test]
+    public function files_with_the_same_timestamp_are_ordered_by_path()
+    {
+        mkdir($this->tempDir.'/nested');
+        touch($this->tempDir.'/c.txt', 1234567891);
+        touch($this->tempDir.'/nested/b.txt', 1234567891);
+        touch($this->tempDir.'/a.txt', 1234567891);
+        touch($this->tempDir.'/later.txt', 1234567892);
+        touch($this->tempDir.'/earlier.txt', 1234567890);
+
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir);
+
+        $files = $this->traverser->traverse($store);
+
+        $dir = Path::tidy($this->tempDir);
+        $this->assertSame([
+            $dir.'/earlier.txt' => 1234567890,
+            $dir.'/a.txt' => 1234567891,
+            $dir.'/c.txt' => 1234567891,
+            $dir.'/nested/b.txt' => 1234567891,
+            $dir.'/later.txt' => 1234567892,
+        ], $files->all());
+    }
+
+    #[Test]
     public function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567891);

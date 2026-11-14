@@ -317,7 +317,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save') ?? 'listing';
+            return this.getPreference('after_save') ?? this.$config.get('afterSave');
         },
 
         direction() {

@@ -164,10 +164,9 @@ class TermRepository implements RepositoryContract
 
     public function entriesCount(Term $term, ?string $status = null): int
     {
-        $items = $this->store->store($term->taxonomyHandle())
+        $items = collect($this->store->store($term->taxonomyHandle())
             ->index('associations')
-            ->items()
-            ->where('value', $term->inDefaultLocale()->slug());
+            ->forValue($term->inDefaultLocale()->slug()));
 
         if ($term instanceof LocalizedTerm) {
             $items = $items->where('site', $term->locale());

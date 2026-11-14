@@ -10,7 +10,6 @@ use Statamic\Data\NestedFieldUpdater;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -641,18 +640,6 @@ class Bard extends Replicator
             })->all();
         })->all();
 
-        $linkCollections = $this->config('link_collections');
-
-        if (empty($linkCollections)) {
-            $site = Site::current()->handle();
-
-            $linkCollections = Blink::once('routable-collection-handles-'.$site, function () use ($site) {
-                return Collection::all()->reject(function ($collection) use ($site) {
-                    return is_null($collection->route($site));
-                })->map->handle()->values()->all();
-            });
-        }
-
         $data = [
             'existing' => $existing,
             'new' => $new ?? null,
@@ -660,7 +647,6 @@ class Bard extends Replicator
             'collapsed' => $this->config('collapse') ? array_keys($existing) : [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
-            'linkCollections' => $linkCollections,
             'linkData' => (object) $this->getLinkData($value),
             'linkTypes' => $this->linkTypesForToolbar(),
         ];

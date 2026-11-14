@@ -41,7 +41,9 @@ class Entries extends Provider
                 ->map->reference();
         }
 
-        $query->whereStatus('published');
+        if ($this->index->handle() !== 'cp') {
+            $query->whereStatus('published');
+        }
 
         return $query->pluck('reference');
     }
@@ -66,7 +68,7 @@ class Entries extends Provider
 
         $query = Entry::query()->where('id', $searchable->id());
 
-        if (! $filter) {
+        if (! $filter && $this->index->handle() !== 'cp') {
             $query->whereStatus('published');
         }
 
