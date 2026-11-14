@@ -10,3 +10,27 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+    commit-message:
+      prefix: "[6.x] "
+
+  # Version updates are disabled for these ecosystems. They're only here so
+  # security updates pick up the commit message prefix.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "[6.x] "
+
+  - package-ecosystem: "composer"
+    directory: "/tests/Composer/__fixtures__"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "[6.x] "

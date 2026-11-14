@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
         if (is_null($this->artisan)) {
             $this->artisan = tap(
                 (new Please($this->app, $this->events, Statamic::version()))
-                    ->resolveCommands($this->commands)
+                    ->resolveCommands([...($this->kernelCommands ?? []), ...$this->commands])
                     ->setContainerCommandLoader()
             )->setName('Statamic');
 

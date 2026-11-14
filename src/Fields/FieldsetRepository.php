@@ -46,7 +46,7 @@ class FieldsetRepository
         $fieldset = $this
             ->make($handle)
             ->initialPath($path)
-            ->setContents(YAML::file($path)->parse());
+            ->setContents(ParsedYamlFiles::parse($path));
 
         $this->fieldsets[$handle] = $fieldset;
 
@@ -228,7 +228,7 @@ class FieldsetRepository
                 return $this
                     ->make($handle)
                     ->initialPath($file)
-                    ->setContents(YAML::file($file)->parse());
+                    ->setContents(ParsedYamlFiles::parse($file));
             })
             ->keyBy->handle()
             ->collect();

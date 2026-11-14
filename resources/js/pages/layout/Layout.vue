@@ -83,6 +83,8 @@ onUnmounted(() => {
             <Nav />
             <!-- The data attribute allows CSS to target elements when max-width is disabled. -->
             <div id="main-content" scroll-region class="main-content sm:p-2 h-full flex-1 overflow-y-auto focus:outline-none rounded-t-2xl" :data-max-width-enabled="isMaxWidthEnabled">
+                <!-- Fills any gaps Safari hasn't painted yet during a fast scroll. See .main-content-backing in app.css. -->
+                <div class="main-content-backing" aria-hidden="true"></div>
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative content-card grid min-h-full mx-auto">
                     <!-- Data attribute used by the CSS style tag below to override max-width when disabled.-->
                     <div class="w-full min-w-0 mx-auto max-w-page max-[1220px]:mb-18" data-max-width-wrapper>

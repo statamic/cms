@@ -43,7 +43,7 @@ Statamic is broken out into a few Github repositories. Here's a quick summary of
 
 - [`statamic/cms`](https://github.com/statamic/cms) is the core package. It doesn't run by itself but is instead a dependency consumed by Laravel apps. 99% of the work goes on here.
 - [`statamic/statamic`](https://github.com/statamic/statamic) is the starter Laravel app used to build a new site.
-- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic documentation site that is curently running on [statamic.dev](https://statamic.dev).
+- [`statamic/docs`](https://github.com/statamic/docs) is the Statamic documentation site that is currently running on [statamic.dev](https://statamic.dev).
 
 ### Bug Reports
 
@@ -65,7 +65,7 @@ If you discover a security vulnerability, please review our [Security Policy](ht
 
 ### Documentation Edits
 
-Statamic's documentation lives in the [https://github.com/statamic/docs](https://github.com/statamic/docs) repository. Improvements or corrections to them can be submitted as a pull request.
+Statamic's documentation lives in the [statamic/docs](https://github.com/statamic/docs) repository. Improvements or corrections to them can be submitted as a pull request.
 
 ### Core Enhancements
 
@@ -73,7 +73,7 @@ If you would like to work on a new core feature or improvement, first create a [
 
 ### Compiled Assets
 
-If you are submitting a change that will affect a compiled file, such as most of the files in `resources/sass` or `resources/js`, do not commit the compiled files. Due to their large size, they cannot realistically be reviewed by our team. This could be exploited as a way to inject malicious code into Statamic. In order to defensively prevent this, all compiled files will be generated and committed by the core Statamic team.
+If you are submitting a change that will affect a compiled file, such as most of the files in `resources/css` or `resources/js`, do not commit the compiled files. Due to their large size, they cannot realistically be reviewed by our team. This could be exploited as a way to inject malicious code into Statamic. In order to defensively prevent this, all compiled files will be generated and committed by the core Statamic team.
 
 ### Control Panel Translations
 
@@ -83,9 +83,9 @@ We welcome new translations and updates! Please follow [these instructions](http
 
 Pull requests should clearly describe the problem and solution. Include the relevant issue number if there is one. If the pull request fixes a bug, it should include a new test case that demonstrates the issue, if possible.
 
-Creating a pull request that introduces a new feature or changes current behavior? Please open an issue referencing your PR in the [statamic/docs](https://github.com/statamic/docs/issues) repo. No need to write the docs yourself. We'll take care of that for you. Any hints or bullet points are appreciated though!
+You don't need to document new features or behavior changes. We'll write the docs as part of the release process. That said, if you've built something big and would prefer to write the docs yourself, feel free to open a pull request on the [statamic/docs](https://github.com/statamic/docs) repo.
 
-PR titles should include the major version number they're targeted at — e.g. [4.x] or [3.x].
+PR titles should include the major version number they're targeted at — e.g. [6.x].
 
 <br>
 Thank you! Stay rad. If you're not already rad, tell us and we will make it so.

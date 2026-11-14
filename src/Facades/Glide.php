@@ -15,7 +15,7 @@ use Statamic\Imaging\GlideManager;
  * @method static string route()
  * @method static string url()
  * @method static \Illuminate\Contracts\Cache\Repository cacheStore()
- * @method static void clearAsset($asset)
+ * @method static void clearAsset($asset, bool $preserveHybridMappings = false)
  * @method static array normalizeParameters($params)
  * @method static void generateHashUsing(\Closure $callback)
  *

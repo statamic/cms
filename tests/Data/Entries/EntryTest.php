@@ -706,6 +706,18 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function entries_created_in_the_same_request_get_urls_from_the_structure()
+    {
+        $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}')->structureContents(['max_depth' => 3]))->save();
+
+        $one = tap((new Entry)->locale('en')->collection($collection)->slug('one'))->save();
+        $this->assertEquals('/one', $one->url());
+
+        $two = tap((new Entry)->locale('en')->collection($collection)->slug('two'))->save();
+        $this->assertEquals('/two', $two->url());
+    }
+
+    #[Test]
     public function structured_entry_uri_updates_when_custom_field_in_route_changes()
     {
         $this->setSites([

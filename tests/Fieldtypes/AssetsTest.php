@@ -24,6 +24,7 @@ use Tests\TestCase;
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use \Tests\FakesRoles;
     use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
@@ -255,6 +256,54 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertEquals('file', $replaced[0]);
+    }
+
+    #[Test]
+    public function what_it_preloads_about_a_container_is_worked_out_once_however_many_fields_use_it()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $this->actingAs(tap(\Statamic\Facades\User::make()->assignRole('test'))->save());
+
+        $checks = 0;
+        \Illuminate\Support\Facades\Gate::after(function () use (&$checks) {
+            $checks++;
+        });
+
+        $first = $this->fieldtype(['container' => 'test'])->preload();
+        $checksForOne = $checks;
+        $second = $this->fieldtype(['container' => 'test'])->preload();
+
+        $this->assertGreaterThan(0, $checksForOne);
+        $this->assertSame($checksForOne, $checks);
+        $this->assertSame($first['container'], $second['container']);
+        $this->assertTrue($first['container']['can_view']);
+        $this->assertFalse($first['container']['can_delete']);
+        $this->assertEquals($first['columns']->map->toArray()->all(), $second['columns']->map->toArray()->all());
+    }
+
+    #[Test]
+    public function each_field_gets_columns_of_its_own()
+    {
+        $this->actingAs(tap(\Statamic\Facades\User::make()->makeSuper())->save());
+
+        $first = $this->fieldtype(['container' => 'test'])->preload()['columns'];
+        $first->first()->label('Changed');
+        $second = $this->fieldtype(['container' => 'test'])->preload()['columns'];
+
+        $this->assertNotSame($first->first(), $second->first());
+        $this->assertSame('Alt Text', $second->first()->label());
+    }
+
+    #[Test]
+    public function what_it_preloads_about_a_container_is_each_users_own()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+
+        $this->actingAs(tap(\Statamic\Facades\User::make()->id('one')->assignRole('test'))->save());
+        $this->assertFalse($this->fieldtype(['container' => 'test'])->preload()['container']['can_edit']);
+
+        $this->actingAs(tap(\Statamic\Facades\User::make()->id('two')->makeSuper())->save());
+        $this->assertTrue($this->fieldtype(['container' => 'test'])->preload()['container']['can_edit']);
     }
 
     public function fieldtype($config = [])
