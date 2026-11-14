@@ -194,4 +194,28 @@ class TraverserTest extends TestCase
 
         $this->assertCount(3, StacheFacade::store('entries')->store('blog')->paths());
     }
+
+    #[Test]
+    public function it_skips_a_file_removed_after_it_was_listed()
+    {
+        touch($this->tempDir.'/one.txt', 1234567891);
+        touch($this->tempDir.'/two.txt', 1234567892);
+
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir);
+
+        // Removing the file as the filter sees it is the same as a concurrent delete landing
+        // between the Finder listing it and the traverser reading its modified time.
+        $this->traverser = $this->traverser->filter(function ($file) {
+            if ($file->getFilename() === 'one.txt') {
+                unlink($file->getPathname());
+            }
+
+            return true;
+        });
+
+        $files = $this->traverser->traverse($store);
+
+        $this->assertSame([Path::tidy($this->tempDir.'/two.txt')], $files->keys()->all());
+    }
 }

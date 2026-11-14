@@ -94,7 +94,19 @@ class TaxonomyTermsStore extends ChildStore
         [$site, $slug] = explode('::', $key);
 
         if ($path = $this->getPath($key)) {
-            $term = $this->makeItemFromFile($path, File::get($path));
+            $contents = File::get($path);
+
+            // A file a fresh listing shows was removed after its path was recorded is
+            // treated as gone, rather than rebuilt from no contents as a new, empty item
+            if ($contents === null) {
+                $listing = @scandir(dirname($path));
+
+                if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                    return null;
+                }
+            }
+
+            $term = $this->makeItemFromFile($path, $contents);
         } else {
             $term = Term::make($slug)
                 ->taxonomy($this->childKey())
@@ -189,7 +201,19 @@ class TaxonomyTermsStore extends ChildStore
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $paths = $files->mapWithKeys(function ($timestamp, $path) {
-            $term = $this->makeItemFromFile($path, File::get($path));
+            $contents = File::get($path);
+
+            // A file a fresh listing shows was removed after its path was recorded is
+            // treated as gone, rather than rebuilt from no contents as a new, empty item
+            if ($contents === null) {
+                $listing = @scandir(dirname($path));
+
+                if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                    return [];
+                }
+            }
+
+            $term = $this->makeItemFromFile($path, $contents);
 
             return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
                 $this->cacheItem($localization);
@@ -259,6 +283,7 @@ class TaxonomyTermsStore extends ChildStore
 
     protected function getItemFromModifiedPath($path)
     {
-        return parent::getItemFromModifiedPath($path)->localizations()->all();
+        // The parent skips a file that vanished before its read, and returns null for it
+        return parent::getItemFromModifiedPath($path)?->localizations()->all() ?? [];
     }
 }
