@@ -5,9 +5,12 @@ namespace Tests\Feature\Collections;
 use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
+use Statamic\Routing\UrlBuilder;
+use Statamic\Structures\Page;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -124,6 +127,70 @@ class UpdateCollectionTreeTest extends TestCase
             ['entry' => 'e4'],
             ['entry' => 'e5'],
         ], $collection->structure()->in('en')->tree());
+    }
+
+    #[Test]
+    public function it_builds_each_siblings_uri_once_when_validating_moved_pages()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $collection = tap(Collection::make('test')->routes('{parent_uri}/{slug}'))->save();
+        EntryFactory::id('e1')->collection($collection)->slug('alfa')->create();
+        EntryFactory::id('e2')->collection($collection)->slug('bravo')->create();
+        EntryFactory::id('e3')->collection($collection)->slug('charlie')->create();
+        EntryFactory::id('e4')->collection($collection)->slug('delta')->create();
+        EntryFactory::id('e5')->collection($collection)->slug('echo')->create();
+        EntryFactory::id('e6')->collection($collection)->slug('foxtrot')->create();
+        $collection->structureContents(['root' => false])->save();
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'e1', 'children' => [
+                ['entry' => 'e2', 'children' => [
+                    ['entry' => 'e3'],
+                    ['entry' => 'e4'],
+                    ['entry' => 'e5'],
+                    ['entry' => 'e6'],
+                ]],
+            ]],
+        ])->save();
+
+        // Saving leaves the tree's pages cached in memory, where a request would load it fresh.
+        $collection->structure()->in('en')->flushCache();
+
+        $built = collect();
+
+        $this->app->bind(UrlBuilderContract::class, fn () => new class($built) extends UrlBuilder
+        {
+            public function __construct(private $built)
+            {
+            }
+
+            public function build($route)
+            {
+                if ($this->content instanceof Page) {
+                    $this->built->push($this->content->reference());
+                }
+
+                return parent::build($route);
+            }
+        });
+
+        $this
+            ->actingAs($user)
+            ->update($collection, ['pages' => [
+                ['id' => 'e1', 'children' => [
+                    ['id' => 'e2', 'children' => [
+                        ['id' => 'e6', 'children' => []],
+                        ['id' => 'e3', 'children' => []],
+                        ['id' => 'e4', 'children' => []],
+                        ['id' => 'e5', 'children' => []],
+                    ]],
+                ]],
+            ]])
+            ->assertOk();
+
+        $this->assertEquals(
+            ['e3' => 1, 'e4' => 1, 'e5' => 1, 'e6' => 1],
+            $built->countBy()->only(['e3', 'e4', 'e5', 'e6'])->sortKeys()->all(),
+        );
     }
 
     #[Test]
