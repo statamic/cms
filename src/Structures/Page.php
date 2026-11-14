@@ -49,6 +49,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     private $routeData;
     private $status;
     private $structure;
+    private $uri;
 
     public function __construct()
     {
@@ -170,6 +171,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
 
         $this->reference = $reference;
         $this->routeData = null;
+        $this->uri = null;
 
         return $this;
     }
@@ -247,14 +249,18 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             return $cached;
         }
 
+        if (! $this->tree->uriCacheEnabled() && ! is_null($this->uri)) {
+            return $this->uri;
+        }
+
         if (! $this->structure() instanceof CollectionStructure) {
-            return $uris[$this->reference] = $this->entry()->uri();
+            return $this->uri = $uris[$this->reference] = $this->entry()->uri();
         }
 
         $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
         $parentUri = Str::replace(['.html', '.htm'], '', $parentUri);
 
-        return $uris[$this->reference] = app(UrlBuilder::class)
+        return $this->uri = $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $parentUri,
