@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import Fieldtype from '../Fieldtype.vue';
 import SuggestsConditionalFields from '../../blueprints/SuggestsConditionalFields';
 import Tabs from '../../blueprints/Tabs.vue';
@@ -36,11 +37,29 @@ export default {
         };
     },
 
-    provide: {
-        isInsideSet: true,
+    provide() {
+        return {
+            isInsideSet: true,
+            setConfig: computed(() => this.meta?.setConfig),
+            setConfigErrors: this.setConfigErrors,
+        };
     },
 
     methods: {
+        setConfigErrors(id) {
+            for (const [tabIndex, tab] of this.value.entries()) {
+                const sectionIndex = tab.sections.findIndex(section => section._id === id);
+                if (sectionIndex === -1) continue;
+
+                const prefix = [this.fieldPathPrefix, this.handle, tabIndex, 'sections', sectionIndex, 'extraConfig', 'values'].filter(part => part !== undefined && part !== '').join('.') + '.';
+                return Object.fromEntries(Object.entries(this.publishContainer.errors || {})
+                    .filter(([key]) => key.startsWith(prefix))
+                    .map(([key, value]) => [key.slice(prefix.length), value]));
+            }
+
+            return {};
+        },
+
         tabsUpdated(tabs) {
             this.update(tabs);
         },
