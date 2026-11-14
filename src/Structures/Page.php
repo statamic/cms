@@ -121,6 +121,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setDepth($depth)
     {
         $this->depth = $depth;
+        $this->uri = null;
 
         return $this;
     }
@@ -207,6 +208,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setParent(?self $parent): self
     {
         $this->parent = $parent;
+        $this->uri = null;
 
         return $this;
     }
@@ -214,6 +216,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setRoute(?string $route): self
     {
         $this->route = $route;
+        $this->uri = null;
 
         return $this;
     }
@@ -307,6 +310,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setTree($tree)
     {
         $this->tree = $tree;
+        $this->uri = null;
 
         return $this;
     }
@@ -314,6 +318,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setRoot(bool $isRoot)
     {
         $this->isRoot = $isRoot;
+        $this->uri = null;
 
         return $this;
     }
