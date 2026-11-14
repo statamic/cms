@@ -258,7 +258,12 @@ class FrontendTest extends TestCase
             ->assertStatus(200)
             ->assertHeader('X-Statamic-Draft', true);
 
-        $this->assertEquals('Testing 123', $response->content());
+        $this->assertEquals(
+            'Testing 123<script type="application/json" id="statamic-preview-fields">'.
+            '{"version":1,"owner":{"reference":"entry::about","locale":"en"},"fields":[],"markers":[]}'.
+            '</script>',
+            $response->content()
+        );
     }
 
     #[Test]
