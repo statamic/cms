@@ -191,6 +191,8 @@ abstract class AbstractCacher implements Cacher
     /**
      * Save a URL to the cache.
      *
+     * @param  string  $key
+     * @param  string  $url
      * @return void
      */
     public function cacheUrl($key, $url, $domain = null)
@@ -265,6 +267,8 @@ abstract class AbstractCacher implements Cacher
 
     /**
      * Invalidate a wildcard URL.
+     *
+     * @param  string  $wildcard
      */
     protected function invalidateWildcardUrl($wildcard)
     {
@@ -362,6 +366,8 @@ abstract class AbstractCacher implements Cacher
 
     /**
      * Refresh a wildcard URL.
+     *
+     * @param  string  $wildcard
      */
     protected function refreshWildcardUrl($wildcard)
     {
