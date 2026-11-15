@@ -118,23 +118,31 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDomains()
     {
-        return collect($this->cache->get($this->normalizeKey('domains'), []));
+        // Caches written before domains were tracked per site only have the flat list.
+        return collect($this->cache->get($this->normalizeKey('domains'), []))
+            ->merge($this->getSiteDomains()->flatten())
+            ->unique()
+            ->values();
     }
 
     /**
-     * Cache the current domain.
+     * Cache the current domain under the site the given URL belongs to.
      *
      * @return void
      */
-    public function cacheDomain($domain = null)
+    public function cacheDomain($domain = null, $url = '/')
     {
-        $domains = $this->getDomains();
+        $domain ??= $this->getBaseUrl();
 
-        if (! $domains->contains($domain = $domain ?? $this->getBaseUrl())) {
-            $domains->push($domain);
+        $site = (Site::findByUrl($domain.$url) ?? Site::default())->handle();
+
+        $siteDomains = $this->getSiteDomains();
+
+        if (in_array($domain, $domains = $siteDomains->get($site, []))) {
+            return;
         }
 
-        $this->cache->forever($this->normalizeKey('domains'), $domains->all());
+        $this->cache->forever($this->normalizeKey('site-domains'), $siteDomains->put($site, [...$domains, $domain])->all());
     }
 
     /**
@@ -205,8 +213,7 @@ abstract class AbstractCacher implements Cacher
         $url = Str::removeLeft($url, $domain);
 
         $this->withUrlsLock(function () use ($key, $url, $domain) {
-            $this->cacheDomain($domain);
-            $this->cacheSiteDomain($domain, $url);
+            $this->cacheDomain($domain, $url);
 
             $urls = $this->getUrls($domain)->put($key, $url);
 
@@ -243,19 +250,6 @@ abstract class AbstractCacher implements Cacher
 
             $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
         });
-    }
-
-    private function cacheSiteDomain($domain, $url)
-    {
-        $site = (Site::findByUrl($domain.$url) ?? Site::default())->handle();
-
-        $siteDomains = $this->getSiteDomains();
-
-        if (in_array($domain, $domains = $siteDomains->get($site, []))) {
-            return;
-        }
-
-        $this->cache->forever($this->normalizeKey('site-domains'), $siteDomains->put($site, [...$domains, $domain])->all());
     }
 
     private function withUrlsLock(callable $callback)
