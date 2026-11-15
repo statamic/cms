@@ -72,4 +72,93 @@ class MountingTest extends TestCase
 
         $mount->save();
     }
+
+    #[Test]
+    public function updating_the_parent_of_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        Cache::clear();
+
+        $this->makeStructuredPages();
+        Collection::make('blog')->routes('{mount}/{slug}')->mount('blog')->save();
+        $one = EntryFactory::collection('blog')->slug('one')->create();
+
+        $this->assertEquals($one->id(), Entry::findByUri('/about/blog/one')->id());
+
+        Entry::find('about')->slug('info')->save();
+
+        $this->assertNull(Entry::findByUri('/about/blog/one'));
+        $this->assertEquals($one->id(), Entry::findByUri('/info/blog/one')->id());
+    }
+
+    #[Test]
+    public function moving_a_mounted_page_in_the_tree_will_update_the_uris_for_each_entry_in_that_collection()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        Cache::clear();
+
+        $pages = $this->makeStructuredPages();
+        Collection::make('blog')->routes('{mount}/{slug}')->mount('blog')->save();
+        $one = EntryFactory::collection('blog')->slug('one')->create();
+
+        $this->assertEquals($one->id(), Entry::findByUri('/about/blog/one')->id());
+
+        $pages->structure()->in('en')->tree([
+            ['entry' => 'about'],
+            ['entry' => 'contact', 'children' => [['entry' => 'blog']]],
+        ])->save();
+
+        $this->assertNull(Entry::findByUri('/about/blog/one'));
+        $this->assertEquals($one->id(), Entry::findByUri('/contact/blog/one')->id());
+    }
+
+    #[Test]
+    public function moving_a_localized_mounted_page_in_the_tree_will_update_the_uris_for_each_entry_in_that_collection()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        Cache::clear();
+
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr'],
+        ]);
+
+        $pages = $this->makeStructuredPages(['en', 'fr']);
+        collect(['about', 'contact', 'blog'])->each(
+            fn ($id) => Entry::find($id)->makeLocalization('fr')->id("{$id}-fr")->save()
+        );
+        $pages->structure()->in('fr')->tree([
+            ['entry' => 'about-fr', 'children' => [['entry' => 'blog-fr']]],
+            ['entry' => 'contact-fr'],
+        ])->save();
+
+        Collection::make('blog')->sites(['en', 'fr'])->routes('{mount}/{slug}')->mount('blog')->save();
+        $one = EntryFactory::collection('blog')->locale('fr')->slug('one')->create();
+
+        $this->assertEquals($one->id(), Entry::findByUri('/about/blog/one', 'fr')->id());
+
+        $pages->structure()->in('fr')->tree([
+            ['entry' => 'about-fr'],
+            ['entry' => 'contact-fr', 'children' => [['entry' => 'blog-fr']]],
+        ])->save();
+
+        $this->assertNull(Entry::findByUri('/about/blog/one', 'fr'));
+        $this->assertEquals($one->id(), Entry::findByUri('/contact/blog/one', 'fr')->id());
+    }
+
+    private function makeStructuredPages(array $sites = ['en'])
+    {
+        $pages = tap(Collection::make('pages')->sites($sites)->routes('{parent_uri}/{slug}')->structureContents(['root' => false]))->save();
+
+        EntryFactory::id('about')->collection('pages')->slug('about')->create();
+        EntryFactory::id('contact')->collection('pages')->slug('contact')->create();
+        EntryFactory::id('blog')->collection('pages')->slug('blog')->create();
+
+        $pages->structure()->in('en')->tree([
+            ['entry' => 'about', 'children' => [['entry' => 'blog']]],
+            ['entry' => 'contact'],
+        ])->save();
+
+        return $pages;
+    }
 }

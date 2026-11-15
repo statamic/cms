@@ -531,6 +531,8 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
     {
         Facades\Entry::updateUris($this, $ids);
 
+        $this->collectionsMountedOnEntries($ids)->each->updateEntryUris();
+
         return $this;
     }
 
@@ -977,6 +979,21 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         }
 
         return null;
+    }
+
+    private function collectionsMountedOnEntries($ids)
+    {
+        $mounted = Facades\Collection::all()
+            ->filter(fn ($collection) => $collection->mount()?->collectionHandle() === $this->handle());
+
+        if ($mounted->isEmpty() || collect($ids)->isEmpty()) {
+            return $mounted;
+        }
+
+        // Compare roots, since the ids may be localizations of the mounted entry.
+        $rootIds = collect($ids)->map(fn ($id) => Entry::find($id)?->root()->id())->filter()->all();
+
+        return $mounted->filter(fn ($collection) => in_array($collection->mount()->root()->id(), $rootIds));
     }
 
     private function queryableMethods(): array
