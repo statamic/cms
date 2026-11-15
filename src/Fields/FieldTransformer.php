@@ -35,9 +35,13 @@ class FieldTransformer
             ->merge($fieldtype->configFields()->all());
 
         $field = collect($submitted['config'])
-            ->reject(function ($value, $key) use ($fields) {
+            ->reject(function ($value, $key) use ($fields, $submitted) {
                 if ($key === 'isNew') {
                     return true;
+                }
+
+                if ($key === 'listable' && in_array($submitted['handle'], Field::LISTED_BY_DEFAULT)) {
+                    return false;
                 }
 
                 if ($key === 'width' && $value === 100) {
@@ -151,6 +155,7 @@ class FieldTransformer
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
         $mergedConfig['localizable'] = $mergedConfig['localizable'] ?? false;
+        $mergedConfig = static::normalizeListable($mergedConfig, $field['handle']);
 
         return [
             'handle' => $field['handle'],
@@ -170,6 +175,7 @@ class FieldTransformer
         $config['localizable'] = $config['localizable'] ?? false;
         $config = static::normalizeRequiredValidation($config);
         $config = static::normalizeVisibility($config);
+        $config = static::normalizeListable($config, $field['handle']);
 
         return [
             'handle' => $field['handle'],
@@ -217,6 +223,15 @@ class FieldTransformer
         app()->instance($binding, $fields);
 
         return $fields;
+    }
+
+    protected static function normalizeListable($config, $handle)
+    {
+        if (in_array($handle, Field::LISTED_BY_DEFAULT)) {
+            $config['listable'] ??= true;
+        }
+
+        return $config;
     }
 
     protected static function normalizeRequiredValidation($config)

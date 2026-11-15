@@ -2,6 +2,7 @@
 
 namespace Tests\Fields;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldset;
@@ -417,5 +418,85 @@ class FieldTransformerTest extends TestCase
             'width' => 100,
             'localizable' => false,
         ], $this->configToVue('addon::some_fieldset.field1'));
+    }
+
+    #[Test]
+    #[DataProvider('listedByDefaultHandles')]
+    public function it_keeps_listable_hidden_for_fields_listed_by_default($handle)
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text',
+            'handle' => $handle,
+            'type' => 'inline',
+            'config' => ['listable' => 'hidden'],
+        ]);
+
+        $this->assertEquals(['listable' => 'hidden'], $fromVue['field']);
+    }
+
+    #[Test]
+    public function it_removes_listable_hidden_for_other_fields()
+    {
+        $fromVue = FieldTransformer::fromVue([
+            'fieldtype' => 'text',
+            'handle' => 'test',
+            'type' => 'inline',
+            'config' => ['foo' => 'bar', 'listable' => 'hidden'],
+        ]);
+
+        $this->assertEquals(['foo' => 'bar'], $fromVue['field']);
+    }
+
+    #[Test]
+    #[DataProvider('listedByDefaultHandles')]
+    public function it_shows_fields_listed_by_default_as_listable($handle)
+    {
+        $config = FieldTransformer::toVue(['handle' => $handle, 'field' => []])['config'];
+
+        $this->assertTrue($config['listable']);
+    }
+
+    #[Test]
+    public function it_keeps_explicit_listable_for_fields_listed_by_default()
+    {
+        $config = FieldTransformer::toVue(['handle' => 'slug', 'field' => ['listable' => 'hidden']])['config'];
+
+        $this->assertEquals('hidden', $config['listable']);
+    }
+
+    #[Test]
+    public function it_doesnt_set_listable_for_other_fields()
+    {
+        $this->assertArrayNotHasKey('listable', $this->configToVue([]));
+    }
+
+    #[Test]
+    public function it_shows_referenced_fields_listed_by_default_as_listable()
+    {
+        $fieldset = tap(new Fieldset)
+            ->setHandle('common')
+            ->setContents(['fields' => [
+                [
+                    'handle' => 'slug',
+                    'field' => ['type' => 'slug'],
+                ],
+            ]]);
+
+        \Statamic\Facades\Fieldset::shouldReceive('all')->andReturn(collect(['common' => $fieldset]));
+
+        $vue = FieldTransformer::toVue(['handle' => 'slug', 'field' => 'common.slug']);
+
+        $this->assertTrue($vue['config']['listable']);
+        $this->assertEquals([], $vue['config_overrides']);
+    }
+
+    public static function listedByDefaultHandles()
+    {
+        return [
+            'title' => ['title'],
+            'slug' => ['slug'],
+            'date' => ['date'],
+            'author' => ['author'],
+        ];
     }
 }
