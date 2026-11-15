@@ -321,14 +321,17 @@ abstract class AbstractCacher implements Cacher
      */
     public function refreshUrl($url, $domain = null)
     {
-        $this->getInvalidationDomains($url, $domain)->each(function (string $domain) use ($url) {
-            $this->getUrls($domain)->filter(function (string $value) use ($url): bool {
+        $domain = $domain ?: $this->getBaseUrl();
+
+        $this->getInvalidationDomains($url, $domain)->each(function (string $target) use ($url, $domain) {
+            $this->getUrls($target)->filter(function (string $value) use ($url): bool {
                 return $value === $url || Str::startsWith($value, $url.'?');
-            })->each(function (string $url, string $key) use ($domain) {
-                // Warming an error response would just fail with the same error,
-                // so invalidate it and let the next request cache a fresh copy.
-                if ($this->hasCachedErrorResponse($key)) {
-                    $this->invalidateUrl($url, $domain);
+            })->each(function (string $url, string $key) use ($target, $domain) {
+                // Other domains were recorded from request hosts, which can be spoofed, so they're never
+                // requested. Warming an error response would just fail with the same error. In both
+                // cases, invalidate it instead and let the next request cache a fresh copy.
+                if ($target !== $domain || $this->hasCachedErrorResponse($key)) {
+                    $this->invalidateUrl($url, $target);
 
                     return;
                 }

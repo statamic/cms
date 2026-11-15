@@ -634,20 +634,39 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
-    public function refreshing_a_url_warms_it_under_every_domain_its_site_was_cached_under()
+    public function refreshing_a_url_invalidates_it_under_other_domains_its_site_was_cached_under()
     {
         Queue::fake();
 
         $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
         $cacher = new ApplicationCacher(app(Repository::class), []);
-        $this->cacheResponse($cacher, 'https://www.example.test/about');
+        $about = $this->cacheResponse($cacher, 'https://www.example.test/about');
+
+        $cacher->refreshUrls(['http://localhost/about']);
+
+        Queue::assertNothingPushed();
+        $this->assertFalse($cacher->hasCachedPage($about));
+    }
+
+    #[Test]
+    public function refreshing_a_url_only_warms_the_domain_it_resolves_to()
+    {
+        Queue::fake();
+
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $this->cacheResponse($cacher, 'http://localhost/about');
+
+        // Domains are recorded from the request's host, which can be spoofed.
+        $spoofed = $this->cacheResponse($cacher, 'http://attacker.test/about');
 
         $cacher->refreshUrls(['http://localhost/about']);
 
         Queue::assertPushed(StaticWarmJob::class, 1);
         Queue::assertPushed(StaticWarmJob::class, function ($job) {
-            return Str::startsWith((string) $job->request->getUri(), 'https://www.example.test/about?');
+            return Str::startsWith((string) $job->request->getUri(), 'http://localhost/about?');
         });
+        $this->assertFalse($cacher->hasCachedPage($spoofed));
     }
 
     #[Test]
