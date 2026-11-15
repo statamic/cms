@@ -7,6 +7,7 @@ use Facades\Statamic\API\ResourceAuthorizer;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -269,13 +270,9 @@ GQL;
     }
 
     #[Test]
+    #[DefineEnvironment('useMultipleSites')]
     public function it_queries_an_entry_in_a_specific_site()
     {
-        $this->setSites([
-            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
-            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
-        ]);
-
         Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
 
         EntryFactory::collection('events')->locale('fr')->origin('4')->id('44')->slug('event-two')->create();
@@ -623,6 +620,14 @@ GQL;
             ->assertJson(['errors' => [[
                 'message' => 'Cannot query field "one" on type "EntryInterface". Did you mean to use an inline fragment on "Entry_Blog_ArtDirected"?',
             ]]]);
+    }
+
+    protected function useMultipleSites()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]);
     }
 
     private function createStructuredCollection()
