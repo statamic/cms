@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
@@ -126,23 +127,13 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Cache the current domain under the site the given URL belongs to.
+     * Cache the current domain.
      *
      * @return void
      */
-    public function cacheDomain($domain = null, $url = '/')
+    public function cacheDomain($domain = null)
     {
-        $domain ??= $this->getBaseUrl();
-
-        $site = (Site::findByUrl($domain.$url) ?? Site::default())->handle();
-
-        $siteDomains = $this->getSiteDomains();
-
-        if (in_array($domain, $domains = $siteDomains->get($site, []))) {
-            return;
-        }
-
-        $this->cache->forever($this->normalizeKey('site-domains'), $siteDomains->put($site, [...$domains, $domain])->all());
+        $this->cacheSiteDomain($domain ?? $this->getBaseUrl(), Site::current()->handle());
     }
 
     /**
@@ -165,10 +156,8 @@ abstract class AbstractCacher implements Cacher
 
     /**
      * Get the domains each site has been cached under, keyed by site handle.
-     *
-     * @return \Illuminate\Support\Collection
      */
-    protected function getSiteDomains()
+    protected function getSiteDomains(): Collection
     {
         return collect($this->cache->get($this->normalizeKey('site-domains'), []));
     }
@@ -202,8 +191,6 @@ abstract class AbstractCacher implements Cacher
     /**
      * Save a URL to the cache.
      *
-     * @param  string  $key
-     * @param  string  $url
      * @return void
      */
     public function cacheUrl($key, $url, $domain = null)
@@ -213,7 +200,7 @@ abstract class AbstractCacher implements Cacher
         $url = Str::removeLeft($url, $domain);
 
         $this->withUrlsLock(function () use ($key, $url, $domain) {
-            $this->cacheDomain($domain, $url);
+            $this->cacheSiteDomain($domain, (Site::findByUrl($domain.$url) ?? Site::default())->handle());
 
             $urls = $this->getUrls($domain)->put($key, $url);
 
@@ -252,6 +239,17 @@ abstract class AbstractCacher implements Cacher
         });
     }
 
+    private function cacheSiteDomain(string $domain, string $site): void
+    {
+        $siteDomains = $this->getSiteDomains();
+
+        if (in_array($domain, $domains = $siteDomains->get($site, []))) {
+            return;
+        }
+
+        $this->cache->forever($this->normalizeKey('site-domains'), $siteDomains->put($site, [...$domains, $domain])->all());
+    }
+
     private function withUrlsLock(callable $callback)
     {
         if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
@@ -267,8 +265,6 @@ abstract class AbstractCacher implements Cacher
 
     /**
      * Invalidate a wildcard URL.
-     *
-     * @param  string  $wildcard
      */
     protected function invalidateWildcardUrl($wildcard)
     {
@@ -277,7 +273,7 @@ abstract class AbstractCacher implements Cacher
 
         [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
-        $this->getWildcardMatches($wildcard, $domain)->each(function ($url) use ($domain) {
+        $this->getWildcardMatches($wildcard, $domain)->each(function (string $url) use ($domain) {
             $this->invalidateUrl($url, $domain);
         });
     }
@@ -325,10 +321,10 @@ abstract class AbstractCacher implements Cacher
      */
     public function refreshUrl($url, $domain = null)
     {
-        $this->getInvalidationDomains($url, $domain)->each(function ($domain) use ($url) {
-            $this->getUrls($domain)->filter(function ($value) use ($url) {
+        $this->getInvalidationDomains($url, $domain)->each(function (string $domain) use ($url) {
+            $this->getUrls($domain)->filter(function (string $value) use ($url): bool {
                 return $value === $url || Str::startsWith($value, $url.'?');
-            })->each(function ($url, $key) use ($domain) {
+            })->each(function (string $url, string $key) use ($domain) {
                 // Warming an error response would just fail with the same error,
                 // so invalidate it and let the next request cache a fresh copy.
                 if ($this->hasCachedErrorResponse($key)) {
@@ -363,8 +359,6 @@ abstract class AbstractCacher implements Cacher
 
     /**
      * Refresh a wildcard URL.
-     *
-     * @param  string  $wildcard
      */
     protected function refreshWildcardUrl($wildcard)
     {
@@ -373,7 +367,7 @@ abstract class AbstractCacher implements Cacher
 
         [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
-        $this->getWildcardMatches($wildcard, $domain)->each(function ($url) use ($domain) {
+        $this->getWildcardMatches($wildcard, $domain)->each(function (string $url) use ($domain) {
             $this->refreshUrl($url, $domain);
         });
     }
@@ -412,13 +406,8 @@ abstract class AbstractCacher implements Cacher
      * from the domain the URL resolves to in this process. e.g. a queue worker has
      * no request, so a relative site URL resolves against the app url instead. So
      * the domains the URL's site has actually been cached under are included too.
-     *
-     * @param  string  $url
-     * @param  string|null  $domain
-     * @param  \Illuminate\Support\Collection|null  $siteDomains
-     * @return \Illuminate\Support\Collection
      */
-    protected function getInvalidationDomains($url, $domain = null, $siteDomains = null)
+    protected function getInvalidationDomains(string $url, ?string $domain = null, ?Collection $siteDomains = null): Collection
     {
         $domain = $domain ?: $this->getBaseUrl();
 
@@ -436,20 +425,15 @@ abstract class AbstractCacher implements Cacher
      *
      * The domain's own matches are returned as-is, followed by any other
      * matches the remaining domains have that aren't already included.
-     *
-     * @param  string  $wildcard
-     * @param  string|null  $domain
-     * @param  \Illuminate\Support\Collection|null  $siteDomains
-     * @return \Illuminate\Support\Collection
      */
-    protected function getWildcardMatches($wildcard, $domain = null, ?callable $urls = null, $siteDomains = null)
+    protected function getWildcardMatches(string $wildcard, ?string $domain = null, ?callable $urls = null, ?Collection $siteDomains = null): Collection
     {
-        $urls ??= fn ($domain) => $this->getUrls($domain);
+        $urls ??= fn (string $domain): Collection => $this->getUrls($domain);
 
-        return $this->getInvalidationDomains($wildcard, $domain, $siteDomains)->reduce(function ($matches, $domain, $index) use ($urls, $wildcard) {
+        return $this->getInvalidationDomains($wildcard, $domain, $siteDomains)->reduce(function (Collection $matches, string $domain, int $index) use ($urls, $wildcard): Collection {
             return $matches->concat(collect($urls($domain))
-                ->filter(fn ($url) => Str::startsWith($url, $wildcard))
-                ->reject(fn ($url) => $index > 0 && $matches->contains($url))
+                ->filter(fn (string $url): bool => Str::startsWith($url, $wildcard))
+                ->reject(fn (string $url): bool => $index > 0 && $matches->contains($url))
                 ->values());
         }, collect());
     }

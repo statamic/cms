@@ -147,11 +147,11 @@ class FileCacher extends AbstractCacher
     {
         $site = optional(Site::findByUrl($domain.$url))->handle();
 
-        $this->getInvalidationDomains($url, $domain)->each(function ($domain) use ($site, $url) {
+        $this->getInvalidationDomains($url, $domain)->each(function (string $domain) use ($site, $url) {
             $this
                 ->getUrls($domain)
-                ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-                ->each(function ($value, $key) use ($site, $domain) {
+                ->filter(fn (string $value): bool => $value === $url || str_starts_with($value, $url.'?'))
+                ->each(function (string $value, string $key) use ($site, $domain) {
                     $this->writer->delete($this->getFilePath($domain.$value, $site));
                     $this->forgetUrl($key, $domain);
                 });
