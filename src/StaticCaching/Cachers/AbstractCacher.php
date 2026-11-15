@@ -156,6 +156,16 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
+     * Get the domains each site has been cached under, keyed by site handle.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getSiteDomains()
+    {
+        return collect($this->cache->get($this->normalizeKey('site-domains'), []));
+    }
+
+    /**
      * Flush all the cached URLs.
      *
      * @return void
@@ -167,6 +177,7 @@ abstract class AbstractCacher implements Cacher
         });
 
         $this->cache->forget($this->normalizeKey('domains'));
+        $this->cache->forget($this->normalizeKey('site-domains'));
     }
 
     protected function flushDedicatedStore(): void
@@ -195,6 +206,7 @@ abstract class AbstractCacher implements Cacher
 
         $this->withUrlsLock(function () use ($key, $url, $domain) {
             $this->cacheDomain($domain);
+            $this->cacheSiteDomain($domain, $url);
 
             $urls = $this->getUrls($domain)->put($key, $url);
 
@@ -233,6 +245,19 @@ abstract class AbstractCacher implements Cacher
         });
     }
 
+    private function cacheSiteDomain($domain, $url)
+    {
+        $site = (Site::findByUrl($domain.$url) ?? Site::default())->handle();
+
+        $siteDomains = $this->getSiteDomains();
+
+        if (in_array($domain, $domains = $siteDomains->get($site, []))) {
+            return;
+        }
+
+        $this->cache->forever($this->normalizeKey('site-domains'), $siteDomains->put($site, [...$domains, $domain])->all());
+    }
+
     private function withUrlsLock(callable $callback)
     {
         if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
@@ -258,9 +283,7 @@ abstract class AbstractCacher implements Cacher
 
         [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
-        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
-            return Str::startsWith($url, $wildcard);
-        })->each(function ($url) use ($domain) {
+        $this->getWildcardMatches($wildcard, $domain)->each(function ($url) use ($domain) {
             $this->invalidateUrl($url, $domain);
         });
     }
@@ -308,28 +331,28 @@ abstract class AbstractCacher implements Cacher
      */
     public function refreshUrl($url, $domain = null)
     {
-        $this->getUrls($domain)->filter(function ($value) use ($url) {
-            return $value === $url || Str::startsWith($value, $url.'?');
-        })->each(function ($url, $key) use ($domain) {
-            // Warming an error response would just fail with the same error,
-            // so invalidate it and let the next request cache a fresh copy.
-            if ($this->hasCachedErrorResponse($key)) {
-                $this->invalidateUrl($url, $domain);
+        $this->getInvalidationDomains($url, $domain)->each(function ($domain) use ($url) {
+            $this->getUrls($domain)->filter(function ($value) use ($url) {
+                return $value === $url || Str::startsWith($value, $url.'?');
+            })->each(function ($url, $key) use ($domain) {
+                // Warming an error response would just fail with the same error,
+                // so invalidate it and let the next request cache a fresh copy.
+                if ($this->hasCachedErrorResponse($key)) {
+                    $this->invalidateUrl($url, $domain);
 
-                return;
-            }
+                    return;
+                }
 
-            $url = ($domain ?: $this->getBaseUrl()).$url;
+                $url = RecacheToken::addToUrl($domain.$url);
 
-            $url = RecacheToken::addToUrl($url);
+                $request = new GuzzleRequest('GET', $url);
 
-            $request = new GuzzleRequest('GET', $url);
+                $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
 
-            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
-
-            $job::dispatch($request, [])
-                ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
-                ->onQueue(config('statamic.static_caching.warm_queue'));
+                $job::dispatch($request, [])
+                    ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
+                    ->onQueue(config('statamic.static_caching.warm_queue'));
+            });
         });
     }
 
@@ -356,9 +379,7 @@ abstract class AbstractCacher implements Cacher
 
         [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
 
-        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
-            return Str::startsWith($url, $wildcard);
-        })->each(function ($url) use ($domain) {
+        $this->getWildcardMatches($wildcard, $domain)->each(function ($url) use ($domain) {
             $this->refreshUrl($url, $domain);
         });
     }
@@ -388,6 +409,55 @@ abstract class AbstractCacher implements Cacher
     public function hasCachedPage(Request $request)
     {
         return $this->getCachedPage($request) !== null;
+    }
+
+    /**
+     * Get the domains a URL should be invalidated under.
+     *
+     * Pages are tracked under the domain they were requested from, which can differ
+     * from the domain the URL resolves to in this process. e.g. a queue worker has
+     * no request, so a relative site URL resolves against the app url instead. So
+     * the domains the URL's site has actually been cached under are included too.
+     *
+     * @param  string  $url
+     * @param  string|null  $domain
+     * @param  \Illuminate\Support\Collection|null  $siteDomains
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getInvalidationDomains($url, $domain = null, $siteDomains = null)
+    {
+        $domain = $domain ?: $this->getBaseUrl();
+
+        if (is_null($site = Site::findByUrl($domain.$url))) {
+            return collect([$domain]);
+        }
+
+        $siteDomains ??= $this->getSiteDomains();
+
+        return collect([$domain, ...$siteDomains->get($site->handle(), [])])->unique()->values();
+    }
+
+    /**
+     * Get the cached URLs matching a wildcard across its invalidation domains.
+     *
+     * The domain's own matches are returned as-is, followed by any other
+     * matches the remaining domains have that aren't already included.
+     *
+     * @param  string  $wildcard
+     * @param  string|null  $domain
+     * @param  \Illuminate\Support\Collection|null  $siteDomains
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getWildcardMatches($wildcard, $domain = null, ?callable $urls = null, $siteDomains = null)
+    {
+        $urls ??= fn ($domain) => $this->getUrls($domain);
+
+        return $this->getInvalidationDomains($wildcard, $domain, $siteDomains)->reduce(function ($matches, $domain, $index) use ($urls, $wildcard) {
+            return $matches->concat(collect($urls($domain))
+                ->filter(fn ($url) => Str::startsWith($url, $wildcard))
+                ->reject(fn ($url) => $index > 0 && $matches->contains($url))
+                ->values());
+        }, collect());
     }
 
     protected function getPathAndDomain($url)

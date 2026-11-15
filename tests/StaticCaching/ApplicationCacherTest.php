@@ -582,6 +582,88 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
+    public function invalidating_a_url_invalidates_it_under_every_domain_its_site_was_cached_under()
+    {
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $about = $this->cacheResponse($cacher, 'https://www.example.test/about');
+        $contact = $this->cacheResponse($cacher, 'https://www.example.test/contact');
+
+        // Outside of a request, the site resolves to the app url instead of the requested domain.
+        $cacher->invalidateUrls(['http://localhost/about']);
+
+        $this->assertEquals(['/contact'], $cacher->getUrls('https://www.example.test')->values()->all());
+        $this->assertFalse($cacher->hasCachedPage($about));
+        $this->assertTrue($cacher->hasCachedPage($contact));
+    }
+
+    #[Test]
+    public function invalidating_a_wildcard_invalidates_it_under_every_domain_its_site_was_cached_under()
+    {
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $one = $this->cacheResponse($cacher, 'https://www.example.test/blog/one');
+        $two = $this->cacheResponse($cacher, 'https://www.example.test/blog/two');
+        $about = $this->cacheResponse($cacher, 'https://www.example.test/about');
+
+        $cacher->invalidateUrls(['http://localhost/blog/*']);
+
+        $this->assertEquals(['/about'], $cacher->getUrls('https://www.example.test')->values()->all());
+        $this->assertFalse($cacher->hasCachedPage($one));
+        $this->assertFalse($cacher->hasCachedPage($two));
+        $this->assertTrue($cacher->hasCachedPage($about));
+    }
+
+    #[Test]
+    public function invalidating_a_url_leaves_other_sites_domains_alone()
+    {
+        $this->setSites([
+            'a' => ['name' => 'A', 'url' => 'http://a.test/', 'locale' => 'en_US'],
+            'b' => ['name' => 'B', 'url' => 'http://b.test/', 'locale' => 'en_US'],
+        ]);
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $a = $this->cacheResponse($cacher, 'http://a.test/about');
+        $secureA = $this->cacheResponse($cacher, 'https://a.test/about');
+        $b = $this->cacheResponse($cacher, 'http://b.test/about');
+
+        $cacher->invalidateUrls(['http://a.test/about']);
+
+        $this->assertFalse($cacher->hasCachedPage($a));
+        $this->assertFalse($cacher->hasCachedPage($secureA));
+        $this->assertTrue($cacher->hasCachedPage($b));
+    }
+
+    #[Test]
+    public function refreshing_a_url_warms_it_under_every_domain_its_site_was_cached_under()
+    {
+        Queue::fake();
+
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $cacher = new ApplicationCacher(app(Repository::class), []);
+        $this->cacheResponse($cacher, 'https://www.example.test/about');
+
+        $cacher->refreshUrls(['http://localhost/about']);
+
+        Queue::assertPushed(StaticWarmJob::class, 1);
+        Queue::assertPushed(StaticWarmJob::class, function ($job) {
+            return Str::startsWith((string) $job->request->getUri(), 'https://www.example.test/about?');
+        });
+    }
+
+    #[Test]
+    public function flushing_forgets_the_domains_each_site_was_cached_under()
+    {
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, []);
+        $this->cacheResponse($cacher, 'https://www.example.test/about');
+
+        $cacher->flush();
+
+        $this->assertNull($cache->get('static-cache:site-domains'));
+    }
+
+    #[Test]
     public function it_flushes()
     {
         $cache = app(Repository::class);
@@ -704,6 +786,17 @@ class ApplicationCacherTest extends TestCase
                 'http://example.com/test?alfa=a',
             ],
         ];
+    }
+
+    private function cacheResponse(ApplicationCacher $cacher, string $url): Request
+    {
+        $request = Request::create($url);
+        $response = response('content', 200);
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+
+        return $request;
     }
 }
 

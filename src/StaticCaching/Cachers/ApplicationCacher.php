@@ -165,14 +165,16 @@ class ApplicationCacher extends AbstractCacher
             [$url, $domain] = $this->getPathAndDomain($url);
         }
 
-        $this
-            ->getUrls($domain)
-            ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) use ($domain) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
-                $this->forgetUrl($key, $domain);
-            });
+        $this->getInvalidationDomains($url, $domain)->each(function ($domain) use ($url) {
+            $this
+                ->getUrls($domain)
+                ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
+                ->each(function ($value, $key) use ($domain) {
+                    $this->cache->forget($this->normalizeKey('responses:'.$key));
+                    $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+                    $this->forgetUrl($key, $domain);
+                });
+        });
 
         UrlInvalidated::dispatch($url, $domain);
     }
@@ -199,9 +201,18 @@ class ApplicationCacher extends AbstractCacher
         $removed = [];
         $events = [];
 
-        $invalidate = function ($path, $domain) use (&$indexes, &$removed, &$events) {
-            foreach ($indexes[$domain]['paths'][$path] ?? [] as $key) {
-                $removed[$domain][$key] = true;
+        // Read once, as every URL and wildcard match looks up the domains to invalidate it under.
+        $siteDomains = $this->getSiteDomains();
+
+        $index = function ($domain) use (&$indexes) {
+            return $indexes[$domain] ??= $this->getUrlIndex($domain);
+        };
+
+        $invalidate = function ($path, $domain) use ($index, $siteDomains, &$removed, &$events) {
+            foreach ($this->getInvalidationDomains($path, $domain, $siteDomains) as $target) {
+                foreach ($index($target)['paths'][$path] ?? [] as $key) {
+                    $removed[$target][$key] = true;
+                }
             }
 
             $events[] = [$path, $domain];
@@ -212,19 +223,17 @@ class ApplicationCacher extends AbstractCacher
 
             [$path, $domain] = $this->getPathAndDomain($wildcard ? substr($url, 0, -1) : $url);
 
-            $indexes[$domain] ??= $this->getUrlIndex($domain);
-
             if (! $wildcard) {
                 $invalidate($path, $domain);
 
                 continue;
             }
 
-            // Match against the index as it stands before this wildcard, like
+            // Match against the indexes as they stand before this wildcard, like
             // invalidateWildcardUrl() does, then invalidate each match in turn.
-            $matches = collect($indexes[$domain]['urls'])
-                ->reject(fn ($value, $key) => isset($removed[$domain][$key]))
-                ->filter(fn ($value) => Str::startsWith($value, $path));
+            $matches = $this->getWildcardMatches($path, $domain, function ($target) use ($index, &$removed) {
+                return collect($index($target)['urls'])->reject(fn ($value, $key) => isset($removed[$target][$key]));
+            }, $siteDomains);
 
             foreach ($matches as $match) {
                 $invalidate($match, $domain);

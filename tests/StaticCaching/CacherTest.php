@@ -315,6 +315,10 @@ class CacherTest extends TestCase
         $cache->shouldReceive('forever')->with('static-cache:domains', ['http://example.com'])->once()->andReturnUsing(function () use ($locked) {
             $this->assertTrue($locked->value, 'Domains were written outside the lock.');
         });
+        $cache->shouldReceive('get')->with('static-cache:site-domains', [])->andReturn([]);
+        $cache->shouldReceive('forever')->with('static-cache:site-domains', ['en' => ['http://example.com']])->once()->andReturnUsing(function () use ($locked) {
+            $this->assertTrue($locked->value, 'Site domains were written outside the lock.');
+        });
         $cache->shouldReceive('forever')->with($urlsKey, ['one' => '/one'])->once()->andReturnUsing(function () use ($locked) {
             $this->assertTrue($locked->value, 'URLs were written outside the lock.');
         });
