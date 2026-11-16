@@ -126,7 +126,7 @@ class ServiceProvider extends LaravelServiceProvider
         // When the cascade gets hydrated, insert it into the
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
-            app(Session::class)->setCascade($cascade->toArray());
+            app(Session::class)->setCascade(array_merge(view()->getShared(), $cascade->toArray()));
         });
 
         VerifyCsrfToken::except([
