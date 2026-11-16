@@ -14,7 +14,7 @@
 
     <StackContent>
         <section v-if="!loading" class="isolate">
-            <Tabs v-model:modelValue="activeTab">
+            <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
                     <TabTrigger name="conditions" :text="__('Conditions')" />
@@ -280,7 +280,7 @@ export default {
                 .post(cp_url('fields/update'), {
                     id: this.id,
                     type: this.type,
-                    values: this.values,
+                    values: this.$refs.container.visibleValues,
                     fields: this.fields,
                     isInsideSet: this.isInsideSet,
                 })
