@@ -9,9 +9,11 @@ const props = defineProps({
     active: { type: Number, default: -1 },
     /** Show the highlighted one's full instructions in a tooltip. */
     explain: { type: Boolean, default: false },
+    /** Offer a new prompt, with a button beside the heading */
+    create: { type: Boolean, default: false },
 });
 
-defineEmits(['pick']);
+defineEmits(['pick', 'create']);
 
 // Hovering one shows its full instructions in a tooltip off to the side, as the row cuts them short. So does Tab, for the highlighted one, and then it follows the highlight until Tab puts it away.
 // Focus stays in the input, so it's shown from here rather than with v-tooltip.
@@ -66,7 +68,19 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
 <template>
     <!-- Laid out like the keyboard shortcuts: a heading, then rows in one white card with a ring -->
     <div class="space-y-2 p-2">
-        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
+        <div class="flex items-center justify-between gap-2 px-1">
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
+            <!-- A small white key, like the /command keys but with a slight shadow, so it reads as a button. Regular weight, so it's quieter than the keys. -->
+            <button
+                v-if="create"
+                type="button"
+                class="-me-0.5 inline-flex h-5 cursor-pointer items-center rounded-md bg-white px-1.5 text-2xs text-gray-600 shadow-xs ring-1 ring-gray-200 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700 dark:hover:text-white"
+                @mousedown.prevent
+                @click="$emit('create')"
+            >
+                {{ __('Create') }}
+            </button>
+        </div>
 
         <div ref="list" role="listbox" :aria-label="__('Saved prompts')" class="divide-y divide-gray-200 rounded-lg bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">
             <!-- mousedown.prevent keeps focus in the input, so picking one doesn't hide the menu before the click lands -->

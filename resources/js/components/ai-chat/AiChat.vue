@@ -5,11 +5,12 @@ import { Avatar, Button, Icon, Textarea, TimePicker } from '@ui';
 import { parseTime } from '@internationalized/date';
 import AiChatExamples from './AiChatExamples.vue';
 import AiChatPrompts from './AiChatPrompts.vue';
+import AiChatNewPrompt from './AiChatNewPrompt.vue';
 import AiChatShortcuts from './AiChatShortcuts.vue';
 import AiChatRun from './AiChatRun.vue';
 import AiChatDictation from './AiChatDictation.vue';
 import useDictation, { spokenRequest } from './use-dictation.js';
-import { moving, planPromptRun, planRun, playRun } from './mock-runs.js';
+import { canEditAi, moving, planPromptRun, planRun, playRun } from './mock-runs.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 
 const { open, messages, floating, focusRequests, demoRequest, dictateRequest, phaseTwo, leave, newChat } = useAiChat();
@@ -128,7 +129,28 @@ const commandMatches = computed(() =>
 );
 const activeCommand = ref(0);
 watch(commandQuery, () => (activeCommand.value = 0));
+// With no match, those who can edit AI are offered to create it as a saved prompt
+const canCreateCommand = computed(() => canEditAi.value && !!commandQuery.value && !commandMatches.value.length);
 watch([showHelp, helpView, commandMenuOpen], () => (explainPrompt.value = false));
+
+// Prototype: a new saved prompt, made here rather than on Settings → AI (for those who can edit it). null while it's not open, otherwise what
+// was typed after the / (empty from the help), which starts off its name.
+const newPromptFrom = ref(null);
+function startNewPrompt(from = '') {
+    newPromptFrom.value = from;
+    showHelp.value = false;
+    prompt.value = '';
+}
+function cancelNewPrompt() {
+    newPromptFrom.value = null;
+    focusInput();
+}
+// Once it's saved, its command is put in the input with the menu open on it, so Enter runs it
+function savedNewPrompt(command) {
+    newPromptFrom.value = null;
+    prompt.value = '/' + command;
+    focusInput();
+}
 
 // When focus moves to something outside the chat, put the help away. (The key hint hides itself, as it only shows while focus is inside the card.)
 function onFocusOut(event) {
@@ -571,30 +593,65 @@ function stopFollowing() {
                 leave-to-class="translate-y-3 opacity-0"
             >
                 <div
-                    v-if="showHelp || commandMenuOpen"
+                    v-if="showHelp || commandMenuOpen || newPromptFrom !== null"
                     :class="floating ? (messages.length ? 'start-[7px] w-[calc(100%-14px)]' : '-start-2.75 w-[calc(100%+11px)]') : 'start-0.25 end-2.5'"
                     class="absolute bottom-full z-(--z-index-portal) mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-xl dark:border-gray-700 dark:bg-gray-900"
                 >
+                    <!-- Prototype: a new saved prompt, without going to Settings → AI -->
+                    <AiChatNewPrompt v-if="newPromptFrom !== null" :from="newPromptFrom" @saved="savedNewPrompt" @cancel="cancelNewPrompt" />
                     <!-- While typing a command, only the commands that match -->
-                    <template v-if="commandMenuOpen">
+                    <template v-else-if="commandMenuOpen">
                         <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" :explain="explainPrompt" @pick="runCommand" />
+                        <!-- When you can, offer to make it a saved prompt, named after what was typed: a row in a card, like the saved prompts it would join -->
+                        <div v-else-if="canCreateCommand" class="space-y-2 p-2">
+                            <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
+                            <button
+                                type="button"
+                                class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg bg-white px-3 py-2 text-start text-sm/5 text-gray-900 ring ring-gray-200 transition-colors hover:bg-gray-50 dark:bg-gray-850 dark:text-gray-200 dark:ring-gray-700/80 dark:hover:bg-gray-800"
+                                @mousedown.prevent
+                                @click="startNewPrompt(commandQuery)"
+                            >
+                                {{ __('Create a saved prompt') }}
+                                <span class="inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ commandQuery }}</span>
+                            </button>
+                        </div>
                         <p v-else class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
                     </template>
                     <!-- The keyboard shortcuts on their own. Esc or ? puts them away. -->
                     <AiChatShortcuts v-else-if="helpView === 'shortcuts'" :has-examples="examplesVisible" />
                     <template v-else>
-                        <AiChatPrompts v-if="savedPrompts.length" :prompts="savedPrompts" :active="activeHelpPrompt" :explain="explainPrompt" @pick="runPrompt" />
-                        <!-- A hint along the foot, which also works as a button. mousedown.prevent keeps focus in the input. -->
-                        <button
-                            type="button"
-                            class="flex w-full cursor-pointer items-center gap-1.5 px-3 pt-1.5 pb-3 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                            @mousedown.prevent
-                            @click="helpView = 'shortcuts'"
-                        >
-                            {{ __('Press') }}
-                            <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">?</kbd>
-                            {{ __('for keyboard shortcuts') }}
-                        </button>
+                        <AiChatPrompts
+                            v-if="savedPrompts.length"
+                            :prompts="savedPrompts"
+                            :active="activeHelpPrompt"
+                            :explain="explainPrompt"
+                            :create="canEditAi"
+                            @pick="runPrompt"
+                            @create="startNewPrompt()"
+                        />
+                        <div class="flex items-center justify-between px-3 pt-1.5 pb-3">
+                            <!-- A hint along the foot, which also works as a button. mousedown.prevent keeps focus in the input. -->
+                            <button
+                                type="button"
+                                class="flex cursor-pointer items-center gap-1.5 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                @mousedown.prevent
+                                @click="helpView = 'shortcuts'"
+                            >
+                                {{ __('Press') }}
+                                <kbd class="inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-gray-100 px-1.5 font-sans text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">?</kbd>
+                                {{ __('for keyboard shortcuts') }}
+                            </button>
+                            <!-- With no saved prompts there's no heading to put it beside, so it's in the foot, opposite the shortcuts hint -->
+                            <button
+                                v-if="canEditAi && !savedPrompts.length"
+                                type="button"
+                                class="flex cursor-pointer items-center gap-1 text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                @mousedown.prevent
+                                @click="startNewPrompt()"
+                            >
+                                <Icon name="plus" class="size-3" />{{ __('New prompt') }}
+                            </button>
+                        </div>
                     </template>
                 </div>
             </Transition>
