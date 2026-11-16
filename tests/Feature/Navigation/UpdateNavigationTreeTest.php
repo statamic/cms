@@ -159,6 +159,7 @@ class UpdateNavigationTreeTest extends TestCase
             'toggle' => ['type' => 'toggle', 'default' => true],
             'disabled' => ['type' => 'toggle', 'default' => false],
             'hidden' => ['type' => 'text', 'default' => 'Not submitted'],
+            'empty' => ['type' => 'text'],
         ]);
         BlueprintRepository::partialMock();
         BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
