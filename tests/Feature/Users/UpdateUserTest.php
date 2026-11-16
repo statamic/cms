@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Users;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Tests\Auth\UnsafeEmailPayloads;
 use Tests\ElevatesSessions;
@@ -37,6 +39,34 @@ class UpdateUserTest extends TestCase
 
         $this->assertEquals('updated@domain.com', User::find($user->id())->email());
         $this->assertEquals('Jonathan Smith', User::find($user->id())->name);
+    }
+
+    #[Test]
+    public function meta_matches_the_values_returned_after_saving()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'sources' => [
+                'type' => 'grid',
+                'min_rows' => 1,
+                'fields' => [['handle' => 'label', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $response = $this
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), ['email' => 'test@domain.com'])
+            ->assertOk();
+
+        $this->assertEquals(
+            collect($response->json('data.values.sources'))->pluck('_id')->all(),
+            array_keys($response->json('data.meta.sources.existing'))
+        );
     }
 
     #[Test]
