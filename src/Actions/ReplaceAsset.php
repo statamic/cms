@@ -2,8 +2,10 @@
 
 namespace Statamic\Actions;
 
+use Closure;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -65,7 +67,7 @@ class ReplaceAsset extends Action
                 'container' => $this->context['container'],
                 'folder' => $this->context['folder'] ?? null,
                 'max_files' => 1,
-                'validate' => 'required',
+                'validate' => ['required', $this->differentAssetRule()],
                 'mode' => 'list',
                 'restrict' => true,
                 'allow_uploads' => true,
@@ -77,5 +79,16 @@ class ReplaceAsset extends Action
                 'default' => true,
             ],
         ];
+    }
+
+    private function differentAssetRule(): Closure
+    {
+        $asset = $this->items->first();
+
+        return function (string $attribute, mixed $value, Closure $fail) use ($asset) {
+            if ($asset && in_array($asset->id(), Arr::wrap($value))) {
+                $fail('statamic::validation.asset_replace_same')->translate();
+            }
+        };
     }
 }
