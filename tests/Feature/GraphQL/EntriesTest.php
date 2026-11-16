@@ -79,12 +79,12 @@ GQL;
     #[Test]
     public function it_queries_all_entries_in_a_specific_site()
     {
-        $this->createEntries();
-
         $this->setSites([
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
         ]);
+
+        $this->createEntries();
 
         Collection::find('events')->routes('/events/{slug}')->sites(['en', 'fr'])->save();
 
