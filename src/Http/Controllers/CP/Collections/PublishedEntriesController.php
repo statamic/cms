@@ -9,7 +9,7 @@ use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class PublishedEntriesController extends CpController
 {
-    use ExtractsFromEntryFields;
+    use ChecksEntryVersions, ExtractsFromEntryFields;
 
     public function store(Request $request, $collection, $entry)
     {
@@ -30,7 +30,7 @@ class PublishedEntriesController extends CpController
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
-                'values' => $values,
+                'values' => [...$values, '_version' => $this->entryVersion($entry)],
             ]),
             'saved' => true,
         ];
@@ -55,7 +55,7 @@ class PublishedEntriesController extends CpController
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
-                'values' => $values,
+                'values' => [...$values, '_version' => $this->entryVersion($entry)],
             ]),
             'saved' => true,
         ];
