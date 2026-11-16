@@ -59,14 +59,14 @@ interface Props {
     labelHtml?: boolean;
     /** The maximum number of selectable options. */
     maxSelections?: number | null;
-    /** The controlled value of the combobox. */
-    modelValue?: string | number | (string | number)[] | null;
+    /** The controlled value of the combobox. A single option value, or an array of option values when `multiple` is `true`. */
+    modelValue?: ModelValue;
     /** When `true`, multiple options are allowed. */
     multiple?: boolean;
     /** Key of the option's label in the option's object. */
     optionLabel?: string;
-    /** Array of option objects. The label and value live under the `optionLabel` and `optionValue` keys. */
-    options?: { icon?: string; image?: string; [key: string]: any }[];
+    /** Array of option objects, like `{ label: 'Apple', value: 'apple' }`. The label and value keys can be changed with `optionLabel` and `optionValue`. Options may also have an `icon` name or an `image` URL. */
+    options?: Option[];
     /** Key of the option's value in the option's object. */
     optionValue?: string;
     /** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
@@ -90,24 +90,10 @@ interface Props {
 }
 
 const emit = defineEmits<{
-    'update:modelValue': [value: string | number | (string | number)[] | null];
+    'update:modelValue': [value: ModelValue];
     search: [query: string, loading: () => void];
-    selected: [value: string | number];
-    added: [value: string | number];
-}>();
-
-defineSlots<{
-    'selected-option'(props: { option: { icon?: string; image?: string; [key: string]: any } }): any;
-    'no-options'(props: { searchQuery: string }): any;
-    option(props: { icon?: string; image?: string; create?: boolean; [key: string]: any }): any;
-    'selected-options'(props: {
-        disabled: boolean;
-        readOnly: boolean;
-        getOptionLabel: (option: { [key: string]: any }) => string;
-        getOptionValue: (option: { [key: string]: any }) => string | number;
-        labelHtml: boolean;
-        deselect: (value: string | number) => void;
-    }): any;
+    selected: [value: OptionValue];
+    added: [value: OptionValue];
 }>();
 
 const props = withDefaults(defineProps<Props>(), {
