@@ -180,6 +180,29 @@ class HalfMeasureStaticCachingTest extends TestCase
             ->assertSee('1 3', false);
     }
 
+    #[Test]
+    public function it_keeps_view_shared_data_dynamic_within_nocache_tags()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ visitor_count }} {{ nocache }}{{ visitor_count }}{{ /nocache }}');
+
+        $this->createPage('about');
+
+        view()->share('visitor_count', 1);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 1', false);
+
+        view()->share('visitor_count', 2);
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 2', false);
+    }
+
     public function shareErrorsEnabled($app)
     {
         $app['config']->set('statamic.static_caching.share_errors', true);
