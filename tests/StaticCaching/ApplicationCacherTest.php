@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Closure;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Repository as CacheRepository;
@@ -126,7 +127,7 @@ class ApplicationCacherTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('generationDateInvalidationMethods')]
+    #[DataProvider('invalidationMethods')]
     public function generation_dates_are_removed_with_their_responses(string $method)
     {
         $cacher = new ApplicationCacher(app(Repository::class), ['base_url' => 'http://example.com']);
@@ -155,7 +156,7 @@ class ApplicationCacherTest extends TestCase
         }
     }
 
-    public static function generationDateInvalidationMethods(): array
+    public static function invalidationMethods(): array
     {
         return [
             'single URL' => ['invalidateUrl'],
@@ -184,6 +185,7 @@ class ApplicationCacherTest extends TestCase
 
         $request = Request::create('http://example.com/one', 'GET');
         $cacher->cachePage($request, response('one', 200));
+        event(new ResponsePrepared($request, response('one', 200)));
 
         $cacher->refreshUrls(['/one']);
 
@@ -648,6 +650,51 @@ class ApplicationCacherTest extends TestCase
         event(new ResponsePrepared($request, $response));
 
         $cacher->flush();
+
+        $this->assertEquals([], $cacher->getUrls()->all());
+        $this->assertFalse($cacher->hasCachedPage($request));
+    }
+
+    #[Test]
+    #[DataProvider('invalidationMethods')]
+    public function a_page_cached_while_it_is_being_invalidated_can_be_invalidated_again(string $method)
+    {
+        $store = new class extends ArrayStore
+        {
+            public ?Closure $onForgettingResponse = null;
+
+            public function forget($key)
+            {
+                $forgotten = parent::forget($key);
+
+                if ($this->onForgettingResponse && str_starts_with($key, 'static-cache:responses:')) {
+                    [$callback, $this->onForgettingResponse] = [$this->onForgettingResponse, null];
+                    $callback();
+                }
+
+                return $forgotten;
+            }
+        };
+
+        $cacher = new ApplicationCacher(new CacheRepository($store), ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/about');
+
+        $visit = function (string $content) use ($cacher, $request) {
+            $cacher->cachePage($request, $content);
+            event(new ResponsePrepared($request, response($content)));
+        };
+
+        $visit('old');
+
+        $store->onForgettingResponse = fn () => $visit('new');
+
+        match ($method) {
+            'invalidateUrl' => $cacher->invalidateUrl('/about'),
+            'invalidateUrls' => $cacher->invalidateUrls(['/about']),
+            'flush' => $cacher->flush(),
+        };
+
+        $cacher->invalidateUrl('/about');
 
         $this->assertEquals([], $cacher->getUrls()->all());
         $this->assertFalse($cacher->hasCachedPage($request));

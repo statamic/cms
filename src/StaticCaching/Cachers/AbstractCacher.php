@@ -233,7 +233,7 @@ abstract class AbstractCacher implements Cacher
         });
     }
 
-    private function withUrlsLock(callable $callback)
+    protected function withUrlsLock(callable $callback)
     {
         if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
             return $callback();
