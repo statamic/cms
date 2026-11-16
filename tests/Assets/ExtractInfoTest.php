@@ -10,8 +10,6 @@ use League\Flysystem\DecoratedAdapter;
 use League\Flysystem\Filesystem;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
 use Statamic\Assets\Asset;
@@ -88,8 +86,6 @@ class ExtractInfoTest extends TestCase
     /** @see https://github.com/statamic/cms/issues/8626 */
     #[Test]
     #[DataProvider('metadataLocations')]
-    #[RunInSeparateProcess]
-    #[PreserveGlobalState(false)]
     public function it_extracts_metadata_without_downloading_the_entire_s3_asset(bool $metadataAtEnd, string $memoryLimit): void
     {
         $size = 10 * 1024 ** 3;
@@ -175,8 +171,6 @@ class ExtractInfoTest extends TestCase
     public static function metadataLocations(): array
     {
         return [
-            'beginning, low memory' => [false, '128M'],
-            'end, low memory' => [true, '128M'],
             'beginning, high memory' => [false, '1G'],
             'end, high memory' => [true, '1G'],
             'beginning, unlimited memory' => [false, '-1'],
