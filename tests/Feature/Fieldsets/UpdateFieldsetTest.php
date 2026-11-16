@@ -391,6 +391,40 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals($originalContents, Facades\Fieldset::find('test')->contents());
     }
 
+    #[Test]
+    public function fieldset_cannot_be_imported_recursively()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+
+        (new Fieldset)->setHandle('page_section')->setContents([
+            'title' => 'Page Section',
+            'fields' => [
+                ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [['import' => 'page_tabs']]]],
+            ],
+        ])->save();
+
+        $fieldset = (new Fieldset)->setHandle('page_tabs')->setContents($originalContents = [
+            'title' => 'Page Tabs',
+            'fields' => [],
+        ])->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit($fieldset, ['sections' => [
+                [
+                    '_id' => 'section-1',
+                    'fields' => [
+                        ['_id' => 'field-1', 'type' => 'import', 'fieldset' => 'page_section'],
+                    ],
+                ],
+            ]])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors(['sections' => 'Fieldset page_tabs is being imported recursively.']);
+
+        $this->assertEquals($originalContents, Facades\Fieldset::find('page_tabs')->contents());
+    }
+
     private function submit($fieldset, $params = [])
     {
         return $this->patch(
