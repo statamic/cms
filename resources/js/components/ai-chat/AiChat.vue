@@ -533,9 +533,14 @@ function stopFollowing() {
                                     : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
                             ]"
                         >
-                            {{ message.text }}
-                            <!-- A saved prompt also shows its command, so you learn to type it -->
-                            <span v-if="message.command" class="ms-1 inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ message.command }}</span>
+                            <!-- A saved prompt shows just its command, as a 24px white key, so you learn to type it. Its name is in the tooltip. The / is lighter, with 4px before the name, so the name leads. -->
+                            <span
+                                v-if="message.command"
+                                v-tooltip="{ content: message.text, hoverOnly: true }"
+                                class="inline-flex h-6 items-center rounded-md bg-white px-2 text-xs font-medium text-gray-700 shadow-xs ring-1 ring-gray-300/70 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-700"
+                                ><span class="me-1 text-gray-400 dark:text-gray-500">/</span>{{ message.command }}</span
+                            >
+                            <template v-else>{{ message.text }}</template>
                         </div>
                         <!-- 20px, 6px from the bubble, level with its top -->
                         <Avatar v-if="message.role === 'user'" :user="user" class="ms-1.5 size-5 shrink-0 text-[0.5rem]" />
