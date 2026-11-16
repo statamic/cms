@@ -136,22 +136,33 @@ class CacherTest extends TestCase
     }
 
     #[Test]
+    public function gets_domains_from_every_site_and_the_legacy_list()
+    {
+        $cache = app(Repository::class);
+        $cacher = $this->cacher();
+
+        $cache->forever('static-cache:domains', ['http://example.com', 'http://legacy.com']);
+        $cache->forever('static-cache:site-domains', ['en' => ['http://example.com'], 'fr' => ['http://example.fr']]);
+
+        $this->assertEquals(['http://example.com', 'http://legacy.com', 'http://example.fr'], $cacher->getDomains()->all());
+    }
+
+    #[Test]
     public function caches_a_url()
     {
         $cache = app(Repository::class);
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
 
         $this->assertNull($cache->get('static-cache:urls'));
-        $this->assertNull($cache->get('static-cache:domains'));
+        $this->assertEquals([], $cacher->getDomains()->all());
 
         $cacher->cacheUrl('one', 'http://example.com/one');
         $cacher->cacheUrl('two', '/two');
         $cacher->cacheUrl('three', 'http://example.org/three', 'http://example.org');
 
-        $domains = $cache->get('static-cache:domains');
         $urls = $cache->get('static-cache:'.md5('http://example.com').'.urls');
 
-        $this->assertEquals(['http://example.com', 'http://example.org'], $domains);
+        $this->assertEquals(['http://example.com', 'http://example.org'], $cacher->getDomains()->all());
         $this->assertEquals(['one' => '/one', 'two' => '/two'], $urls);
     }
 
@@ -310,9 +321,9 @@ class CacherTest extends TestCase
         [$cache, $locked] = $this->lockingCache();
         $cacher = Mockery::mock(AbstractCacher::class, [$cache, ['base_url' => 'http://example.com']])->makePartial();
 
-        $cache->shouldReceive('get')->with('static-cache:domains', [])->andReturn([]);
         $cache->shouldReceive('get')->with($urlsKey = 'static-cache:'.md5('http://example.com').'.urls', [])->andReturn([]);
-        $cache->shouldReceive('forever')->with('static-cache:domains', ['http://example.com'])->once()->andReturnUsing(function () use ($locked) {
+        $cache->shouldReceive('get')->with('static-cache:site-domains', [])->andReturn([]);
+        $cache->shouldReceive('forever')->with('static-cache:site-domains', ['en' => ['http://example.com']])->once()->andReturnUsing(function () use ($locked) {
             $this->assertTrue($locked->value, 'Domains were written outside the lock.');
         });
         $cache->shouldReceive('forever')->with($urlsKey, ['one' => '/one'])->once()->andReturnUsing(function () use ($locked) {

@@ -2,7 +2,10 @@
 
 namespace Tests\StaticCaching;
 
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
@@ -34,6 +37,35 @@ class FullMeasureStaticCachingTest extends TestCase
     {
         File::delete($this->dir);
         parent::tearDown();
+    }
+
+    #[Test]
+    public function saving_an_entry_outside_of_a_request_invalidates_wildcard_rules_cached_under_the_requested_domain()
+    {
+        config(['statamic.static_caching.invalidation.rules' => [
+            'collections' => ['pages' => ['urls' => ['/blog/*']]],
+        ]]);
+
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+
+        $page = $this->createPage('about', ['with' => ['title' => 'About']]);
+        $this->createPage('blog', ['with' => ['title' => 'Blog']]);
+        Collection::make('blog')->routes('blog/{slug}')->template('default')->save();
+        EntryFactory::collection('blog')->id('post')->slug('post')->data(['title' => 'Post'])->create();
+
+        $this->get('https://www.example.test/blog')->assertOk();
+        $this->get('https://www.example.test/blog/post')->assertOk();
+        $this->assertFileExists($this->dir.'/blog/post_.html');
+
+        // Queue workers have no request, so URLs are resolved against the app url instead.
+        $this->app->instance('request', Request::create(config('app.url')));
+
+        $page->set('title', 'Updated')->save();
+
+        $this->assertFileDoesNotExist($this->dir.'/blog/post_.html');
+        $this->assertFileExists($this->dir.'/blog_.html');
     }
 
     #[Test]

@@ -2,6 +2,7 @@
 
 namespace Tests\StaticCaching;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
@@ -354,6 +355,27 @@ class HalfMeasureStaticCachingTest extends TestCase
         // The junk URL is invalidated rather than warmed, so the tracked
         // set converges to real pages.
         $this->assertEquals(['/about'], app(Cacher::class)->getUrls()->values()->all());
+    }
+
+    #[Test]
+    public function saving_an_entry_outside_of_a_request_invalidates_pages_cached_under_the_requested_domain()
+    {
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->setSites(['en' => ['name' => 'English', 'url' => '/', 'locale' => 'en_US']]);
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ title }}');
+
+        $page = $this->createPage('about', ['with' => ['title' => 'Original']]);
+
+        $this->get('https://www.example.test/about')->assertSee('Original');
+
+        // Queue workers have no request, so URLs are resolved against the app url instead.
+        $this->app->instance('request', Request::create(config('app.url')));
+
+        $page->set('title', 'Updated')->save();
+
+        $this->get('https://www.example.test/about')->assertSee('Updated');
     }
 
     #[Test]
