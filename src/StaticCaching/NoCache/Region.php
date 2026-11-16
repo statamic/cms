@@ -37,7 +37,8 @@ abstract class Region
     {
         return collect($context)
             ->reject(fn ($value, $key) => str_starts_with((string) $key, '__') && ! in_array($key, static::$preservedContextKeys))
-            ->reject(fn ($value, $key) => in_array($key, ['app', 'config', 'errors', 'obLevel', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->reject(fn ($value, $key) => in_array($key, ['app', 'errors', 'obLevel', 'resolve', 'resolveComponentsUsing', 'forgetComponentsResolver', 'forgetFactory', 'flushCache', 'constructor']))
+            ->reject(fn ($value, $key) => $key === 'config' && $value === config()->all())
             ->map(fn ($value) => $value instanceof InvokableComponentVariable ? $value->resolveDisplayableValue() : $value)
             ->all();
     }

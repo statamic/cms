@@ -71,12 +71,30 @@ class NoCacheSessionTest extends TestCase
 
         $region = $session->pushRegion('', [
             'foo' => 'bar',
-            'config' => ['app' => ['key' => 'secret']],
+            'config' => config()->all(),
         ], '');
 
         $this->assertEquals([
             'foo' => 'bar',
         ], $region->context());
+    }
+
+    #[Test]
+    public function when_pushing_a_region_it_will_keep_a_config_variable_that_is_not_the_app_config()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            'config' => ['mine' => true],
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'config' => ['mine' => true],
+        ], $region->context());
+
+        $this->assertEquals(['mine' => true], $region->fragmentData()['config']);
     }
 
     #[Test]
