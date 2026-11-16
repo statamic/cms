@@ -187,7 +187,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: id, title: id };
+                return existing || option || { id: id, title: id, editable: false };
             });
 
             this.$emit('input', items);
