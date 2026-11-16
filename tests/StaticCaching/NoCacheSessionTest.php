@@ -192,6 +192,7 @@ class NoCacheSessionTest extends TestCase
         $session = new Session('http://localhost/test');
 
         $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+        $session->write();
 
         $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
         $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
@@ -209,6 +210,7 @@ class NoCacheSessionTest extends TestCase
         $session = new Session('http://localhost/test');
 
         $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+        $session->write();
 
         // Simulate what happens when serializable_classes enforcement
         // turns a cached Region object into __PHP_Incomplete_Class.
@@ -216,7 +218,7 @@ class NoCacheSessionTest extends TestCase
 
         $this->expectException(RegionNotFound::class);
 
-        $session->region($region->key());
+        (new Session('http://localhost/test'))->restore()->region($region->key());
     }
 
     #[Test]
@@ -275,6 +277,37 @@ class NoCacheSessionTest extends TestCase
             ->assertSee('Test Test');
 
         $this->assertNotNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+    }
+
+    #[Test]
+    public function it_only_stores_regions_when_the_session_is_written()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', [], '.html');
+
+        $this->assertNull(StaticCache::cacheStore()->get('nocache::region.'.$region->key()));
+        $this->assertEquals($region->key(), $session->region($region->key())->key());
+
+        $session->write();
+
+        $this->assertNotNull(StaticCache::cacheStore()->get('nocache::region.'.$region->key()));
+    }
+
+    #[Test]
+    public function it_doesnt_store_regions_for_responses_that_are_not_cached()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.404', 'Missing {{ nocache }}{{ response_code }}{{ /nocache }}');
+
+        $this
+            ->get('/missing')
+            ->assertNotFound()
+            ->assertSee('Missing 404');
+
+        $key = sha1('{{ response_code }}').md5('http://localhost/missing|1');
+
+        $this->assertNull(StaticCache::cacheStore()->get('nocache::region.'.$key));
     }
 
     #[Test]
