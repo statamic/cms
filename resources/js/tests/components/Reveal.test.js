@@ -1,9 +1,43 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { nextTick } from 'vue';
+import { defineComponent, nextTick, ref } from 'vue';
+import { mount } from '@vue/test-utils';
 import Reveal from '@/components/Reveal.js';
 
 afterEach(() => {
     document.body.innerHTML = '';
+});
+
+test.each(['ref', 'getter'])('registers a delayed %s target and removes it on unmount', async (source) => {
+    const reveal = new Reveal();
+    const callback = vi.fn();
+    const visible = ref(false);
+    const wrapper = mount(defineComponent({
+        setup() {
+            const target = ref(null);
+            reveal.use(source === 'ref' ? target : () => target.value, callback);
+
+            return { target, visible };
+        },
+        template: '<section v-if="visible" ref="target"><input /></section>',
+    }));
+
+    visible.value = true;
+    await nextTick();
+
+    const target = wrapper.get('section').element;
+    const input = wrapper.get('input').element;
+    input.scrollIntoView = vi.fn();
+
+    reveal.element(input);
+    expect(callback).toHaveBeenCalledWith(target);
+    await nextTick();
+
+    wrapper.unmount();
+    callback.mockClear();
+
+    reveal.element(input);
+    expect(callback).not.toHaveBeenCalled();
+    await nextTick();
 });
 
 test('invalid focuses the first control inside the first errored field', async () => {

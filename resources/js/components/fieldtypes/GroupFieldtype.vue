@@ -51,7 +51,7 @@ export default {
         };
     },
     mounted() {
-        reveal.mount(this.$refs.fieldsContainer, () => {
+        reveal.use(() => this.$refs.fieldsContainer, () => {
             this.isCollapsed = false;
         });
     },

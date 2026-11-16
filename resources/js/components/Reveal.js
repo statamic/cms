@@ -1,4 +1,4 @@
-import { nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { nextTick, onBeforeUnmount, watch } from 'vue';
 
 const registry = new WeakMap();
 
@@ -15,7 +15,16 @@ const FOCUSABLE_CONTROL_SELECTORS = [
 
 class Reveal {
     use(ref, callback) {
-        onMounted(() => this.mount(ref.value, callback));
+        watch(
+            ref,
+            (el, previous, onCleanup) => {
+                if (!el) return;
+
+                registry.set(el, callback);
+                onCleanup(() => registry.delete(el));
+            },
+            { immediate: true, flush: 'post' },
+        );
     }
 
     mount(el, callback) {
