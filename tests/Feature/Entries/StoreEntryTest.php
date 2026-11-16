@@ -472,6 +472,57 @@ class StoreEntryTest extends TestCase
             ->assertJsonValidationErrors(['slug']);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/11593
+     **/
+    #[Test]
+    public function entries_without_slugs_dont_have_their_uris_validated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $collection
+            ->requiresSlugs(false)
+            ->routes('{parent_uri}/{slug}')
+            ->structureContents(['max_depth' => 10])
+            ->save();
+
+        EntryFactory::id('existing-id')->slug(null)->collection('test')->create();
+
+        $collection
+            ->structure()
+            ->in('en')
+            ->tree([['entry' => 'existing-id']])
+            ->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'Another Entry Without A Slug', 'slug' => null])
+            ->assertOk();
+
+        $this->assertCount(2, Entry::all());
+    }
+
+    #[Test]
+    public function entries_without_slugs_have_their_uris_validated_when_the_route_doesnt_use_the_slug()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $collection
+            ->requiresSlugs(false)
+            ->routes('/pages/{title}')
+            ->save();
+
+        EntryFactory::id('existing-id')->slug(null)->collection('test')->data(['title' => 'About'])->create();
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, ['title' => 'About', 'slug' => null])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['slug']);
+
+        $this->assertCount(1, Entry::all());
+    }
+
     private function seedUserAndCollection()
     {
         $this->setTestRoles(['test' => ['access cp', 'create test entries']]);

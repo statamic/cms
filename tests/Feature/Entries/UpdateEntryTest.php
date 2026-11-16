@@ -677,6 +677,42 @@ class UpdateEntryTest extends TestCase
             ->assertJsonValidationErrors(['slug']);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/11593
+     **/
+    #[Test]
+    public function entries_without_slugs_dont_have_their_uris_validated()
+    {
+        [$user, $collection] = $this->seedUserAndCollection();
+
+        $collection
+            ->requiresSlugs(false)
+            ->routes('{parent_uri}/{slug}')
+            ->structureContents(['max_depth' => 10])
+            ->save();
+
+        EntryFactory::id('existing-id')->slug(null)->collection('test')->create();
+
+        $entry = EntryFactory::id('the-id')
+            ->slug(null)
+            ->collection('test')
+            ->data(['title' => 'Entry Without A Slug'])
+            ->create();
+
+        $collection
+            ->structure()
+            ->in('en')
+            ->tree([['entry' => 'existing-id'], ['entry' => 'the-id']])
+            ->save();
+
+        $this
+            ->actingAs($user)
+            ->update($entry, ['title' => 'Updated Entry Without A Slug', 'slug' => null])
+            ->assertOk();
+
+        $this->assertEquals('Updated Entry Without A Slug', $entry->fresh()->value('title'));
+    }
+
     private function seedUserAndCollection()
     {
         $this->setTestRoles(['test' => [
