@@ -55,6 +55,7 @@
         <PublishContainer
             v-if="fieldset"
             ref="container"
+            :key="site"
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
@@ -432,7 +433,7 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (localization.exists) {
+            if (localization.exists || this.isCreating) {
                 this.editLocalization(localization);
             } else {
                 this.createLocalization(localization);
