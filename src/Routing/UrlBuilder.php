@@ -50,7 +50,7 @@ class UrlBuilder implements UrlBuilderContract
     }
 
     /**
-     * @return string
+     * @return string|null
      *
      * @throws \Statamic\Exceptions\InvalidEntryTypeException
      */
@@ -59,6 +59,10 @@ class UrlBuilder implements UrlBuilderContract
         // Routes can be defined as a string for just the route URL,
         // or they can be an array with a route for each locale.
         $route = (is_array($route)) ? $route[$this->content->locale()] : $route;
+
+        if ($this->isMissingSlug($route)) {
+            return null;
+        }
 
         if (($url = $this->fillPlaceholders($route)) === null) {
             $route = $this->convertToAntlers($route);
@@ -75,6 +79,19 @@ class UrlBuilder implements UrlBuilderContract
         // blank spaces in the URL, possibly resulting in double slashes.
         // Tidying up the URL will de-duplicate those extra slashes.
         return URL::tidy($url, withTrailingSlash: false);
+    }
+
+    /**
+     * Content without a slug can't have a URL when the route needs one, otherwise
+     * it would end up with the URL of its parent, or of the home page.
+     */
+    private function isMissingSlug($route): bool
+    {
+        if (! preg_match('/{{?\s*slug\s*}}?/', $route) || ($this->merged['is_root'] ?? false)) {
+            return false;
+        }
+
+        return ! ($this->merged['slug'] ?? $this->content->slug());
     }
 
     /**

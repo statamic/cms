@@ -645,6 +645,49 @@ class EntryTest extends TestCase
     }
 
     #[Test]
+    public function entries_without_a_slug_dont_have_a_uri_when_the_route_uses_the_slug()
+    {
+        $collection = tap((new Collection)->handle('test')->requiresSlugs(false)->routes('/blog/{{ slug }}'))->save();
+        $entry = tap((new Entry)->id('1')->collection($collection)->locale('en'))->save();
+
+        $this->assertNull($entry->uri());
+        $this->assertNull($entry->url());
+
+        $collection->routes('/blog/{id}')->save();
+        Blink::store('entry-uris')->flush();
+
+        $this->assertEquals('/blog/1', $entry->uri());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/11593
+     **/
+    #[Test]
+    public function structured_entries_without_a_slug_dont_take_the_uri_of_their_parent()
+    {
+        $collection = tap((new Collection)->handle('pages')->requiresSlugs(false)->routes('{parent_uri}/{slug}')->structureContents(['root' => true, 'max_depth' => 3]))->save();
+
+        $slugless = tap((new Entry)->id('slugless')->locale('en')->collection($collection))->save();
+        $home = tap((new Entry)->id('home')->locale('en')->collection($collection))->save();
+        $about = tap((new Entry)->id('about')->locale('en')->collection($collection)->slug('about'))->save();
+        $sluglessChild = tap((new Entry)->id('slugless-child')->locale('en')->collection($collection))->save();
+
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'slugless'],
+            ['entry' => 'about', 'children' => [['entry' => 'slugless-child']]],
+        ])->save();
+
+        $this->assertEquals('/', $home->uri());
+        $this->assertEquals('/about', $about->uri());
+        $this->assertNull($slugless->uri());
+        $this->assertNull($sluglessChild->uri());
+
+        $this->assertEquals('home', Facades\Entry::findByUri('/')->id());
+        $this->assertEquals('about', Facades\Entry::findByUri('/about')->id());
+    }
+
+    #[Test]
     #[DataProvider('firstChildRedirectProvider')]
     public function it_gets_urls_for_first_child_redirects($value)
     {

@@ -477,10 +477,6 @@ class EntriesController extends CpController
             return;
         }
 
-        if (! $entry->slug() && Str::contains($entry->route(), 'slug')) {
-            return;
-        }
-
         $existing = Entry::findByUri($uri, $entry->locale());
 
         if (! $existing || $existing->id() === $entry->id()) {

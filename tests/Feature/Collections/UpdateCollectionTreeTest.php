@@ -150,10 +150,10 @@ class UpdateCollectionTreeTest extends TestCase
     {
         $user = tap(User::make()->makeSuper())->save();
         $collection = tap(Collection::make('test')->routes('{parent_uri}/{slug}'))->save();
-        EntryFactory::id('e1')->collection($collection)->create();
-        EntryFactory::id('e2')->collection($collection)->create();
-        EntryFactory::id('e3')->collection($collection)->create();
-        EntryFactory::id('e4')->collection($collection)->create();
+        EntryFactory::id('e1')->slug('bar')->collection($collection)->create();
+        EntryFactory::id('e2')->slug('foo')->collection($collection)->create();
+        EntryFactory::id('e3')->slug('foo')->collection($collection)->create();
+        EntryFactory::id('e4')->slug('baz')->collection($collection)->create();
         $collection->structureContents(['root' => false])->save();
         $tree = $collection->structure()->in('en');
         $tree->tree([
@@ -184,6 +184,39 @@ class UpdateCollectionTreeTest extends TestCase
                 ['entry' => 'e2'],
             ]],
             ['entry' => 'e4'],
+        ], $collection->structure()->in('en')->tree());
+    }
+
+    #[Test]
+    public function entries_without_slugs_can_be_moved_next_to_each_other()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $collection = tap(Collection::make('test')->requiresSlugs(false)->routes('{parent_uri}/{slug}'))->save();
+        EntryFactory::id('e1')->collection($collection)->create();
+        EntryFactory::id('e2')->collection($collection)->create();
+        EntryFactory::id('e3')->collection($collection)->create();
+        $collection->structureContents(['root' => false])->save();
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'e1'],
+            ['entry' => 'e2'],
+            ['entry' => 'e3'],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->update($collection, [
+                'pages' => [
+                    ['id' => 'e1', 'children' => []],
+                    ['id' => 'e3', 'children' => []],
+                    ['id' => 'e2', 'children' => []],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            ['entry' => 'e1'],
+            ['entry' => 'e3'],
+            ['entry' => 'e2'],
         ], $collection->structure()->in('en')->tree());
     }
 

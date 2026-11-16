@@ -441,7 +441,7 @@ EOT;
     #[Test]
     public function it_sets_is_current_and_is_parent_for_a_nav_when_home_is_an_entry()
     {
-        tap(Collection::make('pages')->routes('{slug}')->structureContents(['expects_root' => true]))->save();
+        tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => true]))->save();
         $home = EntryFactory::collection('pages')->id('home')->data(['title' => 'One'])->create();
 
         $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';

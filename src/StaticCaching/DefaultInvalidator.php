@@ -127,6 +127,10 @@ class DefaultInvalidator implements Invalidator
             ...$original->all(),
         ])->build($route);
 
+        if (! $uri) {
+            return [];
+        }
+
         $oldUrl = URL::tidy($entry->site()->absoluteUrl().'/'.$uri);
 
         if ($oldUrl === $entry->absoluteUrl()) {

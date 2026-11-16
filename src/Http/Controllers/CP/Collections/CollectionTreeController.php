@@ -90,7 +90,7 @@ class CollectionTreeController extends CpController
 
             $uris = $siblings->map->uri();
 
-            if ($uris->contains($uri = $page->uri())) {
+            if (($uri = $page->uri()) && $uris->contains($uri)) {
                 throw ValidationException::withMessages(['uri' => trans('statamic::validation.duplicate_uri', ['value' => $uri])]);
             }
         }
