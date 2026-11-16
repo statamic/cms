@@ -184,6 +184,11 @@ export default class {
             return lhs ? lhs.toString() : '';
         }
 
+        // When searching an array, cast numbers to strings, since the values being searched for are strings.
+        if (['includes', 'includes_any', 'contains_any'].includes(operator) && Array.isArray(lhs)) {
+            return lhs.map((item) => (typeof item === 'number' ? item.toString() : item));
+        }
+
         // When lhs is an empty string, cast to null.
         if (isString(lhs) && isEmpty(lhs)) {
             lhs = null;
