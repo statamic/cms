@@ -157,14 +157,15 @@ watch(dropdownOpen, (open) => {
     if (!open) searchQuery.value = '';
 });
 
-const getOptionLabel = (option) => {
-    const label = option?.[props.optionLabel];
-    if (props.labelHtml) {
-        return DOMPurify.sanitize(label ?? '', {
-            USE_PROFILES: { html: true, svg: true },
-        });
-    }
-    return label;
+const sanitizeOptionLabel = (option, config = {}) =>
+    DOMPurify.sanitize(option?.[props.optionLabel] ?? '', { USE_PROFILES: { html: true, svg: true }, ...config });
+
+const getOptionLabel = (option) => (props.labelHtml ? sanitizeOptionLabel(option) : option?.[props.optionLabel]);
+
+const getOptionPlainLabel = (option) => {
+    if (!props.labelHtml) return getOptionLabel(option);
+
+    return sanitizeOptionLabel(option, { RETURN_DOM_FRAGMENT: true }).textContent.replace(/\s+/g, ' ').trim();
 };
 
 const getOptionValue = (option) => option?.[props.optionValue];
@@ -239,7 +240,7 @@ const placeholder = computed(() => {
     }
 
     if (selectedOption.value) {
-        return getOptionLabel(selectedOption.value);
+        return getOptionPlainLabel(selectedOption.value);
     }
 
     return props.placeholder;
@@ -276,7 +277,7 @@ const shouldShowCreateOption = computed(() => {
     if (!props.taggable || !searchQuery.value) return false;
 
     const matchesSearchQuery = (option) =>
-        getOptionLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
+        getOptionPlainLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
 
     return !props.options.some(matchesSearchQuery) && !selectedOptions.value.some(matchesSearchQuery);
 });
@@ -537,7 +538,8 @@ defineExpose({
                                 <!-- Hidden width measurer for wide dropdown mode -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
                                     <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
-                                        {{ getOptionLabel(option) }}
+                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                        <template v-else>{{ getOptionLabel(option) }}</template>
                                     </div>
                                 </div>
 
@@ -551,7 +553,7 @@ defineExpose({
                                     v-if="filteredOptions.length"
                                     :estimate-size="40"
                                     :options="filteredOptions"
-                                    :text-content="(opt) => getOptionLabel(opt)"
+                                    :text-content="getOptionPlainLabel"
                                     v-slot="{ option }"
                                 >
                                     <div class="py-1 px-2 w-full overflow-x-hidden">
@@ -559,17 +561,17 @@ defineExpose({
                                             as="button"
                                             :key="`${getOptionValue(option)}-${isDisabled(option)}`"
                                             :value="getOptionValue(option)"
-                                            :text-value="getOptionLabel(option)"
+                                            :text-value="getOptionPlainLabel(option)"
                                             :disabled="isDisabled(option)"
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
-                                            :title="getOptionLabel(option)"
+                                            :title="getOptionPlainLabel(option)"
                                             @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
                                                 <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
                                                 <template v-else>
-                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionPlainLabel(option)">
                                                     <Icon v-else-if="option.icon" :name="option.icon" />
                                                     <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
                                                     <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
@@ -596,7 +598,7 @@ defineExpose({
             </div>
         </div>
 
-        <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
+        <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionPlainLabel, getOptionValue, labelHtml, deselect }">
             <SortableList
                 v-if="multiple"
                 data-ui-combobox-selected-options
@@ -623,7 +625,7 @@ defineExpose({
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
-                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
+                                :aria-label="__('Remove :label', { label: getOptionPlainLabel(option) })"
                                 @click="deselect(getOptionValue(option))"
                             >
                                 &times;
