@@ -14,7 +14,7 @@
 
     <StackContent>
         <section v-if="!loading" class="isolate">
-            <Tabs v-model:modelValue="activeTab" :unmount-on-hide="false">
+            <Tabs v-model:modelValue="activeTab">
                 <TabList class="mb-6">
                     <TabTrigger name="settings" :text="__('Settings')" />
                     <TabTrigger name="conditions" :text="__('Conditions')" />
@@ -22,7 +22,7 @@
                 </TabList>
 
                 <div>
-                    <TabContent name="settings">
+                    <TabContent name="settings" force-mount :class="{ hidden: activeTab !== 'settings' }">
                         <ui-publish-container
                             ref="container"
                             :blueprint="adjustedBlueprint"
