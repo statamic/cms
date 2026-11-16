@@ -95,6 +95,8 @@ class GlideTest extends TestCase
     #[Test]
     public function local_cache_uses_configured_permissions()
     {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
         config([
             'statamic.assets.image_manipulation.cache' => true,
             'statamic.assets.image_manipulation.cache_path' => public_path('img'),
