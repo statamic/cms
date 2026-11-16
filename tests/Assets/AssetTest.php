@@ -1937,6 +1937,8 @@ class AssetTest extends TestCase
     #[Test]
     public function it_throws_an_exception_when_the_uploaded_file_cannot_be_written_to_the_disk()
     {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
         Event::fake([AssetSaved::class, AssetUploaded::class, AssetCreated::class]);
 
         $asset = (new Asset)->container($this->container)->path('asset.jpg')->syncOriginal();
