@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { cva } from 'cva';
 import {
     ComboboxAnchor,
@@ -22,58 +22,121 @@ import DOMPurify from 'dompurify';
 import { SortableList } from '@/components/sortable/Sortable.js';
 import { useUiFieldId } from '@/composables/ui-field-id.js';
 
-const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
+type OptionValue = string | number;
 
-const props = defineProps({
-	/** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
-	adaptiveWidth: { type: Boolean, default: false },
-	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
-	align: { type: String, default: 'start' },
-	/** When `true`, the selected value will be clearable. */
-	clearable: { type: Boolean, default: false },
-	/** When `true`, the options dropdown will close after selecting an option. */
-	closeOnSelect: { type: Boolean, default: undefined },
-	disabled: { type: Boolean, default: false },
-	/** When `true`, the focus outline will be more discrete. */
-	discreteFocusOutline: { type: Boolean, default: false },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-	icon: { type: String, default: null },
-	/** ID attribute for the input element. Inherits from parent `Field` when omitted. */
-	id: { type: String, default: null },
-	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
-	ignoreFilter: { type: Boolean, default: false },
-	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
-	labelHtml: { type: Boolean, default: false },
-	/** The maximum number of selectable options. */
-	maxSelections: { type: Number, default: null },
-	/** The controlled value of the combobox. */
-	modelValue: { type: [Object, String, Number], default: null },
-	/** When `true`, multiple options are allowed. */
-	multiple: { type: Boolean, default: false },
-	/** Key of the option's label in the option's object. */
-	optionLabel: { type: String, default: 'label' },
-	/** Array of option objects */
-	options: { type: Array, default: () => [] },
-	/** Key of the option's value in the option's object. */
-	optionValue: { type: String, default: 'value' },
-	/** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
-	pasteDelimiter: { type: String, default: ',' },
-	placeholder: { type: String, default: () => __('Select...') },
-	readOnly: { type: Boolean, default: false },
-	/** When `true`, the options will be searchable. */
-	searchable: { type: Boolean, default: true },
-	/** Keys of the option object to search against. Defaults to just `optionLabel`. */
-	searchKeys: { type: Array, default: null },
-	/** Determines if the dropdown should open */
-	shouldOpenDropdown: { type: Function, default: () => true },
-	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
-	size: { type: String, default: 'base' },
-	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
-	taggable: { type: Boolean, default: false },
-	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
-	variant: { type: String, default: 'default' },
-	/** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
-	excludeZManipulation: { type: Boolean, default: false },
+type ModelValue = OptionValue | OptionValue[] | null;
+
+interface Option {
+    /** Icon name displayed next to the label. */
+    icon?: string;
+    /** Image URL displayed next to the label. */
+    image?: string;
+    /** Set on the "Add" option shown while searching a `taggable` combobox. */
+    create?: boolean;
+    /** The label and value live under the keys set by `optionLabel` and `optionValue`. */
+    [key: string]: any;
+}
+
+interface Props {
+    /** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
+    adaptiveWidth?: boolean;
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+    align?: 'start' | 'center' | 'end';
+    /** When `true`, the selected value will be clearable. */
+    clearable?: boolean;
+    /** When `true`, the options dropdown will close after selecting an option. */
+    closeOnSelect?: boolean;
+    disabled?: boolean;
+    /** When `true`, the focus outline will be more discrete. */
+    discreteFocusOutline?: boolean;
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon?: string | null;
+    /** ID attribute for the input element. Inherits from parent `Field` when omitted. */
+    id?: string | null;
+    /** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+    ignoreFilter?: boolean;
+    /** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+    labelHtml?: boolean;
+    /** The maximum number of selectable options. */
+    maxSelections?: number | null;
+    /** The controlled value of the combobox. */
+    modelValue?: string | number | (string | number)[] | null;
+    /** When `true`, multiple options are allowed. */
+    multiple?: boolean;
+    /** Key of the option's label in the option's object. */
+    optionLabel?: string;
+    /** Array of option objects. The label and value live under the `optionLabel` and `optionValue` keys. */
+    options?: { icon?: string; image?: string; [key: string]: any }[];
+    /** Key of the option's value in the option's object. */
+    optionValue?: string;
+    /** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
+    pasteDelimiter?: string;
+    placeholder?: string;
+    readOnly?: boolean;
+    /** When `true`, the options will be searchable. */
+    searchable?: boolean;
+    /** Keys of the option object to search against. Defaults to just `optionLabel`. */
+    searchKeys?: string[] | null;
+    /** Determines if the dropdown should open */
+    shouldOpenDropdown?: (open: boolean) => boolean;
+    /** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+    size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
+    /** When `true`, additional options can be added by typing in the search input and pressing enter. */
+    taggable?: boolean;
+    /** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+    variant?: 'default' | 'filled' | 'ghost' | 'subtle';
+    /** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
+    excludeZManipulation?: boolean;
+}
+
+const emit = defineEmits<{
+    'update:modelValue': [value: string | number | (string | number)[] | null];
+    search: [query: string, loading: () => void];
+    selected: [value: string | number];
+    added: [value: string | number];
+}>();
+
+defineSlots<{
+    'selected-option'(props: { option: { icon?: string; image?: string; [key: string]: any } }): any;
+    'no-options'(props: { searchQuery: string }): any;
+    option(props: { icon?: string; image?: string; create?: boolean; [key: string]: any }): any;
+    'selected-options'(props: {
+        disabled: boolean;
+        readOnly: boolean;
+        getOptionLabel: (option: { [key: string]: any }) => string;
+        getOptionValue: (option: { [key: string]: any }) => string | number;
+        labelHtml: boolean;
+        deselect: (value: string | number) => void;
+    }): any;
+}>();
+
+const props = withDefaults(defineProps<Props>(), {
+    adaptiveWidth: false,
+    align: 'start',
+    clearable: false,
+    closeOnSelect: undefined,
+    disabled: false,
+    discreteFocusOutline: false,
+    icon: null,
+    id: null,
+    ignoreFilter: false,
+    labelHtml: false,
+    maxSelections: null,
+    modelValue: null,
+    multiple: false,
+    optionLabel: 'label',
+    options: () => [],
+    optionValue: 'value',
+    pasteDelimiter: ',',
+    placeholder: () => __('Select...'),
+    readOnly: false,
+    searchable: true,
+    searchKeys: null,
+    shouldOpenDropdown: () => true,
+    size: 'base',
+    taggable: false,
+    variant: 'default',
+    excludeZManipulation: false,
 });
 
 defineOptions({
@@ -84,7 +147,7 @@ const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const attrs = useAttrs();
 
-const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class));
+const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class as string));
 const wrapperAttrs = computed(() => {
     const { class: _, ...rest } = attrs;
     return rest;
@@ -143,7 +206,7 @@ const itemClasses = cva({
     },
 });
 
-const searchQuery = ref('');
+const searchQuery = ref<string>('');
 const dropdownOpen = ref(false);
 const focusedByPointer = ref(false);
 const rootRef = useTemplateRef('root');
@@ -157,7 +220,7 @@ watch(dropdownOpen, (open) => {
     if (!open) searchQuery.value = '';
 });
 
-const getOptionLabel = (option) => {
+const getOptionLabel = (option: Option): string => {
     const label = option?.[props.optionLabel];
     if (props.labelHtml) {
         return DOMPurify.sanitize(label ?? '', {
@@ -167,12 +230,12 @@ const getOptionLabel = (option) => {
     return label;
 };
 
-const getOptionValue = (option) => option?.[props.optionValue];
-const matchOptionByValue = (option, value) => getOptionValue(option) === value;
-const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
-const isDisabled = (option) => !isSelected(option) && props.multiple && limitReached.value;
+const getOptionValue = (option: Option): OptionValue => option?.[props.optionValue];
+const matchOptionByValue = (option: Option, value: OptionValue): boolean => getOptionValue(option) === value;
+const isSelected = (option: Option): boolean => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
+const isDisabled = (option: Option): boolean => !isSelected(option) && props.multiple && limitReached.value;
 
-const selectedOptions = computed(() => {
+const selectedOptions = computed<Option[]>(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
     if (typeof selections === 'string' || typeof selections === 'number') {
@@ -185,7 +248,7 @@ const selectedOptions = computed(() => {
     });
 });
 
-const selectedOption = computed(() => {
+const selectedOption = computed<Option | null>(() => {
     if (props.multiple || props.modelValue === null || selectedOptions.value.length !== 1) {
         return null;
     }
@@ -245,18 +308,15 @@ const placeholder = computed(() => {
     return props.placeholder;
 });
 
-const filteredOptions = computed(() => {
-    let results = [...props.options];
+const filteredOptions = computed<Option[]>(() => {
+    let results: Option[] = [...props.options];
 
     if (props.searchable && !props.ignoreFilter) {
-        const matches = new Set(
-            fuzzysort
-                .go(searchQuery.value, props.options, {
-                    all: true,
-                    ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
-                })
-                .map((result) => result.obj)
-        );
+        const searchResults = props.searchKeys?.length
+            ? fuzzysort.go(searchQuery.value, props.options, { all: true, keys: props.searchKeys })
+            : fuzzysort.go(searchQuery.value, props.options, { all: true, key: props.optionLabel });
+
+        const matches = new Set<Option>(searchResults.map((result) => result.obj));
 
         results = props.options.filter((option) => matches.has(option));
     }
@@ -275,7 +335,7 @@ const filteredOptions = computed(() => {
 const shouldShowCreateOption = computed(() => {
     if (!props.taggable || !searchQuery.value) return false;
 
-    const matchesSearchQuery = (option) =>
+    const matchesSearchQuery = (option: Option): boolean =>
         getOptionLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
 
     return !props.options.some(matchesSearchQuery) && !selectedOptions.value.some(matchesSearchQuery);
@@ -286,19 +346,19 @@ function clear() {
     emit('update:modelValue', null);
 }
 
-function select(option) {
+function select(option: Option) {
     if (option.create) emit('added', getOptionValue(option));
 
     dropdownOpen.value = !shouldCloseOnSelect.value;
     if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
 
-function deselect(option) {
-    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
+function deselect(value: OptionValue) {
+    emit('update:modelValue', (props.modelValue as OptionValue[]).filter((item) => item !== value));
 }
 
-function updateModelValue(value) {
-    let originalValue = props.modelValue === null ? [] : props.modelValue;
+function updateModelValue(value: ModelValue) {
+    let originalValue: ModelValue = props.modelValue === null ? [] : props.modelValue;
 
     searchQuery.value = '';
     emit('update:modelValue', value);
@@ -311,7 +371,7 @@ function updateModelValue(value) {
         .forEach((option) => emit('selected', option));
 }
 
-function updateDropdownOpen(open) {
+function updateDropdownOpen(open: boolean) {
     if (open && ! props.shouldOpenDropdown(open)) return;
     if (props.disabled || props.readOnly) return;
 
@@ -323,15 +383,15 @@ function updateDropdownOpen(open) {
     }
 }
 
-function openDropdown(e) {
+function openDropdown(e: KeyboardEvent) {
     if (dropdownOpen.value) return;
-    if (e.key === ' ' && e.target.tagName === 'INPUT') return;
+    if (e.key === ' ' && (e.target as HTMLElement).tagName === 'INPUT') return;
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
     updateDropdownOpen(true);
 }
 
-function onFocus(e) {
+function onFocus(e: FocusEvent) {
     const byPointer = focusedByPointer.value;
     focusedByPointer.value = false;
 
@@ -341,23 +401,25 @@ function onFocus(e) {
     updateDropdownOpen(true);
 }
 
-function focusCameFromOutside(e) {
-    if (!e.relatedTarget) return false;
-    if ('rekaCollectionItem' in e.relatedTarget.dataset) return false;
+function focusCameFromOutside(e: FocusEvent): boolean {
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
 
-    return !wrapperRef.value?.contains(e.relatedTarget);
+    if (!relatedTarget) return false;
+    if ('rekaCollectionItem' in relatedTarget.dataset) return false;
+
+    return !wrapperRef.value?.contains(relatedTarget);
 }
 
-function onBlur(e) {
+function onBlur(e: FocusEvent) {
     if (!props.taggable) return;
 
-    let isInsideDropdown = 'rekaCollectionItem' in (e.relatedTarget?.dataset ?? {});
+    let isInsideDropdown = 'rekaCollectionItem' in ((e.relatedTarget as HTMLElement | null)?.dataset ?? {});
     if (isInsideDropdown) return;
 
     pushTaggableOption(e);
 }
 
-function onPaste(e) {
+function onPaste(e: ClipboardEvent) {
     if (!props.taggable || !props.multiple) return;
 
     e.preventDefault();
@@ -369,23 +431,26 @@ function onPaste(e) {
         .map((v) => v.trim())
         .filter((v) => v !== '');
 
-    updateModelValue([...(props.modelValue ?? []), ...tags]);
+    updateModelValue([...((props.modelValue as OptionValue[]) ?? []), ...tags]);
 }
 
-function pushTaggableOption(e) {
+function pushTaggableOption(e: KeyboardEvent | FocusEvent) {
     if (!props.taggable) return;
     if (e.defaultPrevented) return; // Reka prevents the event's default when it selects a highlighted option.
-    if (e.target.value === '') return;
+
+    const value = (e.target as HTMLInputElement).value;
+
+    if (value === '') return;
 
     e.preventDefault();
 
     const alreadySelected = props.multiple
-        ? props.modelValue?.includes(e.target.value)
-        : props.modelValue === e.target.value;
+        ? (props.modelValue as OptionValue[] | null)?.includes(value)
+        : props.modelValue === value;
 
     if (!alreadySelected) {
-        emit('added', e.target.value);
-        updateModelValue(props.multiple ? [...(props.modelValue ?? []), e.target.value] : e.target.value);
+        emit('added', value);
+        updateModelValue(props.multiple ? [...((props.modelValue as OptionValue[]) ?? []), value] : value);
     }
 
     searchQuery.value = '';
