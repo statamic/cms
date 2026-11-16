@@ -279,6 +279,10 @@ class AssetsTest extends TestCase
             'id folder, new entry' => ['id', fn () => \Statamic\Facades\Collection::make('blog'), false],
             'id folder, existing entry' => ['id', fn () => \Statamic\Facades\Entry::make()->id('123'), true],
             'slug folder, new entry' => ['slug', fn () => \Statamic\Facades\Collection::make('blog'), true],
+            'id folder, new term' => ['id', fn () => \Statamic\Facades\Taxonomy::make('tags'), false],
+            'id folder, existing term' => ['id', fn () => \Statamic\Facades\Term::make('foo')->taxonomy('tags'), true],
+            'id folder, existing user' => ['id', fn () => \Statamic\Facades\User::make()->id('123'), true],
+            'id folder, no parent' => ['id', fn () => null, true],
         ];
     }
 

@@ -5,7 +5,9 @@ namespace Statamic\Fieldtypes\Assets;
 use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Contracts\Entries\Collection as EntryCollection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Action;
@@ -512,7 +514,7 @@ class Assets extends Fieldtype
 
         $parent = $this->field->parent();
 
-        return ! ($parent instanceof Entry && $parent->id());
+        return $parent instanceof EntryCollection || $parent instanceof Taxonomy;
     }
 
     public function preProcessIndex($data)
