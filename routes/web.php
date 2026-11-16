@@ -104,11 +104,9 @@ Route::name('statamic.')->group(function () {
 
         Route::post('nocache', NoCacheController::class)
             ->middleware(NoCacheLocalize::class)
-            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery'])
             ->name('nocache');
 
-        Route::post('csrf', CsrfTokenController::class)
-            ->withoutMiddleware(['App\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\PreventRequestForgery']);
+        Route::post('csrf', CsrfTokenController::class);
 
         if (config('statamic.static_caching.script_delivery') === 'external') {
             Route::get('nocache.js', [ScriptController::class, 'nocache'])->name('nocache.js');

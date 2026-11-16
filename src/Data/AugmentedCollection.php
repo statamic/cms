@@ -10,12 +10,20 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder as StatamicQueryBuilder;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Link\ArrayableLink;
 
 class AugmentedCollection extends Collection
 {
     protected $shallowNesting = false;
     protected $shouldEvaluate = false;
     protected $withRelations = [];
+
+    /**
+     * The linked items that are currently being converted to an array. A link
+     * back to one of them is represented shallowly, otherwise entries that link
+     * to each other would be converted to arrays forever.
+     */
+    private static $expandingLinks = [];
 
     /**
      * Enables shallow augmentation on nested values when
@@ -80,6 +88,10 @@ class AugmentedCollection extends Collection
                 $value = $value->value();
             }
 
+            if ($value instanceof ArrayableLink) {
+                return $this->linkToArray($value);
+            }
+
             if ($this->isQueryBuilder($value)) {
                 $value = $value->get();
             }
@@ -111,6 +123,29 @@ class AugmentedCollection extends Collection
 
             return $value;
         }, $this->all());
+    }
+
+    private function linkToArray(ArrayableLink $link)
+    {
+        $item = $link->value();
+
+        if (! is_object($item)) {
+            return $link->toArray();
+        }
+
+        $reference = method_exists($item, 'reference') ? $item->reference() : spl_object_id($item);
+
+        if (in_array($reference, self::$expandingLinks, true)) {
+            return (new self($link->jsonSerialize()))->withEvaluation()->toArray();
+        }
+
+        self::$expandingLinks[] = $reference;
+
+        try {
+            return (new self($link->toArray()))->withEvaluation()->toArray();
+        } finally {
+            array_pop(self::$expandingLinks);
+        }
     }
 
     private function isQueryBuilder($value)

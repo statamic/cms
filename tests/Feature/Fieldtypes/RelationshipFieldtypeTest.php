@@ -194,6 +194,35 @@ class RelationshipFieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function an_authorized_user_still_gets_the_full_collection_columns()
+    {
+        Collection::make('news')->title('News')->save();
+        Blueprint::make('news')
+            ->setNamespace('collections.news')
+            ->setContents(['fields' => [
+                ['handle' => 'intro', 'field' => ['type' => 'text', 'listable' => true]],
+            ]])
+            ->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view news entries']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $config = base64_encode(json_encode([
+            'type' => 'entries',
+            'collections' => ['news'],
+        ]));
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson("/cp/fieldtypes/relationship?config={$config}")
+            ->assertOk();
+
+        $columns = collect($response->json('meta.columns'))->pluck('field')->all();
+
+        $this->assertContains('intro', $columns);
+    }
+
+    #[Test]
     public function it_forbids_access_to_entries_when_filters_target_collections_the_user_cannot_view()
     {
         Collection::make('secret')->save();

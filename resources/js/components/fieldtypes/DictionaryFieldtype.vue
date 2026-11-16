@@ -35,7 +35,7 @@
                         :key="getOptionValue(option)"
                         class="sortable-item cursor-grab active:cursor-grabbing"
                     >
-                        <Badge size="lg" color="white">
+                        <Badge size="lg" color="white" class="[&>*:not(svg)]:st-text-trim-optical">
                             <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>

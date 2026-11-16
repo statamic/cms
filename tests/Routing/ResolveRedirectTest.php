@@ -14,10 +14,15 @@ use Statamic\Fieldtypes\Link\ArrayableLink;
 use Statamic\Routing\ResolveRedirect;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
+use Tests\FakesContent;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ResolveRedirectTest extends TestCase
 {
+    use FakesContent;
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_resolves_standard_redirects()
     {
@@ -279,5 +284,69 @@ class ResolveRedirectTest extends TestCase
 
         $this->assertEquals('/test', $resolver($arrayableLink));
         $this->assertEquals(404, $resolver($arrayableLink));
+    }
+
+    #[Test]
+    public function an_entry_redirecting_to_itself_has_no_redirect()
+    {
+        $entry = $this->createPage('about', ['with' => ['redirect' => 'entry::about']]);
+
+        $this->assertNull($entry->redirectUrl());
+        $this->assertFalse($entry->isRedirect());
+        $this->assertEquals('/about', $entry->url());
+    }
+
+    #[Test]
+    public function entries_redirecting_to_each_other_have_no_redirect()
+    {
+        $a = $this->createPage('a', ['with' => ['redirect' => 'entry::b']]);
+        $b = $this->createPage('b', ['with' => ['redirect' => 'entry::a']]);
+
+        $this->assertFalse($a->isRedirect());
+        $this->assertFalse($b->isRedirect());
+        $this->assertEquals('/a', $a->url());
+        $this->assertEquals('/b', $b->url());
+    }
+
+    #[Test]
+    public function a_chain_of_redirects_up_to_the_max_depth_is_followed()
+    {
+        $first = $this->createRedirectChain(10);
+
+        $this->assertTrue($first->isRedirect());
+        $this->assertEquals('/final', $first->url());
+    }
+
+    #[Test]
+    public function a_chain_of_redirects_beyond_the_max_depth_is_treated_as_a_loop()
+    {
+        $first = $this->createRedirectChain(11);
+
+        $this->assertFalse($first->isRedirect());
+        $this->assertEquals('/chain-1', $first->url());
+    }
+
+    #[Test]
+    public function a_detected_loop_does_not_affect_later_redirects()
+    {
+        $loop = $this->createPage('loop', ['with' => ['redirect' => 'entry::loop']]);
+        $other = $this->createPage('other', ['with' => ['redirect' => '/final']]);
+
+        $this->assertFalse($loop->isRedirect());
+        $this->assertTrue($other->isRedirect());
+        $this->assertEquals('/final', $other->url());
+    }
+
+    private function createRedirectChain(int $length)
+    {
+        foreach (range(1, $length) as $i) {
+            $redirect = $i === $length ? '/final' : 'entry::chain-'.($i + 1);
+
+            $entry = $this->createPage('chain-'.$i, ['with' => ['redirect' => $redirect]]);
+
+            $first ??= $entry;
+        }
+
+        return $first;
     }
 }

@@ -10,6 +10,8 @@ const props = defineProps({
     date: { type: [String, Date, Number, Object], required: true },
     /** Extra `{ timezone, label }` rows to render above the defaults. */
     additionalTimezones: { type: Array, default: () => [] },
+    /** When `false`, times are displayed without seconds. */
+    showSeconds: { type: Boolean, default: true },
 });
 
 const isRange = computed(() => {
@@ -40,7 +42,7 @@ const formatTimeZone = (timeZone) => {
 const formatDateTime = (timeZone) => {
     const formatter = new Intl.DateTimeFormat(dateFormatter.locale, {
         dateStyle: isRange.value ? 'short' : 'medium',
-        timeStyle: 'medium',
+        timeStyle: props.showSeconds ? 'medium' : 'short',
         timeZone,
     });
     return isRange.value ? formatter.formatRange(start.value, end.value) : formatter.format(start.value);

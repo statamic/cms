@@ -44,6 +44,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | After Saving
+    |--------------------------------------------------------------------------
+    |
+    | What happens after saving an entry or term, until a user picks another
+    | option in the save button dropdown. Supported: "listing",
+    | "continue_editing", "create_another".
+    |
+    */
+
+    'after_save' => 'listing',
+
+    /*
+    |--------------------------------------------------------------------------
     | Dashboard Widgets
     |--------------------------------------------------------------------------
     |
@@ -69,6 +82,19 @@ return [
     'pagination_size' => 50,
 
     'pagination_size_options' => [10, 25, 50, 100],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Select All Limit
+    |--------------------------------------------------------------------------
+    |
+    | The maximum number of matching results that can be selected across pages
+    | via "Select all". Raise this if your server can handle larger bulk
+    | actions, or set it to null for no limit.
+    |
+    */
+
+    'select_all_limit' => 1000,
 
     /*
     |--------------------------------------------------------------------------

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToWriteFile;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -1927,6 +1928,34 @@ class AssetTest extends TestCase
         $this->assertFalse($return);
 
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetUploaded::class);
+        Event::assertNotDispatched(AssetCreated::class);
+    }
+
+    #[Test]
+    public function it_throws_an_exception_when_the_uploaded_file_cannot_be_written_to_the_disk()
+    {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
+        Event::fake([AssetSaved::class, AssetUploaded::class, AssetCreated::class]);
+
+        $asset = (new Asset)->container($this->container)->path('asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        chmod($root = Storage::disk('test')->path(''), 0555);
+
+        try {
+            $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+            $this->fail('An exception should have been thrown.');
+        } catch (UnableToWriteFile $e) {
+            $this->assertStringContainsString('asset.jpg', $e->getMessage());
+        } finally {
+            chmod($root, 0755);
+        }
 
         Event::assertNotDispatched(AssetSaved::class);
         Event::assertNotDispatched(AssetUploaded::class);

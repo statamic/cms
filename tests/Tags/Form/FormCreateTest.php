@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
@@ -54,8 +55,11 @@ class FormCreateTest extends FormTestCase
     }
 
     #[Test]
-    public function it_dynamically_renders_fields()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ form:fields }}
@@ -75,8 +79,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_scope_param()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_scope_param($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ form:fields scope="field" }}
@@ -240,8 +247,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_using_legacy_array()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_using_legacy_array($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ fields }}
@@ -321,8 +331,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_form_handle()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_form_handle($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
             $this->createForm(handle: $handle);
             $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form }}'));
@@ -334,8 +347,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_form_handle_using_legacy_array_syntax()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_form_handle_using_legacy_array_syntax($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
             $this->createForm(handle: $handle);
             $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ fields }}{{ field }}{{ /fields }}{{ /form }}'));
@@ -347,8 +363,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_text_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_text_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-favourite-animal-field" type="text" name="favourite_animal" value="">',
         ], [
@@ -371,8 +390,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_text_field_with_custom_input_type()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_text_field_with_custom_input_type($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-age-field" type="number" name="age" value="">',
         ], [
@@ -397,8 +419,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_textarea_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_textarea_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<textarea id="[[form-handle]]-form-comment-field" name="comment" rows="5"></textarea>',
         ], [
@@ -421,8 +446,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_checkboxes_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_checkboxes_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<br>',
@@ -463,8 +491,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_inline_checkboxes_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_inline_checkboxes_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<label><input id="[[form-handle]]-form-favourite-animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
@@ -503,8 +534,55 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_radio_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_checkboxes_field_with_a_single_option($language)
     {
+        config(['statamic.templates.language' => $language]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<br>',
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+        ], [
+            'handle' => 'favourite_animals',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                ],
+            ],
+        ]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-terms-field-yes-option" type="checkbox" name="terms[]" value="yes" required>I agree</label>',
+        ], [
+            'handle' => 'terms',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'yes' => 'I agree',
+                ],
+            ],
+        ]);
+    }
+
+    public static function templateLanguageProvider()
+    {
+        return [
+            'antlers' => ['antlers'],
+            'blade' => ['blade'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_radio_field($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
@@ -545,8 +623,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_inline_radio_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_inline_radio_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<label><input id="[[form-handle]]-form-favourite-animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
@@ -585,8 +666,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_select_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_select_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<select id="[[form-handle]]-form-favourite-animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
@@ -629,8 +713,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_select_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_multiple_select_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<select id="[[form-handle]]-form-favourite-animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat">Cat</option>',
@@ -673,8 +760,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_asset_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_asset_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie">',
         ], [
@@ -688,8 +778,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_assets_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_multiple_assets_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
@@ -702,8 +795,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_field_with_fallback_to_default_partial()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_field_with_fallback_to_default_partial($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-custom-field" type="text" name="custom" value="">',
         ], [

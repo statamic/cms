@@ -22,7 +22,7 @@ class LicenseManager
 
     public function requestFailed()
     {
-        return (bool) $this->requestErrorCode();
+        return Arr::has($this->response(), 'error');
     }
 
     public function requestErrorCode()

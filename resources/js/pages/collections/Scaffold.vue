@@ -71,6 +71,7 @@ onUnmounted(() => submitKeyBinding.destroy());
                             v-model="selected.index"
                             size="sm"
                             id="field_index"
+                            :label="__('Index Template')"
                         />
                         <label for="field_index" v-text="__('Index Template')" />
                     </div>
@@ -86,6 +87,7 @@ onUnmounted(() => submitKeyBinding.destroy());
                             v-model="selected.show"
                             size="sm"
                             id="field_template"
+                            :label="__('Show Template')"
                         />
                         <label for="field_template" v-text="__('Show Template')" />
                     </div>

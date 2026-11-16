@@ -6,11 +6,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\Contracts\GraphQL\ResponseCache;
 use Statamic\Events\Event;
+use WeakMap;
 
 class DefaultCache implements ResponseCache
 {
+    private ?WeakMap $generations = null;
+
     public function get(Request $request)
     {
         $cached = Cache::get($this->getCacheKey($request));
@@ -66,11 +70,25 @@ class DefaultCache implements ResponseCache
         $query = $request->input('query');
         $vars = $request->input('variables');
 
-        return 'gql-cache:'.md5($query).'_'.md5(json_encode($vars));
+        return 'gql-cache:'.$this->getGeneration($request).':'.md5($query).'_'.md5(json_encode($vars));
+    }
+
+    private function getGeneration(Request $request): string
+    {
+        $this->generations ??= new WeakMap;
+
+        return $this->generations[$request] ??= Cache::rememberForever($this->getGenerationKey(), fn () => Str::random());
+    }
+
+    private function getGenerationKey(): string
+    {
+        return 'gql-cache:generation';
     }
 
     public function handleInvalidationEvent(Event $event)
     {
+        Cache::forget($this->getGenerationKey());
+
         $this->getTrackedResponses()->each(function ($key) {
             Cache::forget($key);
         });

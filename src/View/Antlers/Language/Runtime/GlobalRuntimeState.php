@@ -290,6 +290,7 @@ class GlobalRuntimeState
         self::$tracedRuntimeAssignments = [];
         self::$traceTagAssignments = false;
         self::$environmentId = StringUtilities::uuidv4();
+        self::$interpolatedVariables = [];
         self::$yieldCount = 0;
         self::$yieldStacks = [];
         self::$abandonedNodes = [];

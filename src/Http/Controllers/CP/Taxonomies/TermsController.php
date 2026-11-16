@@ -73,7 +73,7 @@ class TermsController extends CpController
     {
         $query = $taxonomy->queryTerms();
 
-        $query->where('site', Site::selected());
+        $query->where('site', Site::selected()->handle());
 
         if ($search = request('search')) {
             if ($taxonomy->hasSearchIndex()) {

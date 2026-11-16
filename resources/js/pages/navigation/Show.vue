@@ -135,7 +135,15 @@ export default {
         this.addToCommandPalette();
     },
 
+    unmounted() {
+        toggleArchitecturalBackground(false);
+    },
+
     methods: {
+        afterActionSuccessfullyCompleted() {
+            if (!this.isDirty) this.$refs.tree?.refresh();
+        },
+
         addLink() {
             if (!this.hasCollections) this.linkPage();
         },

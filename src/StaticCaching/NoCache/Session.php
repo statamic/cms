@@ -20,6 +20,8 @@ class Session
 
     protected $url;
 
+    protected $paginationUrl;
+
     private $regionCount = 0;
 
     public function __construct($url)
@@ -36,6 +38,13 @@ class Session
     public function setUrl(string $url)
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function setPaginationUrl(string $url)
+    {
+        $this->paginationUrl = $url;
 
         return $this;
     }
@@ -150,7 +159,7 @@ class Session
         AbstractPaginator::currentPathResolver(fn () => Str::before($this->url, '?'));
 
         AbstractPaginator::currentPageResolver(function () {
-            return Str::of($this->url)->after('page=')->before('&')->__toString();
+            return Str::of($this->paginationUrl ?? $this->url)->after('page=')->before('&')->__toString();
         });
     }
 

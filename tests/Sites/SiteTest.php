@@ -3,8 +3,10 @@
 namespace Tests\Sites;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\Antlers;
+use Statamic\Query\ResolveValue;
 use Statamic\Sites\Site;
 use Tests\TestCase;
 
@@ -56,6 +58,70 @@ class SiteTest extends TestCase
 
         $this->assertNotEmpty($site->locale());
         $this->assertStringNotContainsString('{{', $site->locale());
+    }
+
+    #[Test]
+    public function config_values_come_out_the_same_whether_or_not_antlers_is_needed_for_them()
+    {
+        config([
+            'app.name' => 'A <?php echo 1; ?> & <b>B</b> é',
+            'app.other' => 'has {{ config:app.locale }} in it',
+            'app.at' => 'me@example.com',
+            'app.n' => 5,
+            'app.empty' => '',
+            'app.locale' => 'en',
+        ]);
+
+        $resolved = (new Site('en', []))->resolveAntlers([
+            'a' => '{{ config:app.name }}',
+            'b' => '{{ config:app.other }}',
+            'c' => '{{ config:app.at }}',
+            'd' => 'x {{ config:app.n }} y',
+            'e' => '{{ config:app.empty }}',
+            'f' => '{{ config:app.missing }}',
+            'g' => '  {{ config:app:n }}  ',
+            'h' => "{{ config:app.n }}\n",
+        ]);
+
+        $this->assertSame([
+            'a' => 'A &lt;?php echo 1; ?> & <b>B</b> é',
+            'b' => 'has en in it',
+            'c' => 'me@example.com',
+            'd' => 'x 5 y',
+            'e' => '',
+            'f' => '',
+            'g' => '  5  ',
+            'h' => "5\n",
+        ], $resolved);
+    }
+
+    #[Test]
+    public function a_config_value_holding_a_component_tag_still_goes_through_antlers()
+    {
+        config(['app.name' => 'before <s:the_tag /> after']);
+
+        $parser = \Mockery::mock(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class);
+        $parser->shouldReceive('parse')->once()->withArgs(fn ($value) => $value === 'before <s:the_tag /> after')->andReturn('parsed');
+        $this->app->instance(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class, $parser);
+
+        $this->assertSame(['name' => 'parsed'], (new Site('en', []))->resolveAntlers(['name' => '{{ config:app.name }}']));
+    }
+
+    #[Test]
+    public function a_value_that_is_only_config_is_resolved_without_antlers()
+    {
+        config(['app.name' => 'My Site', 'app.url' => 'https://example.com']);
+
+        $this->app->bind(\Statamic\View\Antlers\Language\Runtime\RuntimeParser::class, function () {
+            $this->fail('Antlers was asked to parse a value with nothing left in it to parse.');
+        });
+
+        $resolved = (new Site('en', []))->resolveAntlers([
+            'name' => '{{ config:app.name }}',
+            'url' => '{{ config:app.url }}/fr/',
+        ]);
+
+        $this->assertSame(['name' => 'My Site', 'url' => 'https://example.com/fr/'], $resolved);
     }
 
     #[Test]
@@ -365,5 +431,15 @@ class SiteTest extends TestCase
         $this->assertEquals('echo', $site->attribute('charlie.delta'));
         $this->assertNull($site->attribute('unknown'));
         $this->assertNull($site->attribute('charlie.unknown'));
+    }
+
+    #[Test]
+    public function it_resolves_to_its_handle_when_queried()
+    {
+        $site = new Site('en', []);
+
+        $this->assertInstanceOf(QueryableValue::class, $site);
+        $this->assertSame('en', $site->toQueryableValue());
+        $this->assertSame('en', (new ResolveValue)(['site' => $site], 'site'));
     }
 }

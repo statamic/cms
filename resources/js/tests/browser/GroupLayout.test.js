@@ -45,7 +45,7 @@ async function render(fields, width, values = {}, meta = {}) {
     document.body.append(host);
     wrapper = mount(Container, {
         attachTo: host,
-        props: { blueprint: { tabs: [] }, modelValue: values, meta, site: 'default' },
+        props: { name: 'test', blueprint: { tabs: [] }, modelValue: values, meta, site: 'default' },
         global: {
             components: {
                 ...components,
@@ -70,7 +70,7 @@ async function render(fields, width, values = {}, meta = {}) {
 }
 
 function rectangle(id) {
-    return document.getElementById(`field_${id}`).getBoundingClientRect();
+    return document.getElementById(`field_test_${id}`).getBoundingClientRect();
 }
 
 function assertStacked(first, second) {
@@ -83,7 +83,7 @@ function assertStacked(first, second) {
 
 test.each([600, 900, 1200])('a 25% group stays inside a %ipx publish panel', async width => {
     await render([text('heading', 75), group('options', [text('tag'), text('design')], { width: 25 })], width);
-    const groupElement = document.getElementById('field_options_tag').closest('.group-fieldtype').getBoundingClientRect();
+    const groupElement = document.getElementById('field_test_options_tag').closest('.group-fieldtype').getBoundingClientRect();
     for (const name of ['options_tag', 'options_design']) {
         const input = rectangle(name);
         expect(input.right).toBeLessThanOrEqual(groupElement.right + 1);
@@ -109,7 +109,7 @@ test.each([false, true])('a wide group preserves 50/50 columns with border=%s', 
 test('nested groups do not inherit a parent column span', async () => {
     await render([group('outer', [text('heading', 75), group('inner', [text('first', 50), text('second', 50)], { width: 25 })])], 1000);
     assertStacked('outer_inner_first', 'outer_inner_second');
-    const input = document.getElementById('field_outer_inner_first');
+    const input = document.getElementById('field_test_outer_inner_first');
     const bounds = input.closest('.group-fieldtype').getBoundingClientRect();
     expect(Math.abs(input.getBoundingClientRect().width - bounds.width)).toBeLessThan(1);
 });
@@ -145,7 +145,7 @@ test.each([511, 512])('a group uses its own %ipx breakpoint width', async width 
 
 test('editing a nested field updates its form value', async () => {
     await render([group('options', [text('first'), text('second')], { width: 25 })], 1000, { options: { first: 'Original', second: 'Retained' } });
-    await wrapper.find('#field_options_first').setValue('Updated');
+    await wrapper.find('#field_test_options_first').setValue('Updated');
     expect(wrapper.vm.values).toEqual({ options: { first: 'Updated', second: 'Retained' } });
 });
 

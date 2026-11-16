@@ -188,8 +188,13 @@ class EntryRepository implements RepositoryContract
 
     public function substitute($item)
     {
-        Blink::store('entry-uris')->forget($item->id());
-        $this->substitutionsById[$item->id()] = $item;
+        // An entry being previewed before its first save has no id yet,
+        // so it can only be found by its URI.
+        if ($id = $item->id()) {
+            Blink::store('entry-uris')->forget($id);
+            $this->substitutionsById[$id] = $item;
+        }
+
         $this->substitutionsByUri[$item->locale().'@'.$item->uri()] = $item;
     }
 

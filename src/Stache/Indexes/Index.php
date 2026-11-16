@@ -116,7 +116,36 @@ abstract class Index
     {
         $this->load();
 
+        $this->putItem($item);
+
+        $this->cache();
+    }
+
+    private function putItem($item)
+    {
         $this->put($this->store->getItemKey($item), $this->getItemValue($item));
+    }
+
+    /**
+     * Updates a number of items and writes the index once, where updating
+     * them one at a time would write the whole of it once for each.
+     */
+    public function updateItems($items)
+    {
+        // An index with its own way of updating an item gets to use it.
+        if ((new \ReflectionMethod($this, 'updateItem'))->getDeclaringClass()->getName() !== self::class) {
+            collect($items)->each(fn ($item) => $this->updateItem($item));
+
+            return;
+        }
+
+        if (collect($items)->isEmpty()) {
+            return;
+        }
+
+        $this->load();
+
+        collect($items)->each(fn ($item) => $this->putItem($item));
 
         $this->cache();
     }

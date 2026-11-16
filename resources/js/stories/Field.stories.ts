@@ -74,7 +74,7 @@ export const _InlineVariant: Story = {
         },
         template: `
             <Field label="Enable notifications" variant="inline">
-                <Switch v-model="enabled" />
+                <Switch v-model="enabled" label="Enable notifications" />
             </Field>
         `,
     }),

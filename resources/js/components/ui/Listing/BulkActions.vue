@@ -2,11 +2,20 @@
 import { Motion } from 'motion-v';
 import { injectListingContext } from '../Listing/Listing.vue';
 import { computed, ref, watch } from 'vue';
-import { Button, ButtonGroup } from '@ui';
 import BulkActions from '@/components/actions/BulkActions.vue';
 import BulkActionsFloatingToolbar from './BulkActionsFloatingToolbar.vue';
 
-const { actionUrl, actionContext, selections, refresh, clearSelections } = injectListingContext();
+const {
+    actionUrl,
+    actionContext,
+    selections,
+    refresh,
+    clearSelections,
+    canSelectAllMatching,
+    selectAllMatching,
+    selectingAllMatching,
+    meta,
+} = injectListingContext();
 const busy = ref(false);
 const hasSelections = computed(() => selections.value.length > 0);
 const visible = ref(false);
@@ -59,6 +68,10 @@ function actionFailed(response) {
             :visible="visible"
             :selections="selections"
             :clear-selections="clearSelections"
+            :can-select-all-matching="canSelectAllMatching"
+            :select-all-matching="selectAllMatching"
+            :selecting-all-matching="selectingAllMatching"
+            :matching-total="meta?.total ?? 0"
         />
     </BulkActions>
 </template>

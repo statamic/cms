@@ -104,7 +104,7 @@
             }
 
             /* When the row is hovered, change the background of all its cells to a hover state color */
-            &:has(:hover) td {
+            &:hover td {
                 @apply bg-gray-50 dark:bg-gray-900;
             }
         }

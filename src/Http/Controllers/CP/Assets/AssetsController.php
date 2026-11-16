@@ -124,7 +124,11 @@ class AssetsController extends CpController
             try {
                 $validator->validate();
             } catch (ValidationException $e) {
-                throw $e->status(409);
+                return response()->json([
+                    'message' => __('The given data was invalid.'),
+                    'errors' => $e->errors(),
+                    'existing' => $container->asset($path)->id(),
+                ], 409);
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP;
 
+use Illuminate\Support\Uri;
 use Statamic\Facades\Site;
 
 use function Statamic\trans as __;
@@ -18,6 +19,21 @@ class SelectSiteController extends CpController
 
         Site::setSelected($handle);
 
-        return back()->with('success', __('Site selected.'));
+        return redirect($this->previousUrl($handle))->with('success', __('Site selected.'));
+    }
+
+    private function previousUrl(string $handle): string
+    {
+        $url = Uri::of(url()->previous());
+
+        $filters = json_decode(base64_decode($url->query()->get('filters', '')), true);
+
+        if (isset($filters['site'])) {
+            $filters['site']['site'] = $handle;
+
+            $url = $url->withQuery(['filters' => base64_encode(json_encode($filters))]);
+        }
+
+        return $url->value();
     }
 }

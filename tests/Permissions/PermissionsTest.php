@@ -347,6 +347,18 @@ class PermissionsTest extends TestCase
     }
 
     #[Test]
+    public function it_checks_whether_it_contains_a_permission_with_placeholders_resolved()
+    {
+        $this->setupComplicatedTest($permissions = new Permissions);
+
+        $this->assertTrue($permissions->contains('one'));
+        $this->assertTrue($permissions->contains('nested-child'));
+        $this->assertTrue($permissions->contains('replaced nested child second'));
+        $this->assertFalse($permissions->contains('four {placeholder}'));
+        $this->assertFalse($permissions->contains('unknown'));
+    }
+
+    #[Test]
     public function existing_permissions_can_be_modified()
     {
         $permissions = new Permissions;

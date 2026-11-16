@@ -93,4 +93,14 @@ class FlysystemAdapterTest extends TestCase
 
         $this->adapter->withAbsolutePaths();
     }
+
+    #[Test]
+    public function putting_a_file_does_not_make_the_directory_first()
+    {
+        $filesystem = \Mockery::mock(\Illuminate\Filesystem\FilesystemAdapter::class);
+        $filesystem->shouldReceive('put')->with('sub/dir/filename.txt', 'Hello World')->once()->andReturnTrue();
+        $filesystem->shouldNotReceive('makeDirectory');
+
+        $this->assertTrue((new FlysystemAdapter($filesystem))->put('sub/dir/filename.txt', 'Hello World'));
+    }
 }

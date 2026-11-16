@@ -92,7 +92,7 @@
             </button>
         </div>
 
-    s*/
+    */
     .show-focus-within:has(.show-focus-within_target:focus-visible) {
         /* Stop the transition ruining the focus outline quickly appearing. */
         transition: none;

@@ -49,7 +49,7 @@
                     variant="inline"
                     id="role-super"
                 >
-                    <Switch v-model="isSuper" id="role-super" />
+                    <Switch v-model="isSuper" id="role-super" :label="__('permissions.super')" />
                 </Field>
             </Card>
         </Panel>

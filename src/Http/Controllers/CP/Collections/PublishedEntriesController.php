@@ -26,11 +26,12 @@ class PublishedEntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
+                'meta' => $meta,
             ]),
             'saved' => true,
         ];
@@ -51,11 +52,12 @@ class PublishedEntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         return [
             'data' => array_merge((new EntryResource($entry->fresh()))->resolve()['data'], [
                 'values' => $values,
+                'meta' => $meta,
             ]),
             'saved' => true,
         ];
