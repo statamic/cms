@@ -1741,7 +1741,7 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
-    public function it_validates_unique_handles_between_imported_fieldsets()
+    public function it_does_not_throw_for_duplicate_handles_between_imported_fieldsets()
     {
         $emailLink = (new Fieldset)->setContents([
             'fields' => [
@@ -1776,10 +1776,7 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Duplicate field [label] on blueprint [test].');
-
-        $blueprint->fields();
+        $this->assertEquals(['label', 'address', 'number'], $blueprint->fields()->all()->keys()->all());
     }
 
     #[Test]

@@ -58,7 +58,7 @@ trait ManagesBlueprints
     private function validateFields($blueprint)
     {
         try {
-            $blueprint->fields();
+            $this->validateUniqueHandles($blueprint);
         } catch (FieldsetRecursionException $exception) {
             throw ValidationException::withMessages([
                 'tabs' => __('statamic::validation.fieldset_imported_recursively', ['handle' => $exception->getFieldset()]),
@@ -67,6 +67,19 @@ trait ManagesBlueprints
             throw ValidationException::withMessages([
                 'tabs' => __('statamic::validation.duplicate_field_handle', ['handle' => $exception->getHandle()]),
             ]);
+        }
+    }
+
+    private function validateUniqueHandles($blueprint)
+    {
+        $fields = $blueprint->fields();
+
+        $handles = $fields->items()
+            ->flatMap(fn ($config) => array_values($fields->createFields($config)))
+            ->map->handle();
+
+        if ($handle = $handles->duplicates()->first()) {
+            throw new DuplicateFieldException($handle, $blueprint);
         }
     }
 

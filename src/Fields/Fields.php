@@ -231,8 +231,8 @@ class Fields
     public function resolveFields()
     {
         return $this->items->flatMap(function ($config) {
-            return array_values($this->createFields($config));
-        });
+            return $this->createFields($config);
+        })->values();
     }
 
     public function createFields(array $config): array
