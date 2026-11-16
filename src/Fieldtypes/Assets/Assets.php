@@ -487,17 +487,32 @@ class Assets extends Fieldtype
             'min_filesize' => MinRule::class,
         ];
 
-        return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
-            $name = Str::before($rule, ':');
+        return collect(parent::fieldRules())
+            ->when($this->isAwaitingDynamicFolder(), fn ($rules) => $rules->reject(fn ($rule) => $rule === 'required'))
+            ->map(function ($rule) use ($classes) {
+                $name = Str::before($rule, ':');
 
-            if ($class = Arr::get($classes, $name)) {
-                $parameters = explode(',', Str::after($rule, ':'));
+                if ($class = Arr::get($classes, $name)) {
+                    $parameters = explode(',', Str::after($rule, ':'));
 
-                return new $class($parameters);
-            }
+                    return new $class($parameters);
+                }
 
-            return $rule;
-        })->all();
+                return $rule;
+            })
+            ->values()
+            ->all();
+    }
+
+    private function isAwaitingDynamicFolder(): bool
+    {
+        if ($this->config('dynamic') !== 'id') {
+            return false;
+        }
+
+        $parent = $this->field->parent();
+
+        return ! ($parent instanceof Entry && $parent->id());
     }
 
     public function preProcessIndex($data)
