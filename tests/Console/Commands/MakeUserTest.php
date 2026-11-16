@@ -5,17 +5,24 @@ namespace Tests\Console\Commands;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
+use Tests\Auth\Eloquent\User as EloquentUser;
 use Tests\TestCase;
 
 class MakeUserTest extends TestCase
 {
     private $files;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->files = app(Filesystem::class);
+    }
+
     public function tearDown(): void
     {
         $path = __DIR__.'/../../__fixtures__/users';
 
-        $this->files = app(Filesystem::class);
         $this->files->cleanDirectory($path);
         $this->files->put($path.'/.gitkeep', null);
 
@@ -35,6 +42,33 @@ class MakeUserTest extends TestCase
 
         $this->assertNotEmpty($user->id());
         $this->assertEquals('jason@tellmewhatyouchasin.com', $user->email());
+    }
+
+    #[Test]
+    public function it_can_make_an_eloquent_user_non_interactively()
+    {
+        config([
+            'auth.providers.users.model' => EloquentUser::class,
+            'statamic.users.repository' => 'eloquent',
+        ]);
+
+        $migrations = sys_get_temp_dir().'/statamic-make-user-migrations';
+        $this->files->deleteDirectory($migrations);
+        $this->files->makeDirectory($migrations);
+
+        $this->loadMigrationsFrom(__DIR__.'/../../Auth/Eloquent/__migrations__');
+        $this->artisan('statamic:auth:migration', ['--path' => $migrations]);
+        $this->loadMigrationsFrom($migrations);
+
+        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com', '--super' => true])
+            ->expectsOutputToContain('User created successfully.');
+
+        $this->files->deleteDirectory($migrations);
+
+        $user = User::all()->first();
+
+        $this->assertEquals('jason@tellmewhatyouchasin.com', $user->email());
+        $this->assertTrue($user->isSuper());
     }
 
     #[Test]

@@ -194,8 +194,11 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
-            ->data($this->data)
-            ->password($this->password);
+            ->data($this->data);
+
+        if ($this->password) {
+            $user->password($this->password);
+        }
 
         if ($this->super || $this->option('super')) {
             $user->makeSuper();
