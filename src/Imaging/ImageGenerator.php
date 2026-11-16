@@ -69,6 +69,10 @@ class ImageGenerator
             $params['mark'] = $this->setUpWatermark($params['mark']);
         }
 
+        if (($params['fm'] ?? null) === 'jpeg') {
+            $params['fm'] = 'jpg';
+        }
+
         $this->params = $params;
 
         return $this;

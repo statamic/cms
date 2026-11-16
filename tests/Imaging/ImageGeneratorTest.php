@@ -217,6 +217,24 @@ class ImageGeneratorTest extends TestCase
     }
 
     #[Test]
+    public function it_generates_an_image_with_the_jpeg_format()
+    {
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), file_get_contents($image->getPathname()));
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $path = $this->makeGenerator()->generateByPath($imagePath, ['fm' => 'jpeg']);
+
+        $md5 = $this->getGlideMd5($imagePath, ['fm' => 'jpg']);
+
+        $this->assertEquals("paths/testimages/foo/hoff.jpg/{$md5}/hoff.jpg", $path);
+        $this->assertContains($path, $this->generatedImagePaths());
+    }
+
+    #[Test]
     public function it_generates_an_image_by_external_url()
     {
         Event::fake();
