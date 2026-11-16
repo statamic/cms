@@ -129,8 +129,11 @@ const commandMatches = computed(() =>
 );
 const activeCommand = ref(0);
 watch(commandQuery, () => (activeCommand.value = 0));
-// With no match, those who can edit AI are offered to create it as a saved prompt
+// With no match, the offer to create it as a saved prompt starts highlighted, as typing a / means you're after a command, so Enter opens it.
+// Up or down takes the highlight off, and Enter then sends it as a message.
 const canCreateCommand = computed(() => canEditAi.value && !!commandQuery.value && !commandMatches.value.length);
+const createHighlighted = ref(true);
+watch(commandQuery, () => (createHighlighted.value = true));
 watch([showHelp, helpView, commandMenuOpen], () => (explainPrompt.value = false));
 
 // Prototype: a new saved prompt, made here rather than on Settings → AI (for those who can edit it). null while it's not open, otherwise what
@@ -224,6 +227,13 @@ async function onKeydown(event) {
             return;
         }
 
+        // The create row is the only one, so either arrow moves onto it or off it
+        if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && canCreateCommand.value) {
+            event.preventDefault();
+            createHighlighted.value = !createHighlighted.value;
+            return;
+        }
+
         // Tab shows and hides what the highlighted one does, as in the help. There's no need to fill it in, as Enter runs the highlighted one anyway.
         if (event.key === 'Tab' && !event.shiftKey && count) {
             event.preventDefault();
@@ -284,6 +294,8 @@ function send(text = prompt.value) {
     showHelp.value = false;
 
     // In the command menu, Enter runs the highlighted command, even if only part of it was typed
+    if (canCreateCommand.value && createHighlighted.value) return startNewPrompt(commandQuery.value);
+
     const command = commandMenuOpen.value ? commandMatches.value[activeCommand.value] : null;
     if (command && !command.builtIn) return runPrompt(command);
     if (command) text = '/' + command.command;
@@ -604,13 +616,19 @@ function stopFollowing() {
                         <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" :explain="explainPrompt" @pick="runCommand" />
                         <!-- When you can, offer to make it a saved prompt, named after what was typed: a row in a card, like the saved prompts it would join -->
                         <div v-else-if="canCreateCommand" class="space-y-2 p-2">
-                            <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
+                            <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No saved prompt matches.') }}</p>
                             <button
                                 type="button"
-                                class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg bg-white px-3 py-2 text-start text-sm/5 text-gray-900 ring ring-gray-200 transition-colors hover:bg-gray-50 dark:bg-gray-850 dark:text-gray-200 dark:ring-gray-700/80 dark:hover:bg-gray-800"
+                                :aria-selected="createHighlighted"
+                                :class="[
+                                    'relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-start text-sm/5 text-gray-900 ring ring-gray-200 transition-colors dark:text-gray-200 dark:ring-gray-700/80',
+                                    createHighlighted ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white hover:bg-gray-50 dark:bg-gray-850 dark:hover:bg-gray-800',
+                                ]"
                                 @mousedown.prevent
                                 @click="startNewPrompt(commandQuery)"
                             >
+                                <!-- Highlighted (with the arrow keys), it gets the same purple-to-blue pill as a highlighted saved prompt, so Enter opens it -->
+                                <span v-if="createHighlighted" aria-hidden="true" class="absolute inset-y-1 -start-2 w-1 rounded-full bg-linear-to-b from-ai to-ai-end" />
                                 {{ __('Create a saved prompt') }}
                                 <span class="inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ commandQuery }}</span>
                             </button>
