@@ -517,6 +517,8 @@ export default {
 
     watch: {
         mode(mode) {
+            if (mode === (this.getPreference('mode') || 'table')) return;
+
             this.setPreference('mode', mode == 'table' ? null : mode);
         },
 

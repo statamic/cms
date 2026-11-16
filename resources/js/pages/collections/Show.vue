@@ -388,6 +388,8 @@ export default {
         view(view) {
             this.site = this.site || this.initialSite;
 
+            if (view === this.$preferences.get(`collections.${this.handle}.view`)) return;
+
             this.$preferences.set(`collections.${this.handle}.view`, view);
         },
     },
