@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Ai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Statamic\CP\PublishForm;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
@@ -62,6 +63,33 @@ class AiSettingsController extends CpController
         Cache::forever(self::CACHE_KEY, $values);
 
         return ['saved' => true];
+    }
+
+    /**
+     * Adds a page prompt from the AI chat, without going to Settings → AI. It's offered everywhere, to everyone, like a new one added
+     * on Settings → AI, which is where to limit it to some collections or roles. Returns the prompts the chat can now run.
+     */
+    public function storePrompt(Request $request)
+    {
+        $this->onlySuperUsers();
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'instructions' => ['required', 'string'],
+        ]);
+
+        $prompts = self::savedPrompts();
+
+        // Its command is its name as a slug, so two with the same slug couldn't both be run
+        if (collect($prompts)->contains(fn ($prompt) => Str::slug($prompt['name'] ?? '') === Str::slug($request->name))) {
+            throw ValidationException::withMessages(['name' => __('There\'s already a prompt run with /:command.', ['command' => Str::slug($request->name)])]);
+        }
+
+        $prompts[] = ['name' => $request->name, 'instructions' => $request->instructions, 'collections' => [], 'roles' => [], 'use_on' => 'page'];
+
+        Cache::forever(self::CACHE_KEY, [...Cache::get(self::CACHE_KEY, []), 'prompts' => $prompts]);
+
+        return ['prompts' => self::prompts(), 'command' => Str::slug($request->name)];
     }
 
     /**

@@ -278,6 +278,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     // Prototype: Settings → AI (a mock, see AiSettingsController)
     Route::get('ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
     Route::patch('ai', [AiSettingsController::class, 'update'])->name('ai.update');
+    Route::post('ai/prompts', [AiSettingsController::class, 'storePrompt'])->name('ai.prompts.store');
 
     // Prototype (phase 2): Tools → AI Reports, the runs of the scheduled prompts (a mock, see AiReportsController)
     Route::get('ai-reports', [AiReportsController::class, 'index'])->name('ai.reports.index');
