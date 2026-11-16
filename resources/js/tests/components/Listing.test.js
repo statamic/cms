@@ -396,3 +396,31 @@ test('canSelectAllMatching stays hidden after perPage changes when all ids are s
     expect(listing.selectedAllMatching.value).toBe(true);
     expect(listing.canSelectAllMatching.value).toBe(false);
 });
+
+test('reordering sorts by order in the default sort direction', async () => {
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1' }, { id: '2' }],
+            meta: { last_page: 1, total: 2, per_page: 50, columns: [] },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/collections/test/entries',
+        items: undefined,
+        sortColumn: 'order',
+        sortDirection: 'desc',
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.sortColumn.value = 'title';
+    listing.sortDirection.value = 'asc';
+
+    await wrapper.setProps({ reorderable: true });
+
+    expect(listing.sortColumn.value).toBe('order');
+    expect(listing.sortDirection.value).toBe('desc');
+});
