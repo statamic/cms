@@ -223,6 +223,44 @@ class UpdateBlueprintTest extends TestCase
     }
 
     #[Test]
+    public function field_handles_must_be_unique_across_imported_fieldsets()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+        $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
+
+        $emailLink = (new Fieldset)->setContents(['fields' => [['handle' => 'label', 'field' => ['type' => 'text']]]]);
+        $phoneLink = (new Fieldset)->setContents(['fields' => [['handle' => 'label', 'field' => ['type' => 'text']]]]);
+
+        Facades\Fieldset::shouldReceive('find')->with('email_link')->andReturn($emailLink);
+        Facades\Fieldset::shouldReceive('find')->with('phone_link')->andReturn($phoneLink);
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit($collection, $blueprint, [
+                'tabs' => [
+                    [
+                        '_id' => 'id-main',
+                        'handle' => 'main',
+                        'display' => 'Main',
+                        'sections' => [
+                            [
+                                'fields' => [
+                                    ['_id' => 'id-email-link', 'type' => 'import', 'fieldset' => 'email_link', 'prefix' => null],
+                                    ['_id' => 'id-phone-link', 'type' => 'import', 'fieldset' => 'phone_link', 'prefix' => null],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors(['tabs' => 'A field with a handle of label already exists.']);
+    }
+
+    #[Test]
     public function width_of_100_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
