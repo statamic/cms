@@ -44,7 +44,7 @@ const props = defineProps({
 
 const emit = defineEmits(['opened', 'closed']);
 
-const editableSelector = 'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), [contenteditable="true"]';
+const editableSelector = 'input:not([type="hidden"]):not([type="file"]):not([disabled]), textarea:not([disabled]), [contenteditable="true"]';
 const focusableSelector = 'button:not([disabled]), [tabindex="0"]';
 
 const { name, blueprint, values } = injectContainerContext();
