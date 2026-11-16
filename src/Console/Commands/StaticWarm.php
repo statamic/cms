@@ -176,11 +176,24 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->components->twoColumnDetail($this->getRelativeUri($this->uris()->get($index)), '<info>✓ Cached</info>');
+        $url = $this->uris()->get($index);
 
-        if ($response->hasHeader('X-Statamic-Pagination')) {
-            $this->paginated[] = [$this->uris()->get($index), ...$this->paginationHeader($response)];
+        $this->components->twoColumnDetail($this->getRelativeUri($url), '<info>✓ Cached</info>');
+
+        if ($this->shouldWarmPaginatedPages($response, $url)) {
+            $this->paginated[] = [$url, ...$this->paginationHeader($response)];
         }
+    }
+
+    private function shouldWarmPaginatedPages(Response $response, string $url): bool
+    {
+        if (! $response->hasHeader('X-Statamic-Pagination')) {
+            return false;
+        }
+
+        [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+        return ! str_contains(parse_url($url, PHP_URL_QUERY) ?? '', "{$pageName}=");
     }
 
     private function paginatedUrls(): Collection

@@ -434,6 +434,36 @@ class StaticWarmTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_paginate_a_url_that_already_has_the_page_parameter()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        StaticWarm::hook('additional', fn () => collect(['/zebra?page=3']));
+
+        $history = [];
+        $this->mockClient([
+            new Response(200),
+            new Response(200),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 3,
+                'total' => 4,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['page=3'], $queries);
+    }
+
+    #[Test]
     public function it_doesnt_warm_paginated_pages_that_are_cached_under_the_same_url()
     {
         config([
