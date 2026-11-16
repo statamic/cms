@@ -65,12 +65,10 @@ class ImageGenerator
 
     public function setParams(array $params)
     {
+        $params = Glide::normalizeParameters($params);
+
         if (isset($params['mark'])) {
             $params['mark'] = $this->setUpWatermark($params['mark']);
-        }
-
-        if (($params['fm'] ?? null) === 'jpeg') {
-            $params['fm'] = 'jpg';
         }
 
         $this->params = $params;
