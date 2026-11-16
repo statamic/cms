@@ -5,6 +5,7 @@ namespace Tests\Feature\Navigation;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Structures\BranchIdGenerator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
@@ -143,6 +144,75 @@ class UpdateNavigationTreeTest extends TestCase
             ['id' => 'newly-generated-id2', 'entry' => '789'],
             ['id' => 'newly-generated-id3', 'entry' => '910'],
         ], $nav->in('en')->tree());
+    }
+
+    #[Test]
+    #[DataProvider('navItemStates')]
+    public function it_saves_untouched_defaults_for_nav_items(bool $new): void
+    {
+        $this->withoutExceptionHandling();
+
+        $blueprint = Blueprint::makeFromFields([
+            'select' => ['type' => 'select', 'options' => ['jack' => 'Jack'], 'default' => 'jack'],
+            'button_group' => ['type' => 'button_group', 'options' => ['yeah_nah' => 'Yeah nah'], 'default' => 'yeah_nah'],
+            'radio' => ['type' => 'radio', 'options' => ['sleight' => 'Sleight'], 'default' => 'sleight'],
+            'toggle' => ['type' => 'toggle', 'default' => true],
+            'disabled' => ['type' => 'toggle', 'default' => false],
+            'hidden' => ['type' => 'text', 'default' => 'Not submitted'],
+        ]);
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
+
+        $user = tap(User::make()->makeSuper())->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', $new ? [] : [['id' => 'id1', 'title' => 'Original title']])->save();
+
+        if ($new) {
+            BranchIdGenerator::shouldReceive('generate')->once()->andReturn('id1');
+        }
+
+        $route = $new
+            ? cp_route('navigation.pages.create', $nav->handle())
+            : cp_route('navigation.pages.edit', [$nav->handle(), 'id1']);
+
+        $values = $this
+            ->actingAs($user)
+            ->getJson($route.'?site=en')
+            ->assertOk()
+            ->json('values');
+
+        unset($values['hidden']);
+        $values['title'] = 'Updated title';
+
+        $this
+            ->update($nav, 'en', [
+                'pages' => [['id' => 'id1', 'children' => []]],
+                'data' => ['id1' => [
+                    'new' => $new,
+                    'entry' => null,
+                    'values' => $values,
+                    'localizedFields' => ['title'],
+                ]],
+            ])
+            ->assertOk();
+
+        $this->assertSame([
+            ['id' => 'id1', 'title' => 'Updated title', 'data' => [
+                'select' => 'jack',
+                'button_group' => 'yeah_nah',
+                'radio' => 'sleight',
+                'toggle' => true,
+                'disabled' => false,
+            ]],
+        ], $nav->in('en')->tree());
+    }
+
+    public static function navItemStates(): array
+    {
+        return [
+            'new' => [true],
+            'existing' => [false],
+        ];
     }
 
     #[Test]

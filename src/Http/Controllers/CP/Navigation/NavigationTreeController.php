@@ -62,11 +62,15 @@ class NavigationTreeController extends CpController
     private function updateData(array $data, Blueprint $blueprint)
     {
         collect($data)->each(function ($branch, $id) use ($blueprint) {
+            $fields = isset($branch['entry'])
+                ? ($branch['localizedFields'] ?? [])
+                : array_keys($branch['values'] ?? []);
+
             $data = $blueprint->fields()
                 ->addValues($branch['values'] ?? [])
                 ->process()
                 ->values()
-                ->only($branch['localizedFields'] ?? []);
+                ->only($fields);
 
             if ($branch['new'] ?? false) {
                 $newId = BranchIdGenerator::generate();
