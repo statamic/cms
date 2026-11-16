@@ -7,7 +7,8 @@ import { Button, Combobox, Icon, Input, Modal } from '@/components/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { isReadOnly, update } = Fieldtype.use(emit, props);
+const { isReadOnly, update, expose } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
 const icons = ref([]);
 const loading = ref(true);
