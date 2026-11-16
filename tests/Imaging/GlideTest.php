@@ -89,6 +89,33 @@ class GlideTest extends TestCase
         $this->assertEquals('/imgs', Glide::url());
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/8199
+     */
+    #[Test]
+    public function local_cache_uses_configured_permissions()
+    {
+        config([
+            'statamic.assets.image_manipulation.cache' => true,
+            'statamic.assets.image_manipulation.cache_path' => public_path('img'),
+            'statamic.assets.image_manipulation.permissions' => [
+                'directory' => 0775,
+                'file' => 0664,
+            ],
+        ]);
+
+        $umask = umask(0002);
+
+        try {
+            Glide::cacheDisk()->put('foo/bar.jpg', 'image');
+        } finally {
+            umask($umask);
+        }
+
+        $this->assertEquals('0775', substr(sprintf('%o', fileperms(public_path('img/foo'))), -4));
+        $this->assertEquals('0664', substr(sprintf('%o', fileperms(public_path('img/foo/bar.jpg'))), -4));
+    }
+
     #[Test]
     public function hybrid_caching_will_make_a_filesystem_using_the_cache_path_location()
     {

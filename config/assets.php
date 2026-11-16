@@ -64,6 +64,22 @@ return [
 
         /*
         |--------------------------------------------------------------------------
+        | Cached Image Permissions
+        |--------------------------------------------------------------------------
+        |
+        | The permissions given to the directories and files Glide creates when
+        | caching manipulated images to the local filesystem. Directory
+        | permissions are still subject to the process's umask.
+        |
+        */
+
+        'permissions' => [
+            'directory' => 0755,
+            'file' => 0644,
+        ],
+
+        /*
+        |--------------------------------------------------------------------------
         | Image Manipulation Defaults
         |--------------------------------------------------------------------------
         |
