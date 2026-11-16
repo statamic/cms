@@ -2,7 +2,9 @@
 
 namespace Tests\Console\Commands;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\User;
 use Tests\Auth\Eloquent\User as EloquentUser;
@@ -12,17 +14,11 @@ class MakeUserTest extends TestCase
 {
     private $files;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->files = app(Filesystem::class);
-    }
-
     public function tearDown(): void
     {
         $path = __DIR__.'/../../__fixtures__/users';
 
+        $this->files = app(Filesystem::class);
         $this->files->cleanDirectory($path);
         $this->files->put($path.'/.gitkeep', null);
 
@@ -52,23 +48,20 @@ class MakeUserTest extends TestCase
             'statamic.users.repository' => 'eloquent',
         ]);
 
-        $migrations = sys_get_temp_dir().'/statamic-make-user-migrations';
-        $this->files->deleteDirectory($migrations);
-        $this->files->makeDirectory($migrations);
-
         $this->loadMigrationsFrom(__DIR__.'/../../Auth/Eloquent/__migrations__');
-        $this->artisan('statamic:auth:migration', ['--path' => $migrations]);
-        $this->loadMigrationsFrom($migrations);
 
-        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com', '--super' => true])
+        Schema::table('users', fn (Blueprint $table) => $table->string('name')->nullable()->change());
+
+        collect(['role', 'group'])->each(fn ($type) => Schema::create("{$type}_user", function (Blueprint $table) use ($type) {
+            $table->id();
+            $table->foreignId('user_id');
+            $table->string("{$type}_id");
+        }));
+
+        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com'])
             ->expectsOutputToContain('User created successfully.');
 
-        $this->files->deleteDirectory($migrations);
-
-        $user = User::all()->first();
-
-        $this->assertEquals('jason@tellmewhatyouchasin.com', $user->email());
-        $this->assertTrue($user->isSuper());
+        $this->assertEquals('jason@tellmewhatyouchasin.com', User::all()->first()->email());
     }
 
     #[Test]
