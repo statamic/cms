@@ -93,7 +93,7 @@ EOT;
 <a href="http://localhost?page=2">Next</a>
 EOT;
 
-        $this->assertSame($expected, trim($this->renderString($template, [])));
+        $this->assertSame($expected, trim($this->renderString($template, [], true)));
     }
 
     public function test_runtimes_are_isolated_when_evaluating_tags()
