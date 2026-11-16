@@ -22,6 +22,7 @@ class test
 
             __('php with/slash'),
             __('php with bracket(s)'),
+            __('php with (bracketed) words'),
         ];
     }
 
