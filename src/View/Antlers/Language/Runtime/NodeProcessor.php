@@ -119,6 +119,13 @@ class NodeProcessor
     protected $isAssignmentProcessor = false;
 
     /**
+     * Indicates if the processor is reducing a value used within an expression.
+     *
+     * @var bool
+     */
+    protected $isExpressionProcessor = false;
+
+    /**
      * Indicates if the processor is providing results for a parameter.
      *
      * @var bool
@@ -308,6 +315,19 @@ class NodeProcessor
     public function setIsAssignmentProcessor($isAssignment)
     {
         $this->isAssignmentProcessor = $isAssignment;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is reducing a value used within an expression.
+     *
+     * @param  bool  $isExpression  The value.
+     * @return $this
+     */
+    public function setIsExpressionProcessor($isExpression)
+    {
+        $this->isExpressionProcessor = $isExpression;
 
         return $this;
     }
@@ -980,6 +1000,7 @@ class NodeProcessor
             $interpolationScope = $this->getActiveData();
             $interpolationValue = $this->cloneProcessor()
                 ->setIsInterpolationProcessor(true)
+                ->setIsExpressionProcessor(true)
                 ->setData($interpolationScope)->reduce($node->interpolationNodes);
 
             $this->interpolationCache[$node->name] = $interpolationValue;
@@ -1840,7 +1861,7 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
-                            if (! $this->assigningAugmentable($output) && ! $this->interpolatingValue($output)) {
+                            if (! $this->assigningAugmentable($output) && ! $this->evaluatingValue($output)) {
                                 $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
                             }
                         }
@@ -2559,9 +2580,9 @@ class NodeProcessor
             && $output instanceof Stringable;
     }
 
-    private function interpolatingValue($output): bool
+    private function evaluatingValue($output): bool
     {
-        return $this->isInterpolationProcessor && $output instanceof Value;
+        return $this->isExpressionProcessor && $output instanceof Value;
     }
 
     /**

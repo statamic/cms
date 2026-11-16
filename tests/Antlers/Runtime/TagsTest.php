@@ -168,6 +168,24 @@ EOT;
         $this->assertSame('wrapped!', $this->renderString('{{ {test_augmented_value} | lower }}', [], true));
     }
 
+    public function test_values_returned_from_tags_can_be_used_in_paths()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test_key';
+
+            public function index()
+            {
+                return new Value('b');
+            }
+        })::register();
+
+        $data = ['arr' => ['a' => 'A', 'b' => 'B']];
+
+        $this->assertSame('B', $this->renderString('{{ arr[{test_key}] }}', $data, true));
+        $this->assertSame('b', $this->renderString('{{ arr:{test_key} }}', $data, true));
+    }
+
     public function test_missing_assets_assign_nothing_to_a_variable()
     {
         $this->createAsset();
