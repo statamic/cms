@@ -172,4 +172,40 @@ class MakeUserTest extends TestCase
         $this->assertNotEmpty($user->password());
         $this->assertTrue(password_verify($password, $user->password()));
     }
+
+    #[Test]
+    public function it_can_make_a_user_with_name_option()
+    {
+        $this->artisan('statamic:make:user', ['email' => 'jason@tellmewhatyouchasin.com', '--name' => 'Jason'])
+            ->expectsOutputToContain('User created successfully.');
+
+        $this->assertEquals('Jason', User::all()->first()->get('name'));
+    }
+
+    #[Test]
+    public function it_can_make_a_user_with_first_and_last_name_options()
+    {
+        $this->artisan('statamic:make:user', [
+            'email' => 'jason@tellmewhatyouchasin.com',
+            '--first-name' => 'Jason',
+            '--last-name' => 'Varga',
+        ])->expectsOutputToContain('User created successfully.');
+
+        $user = User::all()->first();
+
+        $this->assertEquals('Jason', $user->get('first_name'));
+        $this->assertEquals('Varga', $user->get('last_name'));
+    }
+
+    #[Test]
+    public function if_name_option_is_passed_it_will_not_prompt_for_name()
+    {
+        $this->artisan('statamic:make:user', ['--name' => 'Duncan'])
+            ->expectsQuestion('Email', 'duncan@likesteatime.com')
+            ->expectsQuestion('Password', 'PacManMoonwalk#84')
+            ->expectsQuestion('Super user?', false)
+            ->assertExitCode(0);
+
+        $this->assertEquals('Duncan', User::all()->first()->get('name'));
+    }
 }
