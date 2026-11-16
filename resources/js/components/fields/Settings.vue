@@ -64,6 +64,7 @@ import { FieldConditionsBuilder, FIELD_CONDITIONS_KEYS } from '../field-conditio
 import FieldValidationBuilder from '../field-validation/Builder.vue';
 import { Heading, Button, Tabs, TabList, TabTrigger, TabContent, CardPanel, Icon, StackHeader, StackContent } from '@/components/ui';
 import shortcutLabel from '@/util/shortcutLabel.js';
+import { computed } from 'vue';
 
 export default {
     emits: ['committed', 'closed'],
@@ -104,10 +105,12 @@ export default {
             updateFieldSettingsValue: this.updateField,
             getFieldSettingsValue: this.getFieldValue,
             commitParentField: this.commit,
+            fieldtypeContext: computed(() => this.fieldtypeContext),
         };
     },
 
     inject: {
+        parentFieldtypeContext: { from: 'fieldtypeContext', default: () => ({}) },
         isInsideConfigFields: {
             default: false
         },
@@ -139,6 +142,13 @@ export default {
     },
 
     computed: {
+        fieldtypeContext() {
+            return {
+                ...this.parentFieldtypeContext,
+                field_path: [...(this.parentFieldtypeContext.field_path ?? []), this.values?.handle ?? this.config.handle ?? null],
+            };
+        },
+
         adjustedBlueprint() {
             let blueprint = this.blueprint;
 
@@ -283,6 +293,7 @@ export default {
                     values: this.values,
                     fields: this.fields,
                     isInsideSet: this.isInsideSet,
+                    context: this.fieldtypeContext,
                 })
                 .then((response) => {
                     this.$refs.container?.clearDirtyState();
@@ -389,6 +400,7 @@ export default {
                     type: this.type,
                     reference: field?.type === 'reference' ? field.field_reference : false,
                     values: this.config,
+                    context: this.fieldtypeContext,
                 })
                 .then((response) => {
                     this.loading = false;

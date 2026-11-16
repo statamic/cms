@@ -43,6 +43,7 @@
 import SuggestsConditionalFields from './SuggestsConditionalFields';
 import Tabs from './Tabs.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
+import { computed } from 'vue';
 
 export default {
     mixins: [SuggestsConditionalFields, CanDefineLocalizable],
@@ -57,6 +58,17 @@ export default {
         showTitle: Boolean,
         useTabs: { type: Boolean, default: true },
         isFormBlueprint: { type: Boolean, default: false },
+    },
+
+    provide() {
+        return {
+            fieldtypeContext: computed(() => ({
+                view: 'blueprint',
+                blueprint: this.initialBlueprint.fullyQualifiedHandle,
+                field_path: [],
+                nested: false,
+            })),
+        };
     },
 
     data() {

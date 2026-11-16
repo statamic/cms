@@ -121,6 +121,7 @@ trait ManagesBlueprints
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
+            'fullyQualifiedHandle' => $blueprint->fullyQualifiedHandle(),
             'hidden' => $blueprint->hidden(),
             'tabs' => $blueprint->tabs()->map(function ($tab, $i) {
                 return array_merge($this->tabToVue($tab), ['_id' => $i]);

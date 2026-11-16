@@ -27,6 +27,7 @@ abstract class Fieldtype implements Arrayable
     protected static $preloadable = null;
 
     protected $field;
+    protected $context = [];
     protected $localizable = true;
     protected $validatable = true;
     protected $defaultable = true;
@@ -103,6 +104,18 @@ abstract class Fieldtype implements Arrayable
     public function selectable(): bool
     {
         return $this->selectable;
+    }
+
+    public function context(array $context): self
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    public function isVisible(): bool
+    {
+        return true;
     }
 
     public function selectableInForms(): bool
@@ -277,7 +290,7 @@ abstract class Fieldtype implements Arrayable
 
     public function configFields(): Fields
     {
-        if ($cached = Blink::get($blink = 'config-fields-'.$this->handle())) {
+        if ($cached = Blink::get($blink = 'config-fields-'.$this->handle().'-'.md5(serialize($this->context)))) {
             return $cached;
         }
 

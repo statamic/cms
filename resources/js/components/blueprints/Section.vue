@@ -138,12 +138,25 @@
 import Fields from './Fields.vue';
 import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 import { Switch, Heading } from '@/components/ui';
+import { computed } from 'vue';
 
 export default {
     mixins: [CanDefineLocalizable],
 
     inject: {
         suggestableConditionFieldsProvider: { default: null },
+        parentFieldtypeContext: { from: 'fieldtypeContext', default: () => ({}) },
+        isInsideSet: { default: false },
+    },
+
+    provide() {
+        return {
+            fieldtypeContext: computed(() => this.isInsideSet ? {
+                ...this.parentFieldtypeContext,
+                field_path: [...(this.parentFieldtypeContext.field_path ?? []), this.section.handle],
+                nested: true,
+            } : this.parentFieldtypeContext),
+        };
     },
 
     components: {

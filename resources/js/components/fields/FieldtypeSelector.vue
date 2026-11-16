@@ -52,8 +52,9 @@ import fuzzysort from 'fuzzysort';
 import { ref } from 'vue';
 import { mapValues } from 'lodash-es';
 import { Icon } from '@/components/ui';
+import qs from 'qs';
 
-const loadedFieldtypes = ref(null);
+const loadedFieldtypes = ref({});
 
 export default {
     components: {
@@ -70,6 +71,10 @@ export default {
         allowDate: {
             default: false,
         },
+    },
+
+    inject: {
+        fieldtypeContext: { default: () => ({}) },
     },
 
     data: function () {
@@ -112,18 +117,19 @@ export default {
         fieldtypes() {
             if (!this.fieldtypesLoaded) return;
 
-            return loadedFieldtypes.value.data;
+            return loadedFieldtypes.value[this.cacheKey];
         },
 
         isFormBlueprint() {
             return !!this.$config.get('isFormBlueprint');
         },
 
+        cacheKey() {
+            return JSON.stringify({ forms: this.isFormBlueprint, context: this.fieldtypeContext });
+        },
+
         fieldtypesLoaded() {
-            // The cache is shared across every picker instance, but form and regular blueprints
-            // request different lists. Only treat it as loaded when the cached list matches the
-            // current blueprint mode, otherwise we'll refetch the correct one.
-            return Array.isArray(loadedFieldtypes.value?.data) && loadedFieldtypes.value.forms === this.isFormBlueprint;
+            return Array.isArray(loadedFieldtypes.value[this.cacheKey]);
         },
 
         allFieldtypes() {
@@ -217,6 +223,13 @@ export default {
     },
 
     watch: {
+        cacheKey: {
+            immediate: true,
+            handler() {
+                this.loadFieldtypes();
+            },
+        },
+
         fieldtypesLoaded: {
             immediate: true,
             handler() {
@@ -229,24 +242,26 @@ export default {
         },
     },
 
-    created() {
-        if (this.fieldtypesLoaded) return;
-
-        const forms = this.isFormBlueprint;
-
-        let url = cp_url('fields/fieldtypes?selectable=true');
-
-        if (forms) url += '&forms=true';
-
-        this.$axios.get(url)
-            .then((response) => (loadedFieldtypes.value = { forms, data: response.data }))
-            .catch((e) => {
-                this.$toast.error(e.response?.data?.message || __('Something went wrong'));
-                this.close();
-            });
-    },
-
     methods: {
+        loadFieldtypes() {
+            if (this.fieldtypesLoaded) return;
+
+            const key = this.cacheKey;
+            const query = qs.stringify({
+                selectable: true,
+                forms: this.isFormBlueprint || undefined,
+                context: this.fieldtypeContext,
+            });
+
+            this.$axios.get(cp_url(`fields/fieldtypes?${query}`))
+                .then((response) => (loadedFieldtypes.value[key] = response.data))
+                .catch((e) => {
+                    if (this.cacheKey !== key) return;
+                    this.$toast.error(e.response?.data?.message || __('Something went wrong'));
+                    this.close();
+                });
+        },
+
         select(selection) {
             if (selection.isMeta) {
                 return this.selectMeta(selection);
