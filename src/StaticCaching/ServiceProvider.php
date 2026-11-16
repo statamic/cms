@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
@@ -127,6 +128,11 @@ class ServiceProvider extends LaravelServiceProvider
         Cascade::hydrated(function ($cascade) {
             app(Session::class)->setCascade($cascade->toArray());
         });
+
+        VerifyCsrfToken::except([
+            config('statamic.routes.action').'/nocache',
+            config('statamic.routes.action').'/csrf',
+        ]);
 
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';

@@ -124,6 +124,31 @@ class NocacheRouteTest extends TestCase
             ->assertJsonValidationErrorFor('url');
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/10801
+     */
+    #[Test]
+    #[DataProvider('csrfTokenRouteProvider')]
+    public function it_sets_the_xsrf_token_cookie_without_requiring_a_csrf_token($url)
+    {
+        // CSRF tokens aren't verified when running unit tests.
+        $this->app['env'] = 'production';
+
+        $response = $this
+            ->postJson($url, ['url' => 'http://localhost/test'])
+            ->assertOk();
+
+        $response->assertCookie('XSRF-TOKEN', $response->json('csrf'));
+    }
+
+    public static function csrfTokenRouteProvider()
+    {
+        return [
+            'nocache' => ['/!/nocache'],
+            'csrf' => ['/!/csrf'],
+        ];
+    }
+
     #[Test]
     public function the_script_routes_are_not_registered_unless_script_delivery_is_external()
     {
