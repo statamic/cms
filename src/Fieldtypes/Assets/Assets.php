@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes\Assets;
 use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Collection as EntryCollection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Taxonomies\Taxonomy;
@@ -514,7 +515,9 @@ class Assets extends Fieldtype
 
         $parent = $this->field->parent();
 
-        return $parent instanceof EntryCollection || $parent instanceof Taxonomy;
+        return $parent instanceof EntryCollection
+            || $parent instanceof Taxonomy
+            || ($parent instanceof UserContract && ! $parent->id());
     }
 
     public function preProcessIndex($data)
