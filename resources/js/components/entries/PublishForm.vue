@@ -287,6 +287,7 @@ import {
 	Stack,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import resetMetaFromResponse from '@/util/resetMetaFromResponse.js';
 import debounce from '@/util/debounce.js';
 import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
@@ -836,6 +837,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = resetValuesFromResponse(response.data.data.values, this.$refs.container);
+                this.meta = resetMetaFromResponse(response.data.data.meta, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.activeLocalization.title = response.data.data.title;
                 this.activeLocalization.published = response.data.data.published;
@@ -872,6 +874,7 @@ export default {
                 clearTimeout(this.trackDirtyStateTimeout);
                 this.trackDirtyState = false;
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
+                this.meta = resetMetaFromResponse(response.data.meta, this.$refs.container);
                 this.trackDirtyStateTimeout = setTimeout(() => (this.trackDirtyState = true), 500);
                 this.initialPublished = response.data.published;
                 this.activeLocalization.published = response.data.published;
