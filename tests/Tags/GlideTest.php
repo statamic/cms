@@ -3,14 +3,20 @@
 namespace Tests\Tags;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Parse;
+use Statamic\Support\Str;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlideTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     #[DefineEnvironment('relativeRouteUrl')]
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
@@ -122,6 +128,21 @@ EOT;
         $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'http://localhost/glide/bar.jpg'], trusted: true);
 
         $this->assertStringStartsWith('/img/glide/bar.jpg', $result);
+    }
+
+    #[Test]
+    /**
+     * https://github.com/statamic/cms/issues/13388
+     */
+    public function it_treats_absolute_asset_container_urls_as_internal_assets()
+    {
+        Storage::fake('s3', ['url' => 'https://bucket.s3.amazonaws.com/prefix/images']);
+        Storage::disk('s3')->put('bar.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+        AssetContainer::make('images')->disk('s3')->save();
+
+        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'https://bucket.s3.amazonaws.com/prefix/images/bar.jpg'], trusted: true);
+
+        $this->assertStringStartsWith('/img/asset/'.Str::toBase64Url('images/bar.jpg').'/bar.jpg', $result);
     }
 
     public function relativeRouteUrl($app)
