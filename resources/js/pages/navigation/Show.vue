@@ -51,7 +51,7 @@ export default {
         canSelectAcrossSites: { type: Boolean, required: true },
         canEditBlueprint: { type: Boolean, required: true },
         entryQueryScopes: { type: Array, default: () => [] },
-	    collectionTree: { type: Object, required: false },
+        collectionTree: { type: Object, required: false },
     },
 
     data() {
