@@ -10,7 +10,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Validator;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard;
@@ -591,6 +593,44 @@ class BardTest extends TestCase
 
         // When it is actually null (eg. when it was not in the front matter to begin with, and was never touched), it's an empty array.
         $this->assertNull($bard->process([]));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/12008
+     */
+    #[Test]
+    public function required_rule_fails_on_an_emptied_bard_field()
+    {
+        $fields = (new Fields)->setItems([[
+            'handle' => 'test',
+            'field' => ['type' => 'bard', 'validate' => ['required']],
+        ]]);
+
+        $empty = (new Validator)->fields($fields->addValues(['test' => [['type' => 'paragraph']]]));
+
+        $this->assertFalse($empty->validator()->passes());
+
+        $filled = (new Validator)->fields($fields->addValues(['test' => [
+            ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'foo']]],
+        ]]));
+
+        $this->assertTrue($filled->validator()->passes());
+    }
+
+    #[Test]
+    public function required_rule_fails_when_only_removable_empty_nodes_remain()
+    {
+        $fields = (new Fields)->setItems([[
+            'handle' => 'test',
+            'field' => ['type' => 'bard', 'validate' => ['required'], 'remove_empty_nodes' => 'trim'],
+        ]]);
+
+        $empty = (new Validator)->fields($fields->addValues(['test' => [
+            ['type' => 'paragraph'],
+            ['type' => 'heading'],
+        ]]));
+
+        $this->assertFalse($empty->validator()->passes());
     }
 
     #[Test]
