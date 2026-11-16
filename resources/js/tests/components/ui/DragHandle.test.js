@@ -12,6 +12,12 @@ test('default handle keeps the drag-to-reorder label and does not emit on space'
     expect(wrapper.emitted('keyboard-reorder')).toBeUndefined();
 });
 
+test('the handle is the same size with and without keyboard reorder', () => {
+    const classes = (keyboardReorder) => mount(DragHandle, { props: { keyboardReorder } }).get('button').classes();
+
+    expect(classes(false)).toEqual(classes(true));
+});
+
 test('a consumer aria-label wins over the default label', () => {
     const wrapper = mount(DragHandle, {
         attrs: { 'aria-label': 'Move column' },
