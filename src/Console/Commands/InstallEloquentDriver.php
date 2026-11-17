@@ -375,10 +375,12 @@ class InstallEloquentDriver extends Command
                                 [
                                     'use Statamic\Eloquent\Entries\EntryModel;',
                                     "'model' => EntryModel::class",
+                                    "'model' => \Statamic\Eloquent\Entries\EntryModel::class",
                                 ],
                                 [
                                     'use Statamic\Eloquent\Entries\UuidEntryModel;',
                                     "'model' => UuidEntryModel::class",
+                                    "'model' => \Statamic\Eloquent\Entries\UuidEntryModel::class",
                                 ]
                             )
                             ->__toString()
