@@ -139,6 +139,8 @@ watch([showHelp, helpView, commandMenuOpen], () => (explainPrompt.value = false)
 // Prototype: a new saved prompt, made here rather than on Settings → AI (for those who can edit it). null while it's not open, otherwise what
 // was typed after the / (empty from the help), which starts off its name.
 const newPromptFrom = ref(null);
+// Prototype: what the Create a prompt demo fills the new prompt in with (see AiChatDemos.vue), or null when it's you
+const demoNewPrompt = ref(null);
 function startNewPrompt(from = '') {
     newPromptFrom.value = from;
     showHelp.value = false;
@@ -146,6 +148,7 @@ function startNewPrompt(from = '') {
 }
 function cancelNewPrompt() {
     newPromptFrom.value = null;
+    demoNewPrompt.value = null;
     focusInput();
 }
 // Once it's saved, its command is put in the input with the menu open on it, so Enter runs it
@@ -153,6 +156,11 @@ function savedNewPrompt(command) {
     newPromptFrom.value = null;
     prompt.value = '/' + command;
     focusInput();
+    // The demo goes on to run it, after a moment to see it in the input
+    if (demoNewPrompt.value) {
+        demoNewPrompt.value = null;
+        setTimeout(() => prompt.value === '/' + command && send(), 1200);
+    }
 }
 
 // When focus moves to something outside the chat, put the help away. (The key hint hides itself, as it only shows while focus is inside the card.)
@@ -334,6 +342,10 @@ watch(demoRequest, (request) => {
     demoRequest.value = null;
     clearInterval(demoTyping);
     dictation.cancel();
+    newPromptFrom.value = null;
+    demoNewPrompt.value = request.create;
+    // The prompt an earlier play of the demo made is only pretend, so take it away again, or the command would now match it
+    page.props._statamic.aiPrompts = (page.props._statamic.aiPrompts ?? []).filter((saved) => !saved.demo);
     prompt.value = '';
     focusInput();
     // Dictated, after a moment to see the mic
@@ -344,7 +356,8 @@ watch(demoRequest, (request) => {
         prompt.value = request.text.slice(0, typed);
         if (typed < request.text.length) return;
         clearInterval(demoTyping);
-        setTimeout(() => send(request.text), 350);
+        // Creating, it waits on the highlighted offer to create it for a moment, then Enter takes it up
+        setTimeout(() => send(request.text), request.create ? 1400 : 350);
     }, 30);
 });
 
@@ -610,7 +623,7 @@ function stopFollowing() {
                     class="absolute bottom-full z-(--z-index-portal) mb-3 rounded-2xl border border-gray-200 bg-white shadow-ui-xl dark:border-gray-700 dark:bg-gray-900"
                 >
                     <!-- Prototype: a new saved prompt, without going to Settings → AI -->
-                    <AiChatNewPrompt v-if="newPromptFrom !== null" :from="newPromptFrom" @saved="savedNewPrompt" @cancel="cancelNewPrompt" />
+                    <AiChatNewPrompt v-if="newPromptFrom !== null" :from="newPromptFrom" :demo="demoNewPrompt" @saved="savedNewPrompt" @cancel="cancelNewPrompt" />
                     <!-- While typing a command, only the commands that match -->
                     <template v-else-if="commandMenuOpen">
                         <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" :explain="explainPrompt" @pick="runCommand" />

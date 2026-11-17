@@ -111,13 +111,14 @@ export default function useAiChat() {
             open.value = true;
             dictateRequest.value = true;
         },
-        // Prototype: start a new chat and type the request into it, as if you had, or dictate it (see AiChat.vue)
-        demo: (text, { dictate = false, phase = 1 } = {}) => {
+        // Prototype: start a new chat and type the request into it, as if you had, or dictate it (see AiChat.vue). With create, the
+        // request is a command that matches nothing, and the demo goes on to make it a saved prompt with those instructions.
+        demo: (text, { dictate = false, phase = 1, create = null } = {}) => {
             phaseTwo.value = phase === 2;
             if (!open.value) rememberFocus();
             open.value = true;
             messages.value = [];
-            demoRequest.value = { text, dictate };
+            demoRequest.value = { text, dictate, create };
         },
         // The keyboard shortcut: closed opens (and focuses), open but unfocused focuses, focused closes.
         shortcut: () => {

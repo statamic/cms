@@ -50,7 +50,7 @@ function play(event, item) {
     lastPlayed.value = item.label;
     if (item.canEditAi !== undefined) canEditAi.value = item.canEditAi;
     clearTimeout(starting);
-    starting = setTimeout(() => (item.run ? runOnPage(item.run) : demo(item.text, { dictate: item.dictate, phase: item.phase })), 2000);
+    starting = setTimeout(() => (item.run ? runOnPage(item.run) : demo(item.text, { dictate: item.dictate, phase: item.phase, create: item.create })), 2000);
 }
 
 // A demo with a run is not a chat request: it mocks you using the page. The chat is put away, and the run acts on the real page.
@@ -142,6 +142,19 @@ const groups = [
             { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
             { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
             { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
+        ],
+    },
+    {
+        title: 'Saved prompts',
+        demos: [
+            // Types a command that matches nothing, takes up the offer to create it, fills in the instructions and saves, then runs it.
+            // The save is only pretend (see AiChatNewPrompt.vue), so nothing is left in Settings → AI and it can be played again.
+            {
+                label: 'Create a prompt',
+                text: '/price-check',
+                create: { instructions: 'Check every price on the page against the current price list, and flag any that don’t match.' },
+                canEditAi: true,
+            },
         ],
     },
     {

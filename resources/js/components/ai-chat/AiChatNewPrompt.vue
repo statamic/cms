@@ -9,6 +9,8 @@ import { Button, Field, Input, Textarea } from '@ui';
 const props = defineProps({
     /** What was typed after the /, if it came from a command that matched nothing. It becomes the name, so "/legal" starts as "Legal". */
     from: { type: String, default: '' },
+    /** Prototype: the Create a prompt demo's { instructions }, which it types in and then pretends to save (see AiChatDemos.vue) */
+    demo: { type: Object, default: null },
 });
 
 const emit = defineEmits(['saved', 'cancel']);
@@ -34,7 +36,22 @@ const root = useTemplateRef('root');
 onMounted(async () => {
     await nextTick();
     root.value?.querySelector(props.from ? 'textarea' : 'input')?.focus();
+    if (props.demo) playDemo();
 });
+
+// Prototype: the demo types the instructions in, as if you had, then saves
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function playDemo() {
+    await wait(700);
+    const text = props.demo.instructions;
+    for (let typed = 0; typed < text.length; ) {
+        typed = Math.min(text.length, typed + 2);
+        instructions.value = text.slice(0, typed);
+        await wait(30);
+    }
+    await wait(900);
+    save();
+}
 
 const page = usePage();
 
@@ -42,6 +59,16 @@ async function save() {
     if (saving.value) return;
     saving.value = true;
     errors.value = {};
+
+    // The demo's save is only pretend, so nothing is left in Settings → AI and it can be played again. Its prompt is marked, so the
+    // next play takes it away first (see AiChat.vue).
+    if (props.demo) {
+        await wait(600);
+        const prompt = { name: name.value, command: command.value, instructions: instructions.value, collections: [], use_on: 'page', demo: true };
+        page.props._statamic.aiPrompts = [...(page.props._statamic.aiPrompts ?? []), prompt];
+        saving.value = false;
+        return emit('saved', command.value);
+    }
 
     try {
         const { data } = await axios.post(cp_url('ai/prompts'), { name: name.value, instructions: instructions.value });
