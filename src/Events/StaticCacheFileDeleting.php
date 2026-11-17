@@ -5,7 +5,10 @@ namespace Statamic\Events;
 /**
  * Dispatched right before the full measure static cache deletes a page from disk.
  *
- * The file still exists. Listeners run synchronously and must not implement ShouldQueue.
+ * The file still exists. Listeners that need to read it must run synchronously.
+ *
+ * Returning false does not prevent the deletion, but an exception thrown by a
+ * synchronous listener does.
  */
 class StaticCacheFileDeleting extends Event
 {
