@@ -328,6 +328,47 @@ class EntryRevisionsTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('publishActionsProvider')]
+    public function meta_matches_the_values_returned_after_publishing_or_unpublishing($action, $published)
+    {
+        $this->setTestBlueprint('test', [
+            'sources' => [
+                'type' => 'grid',
+                'min_rows' => 1,
+                'fields' => [['handle' => 'label', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'publish blog entries']]);
+        $user = User::make()->id('user-1')->assignRole('test')->save();
+
+        $entry = EntryFactory::id('1')
+            ->slug('test')
+            ->collection('blog')
+            ->published($published)
+            ->date('2010-12-25')
+            ->data(['blueprint' => 'test', 'title' => 'Title'])
+            ->create();
+
+        $response = $this
+            ->actingAs($user)
+            ->{$action}($entry, ['message' => 'Test!'])
+            ->assertOk();
+
+        $this->assertEquals(
+            collect($response->json('data.values.sources'))->pluck('_id')->all(),
+            array_keys($response->json('data.meta.sources.existing'))
+        );
+    }
+
+    public static function publishActionsProvider()
+    {
+        return [
+            'publish' => ['publish', false],
+            'unpublish' => ['unpublish', true],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('workingCopyActionsProvider')]
     public function blueprint_fields_point_to_the_new_entry_after_publishing_or_unpublishing_a_working_copy($method)
     {

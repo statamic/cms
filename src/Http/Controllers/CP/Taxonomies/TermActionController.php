@@ -24,10 +24,11 @@ class TermActionController extends ActionController
 
         $blueprint = $term->blueprint();
 
-        [$values] = $this->extractFromFields($term, $blueprint);
+        [$values, $meta] = $this->extractFromFields($term, $blueprint);
 
         return array_merge((new TermResource($term))->resolve()['data'], [
             'values' => $values,
+            'meta' => $meta,
             'itemActions' => Action::for($term, $context),
         ]);
     }

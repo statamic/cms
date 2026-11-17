@@ -4,6 +4,7 @@ namespace Tests\Feature\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\TermSaving;
 use Statamic\Facades\Blueprint;
@@ -163,6 +164,98 @@ class UpdateTermTest extends TestCase
             ->assertOk();
 
         $this->assertSame([], $response->json('data.values.nutrition_table'));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15951
+     */
+    #[Test]
+    #[DataProvider('unlocalizedSlugProvider')]
+    public function slug_isnt_saved_on_localization_when_it_isnt_localized($slugField, $localizationData, $localizedFields)
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields('tags', ['slug' => $slugField]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa'])
+            ->dataForLocale('fr', $localizationData)
+        )->save();
+
+        $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'Updated le alfa',
+                'slug' => 'alfa',
+                '_localized' => $localizedFields,
+            ])
+            ->assertOk();
+
+        $term = Term::find('tags::alfa');
+        $this->assertArrayNotHasKey('slug', $term->in('fr')->data()->all());
+
+        $term->in('en')->slug('bravo')->save();
+
+        $this->assertEquals('bravo', Term::find('tags::bravo')->in('fr')->slug());
+    }
+
+    public static function unlocalizedSlugProvider()
+    {
+        return [
+            'slug not localizable' => [
+                ['type' => 'slug'],
+                ['title' => 'le alfa'],
+                ['title'],
+            ],
+            'slug not localizable but previously saved on localization' => [
+                ['type' => 'slug'],
+                ['title' => 'le alfa', 'slug' => 'alfa'],
+                ['title', 'slug'],
+            ],
+            'slug localizable but not localized' => [
+                ['type' => 'slug', 'localizable' => true],
+                ['title' => 'le alfa'],
+                ['title'],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function slug_is_saved_on_localization_when_it_is_localized()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields('tags', [
+            'slug' => ['type' => 'slug', 'localizable' => true],
+        ]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa'])
+            ->dataForLocale('fr', ['title' => 'le alfa'])
+        )->save();
+
+        $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'le alfa',
+                'slug' => 'le-alfa',
+                '_localized' => ['title', 'slug'],
+            ])
+            ->assertOk();
+
+        $term = Term::find('tags::alfa');
+        $this->assertEquals('alfa', $term->in('en')->slug());
+        $this->assertEquals('le-alfa', $term->in('fr')->slug());
     }
 
     #[Test]

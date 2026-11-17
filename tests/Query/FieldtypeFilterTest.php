@@ -4,12 +4,14 @@ namespace Tests\Query;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Fields\Field;
+use Statamic\Fieldtypes\Date as DateFieldtype;
 use Statamic\Fieldtypes\Entries as EntriesFieldtype;
 use Statamic\Fieldtypes\Integer as IntegerFieldtype;
 use Statamic\Fieldtypes\Terms as TermsFieldtype;
@@ -138,6 +140,43 @@ class FieldtypeFilterTest extends TestCase
             'multiple: isnt' => [null, ['operator' => '!=', 'value' => 'topic-1'], ['page-c']],
             'multiple: empty' => [null, ['operator' => 'null', 'value' => null], ['page-c']],
             'multiple: not empty' => [null, ['operator' => 'not-null', 'value' => null], ['page-a', 'page-b']],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('dateRangeFilterProvider')]
+    public function it_applies_the_date_filter_to_a_date_range($values, $expected)
+    {
+        Collection::make('events')->save();
+
+        $blueprint = Blueprint::makeFromFields(['dates' => ['type' => 'date', 'mode' => 'range']]);
+        Blueprint::shouldReceive('in')->with('collections/events')->andReturn(collect(['events' => $blueprint]));
+
+        (new EntryFactory)->collection('events')->id('july')->slug('july')->data(['dates' => ['start' => '2026-07-21', 'end' => '2026-07-22']])->create();
+        (new EntryFactory)->collection('events')->id('august')->slug('august')->data(['dates' => ['start' => '2026-08-10', 'end' => '2026-08-20']])->create();
+
+        $filter = (new DateFieldtype)
+            ->setField(new Field('dates', ['type' => 'date', 'mode' => 'range']))
+            ->filter();
+
+        $query = Entry::query()->where('collection', 'events');
+        $filter->apply($query, 'dates', $values);
+
+        $this->assertEquals($expected, $query->get()->map->id()->sort()->values()->all());
+    }
+
+    public static function dateRangeFilterProvider()
+    {
+        return [
+            'before the start' => [['operator' => '<', 'value' => '2026-07-21'], []],
+            'before the end' => [['operator' => '<', 'value' => '2026-07-22'], ['july']],
+            'after the start' => [['operator' => '>', 'value' => '2026-08-15'], ['august']],
+            'after the end' => [['operator' => '>', 'value' => '2026-08-20'], []],
+            'between, containing the range' => [['operator' => 'between', 'range_value' => ['start' => '2026-07-20', 'end' => '2026-07-26']], ['july']],
+            'between, overlapping the start' => [['operator' => 'between', 'range_value' => ['start' => '2026-07-01', 'end' => '2026-08-10']], ['august', 'july']],
+            'between, overlapping the end' => [['operator' => 'between', 'range_value' => ['start' => '2026-07-22', 'end' => '2026-07-30']], ['july']],
+            'between, inside the range' => [['operator' => 'between', 'range_value' => ['start' => '2026-08-12', 'end' => '2026-08-14']], ['august']],
+            'between, outside the range' => [['operator' => 'between', 'range_value' => ['start' => '2026-07-23', 'end' => '2026-08-09']], []],
         ];
     }
 

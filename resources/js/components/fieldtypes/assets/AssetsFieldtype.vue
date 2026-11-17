@@ -849,6 +849,11 @@ export default {
 
             this.$events.$emit('reset-action-modals');
 
+            if (response.success === false) {
+                this.$toast.error(response.message || __('Action failed'));
+                return;
+            }
+
             if (response.message !== false) {
                 this.$toast.success(response.message || __('Action completed'));
             }

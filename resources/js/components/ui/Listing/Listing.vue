@@ -747,7 +747,7 @@ watch(
             activeFilters.value = props.filtersForReordering ? props.filtersForReordering() : {};
             searchQuery.value = null;
             sortColumn.value = 'order';
-            sortDirection.value = 'asc';
+            sortDirection.value = props.sortDirection;
             currentPage.value = 1;
         } else {
             if (stateBeforeReordering.value) {

@@ -194,16 +194,57 @@ class Fieldset implements ContainsQueryableValues
      */
     public function validateRecursion()
     {
-        $this->fields();
+        $this->validateImportRecursion($this->handle(), $this->fieldConfigs());
+    }
+
+    private function validateImportRecursion(string $import, IlluminateCollection $fields): void
+    {
+        $recursion = tap(app(FieldsetRecursionStack::class))->push($import);
+
+        try {
+            $fields->each(fn ($field) => $this->validateFieldRecursion($field));
+        } finally {
+            $recursion->pop();
+        }
+    }
+
+    private function validateFieldRecursion(array $field): void
+    {
+        if (isset($field['import'])) {
+            $fields = FieldsetRepository::find($field['import'])?->fieldConfigs() ?? collect();
+
+            $this->validateImportRecursion($field['import'], $fields);
+
+            return;
+        }
+
+        $config = is_string($field['field'])
+            ? FieldRepository::find($field['field'])?->config() ?? []
+            : $field['field'];
+
+        $sets = collect($config['sets'] ?? []);
+
+        if ($sets->isNotEmpty() && ! Arr::has($sets->first(), 'sets')) {
+            $sets = collect([['sets' => $sets->all()]]);
+        }
+
+        $sets
+            ->flatMap(fn ($group) => $group['sets'] ?? [])
+            ->flatMap(fn ($set) => $set['fields'] ?? [])
+            ->merge($config['fields'] ?? [])
+            ->each(fn ($field) => $this->validateFieldRecursion($field));
     }
 
     public function fields(): Fields
     {
-        $fields = $this->hasSections()
-            ? $this->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->values()->all()
-            : Arr::get($this->contents(), 'fields', []);
+        return new Fields($this->fieldConfigs()->all());
+    }
 
-        return new Fields($fields);
+    private function fieldConfigs(): IlluminateCollection
+    {
+        return $this->hasSections()
+            ? $this->sections()->flatMap(fn ($section) => Arr::get($section, 'fields', []))->values()
+            : collect(Arr::get($this->contents(), 'fields', []));
     }
 
     public function sections(): IlluminateCollection

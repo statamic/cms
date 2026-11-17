@@ -347,13 +347,14 @@ class UsersController extends CpController
 
         $save = $user->save();
 
-        [$values] = $this->extractFromFields($user, $user->blueprint());
+        [$values, $meta] = $this->extractFromFields($user, $user->blueprint());
 
         return [
             'title' => $user->title(),
             'saved' => is_bool($save) ? $save : true,
             'data' => [
                 'values' => $values,
+                'meta' => $meta,
             ],
         ];
     }

@@ -194,9 +194,15 @@ class GlideManager
             'watermark' => 'mark',
         ];
 
-        return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
+        $params = collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+
+        if (isset($params['fm']) && strtolower($params['fm']) === 'jpeg') {
+            $params['fm'] = 'jpg';
+        }
+
+        return $params;
     }
 
     private function getCachePathCallable()

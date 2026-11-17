@@ -388,6 +388,8 @@ export default {
         view(view) {
             this.site = this.site || this.initialSite;
 
+            if (view === this.$preferences.get(`collections.${this.handle}.view`)) return;
+
             this.$preferences.set(`collections.${this.handle}.view`, view);
         },
     },
@@ -502,7 +504,7 @@ export default {
         treeActionCompleted(successful = null, response = {}) {
             Statamic.$progress.loading('action', false);
 
-            if (!successful) {
+            if (!successful || response.success === false) {
                 Statamic.$toast.error(response.message || __('Action failed'));
                 return;
             }
@@ -527,7 +529,7 @@ export default {
         },
 
         actionCompleted(successful, response = {}) {
-            if (!successful) {
+            if (!successful || response.success === false) {
                 Statamic.$toast.error(response.message || __('Action failed'));
                 return;
             }

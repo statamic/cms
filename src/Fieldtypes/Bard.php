@@ -342,15 +342,16 @@ class Bard extends Replicator
             return (new Augmentor($this))->withStatamicImageUrls()->convertToHtml($structure);
         }
 
-        if ($structure === [['type' => 'paragraph']]) {
-            return null;
-        }
-
-        if ($structure === []) {
+        if ($this->isEmpty($structure)) {
             return null;
         }
 
         return $structure;
+    }
+
+    private function isEmpty(array $structure): bool
+    {
+        return $structure === [] || $structure === [['type' => 'paragraph']];
     }
 
     protected function removeEmptyNodes($value)
@@ -686,7 +687,7 @@ class Bard extends Replicator
     public function preProcessValidatable($value)
     {
         if (is_array($value)) {
-            return $value;
+            return $this->isEmpty($this->removeEmptyNodes($value)->all()) ? null : $value;
         }
 
         $value = $value ?? [];

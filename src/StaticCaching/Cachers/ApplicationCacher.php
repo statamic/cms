@@ -37,13 +37,10 @@ class ApplicationCacher extends AbstractCacher
 
         // Get a hashed version of the URL for the key since slashes
         // and other URL characters wouldn't work as a cache key.
-        $key = $this->makeHash($url);
+        $hash = $this->makeHash($url);
 
-        // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
-
-        $generatedAtKey = $this->normalizeKey('generated-at:'.$key);
-        $key = $this->normalizeKey('responses:'.$key);
+        $generatedAtKey = $this->normalizeKey('generated-at:'.$hash);
+        $key = $this->normalizeKey('responses:'.$hash);
         $value = $this->normalizeContent($content);
 
         // The listener stays registered for the lifetime of the process, so it should
@@ -52,7 +49,7 @@ class ApplicationCacher extends AbstractCacher
         // re-store this entry using later requests' statuses and headers.
         $handled = false;
 
-        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $generatedAtKey, $value, &$handled) {
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($url, $hash, $key, $generatedAtKey, $value, &$handled) {
             if ($handled) {
                 return;
             }
@@ -73,6 +70,10 @@ class ApplicationCacher extends AbstractCacher
                 $key => $cacheValue,
                 $generatedAtKey => now()->getTimestamp(),
             ], $this->getDefaultExpiration() ? now()->addMinutes($this->getDefaultExpiration()) : null);
+
+            // Track the URL only once its response is stored. Otherwise, an invalidation
+            // in between would remove the URL but leave the response being served.
+            $this->cacheUrl($hash, ...$this->getPathAndDomain($url));
         });
     }
 
@@ -138,14 +139,20 @@ class ApplicationCacher extends AbstractCacher
      */
     public function flush()
     {
-        $this->getDomains()->each(function ($domain) {
-            $this->getUrls($domain)->keys()->each(function ($key) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
-            });
+        // Forget the URLs before their responses, so a page cached while the
+        // responses are being forgotten is tracked on a fresh URL index.
+        $keys = $this->withUrlsLock(function () {
+            $keys = $this->getDomains()->flatMap(fn ($domain) => $this->getUrls($domain)->keys());
+
+            $this->flushUrls();
+
+            return $keys;
         });
 
-        $this->flushUrls();
+        $keys->each(function ($key) {
+            $this->cache->forget($this->normalizeKey('responses:'.$key));
+            $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+        });
 
         $this->flushDedicatedStore();
     }
@@ -165,14 +172,18 @@ class ApplicationCacher extends AbstractCacher
             [$url, $domain] = $this->getPathAndDomain($url);
         }
 
-        $this
+        $keys = $this
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) use ($domain) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
-                $this->forgetUrl($key, $domain);
-            });
+            ->keys()
+            ->all();
+
+        $this->forgetUrls($keys, $domain);
+
+        foreach ($keys as $key) {
+            $this->cache->forget($this->normalizeKey('responses:'.$key));
+            $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+        }
 
         UrlInvalidated::dispatch($url, $domain);
     }
@@ -234,12 +245,12 @@ class ApplicationCacher extends AbstractCacher
         foreach ($removed as $domain => $keys) {
             $keys = array_keys($keys);
 
+            $this->forgetUrls($keys, $domain);
+
             foreach ($keys as $key) {
                 $this->cache->forget($this->normalizeKey('responses:'.$key));
                 $this->cache->forget($this->normalizeKey('generated-at:'.$key));
             }
-
-            $this->forgetUrls($keys, $domain);
         }
 
         foreach ($events as [$path, $domain]) {
