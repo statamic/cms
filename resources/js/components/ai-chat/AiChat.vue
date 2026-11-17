@@ -813,7 +813,7 @@ function stopFollowing() {
                 size="xs"
                 round
                 :class="floating ? 'end-4 bottom-[12px]' : 'end-5.25 bottom-5.25'"
-                class="absolute border-0 bg-none! bg-ai! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-ai-hover! disabled:opacity-100! disabled:bg-ai/8! dark:disabled:bg-ai/20! [&_svg]:opacity-100! disabled:[&_svg]:text-ai/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
+                class="absolute border-0 bg-none! bg-ai! shadow-none! inset-shadow-none! hover:bg-ai-hover! disabled:opacity-100! disabled:bg-ai/8! dark:disabled:bg-ai/20! [&_svg]:opacity-100! disabled:[&_svg]:text-ai/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 tabindex="-1"
                 v-tooltip="__('Send')"
