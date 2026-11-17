@@ -148,6 +148,67 @@ class CharacterOffsets
     }
 
     /**
+     * @internal
+     *
+     * @param  string  $source
+     * @param  int[]  $characterOffsets
+     * @return array{0: array<int, int>, 1: array<int, int>}
+     */
+    public static function normalizedToBytesAndCharacters($source, array $characterOffsets)
+    {
+        if ($characterOffsets === []) {
+            return [[], []];
+        }
+
+        $byteLength = strlen($source);
+
+        if ($byteLength === mb_strlen($source) && strpos($source, "\r\n") === false) {
+            $bytes = self::identity($characterOffsets, $byteLength);
+            $characters = [];
+
+            foreach ($bytes as $byte) {
+                $characters[$byte] = $byte;
+            }
+
+            return [$bytes, $characters];
+        }
+
+        $needed = array_fill_keys($characterOffsets, true);
+        $bytes = [];
+        $characters = [];
+        $normalizedCharacter = 0;
+        $sourceCharacter = 0;
+
+        for ($byte = 0; $byte < $byteLength; $byte++) {
+            if ((ord($source[$byte]) & 0xC0) === 0x80) {
+                continue;
+            }
+
+            if (isset($needed[$normalizedCharacter]) && ! isset($bytes[$normalizedCharacter])) {
+                $bytes[$normalizedCharacter] = $byte;
+                $characters[$byte] = $sourceCharacter;
+            }
+
+            if ($source[$byte] === "\r" && $byte + 1 < $byteLength && $source[$byte + 1] === "\n") {
+                $byte++;
+                $sourceCharacter++;
+            }
+
+            $normalizedCharacter++;
+            $sourceCharacter++;
+        }
+
+        foreach ($needed as $neededCharacter => $unused) {
+            if (! isset($bytes[$neededCharacter])) {
+                $bytes[$neededCharacter] = $byteLength;
+                $characters[$byteLength] = $sourceCharacter;
+            }
+        }
+
+        return [$bytes, $characters];
+    }
+
+    /**
      * @param  string  $source
      * @param  int[]  $byteOffsets
      * @param  bool|null  $sourceIsMultibyte

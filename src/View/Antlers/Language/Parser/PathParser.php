@@ -423,21 +423,21 @@ class PathParser
                 $nestedChars[] = $cur;
             }
 
-            if ($isParsingString == false && ctype_space($next)) {
+            if ($next == null || ($isParsingString == false && ctype_space($next))) {
                 throw ErrorFactory::makeSyntaxError(
                     AntlersErrorCodes::TYPE_UNEXPECTED_EOI_VARPATH_ACCESSOR,
                     null,
                     'Unexpected end of input or whitespace while parsing inner variable accessor path.'
                 );
             }
+        }
 
-            if ($next == null) {
-                throw ErrorFactory::makeSyntaxError(
-                    AntlersErrorCodes::TYPE_UNEXPECTED_EOI_VARPATH_ACCESSOR,
-                    null,
-                    'Unexpected end of input or whitespace while parsing inner variable accessor path.'
-                );
-            }
+        if ($foundOn < 0) {
+            throw ErrorFactory::makeSyntaxError(
+                AntlersErrorCodes::TYPE_UNEXPECTED_EOI_VARPATH_ACCESSOR,
+                null,
+                'Unexpected end of input or whitespace while parsing inner variable accessor path.'
+            );
         }
 
         return [$foundOn, $nestedContent];

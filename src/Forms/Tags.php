@@ -6,6 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\View\Instrumentation\ComposesRenderedOutput;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -19,7 +20,7 @@ use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 
-class Tags extends BaseTags
+class Tags extends BaseTags implements ComposesRenderedOutput
 {
     use Concerns\GetsFormSession,
         Concerns\GetsQueryResults,

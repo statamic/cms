@@ -40,7 +40,7 @@ class LivePreviewNewEntryTest extends TestCase
         ]);
 
         $this->assertStringStartsWith('http://localhost/blog/2024/dated-entry?', $url);
-        $this->get($url)->assertOk()->assertSee('<h1>Dated entry</h1>', false);
+        $this->get($url)->assertOk()->assertSee('<h1><!--statamic:field:1-->Dated entry<!--/statamic:field:1--></h1>', false);
     }
 
     #[Test]
@@ -51,7 +51,7 @@ class LivePreviewNewEntryTest extends TestCase
         $url = $this->previewUrl('blog', ['title' => 'Undated entry', 'slug' => 'undated-entry']);
 
         $this->assertStringStartsWith('http://localhost/blog/'.now()->year.'/undated-entry?', $url);
-        $this->get($url)->assertOk()->assertSee('<h1>Undated entry</h1>', false);
+        $this->get($url)->assertOk()->assertSee('<h1><!--statamic:field:1-->Undated entry<!--/statamic:field:1--></h1>', false);
     }
 
     #[Test]
@@ -62,7 +62,7 @@ class LivePreviewNewEntryTest extends TestCase
         $url = $this->previewUrl('pages', ['title' => 'New page', 'slug' => 'new-page']);
 
         $this->assertStringStartsWith('http://localhost/new-page?', $url);
-        $this->get($url)->assertOk()->assertSee('<h1>New page</h1>', false)->assertDontSee('Home');
+        $this->get($url)->assertOk()->assertSee('<h1><!--statamic:field:1-->New page<!--/statamic:field:1--></h1>', false)->assertDontSee('Home');
     }
 
     #[Test]
@@ -73,7 +73,7 @@ class LivePreviewNewEntryTest extends TestCase
         $url = $this->previewUrl('pages', ['title' => 'Child page', 'slug' => 'child-page'], parent: 'about');
 
         $this->assertStringStartsWith('http://localhost/about/child-page?', $url);
-        $this->get($url)->assertOk()->assertSee('<h1>Child page</h1>', false);
+        $this->get($url)->assertOk()->assertSee('<h1><!--statamic:field:1-->Child page<!--/statamic:field:1--></h1>', false);
     }
 
     #[Test]
@@ -84,7 +84,7 @@ class LivePreviewNewEntryTest extends TestCase
         $url = $this->previewUrl('pages', ['title' => 'Sibling page', 'slug' => 'sibling-page'], parent: 'home');
 
         $this->assertStringStartsWith('http://localhost/sibling-page?', $url);
-        $this->get($url)->assertOk()->assertSee('<h1>Sibling page</h1>', false);
+        $this->get($url)->assertOk()->assertSee('<h1><!--statamic:field:1-->Sibling page<!--/statamic:field:1--></h1>', false);
     }
 
     #[Test]

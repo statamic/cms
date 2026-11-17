@@ -10,6 +10,7 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\GraphQL\Types\ReplicatorSetsType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
@@ -148,7 +149,19 @@ class Replicator extends Fieldtype
         $config = Arr::get($this->flattenedSetsConfig(), "$set.fields");
         $parent = $this->field->parent();
         $locale = $parent instanceof Localization ? $parent->locale() : null;
-        $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
+
+        if (Value::isObservingReads()) {
+            $hash = 'field-trace:'.md5(json_encode([
+                spl_object_id(is_object($parent) ? $parent : $this->field),
+                $this->field->fieldPathKeys(),
+                $this->field->sourcePathKeys(),
+                $index,
+                $config,
+                $locale,
+            ]));
+        } else {
+            $hash = md5($this->field->fieldPathPrefix().$index.json_encode($config).$locale);
+        }
 
         return Blink::once($hash, function () use ($config, $index) {
             return new Fields(

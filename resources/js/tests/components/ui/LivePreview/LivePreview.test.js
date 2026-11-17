@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { flushPromises, mount } from '@vue/test-utils';
 import axios from 'axios';
 import LivePreview from '@/components/ui/LivePreview/LivePreview.vue';
+import { useIframeManager } from '@/components/ui/LivePreview/ManagesIframes.js';
 
 vi.mock('axios', () => ({
     default: { post: vi.fn() },
@@ -10,7 +11,15 @@ vi.mock('axios', () => ({
 
 vi.mock('@/components/ui/LivePreview/ManagesIframes.js', async () => {
     const { ref } = await import('vue');
-    return { useIframeManager: () => ({ previousUrl: ref(null), updateIframeContents: vi.fn() }) };
+    return {
+        useIframeManager: vi.fn(() => ({
+            previousUrl: ref(null),
+            updateIframeContents: vi.fn(),
+            selectFields: vi.fn(),
+            highlightField: vi.fn(),
+            dispose: vi.fn(),
+        })),
+    };
 });
 
 vi.mock('@ui', async () => {
@@ -27,8 +36,9 @@ vi.mock('@ui', async () => {
 let values;
 let events;
 
-function livePreview(props = {}) {
+function livePreview(props = {}, fields = null) {
     return mount(LivePreview, {
+        attachTo: fields ? document.body : undefined,
         props: { enabled: false, url: '/preview', targets: [{ label: 'Default' }], ...props },
         global: {
             provide: {
@@ -38,7 +48,12 @@ function livePreview(props = {}) {
                     values,
                 },
             },
-            stubs: { 'v-portal': true, portal: true, 'portal-target': true, Resizer: true },
+            stubs: {
+                'v-portal': true,
+                portal: fields ? { template: '<div><slot /></div>' } : true,
+                'portal-target': fields ? { template: fields } : true,
+                Resizer: true,
+            },
         },
     });
 }
@@ -113,6 +128,32 @@ test('it posts once when enabled', async () => {
         preview: { title: 'One' },
         extras: {},
     });
+});
+
+test.each([
+    ['Markdown', '<div class="CodeMirror-code" contenteditable="true" tabindex="0"></div>'],
+    ['Bard', '<div class="tiptap" contenteditable="true" tabindex="0"></div>'],
+    ['text', '<input type="text" />'],
+    ['textarea', '<textarea></textarea>'],
+    ['Assets', '<button type="button">Browse Assets</button>'],
+])('selecting a %s field focuses its control instead of its upload input', async (type, editor) => {
+    const wrapper = livePreview({}, `
+        <div data-preview-field-path="body">
+            <input type="file" class="hidden" />
+            ${editor}
+        </div>
+    `);
+    await enable(wrapper);
+
+    const field = wrapper.get('[data-preview-field-path="body"]');
+    field.element.scrollIntoView = vi.fn();
+    const selectField = useIframeManager.mock.lastCall[1];
+
+    selectField({ path: ['body'] });
+    await settle();
+
+    expect(document.activeElement).toBe(field.element.children[1]);
+    wrapper.unmount();
 });
 
 test('it posts when the values change while enabled', async () => {
