@@ -60,6 +60,12 @@ class ReplaceAsset extends Action
 
     protected function fieldItems()
     {
+        $asset = $this->items->first();
+
+        // The selected asset may no longer exist (e.g. it was deleted by a
+        // previous request), in which case there's nothing left to replace.
+        abort_unless($asset, 404);
+
         return [
             'new_asset' => [
                 'display' => __('New Asset'),
@@ -67,7 +73,7 @@ class ReplaceAsset extends Action
                 'container' => $this->context['container'],
                 'folder' => $this->context['folder'] ?? null,
                 'max_files' => 1,
-                'validate' => ['required', $this->differentAssetRule()],
+                'validate' => ['required', $this->differentAssetRule($asset)],
                 'mode' => 'list',
                 'restrict' => true,
                 'allow_uploads' => true,
@@ -81,12 +87,10 @@ class ReplaceAsset extends Action
         ];
     }
 
-    private function differentAssetRule(): Closure
+    private function differentAssetRule(Asset $asset): Closure
     {
-        $asset = $this->items->first();
-
         return function (string $attribute, mixed $value, Closure $fail) use ($asset) {
-            if ($asset && in_array($asset->id(), Arr::wrap($value))) {
+            if (in_array($asset->id(), Arr::wrap($value))) {
                 $fail('statamic::validation.asset_replace_same')->translate();
             }
         };

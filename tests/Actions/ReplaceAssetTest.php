@@ -43,6 +43,17 @@ class ReplaceAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_404s_when_the_selected_asset_does_not_exist()
+    {
+        $this->createAsset('bravo.jpg');
+
+        $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->replace('does-not-exist.jpg', 'bravo.jpg')
+            ->assertNotFound();
+    }
+
+    #[Test]
     public function it_fails_validation_when_replacing_an_asset_with_itself()
     {
         $this->createAsset('alfa.jpg');
