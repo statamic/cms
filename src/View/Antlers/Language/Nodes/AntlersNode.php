@@ -5,6 +5,7 @@ namespace Statamic\View\Antlers\Language\Nodes;
 use Illuminate\Support\Str;
 use Statamic\Facades\Antlers;
 use Statamic\Tags\TagNotFoundException;
+use Statamic\View\Antlers\Language\Analyzers\Html\AntlersNode as HtmlAntlersNode;
 use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
 use Statamic\View\Antlers\Language\Exceptions\SyntaxErrorException;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
@@ -40,6 +41,33 @@ class AntlersNode extends AbstractNode
     protected $parser = null;
 
     /**
+     * @internal
+     *
+     * @var \Statamic\View\Instrumentation\HtmlContext|null
+     */
+    public $htmlContext = null;
+
+    /**
+     * @internal
+     *
+     * @var int|null
+     */
+    public $parserGeneration = null;
+
+    /** @var HtmlAntlersNode|null */
+    protected $htmlGraphNode = null;
+
+    /** @var AntlersNode|null */
+    protected $htmlContextOwner = null;
+
+    /**
+     * @internal
+     *
+     * @var array{0: string, 1: \Statamic\View\Instrumentation\TagBody}|null
+     */
+    public $tagBody = null;
+
+    /**
      * The parsed runtime content.
      *
      * @var string
@@ -66,6 +94,82 @@ class AntlersNode extends AbstractNode
     public function getParser()
     {
         return $this->parser;
+    }
+
+    /**
+     * @internal
+     *
+     * @return HtmlAntlersNode|null
+     */
+    public function htmlNode()
+    {
+        if ($this->htmlContextOwner !== null) {
+            return $this->htmlContextOwner->htmlNode();
+        }
+
+        if ($this->htmlGraphNode === null && $this->describesCurrentParse()) {
+            $this->htmlGraphNode = $this->parser->html()->node($this);
+        }
+
+        return $this->htmlGraphNode;
+    }
+
+    /** @return bool */
+    protected function describesCurrentParse()
+    {
+        if ($this->parser === null || $this->parserGeneration === null) {
+            return false;
+        }
+
+        return $this->parserGeneration === $this->parser->generation();
+    }
+
+    /** @internal */
+    public function withHtmlContextOwner(AntlersNode $owner)
+    {
+        $this->htmlContextOwner = $owner;
+
+        foreach ($this->processedInterpolationRegions as $nodes) {
+            foreach ($nodes as $node) {
+                if ($node instanceof AntlersNode) {
+                    $node->withHtmlContextOwner($owner);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /** @internal */
+    public function parentElement()
+    {
+        return $this->htmlNode()?->parentElement();
+    }
+
+    /** @internal */
+    public function htmlContext()
+    {
+        if ($this->htmlContextOwner !== null) {
+            return $this->htmlContextOwner->htmlContext();
+        }
+
+        if ($this->htmlContext === null && $this->describesCurrentParse()) {
+            $this->parser->scanHtmlContext();
+        }
+
+        return $this->htmlContext;
+    }
+
+    /** @internal */
+    public function previousHtmlSibling()
+    {
+        return $this->htmlNode()?->previousSibling();
+    }
+
+    /** @internal */
+    public function nextHtmlSibling()
+    {
+        return $this->htmlNode()?->nextSibling();
     }
 
     /**
@@ -314,6 +418,9 @@ class AntlersNode extends AbstractNode
         $instance->endPosition = $this->endPosition;
         $instance->interpolationRegions = $this->interpolationRegions;
         $instance->processedInterpolationRegions = $this->processedInterpolationRegions;
+        $instance->htmlContextOwner = $this->htmlContextOwner;
+        $instance->htmlContext = $this->htmlContext;
+        $instance->parserGeneration = $this->parserGeneration;
 
         return $instance;
     }
