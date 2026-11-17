@@ -57,6 +57,8 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote :param',
             'vue script with/slash',
             'vue script with bracket(s)',
+            'vue script with (bracketed) words',
+            'vue script with bracketed (:param)',
 
             'blade trans single quote string',
             'blade trans single quote :param',
@@ -90,6 +92,7 @@ class MethodDiscoveryTest extends TestCase
             'php with/slash',
             'php annotated return with/slash',
             'php with bracket(s)',
+            'php with (bracketed) words',
             'php annotated return with bracket(s)',
 
             'vue template trans single quote',

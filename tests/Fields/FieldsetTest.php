@@ -11,6 +11,7 @@ use Statamic\Events\FieldsetDeleted;
 use Statamic\Events\FieldsetDeleting;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Events\FieldsetSaving;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -1120,5 +1121,64 @@ class FieldsetTest extends TestCase
         $fieldset = (new Fieldset)->setContents(['title' => 'Test']);
 
         $this->assertEquals(['title' => 'Test', 'fields' => []], $fieldset->contents());
+    }
+
+    /** @see https://github.com/statamic/cms/issues/12698 */
+    #[Test]
+    #[DataProvider('nestedImportProvider')]
+    public function it_does_not_allow_recursive_imports_inside_nested_fields($nest)
+    {
+        $this->expectException(FieldsetRecursionException::class);
+        $this->expectExceptionMessage('Fieldset [page_tabs] is being imported recursively.');
+
+        $section = (new Fieldset)->setHandle('page_section')->setContents([
+            'fields' => [$nest(['import' => 'page_tabs'])],
+        ]);
+
+        $tabs = (new Fieldset)->setHandle('page_tabs')->setContents([
+            'fields' => [$nest(['import' => 'page_section'])],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('page_section')->andReturn($section);
+        FieldsetRepository::shouldReceive('find')->with('page_tabs')->andReturn(null);
+
+        $tabs->validateRecursion();
+    }
+
+    public static function nestedImportProvider()
+    {
+        return [
+            'grid' => [fn ($field) => ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [$field]]]],
+            'replicator' => [fn ($field) => ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
+                'main' => ['sets' => ['block' => ['fields' => [$field]]]],
+            ]]]],
+            'replicator with ungrouped sets' => [fn ($field) => ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
+                'block' => ['fields' => [$field]],
+            ]]]],
+            'replicator inside grid' => [fn ($field) => ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [
+                ['handle' => 'blocks', 'field' => ['type' => 'replicator', 'sets' => [
+                    'main' => ['sets' => ['block' => ['fields' => [$field]]]],
+                ]]],
+            ]]]],
+        ];
+    }
+
+    #[Test]
+    public function it_allows_the_same_fieldset_to_be_imported_more_than_once_inside_nested_fields()
+    {
+        FieldsetRepository::shouldReceive('find')->with('text')->andReturn(
+            (new Fieldset)->setHandle('text')->setContents(['fields' => [
+                ['handle' => 'text', 'field' => ['type' => 'text']],
+            ]])
+        );
+
+        $fieldset = (new Fieldset)->setHandle('page_section')->setContents(['fields' => [
+            ['import' => 'text'],
+            ['handle' => 'rows', 'field' => ['type' => 'grid', 'fields' => [['import' => 'text']]]],
+        ]]);
+
+        $fieldset->validateRecursion();
+
+        $this->addToAssertionCount(1);
     }
 }
