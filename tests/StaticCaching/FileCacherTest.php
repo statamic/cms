@@ -17,13 +17,18 @@ use Statamic\Facades\File;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class FileCacherTest extends TestCase
 {
+    private ?string $cachePath = null;
+
     public function tearDown(): void
     {
-        File::delete(storage_path('framework/testing/static-cache-events'));
+        if ($this->cachePath) {
+            app('files')->deleteDirectory($this->cachePath);
+        }
 
         parent::tearDown();
     }
@@ -411,6 +416,24 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function written_listeners_can_modify_the_file_and_write_sidecar_files()
+    {
+        $cacher = $this->fileCacherWithRealWriter();
+        $path = $cacher->getFilePath('http://example.com/about');
+
+        Event::listen(StaticCacheFileWritten::class, function ($event) {
+            $html = file_get_contents($event->path);
+            file_put_contents($event->path.'.md', strip_tags($html));
+            file_put_contents($event->path, str_replace('</html>', '<!-- modified --></html>', $html));
+        });
+
+        $cacher->cachePage(Request::create('http://example.com/about'), '<html>about</html>');
+
+        $this->assertEquals('<html>about<!-- modified --></html>', file_get_contents($path));
+        $this->assertEquals('about', file_get_contents($path.'.md'));
+    }
+
+    #[Test]
     public function written_is_not_dispatched_when_the_file_is_locked_by_another_process()
     {
         Event::fake([StaticCacheFileWriting::class, StaticCacheFileWritten::class]);
@@ -422,10 +445,12 @@ class FileCacherTest extends TestCase
         $handle = fopen($path, 'r');
         flock($handle, LOCK_EX);
 
-        $cacher->cachePage(Request::create('http://example.com/about'), '<html>new</html>');
-
-        flock($handle, LOCK_UN);
-        fclose($handle);
+        try {
+            $cacher->cachePage(Request::create('http://example.com/about'), '<html>new</html>');
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
 
         Event::assertDispatched(StaticCacheFileWriting::class);
         Event::assertNotDispatched(StaticCacheFileWritten::class);
@@ -467,6 +492,64 @@ class FileCacherTest extends TestCase
         $this->assertFileDoesNotExist($cacher->getFilePath('/one?baz=qux'));
         $this->assertFileExists($cacher->getFilePath('/onemore'));
         $this->assertFileExists($cacher->getFilePath('/two'));
+    }
+
+    #[Test]
+    public function a_failing_writing_listener_prevents_the_write()
+    {
+        $cacher = $this->fileCacherWithRealWriter();
+        $path = $cacher->getFilePath('http://example.com/about');
+
+        File::put($path, '<html>old</html>');
+
+        Event::listen(StaticCacheFileWriting::class, fn () => throw new \RuntimeException('Sidecar removal failed'));
+
+        try {
+            $cacher->cachePage(Request::create('http://example.com/about'), '<html>new</html>');
+            $this->fail('Expected the listener exception to propagate.');
+        } catch (\RuntimeException $e) {
+            $this->assertEquals('Sidecar removal failed', $e->getMessage());
+        }
+
+        $this->assertEquals('<html>old</html>', file_get_contents($path));
+    }
+
+    #[Test]
+    public function a_failing_deleting_listener_prevents_the_deletion()
+    {
+        $cacher = $this->fileCacherWithRealWriter();
+        $path = $cacher->getFilePath('/one');
+
+        File::put($path, '<html></html>');
+        File::put($path.'.br', 'compressed');
+
+        Event::listen(StaticCacheFileDeleting::class, fn () => throw new \RuntimeException('Sidecar removal failed'));
+
+        try {
+            $cacher->invalidateUrl('/one', 'http://example.com');
+            $this->fail('Expected the listener exception to propagate.');
+        } catch (\RuntimeException $e) {
+            $this->assertEquals('Sidecar removal failed', $e->getMessage());
+        }
+
+        $this->assertFileExists($path);
+        $this->assertFileExists($path.'.br');
+    }
+
+    #[Test]
+    public function deleting_event_is_not_dispatched_for_indexed_urls_without_a_file()
+    {
+        Event::fake([StaticCacheFileDeleting::class]);
+
+        $cache = app(Repository::class);
+        $cacher = $this->fileCacherWithRealWriter([], $cache);
+
+        $cache->forever($this->cacheKey('http://example.com'), ['one' => '/one']);
+
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        Event::assertNotDispatched(StaticCacheFileDeleting::class);
+        $this->assertEquals([], $cacher->getUrls('http://example.com')->all());
     }
 
     #[Test]
@@ -639,7 +722,7 @@ class FileCacherTest extends TestCase
     private function fileCacherWithRealWriter($config = [], $cache = null)
     {
         return $this->fileCacher(array_merge([
-            'path' => storage_path('framework/testing/static-cache-events'),
+            'path' => $this->cachePath ??= storage_path('framework/testing/static-cache-'.Str::random(16)),
             'base_url' => 'http://example.com',
         ], $config), new Writer, $cache);
     }
