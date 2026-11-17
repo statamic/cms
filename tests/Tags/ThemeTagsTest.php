@@ -148,6 +148,48 @@ class ThemeTagsTest extends TestCase
         );
     }
 
+    public function testOutputsFileContentsFromResourcesDisk()
+    {
+        file_put_contents($path = resource_path('theme-output-test.txt'), 'inside');
+
+        try {
+            $this->assertEquals('inside', $this->tag('{{ theme:output src="theme-output-test.txt" }}'));
+            $this->assertEquals('inside', $this->tag('{{ theme:output src="views/../theme-output-test.txt" }}'));
+        } finally {
+            unlink($path);
+        }
+    }
+
+    public function testOutputsFileContentsWithControlCharactersInFilename()
+    {
+        file_put_contents($path = resource_path("theme-output-\u{200D}test.txt"), 'inside');
+
+        try {
+            $this->assertEquals('inside', $this->tag("{{ theme:output src=\"theme-output-\u{200D}test.txt\" }}"));
+        } finally {
+            unlink($path);
+        }
+    }
+
+    public function testDoesntOutputFileContentsFromOutsideResourcesDisk()
+    {
+        file_put_contents($outside = base_path('theme-output-test.txt'), 'outside');
+        mkdir($siblingDir = resource_path().'-old');
+        file_put_contents($sibling = $siblingDir.'/theme-output-test.txt', 'sibling');
+
+        try {
+            $this->assertEquals('', $this->tag('{{ theme:output src="../theme-output-test.txt" }}'));
+            $this->assertEquals('', $this->tag('{{ theme:output src="views/../../theme-output-test.txt" }}'));
+            $this->assertEquals('', $this->tag('{{ theme:output src="'.$outside.'" }}'));
+            $this->assertEquals('', $this->tag('{{ theme:output src="'.$sibling.'" }}'));
+            $this->assertEquals('', $this->tag('{{ theme:output src="'.resource_path('../theme-output-test.txt').'" }}'));
+        } finally {
+            unlink($outside);
+            unlink($sibling);
+            rmdir($siblingDir);
+        }
+    }
+
     public function testAppendsTimestampForCacheBusting()
     {
         File::shouldReceive('exists')->with(Path::tidy(public_path('/js/foo.js')))->andReturnTrue();

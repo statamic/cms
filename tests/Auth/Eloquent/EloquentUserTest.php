@@ -2,10 +2,14 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
+use DateTime;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -308,6 +312,27 @@ class EloquentUserTest extends TestCase
         $user->model()->timestamps = false;
 
         $this->assertFalse($user->timestamps);
+    }
+
+    #[Test]
+    public function it_gets_the_last_login_when_the_app_uses_immutable_dates()
+    {
+        Date::use(CarbonImmutable::class);
+
+        // The Control Panel's Localize middleware changes the format too.
+        Date::setToStringFormat(DateTime::ATOM);
+
+        $this->beforeApplicationDestroyed(function () {
+            Date::useDefault();
+            Date::resetToStringFormat();
+        });
+
+        $user = $this->makeUser();
+        $user->model()->mergeCasts(['last_login' => 'datetime']);
+        $user->setLastLogin(now());
+
+        $this->assertInstanceOf(CarbonInterface::class, $user->lastLogin());
+        $this->assertEquals('2019-11-21 23:39:29', $user->lastLogin()->format('Y-m-d H:i:s'));
     }
 
     #[Test]

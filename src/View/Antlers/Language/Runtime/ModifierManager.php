@@ -20,6 +20,15 @@ class ModifierManager
     public static $lastModifierName = null;
     const METHOD_MODIFIER = '{__method_args}';
 
+    /**
+     * Modifiers that should still run when the value is null.
+     *
+     * @var string[]
+     */
+    protected static $nullAwareModifiers = [
+        'bool_string',
+    ];
+
     public static function isModifier(ParameterNode $node)
     {
         if (self::$statamicModifiers == null) {
@@ -93,6 +102,11 @@ class ModifierManager
         return true;
     }
 
+    protected static function acceptsNull($modifierName)
+    {
+        return in_array($modifierName, self::$nullAwareModifiers, true);
+    }
+
     public static function evaluate($value, Environment $env, ModifierChainNode $modifierChain, $context)
     {
         self::clearModifierState();
@@ -101,7 +115,7 @@ class ModifierManager
             return $value;
         }
 
-        if ($value === null) {
+        if ($value === null && ! self::acceptsNull($modifierChain->modifierChain[0]->nameNode->name)) {
             return null;
         }
 
@@ -151,7 +165,7 @@ class ModifierManager
                 $returnValue = $value->value();
             }
 
-            if ($returnValue === null) {
+            if ($returnValue === null && ! self::acceptsNull($modifierName)) {
                 break;
             }
 

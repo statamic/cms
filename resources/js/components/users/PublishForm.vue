@@ -77,6 +77,7 @@ import HasActions from '../publish/HasActions';
 import TwoFactor from '@/components/two-factor/TwoFactor.vue';
 import clone from '@/util/clone.js';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import resetMetaFromResponse from '@/util/resetMetaFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -226,6 +227,7 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
+                this.meta = resetMetaFromResponse(response.data.meta, this.$refs.container);
             }
         },
 

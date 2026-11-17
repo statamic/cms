@@ -8,7 +8,7 @@
  * Select-all-matching uses A (always reserved so actions skip it).
  */
 import { Motion } from 'motion-v';
-import { computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Button, ButtonGroup, Icon } from '@ui';
 
 // ——— Keyboard shortcut constants ———
@@ -38,6 +38,7 @@ const props = defineProps({
 const hasSelections = computed(() => (props.selections?.length ?? 0) > 0);
 const showSelectAllMatching = computed(() => !!props.canSelectAllMatching);
 const isSelectingAllMatching = computed(() => !!props.selectingAllMatching);
+const toolbar = ref(null);
 
 /** True if this action is the built-in delete (by handle or trash icon). */
 function isDeleteAction(action) {
@@ -75,9 +76,11 @@ const actionsWithShortcuts = computed(() => {
 
 // ——— Keyboard handler: skip when overlays or form controls have focus ———
 function hasOpenOverlay() {
-    return !!document.querySelector(
+    const overlays = document.querySelectorAll(
         '[data-ui-modal-content], [data-ui-dropdown-menu], .stack-content, [role="dialog"]'
     );
+
+    return Array.from(overlays).some((overlay) => !overlay.contains(toolbar.value));
 }
 
 function isInsideFormControl(event) {
@@ -143,6 +146,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown, true));
         :transition="{ duration: 0.2, ease: 'easeInOut' }"
     >
         <div
+            ref="toolbar"
             class="pointer-events-auto space-y-1 rounded-xl border border-gray-300/60 dark:border-gray-700 p-1 shadow-[0_1px_16px_-2px_rgba(63,63,71,0.2)] dark:shadow-[0_10px_15px_rgba(0,0,0,.5)] dark:inset-shadow-2xs dark:inset-shadow-white/10"
             :class="showSelectAllMatching ? 'bg-white dark:bg-gray-900' : 'bg-gray-200/55 dark:bg-gray-800'"
         >

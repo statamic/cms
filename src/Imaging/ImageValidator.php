@@ -7,6 +7,11 @@ use Symfony\Component\Mime\MimeTypes;
 
 class ImageValidator
 {
+    /**
+     * Formats every supported driver can read, so there's no need to ask it.
+     */
+    private const ALWAYS_SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
+
     private static array $extensionSupport = [];
 
     public function __construct(private DriverInterface $driver)
@@ -47,6 +52,10 @@ class ImageValidator
     {
         if (! $extension) {
             return false;
+        }
+
+        if (in_array(strtolower($extension), self::ALWAYS_SUPPORTED_EXTENSIONS, true)) {
+            return true;
         }
 
         return static::$extensionSupport[$this->driver::class][strtolower($extension)]

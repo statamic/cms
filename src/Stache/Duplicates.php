@@ -62,6 +62,10 @@ class Duplicates
     {
         $this->stache->cacheStore()->forget('stache::duplicates');
 
+        // What's remembered goes too. A duplicate that is found again is only
+        // written back if it's new, and it wouldn't look new if it were still here.
+        $this->items = [];
+
         return $this;
     }
 

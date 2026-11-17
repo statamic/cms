@@ -3,7 +3,7 @@ import { cva } from 'cva';
 import CharacterCounter from './CharacterCounter.vue';
 import Button from './Button/Button.vue';
 import autosize from 'autosize/dist/autosize.js';
-import { computed, nextTick, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef } from 'vue';
+import { computed, onBeforeUnmount, onMounted, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import useCopy from '@/composables/copy';
 import { mergeAriaDescribedBy, useUiFieldId } from '@/composables/ui-field-id.js';
 
@@ -68,18 +68,30 @@ const classes = cva({
 })({ ...props });
 
 const textarea = useTemplateRef('textarea');
+let resizeObserver;
 
 onMounted(() => {
     if (props.elastic) {
         autosize(textarea.value);
-        setTimeout(() => nextTick(() => autosize.update(textarea.value)), 1);
+        let width;
+        resizeObserver = new ResizeObserver(([entry]) => {
+            if (entry.contentRect.width === width) return;
+            width = entry.contentRect.width;
+            requestAnimationFrame(() => autosize.update(textarea.value));
+        });
+        resizeObserver.observe(textarea.value);
     }
 });
+
+if (props.elastic) {
+    watch(() => props.modelValue, () => autosize.update(textarea.value), { flush: 'post' });
+}
 
 onBeforeUnmount(() => {
     if (props.elastic) {
         autosize.destroy(textarea.value);
     }
+    resizeObserver?.disconnect();
 });
 </script>
 

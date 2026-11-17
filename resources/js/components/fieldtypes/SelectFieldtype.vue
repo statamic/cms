@@ -25,7 +25,8 @@ import { computed } from 'vue';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { isReadOnly, defineReplicatorPreview, update } = Fieldtype.use(emit, props);
+const { isReadOnly, defineReplicatorPreview, update, expose } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
 const selectedOptions = computed(() => {
     let selections = props.value === null ? [] : props.value;

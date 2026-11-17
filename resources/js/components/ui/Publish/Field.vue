@@ -48,6 +48,7 @@ const {
     focusField,
     blurField,
     container,
+    name: containerName,
     direction: contentDirection,
 } = injectContainerContext();
 const {
@@ -88,7 +89,8 @@ watch(
     { immediate: true },
 );
 
-const fieldId = computed(() => `field_${fullPath.value.replaceAll('.', '_')}`);
+// Include the container name so stacked containers (e.g. nested field settings) don't share ids.
+const fieldId = computed(() => `field_${containerName.value}_${fullPath.value.replaceAll('.', '_')}`);
 const namePrefix = '';
 const isRequired = computed(() => props.config.required);
 const fieldtype = useTemplateRef('fieldtype');
@@ -278,7 +280,7 @@ const fieldtypeComponentEvents = computed(() => ({
     >
         <Field
             v-show="shouldRenderField"
-            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually }]"
+            :class="[`${config.type}-fieldtype`, { 'opacity-0 pointer-events-none': shouldHideFieldVisually, 'publish-field-hidden': !shouldRenderField }]"
             :inert="shouldHideFieldVisually"
             :id="fieldId"
             :dir="direction"

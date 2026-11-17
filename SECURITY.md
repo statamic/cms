@@ -13,7 +13,9 @@ While working to identify potential security vulnerabilities in Statamic, we ask
 - Abuse of the security advisory system, including bulk or automated submissions, may be reported to GitHub and result in account suspension.
 
 ## Scope
-We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https:/statamic.com), [statamic.dev](https://statamic.dev), and [demo.statamic.com](https://demo.statamic.com).
+We are only interested in vulnerabilities that affect Statamic itself, tested against **your own local installation** of the software, running the latest version. You can install a local copy of Statamic by following these [installation instructions](https://statamic.dev/installing). Do not test against any Statamic installation that you don’t own, including [statamic.com](https://statamic.com), [statamic.dev](https://statamic.dev), and [demo.statamic.com](https://demo.statamic.com).
+
+This repository only covers the Statamic CMS package. Issues with [statamic.com](https://statamic.com) itself, such as the marketplace, accounts, or licensing, should be emailed **privately** to support@statamic.com. Please don't submit them as security advisories or issues on this repository.
 
 ### Potentially Qualifying Vulnerabilities
 

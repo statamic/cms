@@ -11,6 +11,13 @@ use Statamic\Support\Str;
 
 class ResolveRedirect
 {
+    // Redirects followed in a row before we assume a loop (self-redirect, A -> B -> A).
+    private const MAX_DEPTH = 10;
+
+    private static int $depth = 0;
+
+    private static bool $cycleDetected = false;
+
     public function __invoke($redirect, $parent = null, $localize = false)
     {
         return $this->resolve($redirect, $parent, $localize);
@@ -22,6 +29,29 @@ class ResolveRedirect
             return null;
         }
 
+        // Resolving an entry's url() resolves its own redirect, so a loop never ends.
+        // Flag it so every level unwinds to null and entries fall back to their own URL.
+        if (self::$depth >= self::MAX_DEPTH) {
+            self::$cycleDetected = true;
+
+            return null;
+        }
+
+        self::$depth++;
+
+        try {
+            $result = $this->resolveItem($redirect, $parent, $localize);
+
+            return self::$cycleDetected ? null : $result;
+        } finally {
+            if (--self::$depth === 0) {
+                self::$cycleDetected = false;
+            }
+        }
+    }
+
+    private function resolveItem($redirect, $parent, $localize)
+    {
         if (! $item = $this->item($redirect, $parent, $localize)) {
             return 404;
         }

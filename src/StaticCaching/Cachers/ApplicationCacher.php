@@ -7,6 +7,7 @@ use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Support\Facades\Event;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Page;
+use Statamic\Support\Str;
 
 class ApplicationCacher extends AbstractCacher
 {
@@ -36,12 +37,10 @@ class ApplicationCacher extends AbstractCacher
 
         // Get a hashed version of the URL for the key since slashes
         // and other URL characters wouldn't work as a cache key.
-        $key = $this->makeHash($url);
+        $hash = $this->makeHash($url);
 
-        // Keep track of the URL and key the response content is about to be stored within.
-        $this->cacheUrl($key, ...$this->getPathAndDomain($url));
-
-        $key = $this->normalizeKey('responses:'.$key);
+        $generatedAtKey = $this->normalizeKey('generated-at:'.$hash);
+        $key = $this->normalizeKey('responses:'.$hash);
         $value = $this->normalizeContent($content);
 
         // The listener stays registered for the lifetime of the process, so it should
@@ -50,7 +49,7 @@ class ApplicationCacher extends AbstractCacher
         // re-store this entry using later requests' statuses and headers.
         $handled = false;
 
-        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($key, $value, &$handled) {
+        Event::listen(ResponsePrepared::class, function (ResponsePrepared $event) use ($url, $hash, $key, $generatedAtKey, $value, &$handled) {
             if ($handled) {
                 return;
             }
@@ -67,9 +66,14 @@ class ApplicationCacher extends AbstractCacher
                 'status' => $event->response->getStatusCode(),
             ];
 
-            $this->getDefaultExpiration()
-                ? $this->cache->put($key, $cacheValue, now()->addMinutes($this->getDefaultExpiration()))
-                : $this->cache->forever($key, $cacheValue);
+            $this->cache->putMany([
+                $key => $cacheValue,
+                $generatedAtKey => now()->getTimestamp(),
+            ], $this->getDefaultExpiration() ? now()->addMinutes($this->getDefaultExpiration()) : null);
+
+            // Track the URL only once its response is stored. Otherwise, an invalidation
+            // in between would remove the URL but leave the response being served.
+            $this->cacheUrl($hash, ...$this->getPathAndDomain($url));
         });
     }
 
@@ -104,6 +108,13 @@ class ApplicationCacher extends AbstractCacher
         return $this->cache->get($this->normalizeKey('responses:'.$key));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $key = $this->makeHash($this->getUrl(Request::create($url)));
+
+        return $this->cache->get($this->normalizeKey('generated-at:'.$key));
+    }
+
     /**
      * Check if the cached response for a URL key is an error response.
      *
@@ -128,13 +139,22 @@ class ApplicationCacher extends AbstractCacher
      */
     public function flush()
     {
-        $this->getDomains()->each(function ($domain) {
-            $this->getUrls($domain)->keys()->each(function ($key) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-            });
+        // Forget the URLs before their responses, so a page cached while the
+        // responses are being forgotten is tracked on a fresh URL index.
+        $keys = $this->withUrlsLock(function () {
+            $keys = $this->getDomains()->flatMap(fn ($domain) => $this->getUrls($domain)->keys());
+
+            $this->flushUrls();
+
+            return $keys;
         });
 
-        $this->flushUrls();
+        $keys->each(function ($key) {
+            $this->cache->forget($this->normalizeKey('responses:'.$key));
+            $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+        });
+
+        $this->flushDedicatedStore();
     }
 
     /**
@@ -152,14 +172,112 @@ class ApplicationCacher extends AbstractCacher
             [$url, $domain] = $this->getPathAndDomain($url);
         }
 
-        $this
+        $keys = $this
             ->getUrls($domain)
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
-            ->each(function ($value, $key) use ($domain) {
-                $this->cache->forget($this->normalizeKey('responses:'.$key));
-                $this->forgetUrl($key, $domain);
-            });
+            ->keys()
+            ->all();
+
+        $this->forgetUrls($keys, $domain);
+
+        foreach ($keys as $key) {
+            $this->cache->forget($this->normalizeKey('responses:'.$key));
+            $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+        }
 
         UrlInvalidated::dispatch($url, $domain);
+    }
+
+    /**
+     * Invalidate multiple URLs.
+     *
+     * Invalidating URLs one at a time reads and rewrites the domain's whole URL
+     * index for every match, which gets slow when many URLs are invalidated at
+     * once on a site with a large index. Instead, the URLs are walked in order
+     * against an in-memory copy of each domain's index, exactly as invalidating
+     * them one at a time would, and each domain's index is rewritten once.
+     *
+     * The same UrlInvalidated events are dispatched, in the same order, as
+     * invalidating them one at a time. They are dispatched once everything has
+     * been removed, so listeners never see a page that is about to be removed.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function invalidateUrls($urls)
+    {
+        $indexes = [];
+        $removed = [];
+        $events = [];
+
+        $invalidate = function ($path, $domain) use (&$indexes, &$removed, &$events) {
+            foreach ($indexes[$domain]['paths'][$path] ?? [] as $key) {
+                $removed[$domain][$key] = true;
+            }
+
+            $events[] = [$path, $domain];
+        };
+
+        foreach ($urls as $url) {
+            $wildcard = Str::contains($url, '*');
+
+            [$path, $domain] = $this->getPathAndDomain($wildcard ? substr($url, 0, -1) : $url);
+
+            $indexes[$domain] ??= $this->getUrlIndex($domain);
+
+            if (! $wildcard) {
+                $invalidate($path, $domain);
+
+                continue;
+            }
+
+            // Match against the index as it stands before this wildcard, like
+            // invalidateWildcardUrl() does, then invalidate each match in turn.
+            $matches = collect($indexes[$domain]['urls'])
+                ->reject(fn ($value, $key) => isset($removed[$domain][$key]))
+                ->filter(fn ($value) => Str::startsWith($value, $path));
+
+            foreach ($matches as $match) {
+                $invalidate($match, $domain);
+            }
+        }
+
+        foreach ($removed as $domain => $keys) {
+            $keys = array_keys($keys);
+
+            $this->forgetUrls($keys, $domain);
+
+            foreach ($keys as $key) {
+                $this->cache->forget($this->normalizeKey('responses:'.$key));
+                $this->cache->forget($this->normalizeKey('generated-at:'.$key));
+            }
+        }
+
+        foreach ($events as [$path, $domain]) {
+            UrlInvalidated::dispatch($path, $domain);
+        }
+    }
+
+    /**
+     * Get a domain's URLs, along with the keys that invalidateUrl() would remove
+     * for each path: the path itself, or any query string version of it.
+     */
+    private function getUrlIndex($domain)
+    {
+        $urls = $this->getUrls($domain)->all();
+        $paths = [];
+
+        foreach ($urls as $key => $value) {
+            $paths[$value][] = $key;
+
+            $offset = 0;
+
+            while (($position = strpos($value, '?', $offset)) !== false) {
+                $paths[substr($value, 0, $position)][] = $key;
+                $offset = $position + 1;
+            }
+        }
+
+        return ['urls' => $urls, 'paths' => $paths];
     }
 }

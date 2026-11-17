@@ -165,6 +165,7 @@ return [
     'parent_exceeds_max_depth' => 'Dies würde die maximale Tiefe überschreiten.',
     'reserved' => 'Dies ist ein reserviertes Wort.',
     'reserved_field_handle' => '«:handle» ist ein reserviertes Wort und kann nicht als Handle verwendet werden.',
+    'link_cannot_reference_itself' => 'Ein Eintrag darf nicht auf sich selbst verlinken.',
     'unique_entry_value' => 'Dieser Wert ist bereits vergeben.',
     'unique_form_handle' => 'Dieser Wert ist bereits vergeben.',
     'unique_term_value' => 'Dieser Wert ist bereits vergeben.',
@@ -178,6 +179,7 @@ return [
     'invalid_two_factor_code' => 'Der angegebene Zwei-Faktor-Authentifizierungscode ist ungültig.',
     'invalid_two_factor_recovery_code' => 'Der angegebene Zwei-Faktor-Wiederherstellungscode ist ungültig.',
     'bard_container_required_by_button' => 'Dieses Feld ist für einen Button in der Symbolleiste erforderlich.',
+    'users_fieldtype_default_max_items' => 'Die Anzahl der Standard-Benutzer:innen darf die maximale Anzahl Elemente des Feldes (:max) nicht überschreiten.',
     'custom.attribute-name.rule-name' => 'benutzerdefinierte Nachricht',
     'attributes' => [],
 ];

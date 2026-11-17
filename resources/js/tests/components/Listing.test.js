@@ -11,6 +11,8 @@ import { setTranslations } from '@/translations/translator';
 vi.mock('axios', () => ({
     default: {
         get: vi.fn(),
+        // BulkActions fetches the available actions whenever the selections change.
+        post: vi.fn(() => Promise.resolve({ data: [] })),
         isCancel: vi.fn(() => false),
     },
 }));
@@ -99,6 +101,30 @@ test('exposes select-all-matching helpers on the listing context', () => {
     expect(listing.canSelectAllMatching.value).toBe(false);
     expect(listing.allMatchingSelected.value).toBe(false);
     expect(typeof listing.selectAllMatching).toBe('function');
+});
+
+test('keeps the columns prop when the response has no columns', async () => {
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1', email: 'foo@example.com' }],
+            meta: { last_page: 1, total: 1, per_page: 50 },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/subscribers',
+        items: undefined,
+        columns: [{ field: 'email', label: 'Email', sortable: true, visible: true }],
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.setSortColumn('email');
+
+    expect(listing.columns.value.map((column) => column.field)).toEqual(['email']);
+    expect(listing.sortColumn.value).toBe('email');
 });
 
 test('canSelectAllMatching can be disabled via allowSelectAllMatching', async () => {
@@ -369,4 +395,32 @@ test('canSelectAllMatching stays hidden after perPage changes when all ids are s
 
     expect(listing.selectedAllMatching.value).toBe(true);
     expect(listing.canSelectAllMatching.value).toBe(false);
+});
+
+test('reordering sorts by order in the default sort direction', async () => {
+    axios.get.mockResolvedValue({
+        data: {
+            data: [{ id: '1' }, { id: '2' }],
+            meta: { last_page: 1, total: 2, per_page: 50, columns: [] },
+        },
+    });
+
+    const wrapper = mountListing({
+        url: '/cp/collections/test/entries',
+        items: undefined,
+        sortColumn: 'order',
+        sortDirection: 'desc',
+    });
+
+    await flushPromises();
+
+    const { listing } = wrapper.findComponent(Probe).vm;
+
+    listing.sortColumn.value = 'title';
+    listing.sortDirection.value = 'asc';
+
+    await wrapper.setProps({ reorderable: true });
+
+    expect(listing.sortColumn.value).toBe('order');
+    expect(listing.sortDirection.value).toBe('desc');
 });

@@ -104,20 +104,33 @@ async function checkOverflow() {
     measuringOverflow.value = true;
     await nextTick();
 
-    // Check if any child has wrapped to a new line
-    const children = Array.from(group.value.children);
-    const firstTop = children[0].offsetTop;
-    const lastTop = children[children.length - 1].offsetTop;
-    hasOverflow.value = lastTop > firstTop;
+    hasOverflow.value = childrenHaveWrapped();
 
     // Exit measuring mode
     measuringOverflow.value = false;
 }
 
+function childrenHaveWrapped() {
+    const children = Array.from(group.value.children);
+    const firstTop = children[0].offsetTop;
+    const lastTop = children[children.length - 1].offsetTop;
+
+    return lastTop > firstTop;
+}
+
+const checkOverflowSoon = debounce(checkOverflow, 50);
+
+// Layout has just been calculated when a ResizeObserver fires, so reading it here is cheap. Only
+// measure properly, which forces the browser to recalculate styles, when the layout needs to change.
+function resized() {
+    if (!group.value?.children.length) return;
+
+    if (hasOverflow.value || childrenHaveWrapped()) checkOverflowSoon();
+}
+
 onMounted(() => {
     if (needsOverflowObserver.value) {
-        checkOverflow();
-        resizeObserver = new ResizeObserver(debounce(checkOverflow, 50));
+        resizeObserver = new ResizeObserver(resized);
         resizeObserver.observe(wrapper.value);
     }
 });

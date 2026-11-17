@@ -1,8 +1,8 @@
 import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { h, nextTick } from 'vue';
 import { portals } from '@api';
-import { Modal, ModalTitle, Button } from '@/components/ui';
+import { Modal, ModalClose, ModalTitle, Button } from '@/components/ui';
 
 async function openModal(props = {}, options = {}) {
     const wrapper = mount(Modal, { props: { open: true, ...props }, ...options });
@@ -81,5 +81,94 @@ test('hides the page behind from the accessibility tree', async () => {
 
     expect(page.hasAttribute('aria-hidden')).toBe(false);
 
+    vi.useRealTimers();
+});
+
+test('keeps focus trapped when a disabled portal is created after it', async () => {
+    await openModal({ title: 'Licensing Alert', autofocus: false });
+    await nextTick();
+
+    // e.g. a Bard field's fullscreen portal, registered as the page behind loads
+    const fullscreen = portals.create('bard-fullscreen');
+    fullscreen.setDisabled(true);
+    await nextTick();
+
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.focus();
+
+    expect(document.activeElement).toBe(document.querySelector('[data-ui-modal-content]'));
+
+    fullscreen.destroy();
+});
+
+describe('ModalClose', () => {
+    const closeButton = { slots: { default: () => h(ModalClose, () => h('button', 'Cancel')) } };
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    async function clickClose(props) {
+        const wrapper = await openModal(props, closeButton);
+
+        document.querySelector('[data-ui-modal-close] button').click();
+        await vi.advanceTimersByTimeAsync(300);
+        await flushPromises();
+
+        return wrapper;
+    }
+
+    test('respects a beforeClose that returns false', async () => {
+        const beforeClose = vi.fn(() => false);
+        const wrapper = await clickClose({ beforeClose });
+
+        expect(beforeClose).toHaveBeenCalledOnce();
+        expect(document.querySelector('[data-ui-modal-content]')).not.toBeNull();
+        expect(wrapper.emitted('update:open')).toBeUndefined();
+
+        wrapper.unmount();
+    });
+
+    test('closes when beforeClose returns true', async () => {
+        const beforeClose = vi.fn(() => true);
+        const wrapper = await clickClose({ beforeClose });
+
+        expect(beforeClose).toHaveBeenCalledOnce();
+        expect(document.querySelector('[data-ui-modal-content]')).toBeNull();
+        expect(wrapper.emitted('update:open')).toEqual([[false]]);
+
+        wrapper.unmount();
+    });
+
+    test('closes when the modal is not dismissible', async () => {
+        const wrapper = await clickClose({ dismissible: false });
+
+        expect(document.querySelector('[data-ui-modal-content]')).toBeNull();
+        expect(wrapper.emitted('update:open')).toEqual([[false]]);
+
+        wrapper.unmount();
+    });
+});
+
+test('dismissing closes once', async () => {
+    vi.useFakeTimers();
+
+    const beforeClose = vi.fn(() => true);
+    const wrapper = await openModal({ beforeClose });
+
+    document.querySelector('.vue-portal-target.modal .inset-0').click();
+    await vi.advanceTimersByTimeAsync(300);
+    await flushPromises();
+
+    expect(beforeClose).toHaveBeenCalledOnce();
+    expect(wrapper.emitted('dismissed')).toHaveLength(1);
+    expect(wrapper.emitted('update:open')).toEqual([[false]]);
+
+    wrapper.unmount();
     vi.useRealTimers();
 });

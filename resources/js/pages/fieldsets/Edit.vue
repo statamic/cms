@@ -11,7 +11,7 @@
                 prioritize
                 v-slot="{ text, url, icon, action }"
             >
-                <Button type="submit" variant="primary" @click.prevent="action" v-text="text" />
+                <Button type="submit" variant="primary" @click.prevent="action" :text="text" />
             </ui-command-palette-item>
         </Header>
 

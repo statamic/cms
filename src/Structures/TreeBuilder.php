@@ -87,26 +87,31 @@ class TreeBuilder
 
     protected function transformTreeForController($tree)
     {
-        return collect($tree)->map(function ($item) {
+        $user = User::current();
+
+        return collect($tree)->map(function ($item) use ($user) {
             $page = $item['page'];
             $collection = $page->mountedCollection();
-            $referenceExists = $page->referenceExists();
+
+            // Look the entry and its blueprint up once per page, rather than for every key.
+            $entry = $page->entry();
+            $blueprint = $entry?->blueprint();
 
             return [
                 'id' => $page->id(),
                 'entry' => $page->reference(),
                 'title' => $page->hasCustomTitle() ? $page->title() : null,
-                'entry_title' => $referenceExists ? $page->entry()->value('title') : null,
-                'entry_blueprint' => $referenceExists ? [
-                    'handle' => $page->entry()->blueprint()->handle(),
-                    'title' => $page->entry()->blueprint()->title(),
+                'entry_title' => $entry ? $entry->value('title') : null,
+                'entry_blueprint' => $entry ? [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
                 ] : null,
                 'url' => $page->url(),
                 'edit_url' => $page->editUrl(),
-                'can_delete' => $referenceExists ? User::current()->can('delete', $page->entry()) : true,
+                'can_delete' => $entry ? $user->can('delete', $entry) : true,
                 'slug' => $page->slug(),
-                'status' => $referenceExists ? $page->status() : null,
-                'redirect' => $referenceExists ? $page->entry()->get('redirect') : null,
+                'status' => $entry ? $page->status() : null,
+                'redirect' => $entry ? $entry->get('redirect') : null,
                 'collection' => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),

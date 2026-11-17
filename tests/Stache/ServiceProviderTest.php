@@ -57,6 +57,36 @@ class ServiceProviderTest extends TestCase
     }
 
     #[Test]
+    public function it_resets_memoized_store_and_index_state_when_an_octane_request_arrives()
+    {
+        $store = (new ServiceProviderTestStore)->directory('/path/to/directory');
+        Stache::registerStore($store);
+
+        $pathsCacheKey = "stache::indexes::{$store->key()}::path";
+        $idIndexCacheKey = "stache::indexes::{$store->key()}::id";
+
+        Cache::put($pathsCacheKey, ['alfa' => 'alfa.md']);
+        Cache::put($idIndexCacheKey, ['alfa' => 'alfa']);
+
+        // A request to a worker uses the store, which is the same one for every request it handles.
+        $this->assertEquals(['alfa'], $store->paths()->keys()->all());
+        $this->assertEquals(['alfa'], $store->index('id')->keys());
+
+        // Another process saves an item.
+        Cache::put($pathsCacheKey, ['alfa' => 'alfa.md', 'bravo' => 'bravo.md']);
+        Cache::put($idIndexCacheKey, ['alfa' => 'alfa', 'bravo' => 'bravo']);
+
+        $this->assertEquals(['alfa'], $store->paths()->keys()->all());
+        $this->assertEquals(['alfa'], $store->index('id')->keys());
+
+        // Octane isn't a dependency, so its event is fired by name, as the listener is registered.
+        Event::dispatch('Laravel\Octane\Events\RequestReceived');
+
+        $this->assertEquals(['alfa', 'bravo'], $store->paths()->keys()->all());
+        $this->assertEquals(['alfa', 'bravo'], $store->index('id')->keys());
+    }
+
+    #[Test]
     public function it_does_not_reset_memoized_state_for_jobs_processed_outside_a_worker()
     {
         // `Illuminate\Queue\SyncQueue` also fires `JobProcessing` for jobs dispatched

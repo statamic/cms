@@ -3,9 +3,11 @@
 namespace Statamic\Http\Controllers\CP\Fields;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Statamic\CP\Breadcrumbs\Breadcrumb;
 use Statamic\CP\Breadcrumbs\Breadcrumbs;
+use Statamic\Exceptions\FieldsetRecursionException;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
@@ -153,11 +155,22 @@ class FieldsetController extends CpController
             ]);
         }
 
-        $fieldset->validateRecursion();
+        $this->validateRecursion($fieldset);
 
         $fieldset->save();
 
         return response('', 204);
+    }
+
+    private function validateRecursion(Fieldset $fieldset)
+    {
+        try {
+            $fieldset->validateRecursion();
+        } catch (FieldsetRecursionException $exception) {
+            throw ValidationException::withMessages([
+                'sections' => __('statamic::validation.fieldset_imported_recursively', ['handle' => $exception->getFieldset()]),
+            ]);
+        }
     }
 
     public function create()

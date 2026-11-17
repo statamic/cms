@@ -51,13 +51,13 @@ abstract class ActionController extends CpController
             $successful = false;
         }
 
-        if ($redirect = $action->redirect($items, $values)) {
+        if ($successful && $redirect = $action->redirect($items, $values)) {
             return [
                 'redirect' => $redirect,
                 'bypassesDirtyWarning' => $action->bypassesDirtyWarning(),
                 'triggersFullPageRefresh' => $action->triggersFullPageRefresh(),
             ];
-        } elseif ($download = $action->download($items, $values)) {
+        } elseif ($successful && $download = $action->download($items, $values)) {
             return $download instanceof Response ? $download : response()->download($download);
         }
 

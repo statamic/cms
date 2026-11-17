@@ -115,8 +115,7 @@ onBeforeUnmount(() => {
     <button
         ref="buttonEl"
         type="button"
-        class="h-full flex items-center justify-center cursor-grab text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-400"
-        :class="{ 'rounded-sm p-1': keyboardReorder }"
+        class="h-full flex items-center justify-center rounded-sm p-1 cursor-grab text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-400"
         style="--focus-outline-offset: 2px"
         data-drag-handle
         :aria-label="ariaLabel"

@@ -195,6 +195,26 @@ class CacherTest extends TestCase
     }
 
     #[Test]
+    public function forgets_multiple_urls()
+    {
+        $cache = app(Repository::class);
+        $cacher = $this->cacher(['base_url' => 'http://example.com']);
+
+        $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
+            'one' => '/one', 'two' => '/two', 'three' => '/three',
+        ]);
+        $cache->forever('static-cache:'.md5('http://example.org').'.urls', [
+            'one' => '/one', 'two' => '/two', 'three' => '/three',
+        ]);
+
+        $cacher->forgetUrls(['one', 'three', 'missing']);
+        $cacher->forgetUrls(['two'], 'http://example.org');
+
+        $this->assertEquals(['two' => '/two'], $cacher->getUrls('http://example.com')->all());
+        $this->assertEquals(['one' => '/one', 'three' => '/three'], $cacher->getUrls('http://example.org')->all());
+    }
+
+    #[Test]
     public function flushes_urls()
     {
         $cache = app(Repository::class);

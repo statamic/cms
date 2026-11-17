@@ -20,6 +20,7 @@ use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\Image;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\RemoteUrlValidator;
@@ -214,6 +215,42 @@ class ImageGeneratorTest extends TestCase
         $this->assertContains($expectedPath, $paths);
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_generates_an_image_with_the_jpeg_format()
+    {
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), file_get_contents($image->getPathname()));
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $path = $this->makeGenerator()->generateByPath($imagePath, ['fm' => 'jpeg']);
+
+        $md5 = $this->getGlideMd5($imagePath, ['fm' => 'jpg']);
+
+        $this->assertEquals("paths/testimages/foo/hoff.jpg/{$md5}/hoff.jpg", $path);
+        $this->assertContains($path, $this->generatedImagePaths());
+    }
+
+    #[Test]
+    public function it_generates_an_image_with_a_preset_using_the_jpeg_format()
+    {
+        Image::registerCustomManipulationPresets(['jpeg_preset' => ['w' => 20, 'fm' => 'jpeg']]);
+
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), file_get_contents($image->getPathname()));
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $path = $this->makeGenerator()->generateByPath($imagePath, ['p' => 'jpeg_preset']);
+
+        $this->assertStringEndsWith('/hoff.jpg', $path);
+        $this->assertContains($path, $this->generatedImagePaths());
     }
 
     #[Test]

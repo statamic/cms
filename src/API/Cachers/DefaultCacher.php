@@ -5,11 +5,15 @@ namespace Statamic\API\Cachers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\Event;
+use WeakMap;
 
 class DefaultCacher extends AbstractCacher
 {
+    private ?WeakMap $generations = null;
+
     /**
      * {@inheritdoc}
      */
@@ -45,6 +49,8 @@ class DefaultCacher extends AbstractCacher
      */
     public function handleInvalidationEvent(Event $event)
     {
+        Cache::forget($this->getGenerationKey());
+
         $this->getTrackedResponses()->each(function ($key) {
             Cache::forget($key);
         });
@@ -106,6 +112,18 @@ class DefaultCacher extends AbstractCacher
 
         $key = md5(str_replace($domain, '', $fullUrl));
 
-        return $this->normalizeKey($key);
+        return $this->normalizeKey($this->getGeneration($request).':'.$key);
+    }
+
+    private function getGeneration(Request $request): string
+    {
+        $this->generations ??= new WeakMap;
+
+        return $this->generations[$request] ??= Cache::rememberForever($this->getGenerationKey(), fn () => Str::random());
+    }
+
+    private function getGenerationKey(): string
+    {
+        return $this->normalizeKey('generation');
     }
 }

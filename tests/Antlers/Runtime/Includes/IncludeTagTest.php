@@ -81,6 +81,16 @@ class IncludeTagTest extends ParserTestCase
         $this->assertSame('in-include|', $this->render($template));
     }
 
+    public function test_assignments_inside_an_include_in_a_loop_do_not_leak_into_later_tag_pairs_or_partials()
+    {
+        $this->viewShouldReturnRaw('assigner', '{{ leaked = "LEAK" }}');
+        $this->viewShouldReturnRaw('reader', 'R[{{ leaked }}]');
+        $this->viewShouldReturnRaw('template', '{{ items }}{{ include:assigner }}{{ /items }}[{{ leaked }}][{{ foreach:items }}{{ leaked }}{{ /foreach:items }}]{{ partial:reader }}');
+
+        // Render as a view so the template shares the runtime parser with the include, as in a real request.
+        $this->assertSame('[][]R[]', view('template', ['items' => [['a' => 1], ['a' => 2]]])->render());
+    }
+
     public function test_reassigning_a_passed_variable_does_not_change_the_caller()
     {
         $this->viewShouldReturnRaw('reassign', '{{ foo = "changed" }}{{ foo }}');
