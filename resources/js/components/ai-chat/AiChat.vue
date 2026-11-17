@@ -423,10 +423,7 @@ const micClasses = computed(() => [
     !dictating.value && !iconsSettling.value && 'transition-opacity duration-200',
 ]);
 
-
-
-
-const hintClasses = computed(() => (floating.value ? 'end-12.5 bottom-[12.5px]' : 'end-13 bottom-[21.75px]'));
+const hintClasses = computed(() => (floating.value ? 'end-[47px] bottom-[12.5px]' : 'end-13 bottom-[21.75px]'));
 
 // The "/ help" hint or Clear sit at the right, beside send, while nothing's typed, which is when the placeholder shows. A translation can make
 // either longer, so the input's right padding is worked out from how wide the one showing is (rather than a fixed amount that the placeholder
@@ -468,7 +465,7 @@ onUpdated(observeControls);
 onUnmounted(() => controlsObserver?.disconnect());
 const inputEnd = computed(() => {
     // How far in from the right the controls start (see hintClasses), then their width, and a little air
-    const beforeControls = floating.value ? 50 : 52;
+    const beforeControls = floating.value ? 47 : 52;
     const sendOnly = floating.value ? 48 : 56;
     return !prompt.value && controlsWidth.value ? beforeControls + controlsWidth.value + 8 : sendOnly;
 });
@@ -805,7 +802,7 @@ function stopFollowing() {
                 v-if="dictating"
                 :dictation="dictation.state"
                 feedback
-                :class="['absolute', floating ? 'end-4.75 bottom-[12px]' : 'end-5.25 bottom-5.25']"
+                :class="['absolute', floating ? 'end-4 bottom-[12px]' : 'end-5.25 bottom-5.25']"
                 @toggle="toggleDictating"
             />
             <Button
@@ -815,7 +812,7 @@ function stopFollowing() {
                 variant="primary"
                 size="xs"
                 round
-                :class="floating ? 'end-4.75 bottom-[12px]' : 'end-5.25 bottom-5.25'"
+                :class="floating ? 'end-4 bottom-[12px]' : 'end-5.25 bottom-5.25'"
                 class="absolute border-0 bg-none! bg-ai! shadow-none! inset-shadow-none! transition-[background-color] duration-150 hover:bg-ai-hover! disabled:opacity-100! disabled:bg-ai/8! dark:disabled:bg-ai/20! [&_svg]:opacity-100! disabled:[&_svg]:text-ai/50! dark:disabled:[&_svg]:text-white/50! [&_g]:[stroke-width:1.5]"
                 :aria-label="__('Send')"
                 tabindex="-1"
