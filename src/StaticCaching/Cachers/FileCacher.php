@@ -181,23 +181,12 @@ class FileCacher extends AbstractCacher
         $this->getFiles($site)
             ->filter(fn ($file, $path) => $path === $filePath || str_starts_with($file, $url.'_'))
             ->each(function ($file, $path) use ($url, $filePath, $eventSite, $eventDomain) {
-                $fileUrl = $path === $filePath ? $url : $this->getUrlFromFile($file, $url);
-                StaticCacheFileDeleting::dispatch($path, $fileUrl ? $eventDomain.$fileUrl : null, $eventSite);
+                $fileUrl = $path === $filePath ? $eventDomain.$url : null;
+                StaticCacheFileDeleting::dispatch($path, $fileUrl, $eventSite);
                 $this->writer->delete($path);
             });
 
         UrlInvalidated::dispatch($url, $domain);
-    }
-
-    private function getUrlFromFile(string $file, string $url): ?string
-    {
-        if ($this->isLongQueryStringPath($file)) {
-            return null;
-        }
-
-        $query = Str::beforeLast(Str::after($file, $url.'_'), '.html');
-
-        return $query === '' ? $url : $url.'?'.$query;
     }
 
     /**

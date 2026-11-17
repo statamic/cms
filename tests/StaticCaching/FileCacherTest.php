@@ -386,7 +386,7 @@ class FileCacherTest extends TestCase
 
     #[Test]
     #[DataProvider('indexedFilesProvider')]
-    public function invalidating_an_absolute_url_dispatches_the_original_urls(bool $indexed)
+    public function invalidating_an_absolute_url_preserves_known_event_urls(bool $indexed)
     {
         $cacher = $this->fileCacherWithRealWriter();
         $urls = ['http://example.com/one', 'http://example.com/one?foo=bar'];
@@ -406,7 +406,7 @@ class FileCacherTest extends TestCase
 
         $cacher->invalidateUrl('http://example.com/one');
 
-        $this->assertEqualsCanonicalizing($urls, $deleted);
+        $this->assertEqualsCanonicalizing([$urls[0], $indexed ? $urls[1] : null], $deleted);
         $this->assertSame([], $cacher->getUrls('http://example.com')->all());
         foreach ($urls as $url) {
             $this->assertFileDoesNotExist($cacher->getFilePath($url));
@@ -548,7 +548,7 @@ class FileCacherTest extends TestCase
         $this->assertEquals([
             [$cacher->getFilePath('/one'), 'http://example.com/one', 'en', true],
             [$cacher->getFilePath('/one?foo=bar'), 'http://example.com/one?foo=bar', 'en', true],
-            [$cacher->getFilePath('/one?baz=qux'), 'http://example.com/one?baz=qux', 'en', true],
+            [$cacher->getFilePath('/one?baz=qux'), null, 'en', true],
         ], $events);
 
         $this->assertFileDoesNotExist($cacher->getFilePath('/one'));
