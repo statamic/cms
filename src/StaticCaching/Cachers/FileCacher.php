@@ -163,7 +163,11 @@ class FileCacher extends AbstractCacher
             ->filter(fn ($value) => $value === $url || str_starts_with($value, $url.'?'))
             ->each(function ($value, $key) use ($site, $domain, $eventSite, $eventDomain) {
                 $path = $this->getFilePath($domain.$value, $site);
-                StaticCacheFileDeleting::dispatch($path, $eventDomain.$value, $eventSite);
+
+                if (File::exists($path)) {
+                    StaticCacheFileDeleting::dispatch($path, $eventDomain.$value, $eventSite);
+                }
+
                 $this->writer->delete($path);
                 $this->forgetUrl($key, $domain);
             });
