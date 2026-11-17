@@ -1,7 +1,8 @@
 import { ref } from 'vue';
 
 // Prototype: which fieldtypes can have AI suggestions switched on in the blueprint. Their values are plain text, so a suggestion can be dropped straight in.
-export const suggestableTypes = ['text', 'textarea', 'markdown'];
+// Bard too, for now, to try out how a long field's suggestions could look (see AiSuggestLarge.vue).
+export const suggestableTypes = ['text', 'textarea', 'markdown', 'bard'];
 
 // The icon on the suggest button and the blueprint toggle
 export const icon = 'ai-edit';

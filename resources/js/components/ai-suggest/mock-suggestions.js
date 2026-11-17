@@ -5,7 +5,7 @@
 const upperFirst = (text) => (text ? text[0].toUpperCase() + text.slice(1) : text);
 const lowerFirst = (text) => (text ? text[0].toLowerCase() + text.slice(1) : text);
 const tidy = (text) => text.replace(/\s+/g, ' ').trim();
-const sentence = (text) => (/[.!?]$/.test(text) ? text : `${text}.`);
+export const sentence = (text) => (/[.!?]$/.test(text) ? text : `${text}.`);
 
 // What kind of field this is, from its handle and display name
 function kindOf(config) {
@@ -83,7 +83,7 @@ const draftLabels = {
 };
 
 // Takes out filler and wordy phrasing
-function tighten(text) {
+export function tighten(text) {
     return upperFirst(
         tidy(text)
             .replace(/\b(the|our) (\w+est) (\w+) (?:that )?we(?:'ve| have) ever (?:done|had|made|run|offered)\b/gi, 'our $2-ever $3')
@@ -109,7 +109,7 @@ function punchier(text, long) {
 }
 
 // A short phrase gets an inviting verb in front. Full sentences get a friendly opener.
-function warmer(text, long) {
+export function warmer(text, long) {
     const result = tighten(text);
     if (long) return `Good news: ${lowerFirst(result)}`;
 

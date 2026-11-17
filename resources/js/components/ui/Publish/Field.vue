@@ -12,6 +12,7 @@ import {
 import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
+import AiSuggestLarge from '@/components/ai-suggest/AiSuggestLarge.vue';
 import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChangeControls from '@/components/ai-chat/AiChangeControls.vue';
@@ -362,8 +363,17 @@ const fieldtypeComponentEvents = computed(() => ({
                     v-on="fieldtypeComponentEvents"
                 />
                 <!-- Prototype: the suggest button floats in the field's top right corner -->
+                <!-- Prototype: Bard's suggest button sits at the end of its toolbar, and opens a stack, as its suggestions are too long for a dropdown (see AiSuggestLarge.vue) -->
+                <AiSuggestLarge
+                    v-if="canSuggest && config.type === 'bard'"
+                    button-class="absolute! end-2 top-[9px] z-[calc(var(--z-index-above)+1)]"
+                    :config="config"
+                    :value="value"
+                    :values="values"
+                    @apply="suggestionApplied"
+                />
                 <AiSuggest
-                    v-if="canSuggest"
+                    v-else-if="canSuggest"
                     :button-class="['absolute! end-1.5 top-[7px] z-[calc(var(--z-index-above)+1)]', !isSuggestMultiline && 'bg-white! shadow-[-4px_0_4px_white]! rtl:shadow-[4px_0_4px_white]! dark:bg-gray-900! dark:shadow-[-4px_0_4px_var(--color-gray-900)]! rtl:dark:shadow-[4px_0_4px_var(--color-gray-900)]!']"
                     :config="config"
                     :value="value"
