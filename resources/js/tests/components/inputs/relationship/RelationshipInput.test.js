@@ -1,5 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { describe, expect, test, vi } from 'vitest';
+import { h } from 'vue';
 
 vi.mock('@inertiajs/vue3', () => ({
     router: { on: () => () => {} },
@@ -45,8 +46,9 @@ function signalAwareDeferred() {
     };
 }
 
-function mountInput({ axiosPost, itemDataUrl, site = 'default' }) {
+function mountInput({ axiosPost, itemDataUrl, site = 'default', slots = {}, stack = true }) {
     return mount(RelationshipInput, {
+        slots,
         props: {
             value: [],
             data: [],
@@ -62,10 +64,60 @@ function mountInput({ axiosPost, itemDataUrl, site = 'default' }) {
                 $axios: { post: axiosPost },
                 $progress: { loading: () => {} },
             },
-            stubs,
+            stubs: { ...stubs, Stack: stack },
         },
     });
 }
+
+test('uses the ordinary selector when no selector slot is provided', async () => {
+    const wrapper = mountInput({
+        itemDataUrl: '/test/default-selector',
+        axiosPost: () => Promise.resolve({ data: { data: [{ id: 'entry-1', title: 'Entry' }] } }),
+        stack: { props: ['open'], template: '<div v-if="open"><slot /></div>' },
+    });
+    await flushPromises();
+    await wrapper.findComponent({ ref: 'existing' }).trigger('click');
+
+    const selector = wrapper.findComponent({ name: 'ItemSelector' });
+    expect(selector.props('selectionsUrl')).toBe('/api/selections');
+    expect(selector.props('initialSelections')).toEqual([]);
+    selector.vm.$emit('selected', ['entry-1']);
+    selector.vm.$emit('closed');
+    await flushPromises();
+
+    expect(wrapper.emitted('input')).toEqual([[['entry-1']]]);
+    expect(wrapper.find('item-selector-stub').exists()).toBe(false);
+    wrapper.unmount();
+});
+
+test('a composed selector can select or cancel through the public slot', async () => {
+    const wrapper = mountInput({
+        itemDataUrl: '/test/composed-selector',
+        axiosPost: () => Promise.resolve({ data: { data: [{ id: 'video::1', title: 'Video' }] } }),
+        stack: { props: ['open'], template: '<div v-if="open"><slot /></div>' },
+        slots: {
+            selector: ({ select, close }) => [
+                h('button', { onClick: () => { select(['video::1']); close(); } }, 'Select video'),
+                h('button', { onClick: close }, 'Cancel'),
+            ],
+        },
+    });
+    await flushPromises();
+    await wrapper.setProps({ value: ['post::1'], data: [{ id: 'post::1', title: 'Post' }] });
+    await wrapper.findComponent({ ref: 'existing' }).trigger('click');
+    expect(wrapper.find('item-selector-stub').exists()).toBe(false);
+    await wrapper.find('button:last-child').trigger('click');
+    expect(wrapper.emitted('input')).toBeUndefined();
+    expect(wrapper.props('value')).toEqual(['post::1']);
+    expect(wrapper.find('button').exists()).toBe(false);
+
+    await wrapper.findComponent({ ref: 'existing' }).trigger('click');
+    await wrapper.find('button').trigger('click');
+    await flushPromises();
+    expect(wrapper.emitted('input')).toEqual([[['video::1']]]);
+    expect(wrapper.find('button').exists()).toBe(false);
+    wrapper.unmount();
+});
 
 describe('RelationshipInput in-flight request deduplication', () => {
     test('shares a single request across instances with the same selections', async () => {
