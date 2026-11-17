@@ -216,7 +216,7 @@ return [
     'asset_file_exists' => 'A file already exists with this name.',
     'asset_file_exists_same_content' => 'A file already exists with this name and has the same content. You may want to delete this rather than rename it.',
     'asset_file_exists_different_content' => 'A file already exists with this name but has different content. You may want to replace the other file with this one instead.',
-    'asset_replace_same' => 'This is the asset being replaced. To upload a new version of it, use Reupload instead.',
+    'asset_replace_same' => 'An asset can\'t be replaced with itself. Use Reupload to upload a new version of it.',
     'invalid_two_factor_code' => 'The provided two factor authentication code was invalid.',
     'invalid_two_factor_recovery_code' => 'The provided two factor recovery code was invalid.',
     'bard_container_required_by_button' => 'This field is required by a toolbar button.',
