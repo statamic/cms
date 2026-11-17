@@ -623,7 +623,7 @@ export default {
         },
 
         containerActionCompleted(successful, response = {}) {
-            if (!successful) {
+            if (!successful || response.success === false) {
                 Statamic.$toast.error(response.message || __('Action failed'));
                 return;
             }
