@@ -3,11 +3,10 @@
 namespace Statamic\Events;
 
 /**
- * Dispatched after the full measure static cache has written a page to disk.
+ * Dispatched after a full measure cache file is written.
  *
- * The file handle is closed and its lock released, so listeners may read the file,
- * modify it, or write sidecar files next to it. Not dispatched when the write was
- * skipped because another process held the lock.
+ * The file is closed and unlocked, ready for listeners to read or modify.
+ * Skipped writes do not dispatch this event.
  */
 class StaticCacheFileWritten extends Event
 {

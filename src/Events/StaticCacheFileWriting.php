@@ -3,11 +3,10 @@
 namespace Statamic\Events;
 
 /**
- * Dispatched right before the full measure static cache writes a page to disk.
+ * Dispatched before a full measure cache file is written.
  *
- * The file still contains the previous version of the page, or doesn't exist yet.
- * Also dispatched when the write is skipped because another process holds the
- * file lock, in which case no StaticCacheFileWritten event follows.
+ * The file contains the previous page, or doesn't exist yet. The write may still
+ * be skipped if another process holds the file lock.
  */
 class StaticCacheFileWriting extends Event
 {

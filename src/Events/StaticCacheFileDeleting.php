@@ -3,9 +3,9 @@
 namespace Statamic\Events;
 
 /**
- * Dispatched right before the full measure static cache deletes a page from disk.
+ * Dispatched before a full measure cache file is deleted.
  *
- * The file still exists.
+ * Listeners can read the existing file and clean up any related sidecar files.
  */
 class StaticCacheFileDeleting extends Event
 {
