@@ -373,12 +373,10 @@ class InstallEloquentDriver extends Command
                         Str::of(File::get(config_path('statamic/eloquent-driver.php')))
                             ->replace(
                                 [
-                                    "'model' => \Statamic\Eloquent\Entries\EntryModel::class",
                                     'use Statamic\Eloquent\Entries\EntryModel;',
                                     "'model' => EntryModel::class",
                                 ],
                                 [
-                                    "'model' => \Statamic\Eloquent\Entries\UuidEntryModel::class",
                                     'use Statamic\Eloquent\Entries\UuidEntryModel;',
                                     "'model' => UuidEntryModel::class",
                                 ]
