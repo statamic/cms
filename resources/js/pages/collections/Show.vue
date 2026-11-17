@@ -504,7 +504,7 @@ export default {
         treeActionCompleted(successful = null, response = {}) {
             Statamic.$progress.loading('action', false);
 
-            if (!successful) {
+            if (!successful || response.success === false) {
                 Statamic.$toast.error(response.message || __('Action failed'));
                 return;
             }
@@ -529,7 +529,7 @@ export default {
         },
 
         actionCompleted(successful, response = {}) {
-            if (!successful) {
+            if (!successful || response.success === false) {
                 Statamic.$toast.error(response.message || __('Action failed'));
                 return;
             }

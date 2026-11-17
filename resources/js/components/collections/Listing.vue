@@ -282,7 +282,7 @@ export default {
             // the listing will refresh and immediately restart it.
             // this.loading = false;
 
-            successful
+            successful && response.success !== false
                 ? this.$toast.success(response.message || __('Action completed'))
                 : this.$toast.error(response.message || __('Action failed'));
 

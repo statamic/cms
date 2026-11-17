@@ -87,7 +87,7 @@ export default {
 
     methods: {
         actionCompleted(successful = null, response = {}) {
-            successful ? this.actionSuccess(response) : this.actionFailed(response);
+            successful && response.success !== false ? this.actionSuccess(response) : this.actionFailed(response);
 
             this.$emit('action-completed');
         },
