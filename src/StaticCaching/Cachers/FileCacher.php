@@ -154,6 +154,10 @@ class FileCacher extends AbstractCacher
      */
     public function invalidateUrl($url, $domain = null)
     {
+        if ($domain === null) {
+            [$url, $domain] = $this->getPathAndDomain($url);
+        }
+
         $site = optional(Site::findByUrl($domain.$url))->handle();
         $eventSite = $site ?: $this->config('locale');
         $eventDomain = $domain ?: $this->getBaseUrl();
