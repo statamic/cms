@@ -247,6 +247,16 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_rules_that_are_not_strings()
+    {
+        $closure = fn ($attribute, $value, $fail) => null;
+
+        $replaced = $this->fieldtype(['validate' => ['required', $closure]])->fieldRules();
+
+        $this->assertEquals(['required', $closure], $replaced);
+    }
+
+    #[Test]
     public function it_doesnt_replace_non_image_related_rule()
     {
         config()->set('statamic.cp.route', '/');
