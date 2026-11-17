@@ -194,7 +194,9 @@ class UsersController extends CpController
 
         $blueprint = User::blueprint();
 
-        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all());
+        $user = User::make();
+
+        $fields = $blueprint->fields()->except(['roles', 'groups'])->addValues($request->all())->setParent($user);
 
         $fields->validate(['email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue]]);
 
@@ -204,7 +206,7 @@ class UsersController extends CpController
 
         $values = $fields->process()->values()->except(['email']);
 
-        $user = User::make()
+        $user
             ->email($request->email)
             ->data($values);
 

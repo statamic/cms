@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\QueryBuilder;
@@ -256,6 +257,34 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertEquals('file', $replaced[0]);
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/10925
+     */
+    #[Test]
+    #[DataProvider('dynamicFolderRequiredRuleProvider')]
+    public function it_only_requires_assets_once_the_dynamic_folder_can_exist($dynamic, $parent, $shouldBeRequired)
+    {
+        $fieldtype = $this->fieldtype(['dynamic' => $dynamic, 'validate' => ['required']]);
+
+        $fieldtype->field()->setParent($parent());
+
+        $this->assertEquals($shouldBeRequired, in_array('required', $fieldtype->fieldRules()));
+    }
+
+    public static function dynamicFolderRequiredRuleProvider()
+    {
+        return [
+            'id folder, new entry' => ['id', fn () => \Statamic\Facades\Collection::make('blog'), false],
+            'id folder, existing entry' => ['id', fn () => \Statamic\Facades\Entry::make()->id('123'), true],
+            'slug folder, new entry' => ['slug', fn () => \Statamic\Facades\Collection::make('blog'), true],
+            'id folder, new term' => ['id', fn () => \Statamic\Facades\Taxonomy::make('tags'), false],
+            'id folder, existing term' => ['id', fn () => \Statamic\Facades\Term::make('foo')->taxonomy('tags'), true],
+            'id folder, new user' => ['id', fn () => \Statamic\Facades\User::make(), false],
+            'id folder, existing user' => ['id', fn () => \Statamic\Facades\User::make()->id('123'), true],
+            'id folder, no parent' => ['id', fn () => null, true],
+        ];
     }
 
     #[Test]

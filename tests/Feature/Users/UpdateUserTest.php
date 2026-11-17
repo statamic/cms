@@ -185,4 +185,22 @@ class UpdateUserTest extends TestCase
 
         $this->assertTrue(User::find($user->id())->isSuper());
     }
+
+    #[Test]
+    public function it_requires_a_required_assets_field_whose_dynamic_folder_needs_the_users_id()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'avatar' => ['type' => 'assets', 'container' => 'avatars', 'dynamic' => 'id', 'validate' => ['required']],
+        ]);
+        Blueprint::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), ['email' => 'test@domain.com'])
+            ->assertJsonValidationErrors('avatar');
+    }
 }
