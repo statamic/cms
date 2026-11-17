@@ -423,6 +423,20 @@ const micClasses = computed(() => [
     !dictating.value && !iconsSettling.value && 'transition-opacity duration-200',
 ]);
 
+// While the saved prompts, the command menu or a new prompt are open, the messages make way, so they're the one thing in the chat.
+// Floating, the card shrinks to just the input. Docked, the panel keeps its height, so the input doesn't jump up. Either way, the
+// messages come back where you left them.
+const helpOpen = computed(() => showHelp.value || commandMenuOpen.value || newPromptFrom.value !== null);
+let threadScroll = 0;
+watch(
+    helpOpen,
+    (open) => {
+        if (open) threadScroll = thread.value?.scrollTop ?? 0;
+        else nextTick(() => thread.value && (thread.value.scrollTop = threadScroll));
+    },
+    { flush: 'pre' },
+);
+
 const hintClasses = computed(() => (floating.value ? 'end-[47px] bottom-[12.5px]' : 'end-13 bottom-[21.75px]'));
 
 // The "/ help" hint or Clear sit at the right, beside send, while nothing's typed, which is when the placeholder shows. A translation can make
@@ -547,10 +561,10 @@ function stopFollowing() {
             <div v-if="askInInput" :class="['pointer-events-none absolute z-(--z-index-above) bg-gray-950/10 dark:bg-black/20', floating ? '-start-2.5 -end-px -top-px -bottom-px rounded-xl' : 'inset-0']" />
         </Transition>
         <!-- Floating, there is nothing to show above the input until the first message. Docked, it fills the space. -->
-        <!-- While the help is open it dims, so the help stands out in front of it -->
+        <!-- While the help is open it makes way (see helpOpen) -->
         <!-- The cards' left and right gutters match: the thread's 2px on the left sits after the 9px the floating card or the docked panel already has on that side, so the right padding is the same 11px floating, and 10px docked (the panel's 8px, not 9). -->
         <!-- As the thread scrolls, messages fade out under the top edge (only once it has scrolled, via a scroll-driven animation, so nothing fades at rest) instead of being cut off by a hard line, and the top corners follow the card's. The same room below the last card as above the first. -->
-        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 py-3.5 ai-chat-thread transition-[opacity,filter]', floating ? 'flex-initial rounded-t-[11px] pe-[11px]' : 'flex-1 pe-2.5', showHelp || commandMenuOpen ? 'opacity-40' : '', followingBottom ? '[scrollbar-width:none]' : '', dimmed ? '[transition-duration:150ms,500ms] ease-[cubic-bezier(0.4,0,0.2,1)] brightness-70' : '[transition-duration:150ms,300ms] ease-out']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
+        <div v-if="messages.length || !floating" ref="thread" :class="['flex min-h-0 flex-col overflow-y-auto ps-0.5 py-3.5 ai-chat-thread transition-[opacity,filter]', floating ? 'flex-initial rounded-t-[11px] pe-[11px]' : 'flex-1 pe-2.5', helpOpen ? (floating ? 'hidden' : 'invisible') : '', followingBottom ? '[scrollbar-width:none]' : '', dimmed ? '[transition-duration:150ms,500ms] ease-[cubic-bezier(0.4,0,0.2,1)] brightness-70' : '[transition-duration:150ms,300ms] ease-out']" @wheel.passive="stopFollowing" @touchstart.passive="stopFollowing">
             <!-- mt-auto keeps messages next to the input, while still scrolling once they overflow -->
             <div class="relative mt-auto space-y-3">
                 <!-- Docked, show the examples above the input until a request has been sent -->
@@ -600,7 +614,8 @@ function stopFollowing() {
                 dimmed ? 'brightness-85' : '',
                 floating ? 'p-2' : 'p-2.5',
                 // Like the command palette's search row, there's a divider above the input once a chat has started. It runs edge to edge, so it steps out into the card's left padding. Docked has none: the input is its own box.
-                floating && messages.length ? 'border-t border-gray-200/80 dark:border-white/10' : '',
+                // Not while the messages are hidden for the help (see helpOpen), or it would be a line along the top of the card with nothing above it
+                floating && messages.length && !helpOpen ? 'border-t border-gray-200/80 dark:border-white/10' : '',
                 floating && messages.length ? '-ms-2.25 ps-2.5' : 'ps-0.25',
             ]"
             @submit.prevent="send()"
