@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Actions;
+namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
