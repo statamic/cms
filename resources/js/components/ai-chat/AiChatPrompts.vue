@@ -69,7 +69,8 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
     <!-- Laid out like the keyboard shortcuts: a heading, then rows in one white card with a ring -->
     <div class="space-y-2 p-2">
         <div class="flex items-center justify-between gap-2 px-1">
-            <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
+            <!-- Small and quiet, but grey-500 (grey-400 in dark mode) keeps it at AA contrast -->
+            <p class="text-2xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
             <!-- A small white key, like the /command keys but with a slight shadow, so it reads as a button. Regular weight, so it's quieter than the keys. -->
             <button
                 v-if="create"
