@@ -355,6 +355,70 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function sidecar_listeners_do_not_stop_other_addons_when_their_file_is_missing()
+    {
+        $cacher = $this->fileCacherWithRealWriter();
+        $path = $cacher->getFilePath('/one');
+
+        foreach (['.md', '.br'] as $extension) {
+            Event::listen([StaticCacheFileWriting::class, StaticCacheFileDeleting::class], function ($event) use ($extension): void {
+                $path = $event->path.$extension;
+
+                if (File::exists($path) && ! File::delete($path)) {
+                    throw new \RuntimeException("Could not remove [$path].");
+                }
+            });
+        }
+
+        File::put($path, 'old');
+        File::put($path.'.br', 'old compressed');
+        $cacher->cachePage(Request::create('http://example.com/one'), 'new');
+
+        $this->assertSame('new', File::get($path));
+        $this->assertFileDoesNotExist($path.'.br');
+
+        File::put($path.'.br', 'new compressed');
+        $cacher->invalidateUrl('/one', 'http://example.com');
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileDoesNotExist($path.'.br');
+    }
+
+    #[Test]
+    #[DataProvider('indexedFilesProvider')]
+    public function invalidating_an_absolute_url_dispatches_the_original_urls(bool $indexed)
+    {
+        $cacher = $this->fileCacherWithRealWriter();
+        $urls = ['http://example.com/one', 'http://example.com/one?foo=bar'];
+
+        foreach ($urls as $url) {
+            if ($indexed) {
+                $cacher->cachePage(Request::create($url), 'page');
+            } else {
+                File::put($cacher->getFilePath($url), 'page');
+            }
+        }
+
+        $deleted = [];
+        Event::listen(StaticCacheFileDeleting::class, function ($event) use (&$deleted) {
+            $deleted[] = $event->url;
+        });
+
+        $cacher->invalidateUrl('http://example.com/one');
+
+        $this->assertEqualsCanonicalizing($urls, $deleted);
+        $this->assertSame([], $cacher->getUrls('http://example.com')->all());
+        foreach ($urls as $url) {
+            $this->assertFileDoesNotExist($cacher->getFilePath($url));
+        }
+    }
+
+    public static function indexedFilesProvider()
+    {
+        return ['indexed' => [true], 'disk only' => [false]];
+    }
+
+    #[Test]
     public function caching_a_page_dispatches_writing_and_written_events()
     {
         $cacher = $this->fileCacherWithRealWriter();
