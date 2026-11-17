@@ -60,11 +60,7 @@ class ReplaceAsset extends Action
 
     protected function fieldItems()
     {
-        $asset = $this->items->first();
-
-        // The selected asset may no longer exist (e.g. it was deleted by a
-        // previous request), in which case there's nothing left to replace.
-        abort_unless($asset, 404);
+        abort_unless($asset = $this->items->first(), 404);
 
         return [
             'new_asset' => [
