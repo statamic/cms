@@ -111,8 +111,9 @@ const savedPrompts = computed(() => {
     return (page.props._statamic?.aiPrompts ?? []).filter((saved) => saved.use_on !== 'fields' && (!saved.collections.length || saved.collections.includes(collection)));
 });
 
-// Up to three show as pills above the floating chat. With more, only the first two do (in the order they're in on Settings → AI), then a pill that opens the help, which lists them all. That way lots of them don't pile up over the page, they stay on one row, and there's never a "1 more".
-const promptPills = computed(() => (savedPrompts.value.length <= 3 ? savedPrompts.value : savedPrompts.value.slice(0, 2)));
+// Up to three show as pills above the floating chat (in the order they're in on Settings → AI). With more, a "+ 2" pill follows, which opens the help, listing them all.
+// That way lots of them don't pile up over the page, and they stay on one row.
+const promptPills = computed(() => savedPrompts.value.slice(0, 3));
 const morePrompts = computed(() => savedPrompts.value.length - promptPills.value.length);
 
 // Typing / and then a letter (the / itself opens the help) turns the input into a command, with a menu of the matching saved prompts. Enter runs the highlighted one.
@@ -760,14 +761,16 @@ function stopFollowing() {
                 >
                     {{ saved.name }}
                 </button>
+                <!-- The rest of the saved prompts, as "+ 2", with "2 more" in its tooltip. It opens them all. -->
                 <button
                     v-if="morePrompts"
                     type="button"
-                    class="shrink-0 cursor-pointer rounded-full bg-white px-2.5 py-1 text-xs text-gray-500 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-400 dark:ring-gray-700/80 dark:hover:bg-gray-800 dark:hover:text-white"
+                    class="shrink-0 cursor-pointer rounded-full bg-white px-2 py-1 text-xs text-gray-700 tabular-nums shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800 dark:hover:text-white"
+                    v-tooltip="{ content: __(':count more', { count: morePrompts }), hoverOnly: true }"
                     @mousedown.prevent
                     @click="showHelp = true"
                 >
-                    {{ __(':count more', { count: morePrompts }) }}
+                    + {{ morePrompts }}
                 </button>
             </div>
             <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Clicking it opens the help too. It's left out of the Tab order (/ does the same from the keyboard), and mousedown.prevent keeps focus in the input. -->
