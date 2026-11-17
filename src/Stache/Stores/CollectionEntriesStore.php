@@ -52,6 +52,11 @@ class CollectionEntriesStore extends ChildStore
      * While many files are being turned into entries at once, look up their
      * collection once rather than once per file. They all share the same one.
      */
+    public function fillIndexes(?Index $for = null): bool
+    {
+        return $this->makeItemsInBulk(fn () => parent::fillIndexes($for));
+    }
+
     private function makeItemsInBulk(callable $callback)
     {
         $this->makingItemsInBulk++;
@@ -161,6 +166,37 @@ class CollectionEntriesStore extends ChildStore
         $this->takeSnapshot($entry);
 
         return $entry;
+    }
+
+    protected function canIndexWithoutOtherItems($item): bool
+    {
+        // A localization falls back to its origin's values, and an entry
+        // in a structure gets its uri, parent and order from the tree.
+        // Asked of the entry's own property, because hasOrigin() goes looking for the origin.
+        $hasOrigin = (bool) Closure::bind(fn () => $this->origin, $item, EntryInstance::class)();
+
+        return ! $hasOrigin && ! $this->findCollection($item->collectionHandle())?->hasStructure();
+    }
+
+    protected function indexNeedsOtherIndexes($name): bool
+    {
+        // Where an entry sits in a tree is found by querying the collection's
+        // entries, which needs the rest of this store's indexes to be there.
+        return in_array($name, ['uri', 'parent', 'order']) && $this->findCollection($this->childKey)?->hasStructure();
+    }
+
+    protected function releaseItem($key, $item): void
+    {
+        // A structure's uri, parent and order indexes are still to be built from these.
+        if ($this->findCollection($this->childKey)?->hasStructure()) {
+            return;
+        }
+
+        // Entries are kept so that uris can be built and indexes don't have to read them back
+        // from the cache. One that has been indexed is needed for neither, and one that is
+        // waiting to be indexed is read back then, rather than all of them being held.
+        Blink::store('structure-entries')->forget($key);
+        $this->snapshots()->forget($key);
     }
 
     protected function extractAttributesFromPath($path)

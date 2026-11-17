@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Indexes\Terms;
 
+use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Str;
@@ -13,6 +14,10 @@ class Associations extends Index
 
     public function getItems()
     {
+        if (config('statamic.stache.single_pass_indexing', false)) {
+            return $this->getItemsFromEntryIndexes();
+        }
+
         return Taxonomy::findByHandle($handle = $this->store->childKey())
             ->collections()
             ->flatMap(function ($collection) use ($handle) {
@@ -30,6 +35,32 @@ class Associations extends Index
                                     'site' => $entry->locale(),
                                 ];
                             });
+                    })->all();
+            })->all();
+    }
+
+    /**
+     * What each entry has in the taxonomy's field is already in its collection's
+     * index for that field, so the entries themselves don't need to be loaded.
+     */
+    private function getItemsFromEntryIndexes()
+    {
+        return Taxonomy::findByHandle($handle = $this->store->childKey())
+            ->collections()
+            ->flatMap(function ($collection) use ($handle) {
+                $store = Stache::store('entries')->store($collection->handle());
+                $sites = $store->index('site');
+
+                return $store->index($handle)->items()
+                    ->reject(fn ($values) => $values == null)
+                    ->flatMap(function ($values, $id) use ($collection, $sites) {
+                        return collect($values)->map(fn ($value) => [
+                            'value' => $value,
+                            'slug' => Str::slug($value),
+                            'entry' => (string) $id,
+                            'collection' => $collection->handle(),
+                            'site' => $sites->get($id),
+                        ]);
                     })->all();
             })->all();
     }
