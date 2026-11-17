@@ -57,13 +57,41 @@ class StoreTermTest extends TestCase
         $this->assertEquals('Alfa', Term::find('tags::alfa')->title);
     }
 
-    private function store($taxonomy, $attrs = [])
+    /**
+     * @see https://github.com/statamic/cms/issues/15951
+     */
+    #[Test]
+    public function slug_isnt_saved_on_localization_when_term_is_created_in_another_site()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'create tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+
+        $this
+            ->actingAs($user)
+            ->store('tags', ['title' => 'Le Alfa', 'slug' => 'alfa'], 'fr')
+            ->assertOk();
+
+        $term = Term::find('tags::alfa');
+        $this->assertArrayNotHasKey('slug', $term->in('fr')->data()->all());
+
+        $term->in('en')->slug('bravo')->save();
+
+        $this->assertEquals('bravo', Term::find('tags::bravo')->in('fr')->slug());
+    }
+
+    private function store($taxonomy, $attrs = [], $site = 'en')
     {
         $payload = array_merge([
             'title' => 'New term',
             'slug' => 'new-term',
         ], $attrs);
 
-        return $this->postJson(cp_route('taxonomies.terms.store', [$taxonomy, 'en']), $payload);
+        return $this->postJson(cp_route('taxonomies.terms.store', [$taxonomy, $site]), $payload);
     }
 }
