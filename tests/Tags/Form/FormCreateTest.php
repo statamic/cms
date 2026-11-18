@@ -496,6 +496,45 @@ EOT
     }
 
     #[Test]
+    #[DataProvider('hiddenOptionsProvider')]
+    public function it_does_not_render_hidden_options($language, $type, $visible)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $this->createForm(['fields' => [[
+            'handle' => 'answer',
+            'field' => [
+                'type' => $type,
+                'options' => [
+                    ['key' => 0, 'value' => 'No'],
+                    ['key' => 1, 'value' => 'Maybe', 'hidden' => true],
+                    ['key' => 2, 'value' => 'Yes'],
+                ],
+            ],
+        ]]], 'hidden_options');
+
+        $output = $this->normalizeHtml(
+            $this->tag('{{ form:hidden_options }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:hidden_options }}')
+        );
+
+        foreach ($visible as $html) {
+            $this->assertStringContainsString($html, $output);
+        }
+
+        $this->assertStringNotContainsString('Maybe', $output);
+        $this->assertStringNotContainsString('value="1"', $output);
+    }
+
+    public static function hiddenOptionsProvider()
+    {
+        return collect(['antlers', 'blade'])->flatMap(fn ($language) => [
+            "checkboxes ({$language})" => [$language, 'checkboxes', ['value="0">No</label>', 'value="2">Yes</label>']],
+            "multi choice ({$language})" => [$language, 'multi_choice', ['value="0"', '>No</label>', 'value="2">Yes</label>']],
+            "dropdown ({$language})" => [$language, 'dropdown', ['<option value="0"', '>No</option>', '<option value="2">Yes</option>']],
+        ])->all();
+    }
+
+    #[Test]
     #[DataProvider('templateLanguageProvider')]
     public function it_dynamically_renders_inline_checkboxes_field($language)
     {
