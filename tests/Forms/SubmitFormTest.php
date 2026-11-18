@@ -1923,6 +1923,62 @@ class SubmitFormTest extends TestCase
         $form->submissions()->each->delete();
     }
 
+    #[Test]
+    public function a_file_posted_inside_a_group_is_ignored_and_the_groups_other_values_are_kept()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('grouped')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'details', 'field' => ['type' => 'group', 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text']],
+                ]]],
+            ],
+        ]))->save();
+
+        $files = ['details' => ['x' => UploadedFile::fake()->create('resume.pdf', 10)]];
+
+        $result = app(SubmitForm::class)->form($form)->submit(
+            data: array_replace_recursive(['email' => 'test@example.com', 'details' => ['name' => 'Bob']], $files),
+            files: $files,
+        );
+
+        $this->assertEquals(['name' => 'Bob'], $result->submission->get('details'));
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function a_file_posted_under_a_field_that_isnt_an_upload_field_is_ignored()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('injected')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'notes', 'field' => ['type' => 'long_answer']],
+            ],
+        ]))->save();
+
+        $files = [
+            'notes' => UploadedFile::fake()->create('notes.pdf', 10),
+            'unknown' => UploadedFile::fake()->create('unknown.pdf', 10),
+        ];
+
+        $result = app(SubmitForm::class)->form($form)->submit(
+            data: array_replace_recursive(['email' => 'test@example.com'], $files),
+            files: $files,
+        );
+
+        $this->assertNull($result->submission->get('notes'));
+        $this->assertNull($result->submission->get('unknown'));
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+
+        $form->submissions()->each->delete();
+    }
+
     private function uploadForm(bool $honeypot = false)
     {
         $form = Form::make('uploads');

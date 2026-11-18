@@ -217,17 +217,16 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function uploadFiles($uploadedFiles)
     {
-        return collect($uploadedFiles)->map(function ($files, $handle) {
-            $field = $this->fields()->get($handle);
+        $fields = $this->fields();
 
-            if ($field['type'] === 'form_upload') {
-                return FormFileUpload::field($field, $this->id())->upload($files);
-            }
-
-            return $field['type'] === 'assets'
-                ? AssetsUploader::field($field)->upload($files)
-                : FilesUploader::field($field)->upload($files);
-        })->all();
+        return collect($uploadedFiles)
+            ->filter(fn ($files, $handle) => in_array($fields->get($handle)['type'] ?? null, ['assets', 'files', 'form_upload']))
+            ->map(fn ($files, $handle) => match ($fields->get($handle)['type']) {
+                'form_upload' => FormFileUpload::field($fields->get($handle), $this->id())->upload($files),
+                'assets' => AssetsUploader::field($fields->get($handle))->upload($files),
+                'files' => FilesUploader::field($fields->get($handle))->upload($files),
+            })
+            ->all();
     }
 
     public function afterSave($callback)
