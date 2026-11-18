@@ -406,8 +406,8 @@ abstract class Store
             app('stache.indexes')->forget("{$this->key()}.{$index->name()}");
         });
 
-        $this->usedIndexes = collect();
-        Stache::cacheStore()->forget($this->indexUsageCacheKey());
+        // Which indexes queries use is kept. It's what tells the next warm to build them,
+        // rather than leaving the first requests to build each one from every item.
 
         $this->clearCachedPaths();
 
