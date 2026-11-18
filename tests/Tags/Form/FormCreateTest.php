@@ -574,6 +574,34 @@ EOT
         ]);
     }
 
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_multiple_image_choice_field_with_a_single_option($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $requiredCount = function (array $field) {
+            $handle = 'image_choice_'.str_shuffle('abcdefgh');
+
+            $this->createForm(['fields' => [['handle' => 'choice', 'field' => array_merge(['type' => 'image_choice', 'validate' => ['required']], $field)]]], $handle);
+
+            $html = $this->normalizeHtml($this->tag("{{ form:{$handle} }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}"));
+
+            preg_match_all('/<input[^>]*name="choice(\[\])?"[^>]*>/', $html, $inputs);
+
+            return collect($inputs[0])->filter(fn ($input) => preg_match('/\srequired[\s>]/', $input))->count();
+        };
+
+        $options = [
+            ['key' => 'cat', 'label' => 'Cat', 'image' => '/cat.jpg'],
+            ['key' => 'dog', 'label' => 'Dog', 'image' => '/dog.jpg'],
+        ];
+
+        $this->assertEquals(0, $requiredCount(['multiple' => true, 'options' => $options]));
+        $this->assertEquals(1, $requiredCount(['multiple' => true, 'options' => [$options[0]]]));
+        $this->assertEquals(2, $requiredCount(['multiple' => false, 'options' => $options]));
+    }
+
     public static function templateLanguageProvider()
     {
         return [
