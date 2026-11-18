@@ -46,7 +46,7 @@ const fieldOptions = computed(() => {
         });
 });
 
-const isToggleField = (field) => ['toggle', 'revealer', 'yes_no'].includes(field?.config?.type);
+const isToggleField = (field) => ['toggle', 'revealer'].includes(field?.config?.type);
 const showValueToggle = computed(() => isToggleField(selectedField.value) && ['equals', 'not', '===', '!=='].includes(props.condition.operator));
 
 const valueToggleLabel = computed(() => {
@@ -56,17 +56,26 @@ const valueToggleLabel = computed(() => {
 });
 
 const showValueDropdown = computed(() => {
-    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking', 'image_choice'];
+    const optionTypes = ['button_group', 'checkboxes', 'radio', 'select', 'dropdown', 'multi_choice', 'ranking', 'image_choice', 'yes_no'];
     return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
 });
 
 const showNumberInput = computed(() => {
-    const optionTypes = ['number', 'integer', 'opinion_scale', 'star_ranking'];
+    const optionTypes = ['number', 'integer', 'opinion_scale', 'star_rating'];
     return optionTypes.includes(selectedField.value?.config?.type) && ['equals', 'not', '===', '!=='].includes(props.condition.operator);
 });
 
 const valueOptions = computed(() => {
-    if (!showValueDropdown.value || !selectedField.value?.config.options) return null;
+    if (!showValueDropdown.value) return null;
+
+    if (selectedField.value.config.type === 'yes_no') {
+        return [
+            { value: 'yes', label: __('Yes') },
+            { value: 'no', label: __('No') },
+        ];
+    }
+
+    if (!selectedField.value.config.options) return null;
     return HasInputOptions.methods.normalizeInputOptions(selectedField.value.config.options);
 });
 
@@ -75,6 +84,8 @@ const onValueBlur = (value) => value ? update('value', value) : null;
 const onValueToggle = (checked) => update('value', checked.toString());
 
 const update = (key, value) => {
+    if (key === 'value' && value != null) value = String(value);
+
     const condition = { ...props.condition, [key]: value };
 
     // When switching to a Toggle field, ensure the value is set to
@@ -103,6 +114,7 @@ const update = (key, value) => {
             searchable
             adaptive-width
             taggable
+            :hide-input-when-closed="!!$slots['field-selected']"
             @update:model-value="update('field', $event)"
             @search:blur="onFieldBlur"
         >
@@ -114,7 +126,6 @@ const update = (key, value) => {
             </template>
         </Combobox>
     </li>
-            :hide-input-when-closed="!!$slots['field-selected']"
     <li>
         <Combobox
             :model-value="condition.operator"
