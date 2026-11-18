@@ -50,6 +50,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $finalizing = false;
 
     protected ?string $redirect = null;
 
@@ -289,6 +290,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $withEvents = $this->withEvents;
         $this->withEvents = true;
 
+        $finalizing = $this->finalizing;
+        $this->finalizing = false;
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
@@ -309,7 +313,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew && ! $this->get('_partial')) {
+            if ($finalizing || ($isNew && ! $this->get('_partial'))) {
                 SubmissionCreated::dispatch($this);
             }
 
@@ -323,18 +327,15 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
-        $persisted = ! is_null($this->form()->submission($this->id()));
-
         $this->remove('_partial');
 
         // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        // Partials don't fire the created event when they're persisted, so it fires here instead.
+        // Partials don't fire the created event when they're persisted, so it fires when they're finalized instead.
         if ($this->form()->store()) {
-            if ($this->save() !== false && $persisted) {
-                SubmissionCreated::dispatch($this);
-            }
+            $this->finalizing = true;
+            $this->save();
         } else {
             SubmissionCreated::dispatch($this);
 
