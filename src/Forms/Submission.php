@@ -308,22 +308,34 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        $jobs = $this->connectionJobs();
+        // Jobs that can't report success are treated as done once dispatched, so they go
+        // first and the temporary files they may need survive until they've been handed off.
+        [$countable, $uncountable] = collect($this->connectionJobs())
+            ->partition(fn ($job) => RecordConnectionSuccess::isAttachable($job))
+            ->map->values()
+            ->map->all();
+
+        $this->dispatchConnectionJobs($uncountable);
 
         if ($this->shouldDeleteTemporaryFiles()) {
-            if ($jobs) {
-                RecordConnectionSuccess::countDown($this, $jobs);
+            if ($countable) {
+                RecordConnectionSuccess::countDown($this, $countable);
             } else {
                 rescue(fn () => Bus::dispatch(new DeleteTemporaryFiles($this)));
             }
         }
 
+        $this->dispatchConnectionJobs($countable);
+
+        return $this;
+    }
+
+    private function dispatchConnectionJobs(array $jobs): void
+    {
         // Dispatched independently so one failing connection (e.g. on the sync queue) doesn't stop the others.
         foreach ($jobs as $job) {
             rescue(fn () => Bus::dispatch($job));
         }
-
-        return $this;
     }
 
     public function connectionJobs(): array
@@ -332,7 +344,6 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
             ->flatten()
             ->filter()
-            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
             ->values()
             ->all();
     }
