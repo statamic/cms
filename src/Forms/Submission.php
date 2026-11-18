@@ -51,6 +51,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
     protected $finalizing = false;
+    protected $unmarkedSpamAt;
 
     protected ?string $redirect = null;
 
@@ -227,6 +228,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function markAsNotSpam(): self
     {
+        if ($this->isSpam()) {
+            $this->unmarkedSpamAt = $this->get('_marked_spam_at');
+        }
+
         $this->remove('_marked_spam_at');
 
         return $this;
@@ -330,20 +335,37 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
+        $partial = $this->get('_partial');
+        $spamSince = $this->unmarkedSpamAt;
+        $this->unmarkedSpamAt = null;
+
+        // Rescuing a stored spam submission can be vetoed, which leaves it as spam, so its temporary files are kept until it's finalized.
+        $rescuingSpam = $spamSince && $this->form()->store() && $this->form()->submission($this->id());
+
         $this->remove('_partial');
 
         // Assets need to exist before anything reads the submission, so this stays synchronous.
-        CreateAssetsFromFileUploads::dispatchSync($this);
+        Bus::dispatchSync($assets = new CreateAssetsFromFileUploads($this, keepTemporaryFiles: $rescuingSpam));
 
         // Partials don't fire the creation events when they're persisted, so they fire when they're finalized instead.
         // Vetoing the creating event only prevents storage, like on a single page form, so the rest of finalizing still happens.
         if ($this->form()->store()) {
             if (SubmissionCreating::dispatch($this) === false) {
+                if ($rescuingSpam) {
+                    $assets->revert();
+                    $this->set('_partial', $partial);
+                    $this->set('_marked_spam_at', $spamSince);
+
+                    return false;
+                }
+
                 $this->deleteQuietly();
             } else {
                 $this->finalizing = true;
                 $this->save();
             }
+
+            $assets->deleteTemporaryFiles();
         } else {
             SubmissionCreated::dispatch($this);
 

@@ -790,6 +790,56 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function vetoing_the_creating_event_when_marking_as_not_spam_keeps_the_temporary_upload_instead_of_the_asset()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Event::forget(FormSubmitted::class);
+
+        $id = $action->submission()->id();
+        $submission = $form->submission($id);
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        try {
+            (new MarkAsNotSpam)->run(collect([$submission]), []);
+        } catch (\Exception $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $form->submission($id)->get('avatar'));
+        $this->assertEquals('spam', $form->submission($id)->status());
+
+        Event::forget(SubmissionCreating::class);
+        (new MarkAsNotSpam)->run(collect([$form->submission($id)]), []);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
+        $this->assertEquals('finalized', $form->submission($id)->status());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
     public function a_submission_marked_as_spam_by_a_listener_keeps_its_temporary_upload_instead_of_the_asset()
     {
         Storage::fake('local');

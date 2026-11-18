@@ -221,6 +221,8 @@ return [
     'licensing_trial_mode_alert_statamic' => 'Thanks for trying Statamic Pro! This site is currently in trial mode — please enter a license before your site goes live.',
     'licensing_utility_description' => 'View and resolve licensing details.',
     'mark_as_not_spam_action_confirmation' => 'Submissions that were caught before being finalized will be finalized, triggering any configured connections.',
+    'mark_as_not_spam_action_failed' => 'Submission could not be marked as not spam.|Submissions could not be marked as not spam.',
+    'mark_as_not_spam_action_partially_failed' => ':success/:total submissions were marked as not spam.',
     'max_depth_instructions' => 'Set the max page nesting level.',
     'max_items_instructions' => 'Set a maximum number of selectable items.',
     'navigation_configure_blueprint_instructions' => 'Choose from existing blueprints or create a new one.',
