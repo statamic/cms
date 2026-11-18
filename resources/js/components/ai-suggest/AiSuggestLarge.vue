@@ -104,7 +104,7 @@ watch(chat.open, (chatOpen) => chatOpen && (open.value = false));
 const anchor = useTemplateRef('anchor');
 const button = useTemplateRef('button');
 const panel = useTemplateRef('panel');
-const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => (open.value = false));
+const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => (open.value = false), panel);
 
 // Like a dropdown: clicking anywhere else, or Esc, closes it. The suggest button toggles it itself.
 function onPointerDown(event) {
@@ -153,13 +153,14 @@ onBeforeUnmount(() => {
 
     <!-- Over the entry's sidebar, styled like a dropdown (shadow, a quick fade and zoom in). It sticks 16px below the top of the scrolling area,
          and is never taller than fits on screen (see use-sidebar-card.js). The wrapper lets clicks through to the page below the card. -->
-    <Teleport v-if="place" :to="scroller">
-        <div class="pointer-events-none absolute z-(--z-index-modal)" :style="place">
-            <div class="pointer-events-auto sticky top-4 flex flex-col" :style="fit">
+    <!-- Without a sidebar to open over (a narrow window, or no sidebar in the blueprint), it opens under the field instead, like a dropdown -->
+    <Teleport v-if="open" :to="scroller || 'body'" :disabled="!place">
+        <div :class="place ? 'pointer-events-none absolute z-(--z-index-modal)' : 'absolute top-full z-(--z-index-modal) mt-2 inset-x-0'" :style="place">
+            <div :class="place ? 'pointer-events-auto sticky top-4 flex flex-col' : 'flex max-h-[60vh] flex-col'" :style="place && fit">
                 <div
                     ref="panel"
-                    class="flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800"
-                    :class="cardEntrance(switched)"
+                    class="flex min-h-0 flex-col overflow-hidden"
+                    :class="['rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800', cardEntrance(switched)]"
                 >
                     <AiSuggestList
                         :suggestions

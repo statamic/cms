@@ -12,7 +12,7 @@ import {
 import TabContent from './TabContent.vue';
 import { injectContainerContext } from './Container.vue';
 import Sections from './Sections.vue';
-import { ref, computed, reactive, useSlots, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { ref, computed, reactive, useSlots, onMounted, onUnmounted, nextTick, watch, provide } from 'vue';
 import ElementContainer from '@/components/ElementContainer.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import { createTabsOverflowTracker } from '@/util/tabs-overflow.js';
@@ -21,6 +21,9 @@ const slots = useSlots();
 const { blueprint, visibleValues, extraValues, revealerValues, errors, hiddenFields, setHiddenField, container, rememberTab } = injectContainerContext();
 const tabs = computed(() => reactive(blueprint.value.tabs));
 const width = ref(null);
+// Prototype: the sidebar column, for the fields' AI suggestions to open over (see use-sidebar-card.js). Null while it isn't showing.
+const sidebar = ref(null);
+provide('publishSidebar', sidebar);
 const sidebarTab = computed(() => tabs.value.find((tab) => tab.handle === 'sidebar'));
 const mainTabs = computed(() =>
     shouldShowSidebar.value && sidebarTab.value ? tabs.value.filter((tab) => tab.handle !== 'sidebar') : tabs.value,
@@ -214,7 +217,7 @@ onUnmounted(() => {
                         </TabProvider>
                     </component>
 
-                    <aside class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
+                    <aside ref="sidebar" class="space-y-6 starting-style-transition-children" v-if="shouldShowSidebar">
                         <slot name="actions" />
                         <TabProvider v-if="sidebarTab" :tab="sidebarTab">
                             <Sections />

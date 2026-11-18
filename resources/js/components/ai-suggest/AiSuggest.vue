@@ -142,7 +142,8 @@ onBeforeUnmount(() => {
 // the heading, as they can be a long way from it
 const anchor = useTemplateRef('anchor');
 const button = useTemplateRef('button');
-const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => toggled(false));
+const panel = useTemplateRef('panel');
+const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => toggled(false), panel);
 
 // The floating AI chat sits over the same corner, so it's put away while the suggestions are open. Bringing it back (with Ask or its shortcut)
 // puts the suggestions away instead. A docked chat has its own column, so it's left alone.
@@ -173,7 +174,6 @@ onBeforeUnmount(() => {
 });
 
 // Arrow keys go round the suggestions and the "Make it…" box (which is below them), so Up from the box lands on the last suggestion.
-const panel = useTemplateRef('panel');
 
 function onArrowKey(event) {
     if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
@@ -310,10 +310,11 @@ function follow(text) {
 
     <!-- Over the entry's sidebar, styled like a dropdown (shadow, a quick fade and zoom in). It sticks 16px below the top of the scrolling area,
          and is never taller than fits on screen (see use-sidebar-card.js). The wrapper lets clicks through to the page below the card. -->
-    <Teleport v-if="place" :to="scroller">
-        <div class="pointer-events-none absolute z-(--z-index-modal)" :style="place">
-            <div class="pointer-events-auto sticky top-4 flex flex-col" :style="fit">
-                <div class="min-h-0 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800" :class="cardEntrance(switched)">
+    <!-- Without a sidebar to open over (a narrow window, or no sidebar in the blueprint), it opens under the field instead, like a dropdown -->
+    <Teleport v-if="open" :to="scroller || 'body'" :disabled="!place">
+        <div :class="place ? 'pointer-events-none absolute z-(--z-index-modal)' : 'absolute top-full z-(--z-index-modal) mt-2 end-0 w-80'" :style="place">
+            <div :class="place ? 'pointer-events-auto sticky top-4 flex flex-col' : 'flex max-h-[60vh] flex-col'" :style="place && fit">
+                <div class="min-h-0 overflow-y-auto" :class="['rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800', cardEntrance(switched)]">
                     <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
                     <div ref="panel" @keydown="onArrowKey">
                         <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
