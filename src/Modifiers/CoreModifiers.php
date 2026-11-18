@@ -1653,18 +1653,17 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
-        $substring = true;
+        $params = collect($params);
+        $flags = collect(['substring:true', 'substring:false']);
 
-        $params = collect($params)
-            ->reject(function ($param) use (&$substring) {
-                if (! is_string($param) || ! preg_match('/^substring:(true|false)$/i', $param, $match)) {
-                    return false;
-                }
+        $substring = $params
+            ->filter(fn ($param) => is_string($param))
+            ->map(fn (string $param) => strtolower($param))
+            ->intersect($flags)
+            ->last() !== 'substring:false';
 
-                $substring = strtolower($match[1]) === 'true';
-
-                return true;
-            })
+        $params = $params
+            ->reject(fn ($param) => is_string($param) && $flags->contains(strtolower($param)))
             ->values()
             ->all();
 
