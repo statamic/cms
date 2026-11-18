@@ -20,6 +20,7 @@ vi.mock('@/pages/forms/Builder.vue', () => ({ injectBuilderContext: () => contex
 
 globalThis.__ = (key) => key;
 globalThis.cp_url = (url) => url;
+globalThis.Statamic = { $slug: { separatedBy: (separator) => ({ create: (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, separator) }) } };
 
 let wrapper;
 
@@ -263,7 +264,7 @@ test('an edit is applied to its field when the inspector closes before the updat
     const field = textField();
     const response = deferred();
 
-    const { inspecting } = setup({ field, update: () => response.promise });
+    const { inspecting, flushBeforeSave } = setup({ field, update: () => response.promise });
     await flushPromises();
 
     wrapper.vm.values.display = 'Mobile';
@@ -273,10 +274,35 @@ test('an edit is applied to its field when the inspector closes before the updat
     wrapper.unmount();
     wrapper = null;
 
+    let flushed = false;
+    flushBeforeSave().then(() => (flushed = true));
+    await flushPromises();
+
+    expect(flushed).toBe(false);
+
     response.resolve(updateResponse(updateCalls()[0][1]));
     await flushPromises();
 
+    expect(flushed).toBe(true);
     expect(field.config.display).toBe('Mobile');
+});
+
+test('a new field gets a handle when another field is selected before its settings load', async () => {
+    const field = textField({ handle: null, isNew: true, config: { type: 'text', display: 'Phone Number' } });
+    const other = textField({ _id: 'email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+    const response = deferred();
+    let edits = 0;
+
+    const { inspecting } = setup({ field, fields: [other], edit: (payload) => (edits++ === 0 ? response.promise : respondToEdit(payload)) });
+
+    inspecting.value = other;
+    await flushPromises();
+
+    response.resolve(await respondToEdit({ values: { ...field.config, handle: null } }));
+    await flushPromises();
+
+    expect(field.handle).toBe('phone_number');
+    expect(other.handle).toBe('email');
 });
 
 test('a stale update response does not overwrite a newer edit', async () => {

@@ -4,6 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
+import { snake_case } from '@/bootstrap/globals';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
@@ -115,7 +116,10 @@ const load = () => {
             },
         })
         .then((response) => {
-            if (field.value !== target) return;
+            if (field.value !== target) {
+                if (target.isNew && !target.handle && target.config?.display) target.handle = snake_case(target.config.display);
+                return;
+            }
 
             loading.value = false;
             fieldtype.value = response.data.fieldtype;
@@ -158,7 +162,7 @@ const sendPendingUpdate = () => {
             values: payload,
         })
         .then((response) => {
-            if (latestUpdates.get(target) !== id) return;
+            if (latestUpdates.get(target) !== id || pendingUpdate?.field === target) return;
 
             const { handle, ...config } = response.data.values;
 
@@ -304,6 +308,12 @@ onMounted(() => {
 onBeforeUnmount(() => {
     removeBeforeSave?.();
     flushUpdates();
+
+    if (updatesInFlight.size === 0) return;
+
+    const settled = Promise.allSettled([...updatesInFlight]);
+    const removeUntilSettled = onBeforeSave(() => settled);
+    settled.then(() => removeUntilSettled());
 });
 </script>
 
