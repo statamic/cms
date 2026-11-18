@@ -114,6 +114,7 @@ const update = (key, value) => {
             </template>
         </Combobox>
     </li>
+            :hide-input-when-closed="!!$slots['field-selected']"
     <li>
         <Combobox
             :model-value="condition.operator"
