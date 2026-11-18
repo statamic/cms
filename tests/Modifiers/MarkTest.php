@@ -54,6 +54,14 @@ class MarkTest extends TestCase
     }
 
     #[Test]
+    public function it_marks_whole_words_with_accented_characters()
+    {
+        $this->assertEquals('caf&eacute;', $this->modify('café', 'caf', 'substring:false'));
+        $this->assertEquals('&Uuml;ber', $this->modify('Über', 'ber', 'substring:false'));
+        $this->assertEquals('Un <mark>caf&eacute;</mark> noir', $this->modify('Un café noir', 'café', 'substring:false'));
+    }
+
+    #[Test]
     public function it_marks_whole_words_when_any_argument_is_substring_false()
     {
         $this->assertEquals('Network', $this->modify('Network', 'two', 'SUBSTRING:FALSE', 'substring:true'));
