@@ -22,7 +22,8 @@ class DeleteTemporaryFiles implements ShouldQueue
 
     public function handle(): void
     {
-        $submission = $this->submission->form()->submission($this->submission->id()) ?? $this->submission;
+        $stored = $this->submission->form()->submission($this->submission->id());
+        $submission = $stored ?? $this->submission;
 
         $fields = $submission->form()->blueprint()->fields()->all();
         $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
@@ -45,7 +46,7 @@ class DeleteTemporaryFiles implements ShouldQueue
             ->each(fn (Field $field) => $submission->remove($field->handle()))
             ->isNotEmpty();
 
-        if ($removed && $submission->form()->store()) {
+        if ($removed && $stored && $submission->form()->store()) {
             $submission->saveQuietly();
         }
     }
