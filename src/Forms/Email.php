@@ -217,19 +217,20 @@ class Email extends Mailable
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
-        $emailConfig = $this->config;
+        $emailConfig = $this->config->merge(['subject' => $this->subject]);
 
         if (filled($body = $emailConfig->get('body'))) {
             $emailConfig = $emailConfig->merge(['body' => AutocompleteEditor::renderHtml($body, $this->mentionValues)]);
         }
 
-        $data = array_merge($augmented, $this->getGlobalsData(), [
+        $data = array_merge([
+            'sections' => $sections->all(),
+            'pages' => $pages,
+        ], $augmented, $this->getGlobalsData(), [
             'form_config' => $formConfig,
             'email_config' => $emailConfig,
             'config' => Cascade::config(),
             'fields' => $fields,
-            'sections' => $sections->all(),
-            'pages' => $pages,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
