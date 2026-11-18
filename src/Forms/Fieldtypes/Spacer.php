@@ -13,6 +13,7 @@ class Spacer extends FormFieldtype
     protected $description = 'Add visual spacing between form fields.';
     protected $icon = 'fieldtype-width';
     protected $categories = ['structure'];
+    protected $collectsValue = false;
 
     protected function configFieldItems(): array
     {

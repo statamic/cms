@@ -52,7 +52,7 @@ const extraValues = computed(() => ({
     isNew: !!field.value.isNew,
 }));
 
-const shouldShowValidationTab = computed(() => collectsValue(getFieldtypeCategoryHandle(field.value.config.type)));
+const shouldShowValidationTab = computed(() => collectsValue(findFieldtype(field.value.config.type)));
 
 const adjustedBlueprint = computed(() => {
     const bp = JSON.parse(JSON.stringify(blueprint.value));
@@ -166,7 +166,7 @@ const suggestableConditionFields = computed(() => {
         .flatMap((section) => section.fields)
         .filter((f) => f._id !== field.value._id)
         .filter((f) => f.type === 'import' || f.handle)
-        .filter((f) => f.type === 'import' || collectsValue(getFieldtypeCategoryHandle(f.config.type)))
+        .filter((f) => f.type === 'import' || collectsValue(findFieldtype(f.config.type)))
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -177,10 +177,9 @@ const suggestableConditionFields = computed(() => {
         }));
 });
 
-const getFieldtypeCategoryHandle = (fieldtypeHandle: string) => {
-    const fieldtype = fieldtypes?.find((field) => field.handle === fieldtypeHandle);
-    return fieldtype?.categories?.[0] || 'other';
-};
+const findFieldtype = (fieldtypeHandle: string) => fieldtypes?.find((field) => field.handle === fieldtypeHandle);
+
+const getFieldtypeCategoryHandle = (fieldtypeHandle: string) => findFieldtype(fieldtypeHandle)?.categories?.[0] || 'other';
 
 const getFieldtypeCategory = (fieldtypeHandle: string) => categories[getFieldtypeCategoryHandle(fieldtypeHandle)] ?? categories.other;
 

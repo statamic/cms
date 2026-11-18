@@ -322,6 +322,25 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_includes_group_fields_in_the_fields_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'address', 'field' => ['type' => 'group', 'fields' => [
+                    ['handle' => 'street', 'field' => ['type' => 'text']],
+                ]]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'address' => ['street' => '1 Main St']]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name', 'address'], collect($email->viewData['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
     public function it_renders_the_body_in_the_automagic_email_instead_of_listing_the_fields()
     {
         $form = tap(Form::make('test')->formFields([

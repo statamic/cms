@@ -14,6 +14,7 @@ class Heading extends FormFieldtype
     protected $description = 'A heading to organize your form.';
     protected $icon = 'heading';
     protected $categories = ['information'];
+    protected $collectsValue = false;
 
     protected function configFieldItems(): array
     {

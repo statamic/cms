@@ -14,6 +14,7 @@ class Paragraph extends FormFieldtype
     protected $description = 'A paragraph to provide information in your form.';
     protected $icon = 'text-short';
     protected $categories = ['information'];
+    protected $collectsValue = false;
 
     protected function configFieldItems(): array
     {

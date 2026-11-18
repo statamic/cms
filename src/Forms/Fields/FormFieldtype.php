@@ -31,6 +31,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected $field;
     protected $selectable = true;
+    protected $collectsValue = true;
     protected $description;
     protected $categories = [];
     protected $keywords = [];
@@ -87,7 +88,7 @@ abstract class FormFieldtype implements Arrayable
 
     public function collectsValue(): bool
     {
-        return ! array_intersect($this->categories(), ['information', 'structure']);
+        return $this->collectsValue;
     }
 
     public function keywords(): array
@@ -289,6 +290,7 @@ abstract class FormFieldtype implements Arrayable
             'title' => $this->title(),
             'description' => $this->description(),
             'categories' => $this->categories(),
+            'collects_value' => $this->collectsValue(),
             'keywords' => $this->keywords(),
             'icon' => $this->icon(),
             'order' => $this->order(),

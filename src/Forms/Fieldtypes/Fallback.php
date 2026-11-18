@@ -33,6 +33,15 @@ class Fallback extends FormFieldtype
         return $this->field?->config() ?? [];
     }
 
+    public function collectsValue(): bool
+    {
+        if (! $this->wrappedFieldtype) {
+            return parent::collectsValue();
+        }
+
+        return ! in_array($this->wrappedFieldtype->handle(), ['html', 'info', 'section', 'spacer']);
+    }
+
     public function title(): string
     {
         return $this->wrappedFieldtype?->title() ?? parent::title();
@@ -61,6 +70,7 @@ class Fallback extends FormFieldtype
             'handle' => $this->wrappedFieldtype->handle(),
             'title' => $this->wrappedFieldtype->title(),
             'categories' => [],
+            'collects_value' => $this->collectsValue(),
             'keywords' => $this->wrappedFieldtype->keywords(),
             'icon' => $this->wrappedFieldtype->icon(),
             'config' => $this->wrappedFieldtype->configFields()->toPublishArray(),
