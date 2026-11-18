@@ -65,9 +65,12 @@ class FormConnectController extends CpController
 
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
-        Validator::make($request->except('_save'), $connector->rules())->validate();
+        $connections = $request->except('_save');
 
-        $connections = $connector->process($request->except('_save'));
+        Validator::make(['connections' => $connections], ['connections' => ['list']])->validate();
+        Validator::make($connections, $connector->rules())->validate();
+
+        $connections = $connector->process($connections);
 
         if ($request->boolean('_save', true)) {
             $form->connections($form->connections()->put($connector->handle(), $connections))->save();

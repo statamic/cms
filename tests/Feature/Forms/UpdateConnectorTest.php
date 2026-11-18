@@ -4,8 +4,13 @@ namespace Tests\Feature\Forms;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Statamic\Forms\Connectors\Connector;
+use Statamic\Support\VueComponent;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -20,6 +25,8 @@ class UpdateConnectorTest extends TestCase
         parent::resolveApplicationConfiguration($app);
 
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
+
+        $app->booting(fn () => RuledConnector::register());
     }
 
     #[Test]
@@ -360,6 +367,31 @@ class UpdateConnectorTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('objectPayloadProvider')]
+    public function it_rejects_a_payload_that_is_not_a_list(string $connector, array $payload)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.connect.update', [$form->handle(), $connector]), $payload)
+            ->assertUnprocessable();
+
+        $this->assertNull(Form::find('test')->connections()->get($connector));
+    }
+
+    public static function objectPayloadProvider(): array
+    {
+        return [
+            'email with template syntax' => ['email', ['to' => ['to' => 'attacker@example.com', 'x' => '{{ config:app.name }}@example.com']]],
+            'email with an invalid address' => ['email', ['to' => ['to' => 'valid@example.com', 'x' => 'not-an-email']]],
+            'addon connector' => ['ruled', ['value' => ['value' => 'valid', 'x' => 'invalid']]],
+        ];
+    }
+
+    #[Test]
     public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
@@ -376,5 +408,33 @@ class UpdateConnectorTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertEquals([['id' => 'abc', 'to' => ['old@example.com']]], Form::find('test')->connections()->get('email'));
+    }
+}
+
+class RuledConnector extends Connector
+{
+    public function render(): VueComponent
+    {
+        return VueComponent::render('ruled-connector');
+    }
+
+    public function blueprint(): Blueprint
+    {
+        return BlueprintFacade::make();
+    }
+
+    protected function connectionRules(): array
+    {
+        return ['value' => ['in:valid']];
+    }
+
+    protected function processConnection(array $connection): array
+    {
+        return $connection;
+    }
+
+    protected function job(Submission $submission, array $connection): ?object
+    {
+        return null;
     }
 }
