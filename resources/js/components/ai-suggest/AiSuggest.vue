@@ -1,12 +1,14 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Button, Icon, Popover } from '@ui';
+import { Button, Icon } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
 // Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
 import diffWords from './diff-words.js';
 import { icon, suggestionsEmpty, suggestionsFail, suggestionsSlow } from './use-ai-suggest.js';
+import useSidebarCard, { cardEntrance, onSuggestButton } from './use-sidebar-card.js';
+import useAiChat from '@/composables/use-ai-chat.js';
 // Prototype: whether the person can open Settings → AI, set by the demos in the nav
 import { canEditAi } from '@/components/ai-chat/mock-runs.js';
 import { cp_url } from '@/bootstrap/globals.js';
@@ -106,12 +108,12 @@ function toggled(isOpen) {
     if (isOpen) generate();
     else {
         if (loading.value) cancel();
-        // Prototype: the demos' failure, empty and slow rounds last until the dropdown closes
+        // Prototype: the demos' failure, empty and slow rounds last until the suggestions close
         suggestionsFail.value = suggestionsEmpty.value = suggestionsSlow.value = false;
     }
 }
 
-// The suggestions are taller than the loading lines, so the dropdown's body eases to its new height rather than snapping.
+// The suggestions are taller than the loading lines, so the card's body eases to its new height rather than snapping.
 // It's measured as it changes. The first measurement after opening sets the height without easing, so it doesn't grow from nothing.
 const body = ref(null);
 const bodyHeight = ref(null);
@@ -136,9 +138,39 @@ onBeforeUnmount(() => {
     stopWaiting();
 });
 
-// Single-line fields need the dropdown 16px below the button to clear the field's bottom border. In a multi-line field the button sits well inside it, so the dropdown can sit closer.
-const isMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));
-const dropdownOffset = computed(() => (isMultiline.value ? 8 : 16));
+// Prototype: the suggestions open over the entry's sidebar, as Bard's do (see AiSuggestLarge.vue and use-sidebar-card.js), with the field's name in
+// the heading, as they can be a long way from it
+const anchor = useTemplateRef('anchor');
+const button = useTemplateRef('button');
+const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => toggled(false));
+
+// The floating AI chat sits over the same corner, so it's put away while the suggestions are open. Bringing it back (with Ask or its shortcut)
+// puts the suggestions away instead. A docked chat has its own column, so it's left alone.
+const chat = useAiChat();
+watch(open, (isOpen) => isOpen && chat.floating.value && chat.close());
+watch(chat.open, (chatOpen) => chatOpen && toggled(false));
+
+// Like a dropdown: clicking anywhere else, or Esc, closes it. The suggest button toggles it itself.
+function onPointerDown(event) {
+    if ([panel.value, button.value?.$el].some((el) => el?.contains(event.target)) || onSuggestButton(event)) return;
+    toggled(false);
+}
+
+function onEscape(event) {
+    if (event.key !== 'Escape') return;
+    toggled(false);
+    button.value?.$el?.focus();
+}
+
+watch(open, (isOpen) => {
+    document[isOpen ? 'addEventListener' : 'removeEventListener']('pointerdown', onPointerDown);
+    document[isOpen ? 'addEventListener' : 'removeEventListener']('keydown', onEscape);
+});
+
+onBeforeUnmount(() => {
+    document.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('keydown', onEscape);
+});
 
 // Arrow keys go round the suggestions and the "Make it…" box (which is below them), so Up from the box lands on the last suggestion.
 const panel = useTemplateRef('panel');
@@ -162,7 +194,7 @@ function apply(text) {
     focusField();
 }
 
-// After picking one, focus goes into the field, with the cursor at the end of the new text, so you can carry on editing it (and screen readers read out what went in). The dropdown hands focus back to the suggest button as it closes, so wait for that first.
+// After picking one, focus goes into the field, with the cursor at the end of the new text, so you can carry on editing it (and screen readers read out what went in).
 function focusField() {
     nextTick(() =>
         setTimeout(() => {
@@ -259,132 +291,145 @@ function follow(text) {
 </script>
 
 <template>
-    <!-- Opens below the button, with its right edge lined up with the field's (the button sits 6px in from it) -->
-    <Popover :open="open" @update:open="toggled" align="end" :align-offset="-6" :offset="dropdownOffset" inset class="w-80!">
-        <template #trigger>
-            <Button
-                size="xs"
-                variant="ghost"
-                :icon="icon"
-                :class="buttonClass"
-                class="[&_svg]:size-3.5! [&_svg]:text-gray-400! [&_svg]:opacity-100! dark:[&_svg]:text-gray-500!"
-                :aria-label="__('Suggest')"
-                v-tooltip="__('Suggest')"
-            />
-        </template>
+    <span ref="anchor" hidden />
 
-        <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
-        <div ref="panel" @keydown="onArrowKey">
-            <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
-                <!-- The ! is needed for the size, as Icon sets its own. In dark mode the AI purple is too dark against the panel, so it's lightened. -->
-                <Icon :name="icon" class="size-3.5! text-ai dark:text-ai-light" />
-                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('Suggestions') }}
-                </span>
-            </div>
+    <!-- It stays highlighted, with a purple icon, while the suggestions are open -->
+    <Button
+        ref="button"
+        data-ai-suggest-button
+        size="xs"
+        :variant="open ? 'default' : 'ghost'"
+        :icon="icon"
+        :class="[buttonClass, open ? '[&_svg]:text-ai! dark:[&_svg]:text-ai-light!' : '[&_svg]:text-gray-400! dark:[&_svg]:text-gray-500!']"
+        class="[&_svg]:size-3.5! [&_svg]:opacity-100!"
+        :aria-label="__('Suggest')"
+        :aria-expanded="open"
+        v-tooltip="__('Suggest')"
+        @click="toggled(!open)"
+    />
 
-            <!-- Tells screen readers when it's thinking and when the suggestions are in, including after Try again or reworking them -->
-            <p class="sr-only" role="status">{{ status }}</p>
-
-            <!-- Eases to the height of what's inside, so it doesn't snap when the suggestions arrive -->
-            <div :style="{ height: bodyHeight }" :class="['overflow-hidden', easeHeight ? 'transition-[height] duration-150 ease-out motion-reduce:transition-none' : '']">
-                <div ref="body">
-                    <!-- While it "thinks", three lines that pulse where the suggestions will be -->
-                    <div v-if="loading" class="space-y-3 p-3" aria-busy="true">
-                        <div v-for="i in 3" :key="i" class="space-y-1.5">
-                            <div class="h-2.5 w-14 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
-                            <div class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" :class="['w-full', 'w-4/5', 'w-2/3'][i - 1]" />
-                        </div>
-                        <p v-if="slow" class="pt-1 text-xs text-gray-600 tabular-nums dark:text-gray-400">{{ __('Still thinking…') }} {{ waited }}s</p>
-                    </div>
-
-                    <!-- The AI didn't respond. Whoever can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator (as in the AI chat). -->
-                    <div v-else-if="failed" class="px-3 py-3">
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ __('The AI didn’t respond') }}</p>
-                        <template v-if="canEditAi">
-                            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, check your AI settings.') }}</p>
-                            <p class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-300/80">Anthropic · request timed out after 30s</p>
-                        </template>
-                        <p v-else class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, ask an administrator to check the AI settings.') }}</p>
-                        <!-- Try again is here, by the message, as the footer's reads as "more suggestions" rather than "try the connection again" -->
-                        <div class="mt-2.5 flex gap-1.5">
-                            <Button size="xs" variant="default" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="focusClicked($event); retry()" />
-                            <Button v-if="canEditAi" size="xs" variant="default" :href="cp_url('ai')" :text="__('Open Settings → AI')" />
-                        </div>
-                    </div>
-
-                    <!-- The AI came back with nothing: one line, which says the text is fine when there is some. The footer's Try again asks for more, which is what's wanted here. -->
-                    <p v-else-if="isEmpty" class="px-3 py-3 text-xs text-pretty text-gray-600 dark:text-gray-400">
-                        {{ original ? __('Nothing to change: the AI thinks this already reads well. Try again, or say what to change.') : __('No suggestions this time. Try again, or say what you’re after.') }}
-                    </p>
-
-                    <!-- Picking one puts it in the field, replacing what's there -->
-                    <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. The first and last stay within their own top and bottom, so no hover background runs into the borders above and below the list (and the focus outline, which pokes 1px past the ::after, stays clear of them). The focus outline is drawn on the same ::after so it reaches the lines too, and hides them either side. A focused suggestion sits above a hovered one, so a hovered neighbour's background can't cover its outline. -->
-                    <div v-else-if="result" data-suggestions class="p-1.5">
-                        <button
-                            v-for="suggestion in result.suggestions"
-                            :key="suggestion.text"
-                            type="button"
-                            class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:top-0 last:after:bottom-0 after:z-(--z-index-below) after:rounded-lg hover:z-(--z-index-above) hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-[calc(var(--z-index-above)+1)] focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
-                            :aria-label="suggestion.label ? `${__(suggestion.label)}: ${suggestion.text}` : suggestion.text"
-                            @click="apply(suggestion.text)"
-                            @mouseenter="showPreview(suggestion.text)"
-                            @mouseleave="hidePreview"
-                            @focus="showPreview(suggestion.text)"
-                            @blur="hidePreview"
-                        >
-                            <span v-if="suggestion.label" class="mb-1 block text-2xs font-medium text-gray-500 group-hover:text-gray-600 dark:text-gray-300 dark:group-hover:text-white">{{ __(suggestion.label) }}</span>
-                            <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
-                                <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
-                                    <span
-                                        :class="{
-                                            'rounded-sm bg-yellow-100 text-gray-900 dark:bg-transparent dark:text-yellow-300': part.type === 'added',
-                                            'rounded-sm bg-red-50 text-red-700 line-through dark:bg-transparent dark:text-red-400': part.type === 'removed',
-                                        }"
-                                        >{{ part.text }}</span
-                                    >{{ ' ' }}
-                                </template>
+    <!-- Over the entry's sidebar, styled like a dropdown (shadow, a quick fade and zoom in). It sticks 16px below the top of the scrolling area,
+         and is never taller than fits on screen (see use-sidebar-card.js). The wrapper lets clicks through to the page below the card. -->
+    <Teleport v-if="place" :to="scroller">
+        <div class="pointer-events-none absolute z-(--z-index-modal)" :style="place">
+            <div class="pointer-events-auto sticky top-4 flex flex-col" :style="fit">
+                <div class="min-h-0 overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800" :class="cardEntrance(switched)">
+                    <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
+                    <div ref="panel" @keydown="onArrowKey">
+                        <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
+                            <!-- The ! is needed for the size, as Icon sets its own. In dark mode the AI purple is too dark against the panel, so it's lightened. -->
+                            <Icon :name="icon" class="size-3.5! text-ai dark:text-ai-light" />
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                {{ __('Suggestions for :field', { field: __(config.display) }) }}
                             </span>
-                            <span v-else class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
-                        </button>
+                            <!-- Far from the field, so it says which one, and has a close button -->
+                            <Button class="-my-1 -me-1.5 ms-auto" size="xs" variant="ghost" icon="x" :aria-label="__('Close')" @click="toggled(false)" />
+                        </div>
+
+                        <!-- Tells screen readers when it's thinking and when the suggestions are in, including after Try again or reworking them -->
+                        <p class="sr-only" role="status">{{ status }}</p>
+
+                        <!-- Eases to the height of what's inside, so it doesn't snap when the suggestions arrive -->
+                        <div :style="{ height: bodyHeight }" :class="['overflow-hidden', easeHeight ? 'transition-[height] duration-150 ease-out motion-reduce:transition-none' : '']">
+                            <div ref="body">
+                                <!-- While it "thinks", three lines that pulse where the suggestions will be -->
+                                <div v-if="loading" class="space-y-3 p-3" aria-busy="true">
+                                    <div v-for="i in 3" :key="i" class="space-y-1.5">
+                                        <div class="h-2.5 w-14 animate-pulse rounded bg-gray-200 dark:bg-white/10" />
+                                        <div class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" :class="['w-full', 'w-4/5', 'w-2/3'][i - 1]" />
+                                    </div>
+                                    <p v-if="slow" class="pt-1 text-xs text-gray-600 tabular-nums dark:text-gray-400">{{ __('Still thinking…') }} {{ waited }}s</p>
+                                </div>
+
+                                <!-- The AI didn't respond. Whoever can open Settings → AI gets the reason and a button to it; anyone else is sent to an administrator (as in the AI chat). -->
+                                <div v-else-if="failed" class="px-3 py-3">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ __('The AI didn’t respond') }}</p>
+                                    <template v-if="canEditAi">
+                                        <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, check your AI settings.') }}</p>
+                                        <p class="mt-2 rounded bg-gray-100 px-2 py-1 font-mono text-2xs text-gray-600 dark:bg-white/5 dark:text-gray-300/80">Anthropic · request timed out after 30s</p>
+                                    </template>
+                                    <p v-else class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ __('We couldn’t reach your AI provider. If this keeps happening, ask an administrator to check the AI settings.') }}</p>
+                                    <!-- Try again is here, by the message, as the footer's reads as "more suggestions" rather than "try the connection again" -->
+                                    <div class="mt-2.5 flex gap-1.5">
+                                        <Button size="xs" variant="default" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" @click="focusClicked($event); retry()" />
+                                        <Button v-if="canEditAi" size="xs" variant="default" :href="cp_url('ai')" :text="__('Open Settings → AI')" />
+                                    </div>
+                                </div>
+
+                                <!-- The AI came back with nothing: one line, which says the text is fine when there is some. The footer's Try again asks for more, which is what's wanted here. -->
+                                <p v-else-if="isEmpty" class="px-3 py-3 text-xs text-pretty text-gray-600 dark:text-gray-400">
+                                    {{ original ? __('Nothing to change: the AI thinks this already reads well. Try again, or say what to change.') : __('No suggestions this time. Try again, or say what you’re after.') }}
+                                </p>
+
+                                <!-- Picking one puts it in the field, replacing what's there -->
+                                <!-- A faint line between suggestions, stopping short of the edges and lined up with the text, in the middle of a 5px gap. A hovered suggestion's background (an ::after) reaches 3px past its top and bottom to cover the lines either side; the suggestion is lifted above its neighbours so it covers the line below too. The first and last stay within their own top and bottom, so no hover background runs into the borders above and below the list (and the focus outline, which pokes 1px past the ::after, stays clear of them). The focus outline is drawn on the same ::after so it reaches the lines too, and hides them either side. A focused suggestion sits above a hovered one, so a hovered neighbour's background can't cover its outline. -->
+                                <div v-else-if="result" data-suggestions class="p-1.5">
+                                    <button
+                                        v-for="suggestion in result.suggestions"
+                                        :key="suggestion.text"
+                                        type="button"
+                                        class="group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-200 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:top-0 last:after:bottom-0 after:z-(--z-index-below) after:rounded-lg hover:z-(--z-index-above) hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/10 dark:hover:after:bg-white/5 focus-visible:z-[calc(var(--z-index-above)+1)] focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0"
+                                        :aria-label="suggestion.label ? `${__(suggestion.label)}: ${suggestion.text}` : suggestion.text"
+                                        @click="apply(suggestion.text)"
+                                        @mouseenter="showPreview(suggestion.text, suggestion.label)"
+                                        @mouseleave="hidePreview"
+                                        @focus="showPreview(suggestion.text, suggestion.label)"
+                                        @blur="hidePreview"
+                                    >
+                                        <span v-if="suggestion.label" class="mb-1 block text-2xs font-medium text-gray-500 group-hover:text-gray-600 dark:text-gray-300 dark:group-hover:text-white">{{ __(suggestion.label) }}</span>
+                                        <span v-if="showDiff" class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">
+                                            <template v-for="(part, p) in diffWords(original, suggestion.text)" :key="p">
+                                                <span
+                                                    :class="{
+                                                        'rounded-sm bg-yellow-100 text-gray-900 dark:bg-transparent dark:text-yellow-300': part.type === 'added',
+                                                        'rounded-sm bg-red-50 text-red-700 line-through dark:bg-transparent dark:text-red-400': part.type === 'removed',
+                                                    }"
+                                                    >{{ part.text }}</span
+                                                >{{ ' ' }}
+                                            </template>
+                                        </span>
+                                        <span v-else class="block text-sm leading-[18px] text-gray-900 dark:text-gray-200">{{ suggestion.text }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tell it how to rework the suggestions -->
+                        <div class="space-y-2 border-t border-gray-200 px-3 py-2.5 dark:border-white/10">
+                            <form @submit.prevent="follow(instruction)">
+                                <input
+                                    v-model="instruction"
+                                    type="text"
+                                    :placeholder="__('Make it…')"
+                                    :aria-label="__('Rework the suggestions')"
+                                    class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
+                                />
+                            </form>
+                            <!-- Hovering one shows its instructions, wrapped narrow so it reads as a bubble rather than one long line -->
+                            <div v-if="fieldPrompts.length" class="flex flex-wrap gap-1.5">
+                                <button
+                                    v-for="saved in fieldPrompts"
+                                    :key="saved.command"
+                                    type="button"
+                                    class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/17 dark:text-gray-300 dark:hover:bg-white/8"
+                                    :aria-disabled="loading"
+                                    v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs' }"
+                                    @click="focusClicked($event); !loading && follow(saved.name)"
+                                >
+                                    {{ saved.name }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="!failed" class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
+                            <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it tries again. -->
+                            <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': retrying }" @click="focusClicked($event); retry()" />
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Tell it how to rework the suggestions -->
-            <div class="space-y-2 border-t border-gray-200 px-3 py-2.5 dark:border-white/10">
-                <form @submit.prevent="follow(instruction)">
-                    <input
-                        v-model="instruction"
-                        type="text"
-                        :placeholder="__('Make it…')"
-                        :aria-label="__('Rework the suggestions')"
-                        class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900"
-                    />
-                </form>
-                <!-- Hovering one shows its instructions, wrapped narrow so it reads as a bubble rather than one long line -->
-                <div v-if="fieldPrompts.length" class="flex flex-wrap gap-1.5">
-                    <button
-                        v-for="saved in fieldPrompts"
-                        :key="saved.command"
-                        type="button"
-                        class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 aria-disabled:cursor-default aria-disabled:opacity-50 dark:border-white/17 dark:text-gray-300 dark:hover:bg-white/8"
-                        :aria-disabled="loading"
-                        v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs' }"
-                        @click="focusClicked($event); !loading && follow(saved.name)"
-                    >
-                        {{ saved.name }}
-                    </button>
-                </div>
-            </div>
-
-            <div v-if="!failed" class="flex justify-end border-t border-gray-200 px-2 py-1.5 dark:border-white/10">
-                <!-- Not disabled while it works, as that would drop focus from the button. It just ignores clicks until the new suggestions are in. Its arrows go round, clockwise like the icon, while it tries again. -->
-                <Button size="xs" variant="ghost" icon="refresh" :text="__('Try again')" :aria-disabled="loading" class="aria-disabled:cursor-default aria-disabled:opacity-50" :class="{ 'motion-safe:[&_svg]:animate-spin': retrying }" @click="focusClicked($event); retry()" />
             </div>
         </div>
-    </Popover>
-
+    </Teleport>
 
     <!-- The previewed suggestion, laid over the field -->
     <component
