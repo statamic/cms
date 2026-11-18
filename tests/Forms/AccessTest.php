@@ -216,7 +216,7 @@ class AccessTest extends TestCase
             ->assertSessionHasErrors(['*'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -238,7 +238,7 @@ class AccessTest extends TestCase
             ->post('/!/forms/contact', ['email' => 'foo@bar.com'])
             ->assertNoContent();
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -250,7 +250,7 @@ class AccessTest extends TestCase
 
         $this->post('/!/forms/contact', ['email' => 'foo@bar.com'])->assertLocation('/');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -260,7 +260,7 @@ class AccessTest extends TestCase
 
         $this->post('/!/forms/contact', ['email' => 'foo@bar.com'])->assertLocation('/');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]

@@ -1128,7 +1128,7 @@ EOT
     #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1139,7 +1139,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1169,7 +1169,7 @@ EOT
     #[Test]
     public function it_will_submit_form_and_render_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1179,7 +1179,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1372,7 +1372,7 @@ EOT;
     #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1383,7 +1383,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertLocation('/submission-successful');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1409,7 +1409,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_redirect_on_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->from('/contact')
@@ -1421,13 +1421,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/contact');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1438,7 +1438,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1521,13 +1521,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1539,7 +1539,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/submission-error');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1566,7 +1566,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_error_redirect()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
             throw ValidationException::withMessages(['custom' => 'This is a custom message']);
@@ -1583,7 +1583,7 @@ EOT
             ->assertSessionHasErrors(['custom'], null, 'form.contact')
             ->assertLocation('/contact');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
@@ -1608,7 +1608,7 @@ EOT
     #[Test]
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1619,7 +1619,7 @@ EOT
             ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -2002,7 +2002,7 @@ EOT
     {
         Bus::fake();
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->withPrecognition()
@@ -2011,7 +2011,7 @@ EOT
             ->assertNoContent()
             ->assertHeader('Precognition-Success', 'true');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
         Bus::assertNotDispatched(SendEmail::class);
     }
 

@@ -154,11 +154,11 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_saves_submission_when_store_is_enabled()
     {
-        $this->assertEmpty($this->form->submissions());
+        $this->assertEmpty($this->form->querySubmissions()->get());
 
         $this->action()->submit(['email' => 'test@example.com']);
 
-        $this->assertCount(1, $this->form->submissions());
+        $this->assertCount(1, $this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -173,7 +173,7 @@ class SubmitFormTest extends TestCase
         $result = $this->action()->submit(['email' => 'test@example.com']);
 
         $this->assertTrue($result->isFinalized());
-        $this->assertEmpty($this->form->submissions());
+        $this->assertEmpty($this->form->querySubmissions()->get());
         Event::assertDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionFinalized::class);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class);
@@ -210,7 +210,7 @@ class SubmitFormTest extends TestCase
     #[Test]
     public function it_does_not_persist_a_submission_when_validation_fails()
     {
-        $this->assertEmpty($this->form->submissions());
+        $this->assertEmpty($this->form->querySubmissions()->get());
 
         try {
             $this->action()->submit(['name' => 'Test']); // missing required email
@@ -218,7 +218,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertEmpty($this->form->submissions());
+        $this->assertEmpty($this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -315,7 +315,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $this->form->submissions());
+        $this->assertCount(0, $this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -405,7 +405,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $this->form->submissions());
+        $this->assertCount(0, $this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -458,7 +458,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
         Storage::disk('local')->assertMissing('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
     }
 
@@ -496,7 +496,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $this->form->submissions());
+        $this->assertCount(0, $this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -546,7 +546,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -786,7 +786,7 @@ class SubmitFormTest extends TestCase
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
         $this->assertCount(0, Asset::whereContainer('avatars'));
-        $this->assertEmpty($form->submissions());
+        $this->assertEmpty($form->querySubmissions()->get());
     }
 
     #[Test]
@@ -1522,7 +1522,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
         Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
     }
 
@@ -1549,7 +1549,7 @@ class SubmitFormTest extends TestCase
 
         $id = $action->submission()->id();
         Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -1576,7 +1576,7 @@ class SubmitFormTest extends TestCase
 
         $id = $action->submission()->id();
         Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/avatar/avatar.jpg");
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -2032,7 +2032,7 @@ class SubmitFormTest extends TestCase
 
         // The partial submission is promoted to a finalized one rather than a new one being created.
         $this->assertEquals($partial->id(), $result->submission->id());
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
         $this->assertNull($result->nextPage);
         $this->assertTrue($result->isFinalized());
 

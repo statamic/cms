@@ -948,7 +948,7 @@ EOT
     #[Test]
     public function it_wont_submit_form_when_precognition_validate_only_header_is_spoofed()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->withHeaders(['Precognition-Validate-Only' => 'foo'])
@@ -956,7 +956,7 @@ EOT
             ->assertSessionHasErrors(['email'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
     }
 
     private function jsonEncode($data)
