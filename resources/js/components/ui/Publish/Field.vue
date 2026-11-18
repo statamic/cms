@@ -365,7 +365,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest, '[&_textarea]:pe-9!': canSuggest && isSuggestMultiline }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest || aiChange, '[&_textarea]:pe-9!': canSuggest && isSuggestMultiline }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
@@ -392,6 +392,8 @@ const fieldtypeComponentEvents = computed(() => ({
                     @apply="suggestionApplied"
                     @preview="previewingSuggestion = $event"
                 />
+                <!-- Prototype: what the AI chat changed, laid over the field, once you open it from the badge (see placeOptions in AiChangeControls.vue) -->
+                <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="field" />
             </div>
             <!-- Prototype: what the AI chat changed, under the field, once you open it from the badge -->
             <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="below" />
