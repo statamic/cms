@@ -285,13 +285,13 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function save()
     {
+        $finalizing = $this->finalizing;
+        $this->finalizing = false;
+
         $isNew = is_null($this->form()->submission($this->id()));
 
         $withEvents = $this->withEvents;
         $this->withEvents = true;
-
-        $finalizing = $this->finalizing;
-        $this->finalizing = false;
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];

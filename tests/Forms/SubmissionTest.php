@@ -521,8 +521,8 @@ class SubmissionTest extends TestCase
 
         Event::fake();
 
-        // The created event already fired when the partial was first saved. Removing the
-        // partial key and saving again won't re-dispatch it, because the record exists.
+        // The created event only fires on finalize. Removing the partial key and
+        // saving again isn't finalizing, and the record exists, so it doesn't fire.
         $submission->remove('_partial');
         $submission->save();
 
@@ -617,11 +617,28 @@ class SubmissionTest extends TestCase
 
         $this->assertFalse($submission->isPartial());
 
-        // The created event fired once, when the partial was first saved. Finalizing an
-        // existing submission won't dispatch it again, but it does finalize and email.
+        // Saving the partial didn't fire the created event, so finalizing it fires it once.
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
+    }
+
+    #[Test]
+    public function saving_or_finalizing_an_already_finalized_submission_doesnt_dispatch_the_created_event_again()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
+        $submission->finalize();
+
+        Event::fake([SubmissionCreated::class]);
+
+        $submission->save();
+        $submission->finalize();
+        $submission->save();
+
+        Event::assertNotDispatched(SubmissionCreated::class);
     }
 
     #[Test]
