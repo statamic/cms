@@ -17,10 +17,11 @@ trait HasHideableOptions
         }
 
         return collect($options)
-            ->map(fn ($option, $key) => [
+            ->map(fn ($option, $key) => array_filter([
                 'key' => is_array($option) ? ($option['key'] ?? $key) : $key,
                 'value' => is_array($option) ? ($option['value'] ?? null) : $option,
-            ])
+                'hidden' => is_array($option) && ($option['hidden'] ?? false) === true,
+            ], fn ($value, $key) => $key !== 'hidden' || $value, ARRAY_FILTER_USE_BOTH))
             ->values()
             ->all();
     }
@@ -34,7 +35,7 @@ trait HasHideableOptions
             ->all();
     }
 
-    public function preProcessRenderable(array $data): array
+    public function prepareFrontEndRenderable(array $data): array
     {
         $hidden = $this->hiddenOptionKeys();
 

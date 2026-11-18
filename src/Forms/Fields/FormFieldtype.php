@@ -242,7 +242,7 @@ abstract class FormFieldtype implements Arrayable
         return [];
     }
 
-    public function preProcessRenderable(array $data): array
+    public function prepareFrontEndRenderable(array $data): array
     {
         return $data;
     }

@@ -4,6 +4,7 @@ namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Form;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fieldtypes\Checkboxes;
 use Statamic\Forms\Fieldtypes\Dropdown;
@@ -35,7 +36,7 @@ class HiddenChoiceOptionsTest extends TestCase
 
     #[Test]
     #[DataProvider('fieldtypeProvider')]
-    public function it_keeps_hidden_options_for_label_lookup($class, $type)
+    public function it_keeps_hidden_options_marked_as_hidden_for_label_lookup($class, $type)
     {
         $fieldtype = $this->fieldtype($class, $type, [
             ['key' => 0, 'value' => 'No'],
@@ -45,7 +46,7 @@ class HiddenChoiceOptionsTest extends TestCase
 
         $this->assertSame([
             ['key' => 0, 'value' => 'No'],
-            ['key' => 1, 'value' => 'Maybe'],
+            ['key' => 1, 'value' => 'Maybe', 'hidden' => true],
             ['key' => 2, 'value' => 'Yes'],
         ], $fieldtype->toFieldArray()['options']);
 
@@ -54,6 +55,29 @@ class HiddenChoiceOptionsTest extends TestCase
             ['value' => 1, 'label' => 'Maybe'],
             ['value' => 2, 'label' => 'Yes'],
         ], $fieldtype->toField()->fieldtype()->preload()['options']);
+    }
+
+    #[Test]
+    #[DataProvider('fieldtypeProvider')]
+    public function hidden_options_are_marked_as_hidden_in_the_augmented_form($class, $type)
+    {
+        $form = Form::make('survey')->formFields(['fields' => [[
+            'handle' => 'answer',
+            'field' => ['type' => $type, 'options' => [
+                ['key' => 0, 'value' => 'No'],
+                ['key' => 1, 'value' => 'Maybe', 'hidden' => true],
+            ]],
+        ]]]);
+
+        $augmented = $form->toAugmentedArray(['fields', 'sections']);
+
+        $expected = [
+            ['key' => 0, 'value' => 'No'],
+            ['key' => 1, 'value' => 'Maybe', 'hidden' => true],
+        ];
+
+        $this->assertSame($expected, $augmented['fields']->value()['answer']->get('options'));
+        $this->assertSame($expected, $augmented['sections']->value()[0]['fields']['answer']['options']);
     }
 
     #[Test]

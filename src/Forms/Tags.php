@@ -422,7 +422,7 @@ class Tags extends BaseTags
                     $data['is_informative'] = in_array('information', $field->formField()?->fieldtype()?->categories() ?? []);
 
                     if ($formFieldtype = $field->formField()?->fieldtype()) {
-                        $data = $formFieldtype->preProcessRenderable($data);
+                        $data = $formFieldtype->prepareFrontEndRenderable($data);
                     }
 
                     return $jsDriver
