@@ -154,6 +154,51 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_round_trips_sections_without_adding_a_display_or_losing_other_keys()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $sections = [
+            [
+                'instructions' => 'Tell us about yourself',
+                'custom' => 'value',
+                'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                ],
+            ],
+            [
+                'display' => 'Contact',
+                'fields' => [
+                    ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email']],
+                ],
+            ],
+        ];
+
+        $form = tap(Form::make('test')->formFields(['sections' => $sections]))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('forms.builder.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Builder')
+                ->missing('initialFormFields.pages.0.sections.0.display')
+                ->where('initialFormFields.pages.0.sections.0.instructions', 'Tell us about yourself')
+                ->where('initialFormFields.pages.0.sections.0.custom', 'value')
+                ->where('initialFormFields.pages.0.sections.1.display', 'Contact')
+                ->etc()
+            );
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $response->viewData('page')['props']['initialFormFields'])
+            ->assertSuccessful();
+
+        $this->assertSame($sections, Form::find('test')->formFields()->sections()->all());
+    }
+
+    #[Test]
     public function it_provides_available_fieldtypes()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
@@ -687,6 +732,47 @@ class FormBuilderTest extends TestCase
         $this->assertCount(2, $formFields->pages()[0]['sections']);
         $this->assertEquals('Personal', $formFields->pages()[0]['sections'][0]['display']);
         $this->assertEquals('Contact', $formFields->pages()[0]['sections'][1]['display']);
+    }
+
+    #[Test]
+    public function it_does_not_save_builder_state_on_sections()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'collapsed' => true,
+                            'display' => '',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSuccessful();
+
+        $this->assertSame([
+            ['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']]]],
+        ], Form::find('test')->formFields()->sections()->all());
     }
 
     #[Test]

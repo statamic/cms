@@ -219,6 +219,51 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_round_trips_sections_without_adding_a_display_or_losing_other_keys()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $sections = [
+            [
+                'instructions' => 'Tell us about yourself',
+                'custom' => 'value',
+                'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                ],
+            ],
+            [
+                'display' => 'Contact',
+                'fields' => [
+                    ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email']],
+                ],
+            ],
+        ];
+
+        $form = tap(Form::make('test')->formFields(['sections' => $sections]))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Logic')
+                ->missing('formFields.pages.0.sections.0.display')
+                ->where('formFields.pages.0.sections.0.instructions', 'Tell us about yourself')
+                ->where('formFields.pages.0.sections.0.custom', 'value')
+                ->where('formFields.pages.0.sections.1.display', 'Contact')
+                ->etc()
+            );
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $response->viewData('page')['props']['formFields'])
+            ->assertSuccessful();
+
+        $this->assertSame($sections, Form::find('test')->formFields()->sections()->all());
+    }
+
+    #[Test]
     public function it_persists_field_reordering()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);

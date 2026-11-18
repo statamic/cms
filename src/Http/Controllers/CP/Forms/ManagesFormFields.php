@@ -14,8 +14,6 @@ use Statamic\Http\Controllers\CP\Fields\ManagesFields;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-use function Statamic\trans as __;
-
 trait ManagesFormFields
 {
     use ManagesFields {
@@ -102,9 +100,8 @@ trait ManagesFormFields
 
     private function sectionToVue(array $section): array
     {
-        return Arr::removeNullValues([
-            'display' => $section['display'] ?? __('Section'),
-        ]) + [
+        return [
+            ...Arr::except($section, 'fields'),
             'fields' => collect($section['fields'] ?? [])->map(function (array $field) {
                 return array_merge(FormFieldTransformer::toVue($field), ['_id' => Str::random()]);
             })->values()->all(),
@@ -138,6 +135,7 @@ trait ManagesFormFields
                 'sections' => collect($page['sections'])->map(function (array $section) {
                     return Arr::removeNullValues([
                         'display' => $section['display'] ?? null,
+                        ...Arr::except($section, ['_id', 'collapsed', 'display', 'fields']),
                         'fields' => collect($section['fields'])
                             ->reject(fn (array $field) => $field['type'] === 'link_fields')
                             ->map(fn (array $field) => FormFieldTransformer::fromVue($field))
