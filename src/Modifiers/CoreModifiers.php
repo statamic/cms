@@ -1657,13 +1657,13 @@ class CoreModifiers extends Modifier
         $flags = collect(['substring:true', 'substring:false']);
 
         $substring = $params
-            ->filter(fn ($param) => is_string($param))
-            ->map(fn (string $param) => strtolower($param))
+            ->filter(fn (mixed $param): bool => is_string($param))
+            ->map(fn (string $param): string => strtolower($param))
             ->intersect($flags)
             ->last() !== 'substring:false';
 
         $params = $params
-            ->reject(fn ($param) => is_string($param) && $flags->contains(strtolower($param)))
+            ->reject(fn (mixed $param): bool => is_string($param) && $flags->contains(strtolower($param)))
             ->values()
             ->all();
 
@@ -1672,8 +1672,8 @@ class CoreModifiers extends Modifier
         }
 
         $pattern = collect(preg_split('/\s+/', $words))
-            ->map(fn ($word) => preg_quote($word, '/'))
-            ->filter()
+            ->map(fn (string $word): string => preg_quote($word, '/'))
+            ->filter(fn (string $word): bool => $word !== '')
             ->join('|');
 
         if (! $substring && $pattern !== '') {
