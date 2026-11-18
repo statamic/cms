@@ -75,6 +75,10 @@ class EmailConnectionTemplateSyntax implements DataAwareRule, ValidationRule
 
         $values = array_filter(Arr::flatten(Arr::wrap($connection[$key])), is_string(...));
 
+        if (! in_array($key, ['to', 'cc', 'bcc', 'from', 'reply_to'])) {
+            return $values;
+        }
+
         $legacyAddresses = collect($values)->flatMap(fn (string $value) => array_map(trim(...), explode(',', $value)));
 
         return [...$values, ...$legacyAddresses];

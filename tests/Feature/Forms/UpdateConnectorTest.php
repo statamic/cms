@@ -300,6 +300,35 @@ class UpdateConnectorTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('nonAddressKeysProvider')]
+    public function it_only_splits_stored_values_on_commas_for_address_keys(string $key)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test')->connections([
+            'email' => [['id' => 'abc', 'to' => ['old@example.com'], $key => 'smtp, {{ config:app.name }}']],
+        ]))->save();
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.connect.update', [$form->handle(), 'email']), [
+                ['id' => 'abc', 'to' => ['old@example.com'], $key => '{{ config:app.name }}'],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(["0.{$key}"]);
+    }
+
+    public static function nonAddressKeysProvider(): array
+    {
+        return [
+            'subject' => ['subject'],
+            'html' => ['html'],
+            'text' => ['text'],
+            'mailer' => ['mailer'],
+        ];
+    }
+
+    #[Test]
     #[DataProvider('trustedPermissionsProvider')]
     public function it_allows_template_syntax_from_trusted_users(array $permissions, bool $super)
     {
