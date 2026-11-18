@@ -192,6 +192,7 @@ function showPreview(text) {
             padding: css.padding,
             // Longhands rather than the font shorthand, which the browser reports as empty when the field sets font features
             fontFamily: css.fontFamily,
+            color: css.color,
             fontSize: css.fontSize,
             fontWeight: css.fontWeight,
             letterSpacing: css.letterSpacing,
@@ -390,6 +391,6 @@ function follow(text) {
         readonly
         :value="preview"
         :style="overlayStyle"
-        class="pointer-events-none absolute inset-0 z-(--z-index-above) size-full resize-none appearance-none overflow-hidden border-solid border-gray-300 bg-white text-gray-500 antialiased dark:border-white/10 dark:bg-gray-900 dark:text-gray-400"
+        class="pointer-events-none absolute inset-0 z-(--z-index-above) size-full resize-none appearance-none overflow-hidden border-solid border-gray-300 bg-white antialiased dark:border-white/10 dark:bg-gray-900"
     />
 </template>
