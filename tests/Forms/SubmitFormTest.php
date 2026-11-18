@@ -798,6 +798,11 @@ class SubmitFormTest extends TestCase
 
         Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
 
+        $saved = null;
+        Event::listen(SubmissionSaved::class, function ($event) use (&$saved) {
+            $saved = $event->submission->get('avatar');
+        });
+
         $action = app(SubmitForm::class)->form($form)->page('main');
 
         try {
@@ -813,6 +818,8 @@ class SubmitFormTest extends TestCase
         $submission = $form->submission($id);
 
         Storage::disk('avatars')->assertMissing('avatar.jpg');
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $saved);
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], YAML::parse(File::get($submission->path()))['avatar']);
         $this->assertEquals(["{$id}/avatar/avatar.jpg"], $submission->get('avatar'));
         Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
 
