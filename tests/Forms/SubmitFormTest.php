@@ -761,7 +761,7 @@ class SubmitFormTest extends TestCase
             'SubmissionFinalized' => ['avatar.jpg', true],
         ], $seen);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -836,7 +836,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
         $this->assertEquals('finalized', $form->submission($id)->status());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -881,7 +881,7 @@ class SubmitFormTest extends TestCase
         Storage::disk('avatars')->assertExists('avatar.jpg');
         $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -906,7 +906,7 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionCreated::class, fn ($event) => $event->submission->get('email') === 'bob@example.com');
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function recordSubmissionEvents(): \ArrayObject
@@ -972,7 +972,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals(['SubmissionCreating', 'SubmissionSaving', 'SubmissionCreated', 'SubmissionSaved', 'SubmissionFinalized'], $this->takeEvents($events));
         $this->assertEquals(['Hi', null], $creating);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2127,7 +2127,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals(['name' => 'Bob'], $result->submission->get('details'));
         $this->assertEmpty(Storage::disk('local')->allFiles());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2156,7 +2156,7 @@ class SubmitFormTest extends TestCase
         $this->assertNull($result->submission->get('unknown'));
         $this->assertEmpty(Storage::disk('local')->allFiles());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2217,7 +2217,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertEmpty(Storage::disk('avatars')->allFiles());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function uploadForm(bool $honeypot = false)
