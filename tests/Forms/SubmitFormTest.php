@@ -14,8 +14,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
+use Statamic\Events\SubmissionSaving;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
@@ -855,6 +857,127 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionCreated::class, fn ($event) => $event->submission->get('email') === 'bob@example.com');
 
         $form->submissions()->each->delete();
+    }
+
+    private function recordSubmissionEvents(): \ArrayObject
+    {
+        $events = new \ArrayObject;
+
+        foreach ([SubmissionCreating::class, SubmissionSaving::class, SubmissionCreated::class, SubmissionSaved::class, SubmissionFinalized::class] as $event) {
+            Event::listen($event, fn () => $events->append(class_basename($event)));
+        }
+
+        return $events;
+    }
+
+    private function takeEvents(\ArrayObject $events): array
+    {
+        return tap($events->getArrayCopy(), fn () => $events->exchangeArray([]));
+    }
+
+    #[Test]
+    public function a_single_page_submission_fires_the_same_creation_events_as_before()
+    {
+        Bus::fake();
+        $events = $this->recordSubmissionEvents();
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionSaving', 'SubmissionCreated', 'SubmissionSaved', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNotNull($this->form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function a_single_page_submission_for_a_form_that_doesnt_store_submissions_only_fires_the_created_event()
+    {
+        Bus::fake();
+        $this->form->store(false)->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreated', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($this->form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function partial_saves_only_fire_saving_events_and_finalizing_fires_the_creation_events()
+    {
+        Bus::fake();
+        $form = $this->multiPageForm();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $creating = null;
+        Event::listen(SubmissionCreating::class, function ($event) use (&$creating) {
+            $creating = [$event->submission->get('message'), $event->submission->get('_partial')];
+        });
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+        $this->assertEquals(['SubmissionCreating', 'SubmissionSaving', 'SubmissionCreated', 'SubmissionSaved', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertEquals(['Hi', null], $creating);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function a_multi_page_submission_for_a_form_that_doesnt_store_submissions_never_fires_the_creating_event()
+    {
+        Bus::fake();
+        $form = tap($this->multiPageForm()->store(false))->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+        $this->assertEquals(['SubmissionCreated', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function vetoing_the_creating_event_on_the_final_page_deletes_the_partial_but_still_finalizes()
+    {
+        Bus::fake();
+        $form = tap($this->multiPageForm()->connections(['email' => [['to' => 'test@example.com']]]))->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertNotNull($form->submission($result->submission->id()));
+        $this->takeEvents($events);
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        $result = app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($form->submission($result->submission->id()));
+        Bus::assertDispatched(SendEmail::class, 1);
+    }
+
+    #[Test]
+    public function vetoing_the_creating_event_on_a_single_page_form_doesnt_store_it_but_still_finalizes()
+    {
+        Bus::fake();
+        $this->form->connections(['email' => [['to' => 'test@example.com']]])->save();
+        $events = $this->recordSubmissionEvents();
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($this->form->submission($result->submission->id()));
+        Bus::assertDispatched(SendEmail::class, 1);
     }
 
     #[Test]

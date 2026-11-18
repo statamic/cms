@@ -296,8 +296,11 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
+        // Partials aren't complete submissions yet, so they're only "created" once finalized.
+        $creating = $isNew && ! $this->get('_partial');
+
         if ($withEvents) {
-            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+            if ($creating && ! $finalizing && SubmissionCreating::dispatch($this) === false) {
                 return false;
             }
 
@@ -313,7 +316,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($finalizing || ($isNew && ! $this->get('_partial'))) {
+            if ($finalizing || $creating) {
                 SubmissionCreated::dispatch($this);
             }
 
@@ -332,10 +335,15 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         // Assets need to exist before anything reads the submission, so this stays synchronous.
         CreateAssetsFromFileUploads::dispatchSync($this);
 
-        // Partials don't fire the created event when they're persisted, so it fires when they're finalized instead.
+        // Partials don't fire the creation events when they're persisted, so they fire when they're finalized instead.
+        // Vetoing the creating event only prevents storage, like on a single page form, so the rest of finalizing still happens.
         if ($this->form()->store()) {
-            $this->finalizing = true;
-            $this->save();
+            if (SubmissionCreating::dispatch($this) === false) {
+                $this->deleteQuietly();
+            } else {
+                $this->finalizing = true;
+                $this->save();
+            }
         } else {
             SubmissionCreated::dispatch($this);
 
