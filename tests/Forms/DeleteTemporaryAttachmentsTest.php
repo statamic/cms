@@ -2,8 +2,10 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Forms\DeleteTemporaryAttachments;
 use Statamic\Forms\DeleteTemporaryFiles;
@@ -19,13 +21,13 @@ class DeleteTemporaryAttachmentsTest extends TestCase
     {
         Storage::fake('local');
 
-        $form = tap(Form::make('contact')->formFields([
-            'fields' => [
-                ['handle' => 'attachments', 'field' => ['type' => 'files']],
-            ],
-        ]))->save();
+        $blueprint = Blueprint::makeFromFields(['attachments' => ['type' => 'files']])->setHandle('contact')->setNamespace('forms');
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
 
-        $submission = tap($form->makeSubmission()->data(['attachments' => ['abc/resume.pdf']]))->save();
+        $form = tap(Form::make('contact')->store(false))->save();
+
+        $submission = $form->makeSubmission()->data(['attachments' => ['abc/resume.pdf']]);
 
         Storage::disk('local')->put('statamic/file-uploads/abc/resume.pdf', 'contents');
 
@@ -45,6 +47,6 @@ class DeleteTemporaryAttachmentsTest extends TestCase
         $job->handle();
 
         Storage::disk('local')->assertMissing('statamic/file-uploads/abc/resume.pdf');
-        $this->assertNull($form->submission($submission->id())->get('attachments'));
+        $this->assertNull($job->submission->get('attachments'));
     }
 }
