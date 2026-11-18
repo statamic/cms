@@ -1656,11 +1656,9 @@ class CoreModifiers extends Modifier
         $params = collect($params);
         $flags = collect(['substring:true', 'substring:false']);
 
-        $substring = $params
-            ->filter(fn (mixed $param): bool => is_string($param))
-            ->map(fn (string $param): string => strtolower($param))
-            ->intersect($flags)
-            ->last() !== 'substring:false';
+        $flag = $params->last(fn (mixed $param): bool => is_string($param) && $flags->contains(strtolower($param)));
+
+        $substring = strtolower((string) $flag) !== 'substring:false';
 
         $params = $params
             ->reject(fn (mixed $param): bool => is_string($param) && $flags->contains(strtolower($param)))
