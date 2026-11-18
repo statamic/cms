@@ -17,6 +17,7 @@ use Statamic\Facades\Site;
 use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class SubmitForm
 {
@@ -59,6 +60,8 @@ class SubmitForm
 
         $nextPage = null;
         $uploadedAssets = [];
+        $createdAssets = null;
+        $data = $this->withoutFiles($data);
         $files = $this->normalizeFiles($files);
         $values = array_merge($data, $files);
 
@@ -91,15 +94,21 @@ class SubmitForm
                     $this->rejectHoneypotSubmission();
                 }
 
+                ($createdAssets = new CreateAssetsFromFileUploads($this->submission, keepTemporaryFiles: true))->handle();
+
                 $accepted = FormSubmitted::dispatch($this->submission) !== false;
 
                 if ($this->submission->isSpam()) {
+                    $createdAssets->revert();
                     $this->rejectSpamSubmission();
                 }
 
                 throw_unless($accepted, new SilentFormFailureException);
+
+                $createdAssets->deleteTemporaryFiles();
             }
         } catch (ValidationException|SilentFormFailureException $e) {
+            $createdAssets?->revert();
             $this->cleanUpUploads($uploadedAssets);
 
             throw $e;
@@ -115,20 +124,36 @@ class SubmitForm
      *
      * The assets fieldtype expects arrays, even for `max_files: 1`,
      * but we don't want to force that on the front end.
+     *
+     * Only top-level upload fields on the current page accept files, since
+     * fields on other pages aren't validated. Anything else is dropped.
      */
     private function normalizeFiles(array $files): array
     {
-        $assetFields = $this->form->blueprint()->fields()->all()
+        return $this->form->blueprint()->fields()->all()
             ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
-            ->keys();
+            ->keys()
+            ->when($this->page, fn ($handles) => $handles->intersect($this->fieldHandles($this->page)))
+            ->filter(fn ($handle) => isset($files[$handle]))
+            ->mapWithKeys(fn ($handle) => [$handle => Arr::wrap($files[$handle])])
+            ->all();
+    }
 
-        foreach ($assetFields as $handle) {
-            if (isset($files[$handle])) {
-                $files[$handle] = Arr::wrap($files[$handle]);
+    private function withoutFiles(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value) && $value !== []) {
+                $value = $this->withoutFiles($value);
+            }
+
+            if ($value instanceof UploadedFile || $value === [] && $data[$key] !== []) {
+                unset($data[$key]);
+            } else {
+                $data[$key] = $value;
             }
         }
 
-        return $files;
+        return $data;
     }
 
     private function site()
@@ -282,6 +307,7 @@ class SubmitForm
 
     public function validate(array $data, array $files = [], ?array $only = null): void
     {
+        $data = $this->withoutFiles($data);
         $files = $this->normalizeFiles($files);
         $fields = $this->form->blueprint()->fields()->addValues(array_merge($data, $files));
 

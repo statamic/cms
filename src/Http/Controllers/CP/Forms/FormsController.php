@@ -39,7 +39,7 @@ class FormsController extends CpController
             $columns[] = Column::make('submissions')->label(__('Submissions'));
         }
 
-        if ($forms->contains(fn ($form) => $user->can('edit', $form))) {
+        if ($forms->contains(fn ($form) => $user->can('editConnections', $form))) {
             $columns[] = Column::make('connections')->label(__('Connections'));
         }
 
@@ -47,18 +47,20 @@ class FormsController extends CpController
             ->map(function ($form) use ($user) {
                 $canViewSubmissions = $user->can('viewSubmissions', $form);
                 $canEdit = $user->can('edit', $form);
+                $canEditConnections = $user->can('editConnections', $form);
 
                 return [
                     'id' => $form->handle(),
                     'title' => __($form->title()),
                     'status' => $form->status(),
                     'submissions' => $canViewSubmissions ? $form->querySubmissions()->where('site', Site::selected())->whereStatus('finalized')->count() : null,
-                    'connections' => $canEdit ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
+                    'connections' => $canEditConnections ? FormConnector::all()->sum(fn ($connector) => $connector->forForm($form)->count() ?? 0) : null,
                     'show_url' => $form->showUrl(),
                     'submissions_url' => $form->submissionsUrl(),
                     'connect_url' => cp_route('forms.connect.index', $form->handle()),
                     'edit_url' => $form->editUrl(),
                     'can_edit' => $canEdit,
+                    'can_edit_connections' => $canEditConnections,
                     'can_view_submissions' => $canViewSubmissions,
                 ];
             })

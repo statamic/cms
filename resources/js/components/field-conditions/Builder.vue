@@ -57,17 +57,22 @@ const remove = (index) => conditions.value.splice(index, 1);
 const toggleCustom = () => type.value = isCustom.value ? 'all' : 'custom';
 
 const saveableConditions = computed(() => {
-    const result = Object.fromEntries(KEYS.map((key) => [key, null]));
-    if (!hasConditions.value) return result;
+    const result = {};
 
-    const key = type.value === 'any' ? `${when.value}_any` : when.value;
-    const filtered = conditions.value.filter((c) => c.field && c.value);
-    const prepared = new Converter().toBlueprint(filtered);
+    if (hasConditions.value) {
+        const key = type.value === 'any' ? `${when.value}_any` : when.value;
+        const filtered = conditions.value.filter((c) => c.field && c.value);
+        const prepared = new Converter().toBlueprint(filtered);
 
-    if (!isCustom.value && Object.keys(prepared).length) {
-        result[key] = prepared;
-    } else if (isCustom.value && customMethod.value) {
-        result[key] = customMethod.value;
+        if (!isCustom.value && Object.keys(prepared).length) {
+            result[key] = prepared;
+        } else if (isCustom.value && customMethod.value) {
+            result[key] = customMethod.value;
+        }
+    }
+
+    if (props.showAlwaysHideOption) {
+        result.hidden = when.value === 'always_hide';
     }
 
     return result;
@@ -123,10 +128,6 @@ watch(() => props.config.hidden, (hidden) => {
     } else if (when.value === 'always_hide') {
         when.value = 'always';
     }
-});
-
-watch(when, (value) => {
-    if (initialized.value) emit('updated', { hidden: value === 'always_hide' });
 });
 
 watch(saveableConditions, (conditions) => {

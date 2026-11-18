@@ -19,7 +19,7 @@ class FormConnectController extends CpController
 
     public function index($form)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         return Inertia::render('forms/connect/Index', [
             'form' => $form,
@@ -38,7 +38,7 @@ class FormConnectController extends CpController
 
     public function edit($form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
@@ -61,13 +61,16 @@ class FormConnectController extends CpController
 
     public function update(Request $request, $form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
-        Validator::make($request->except('_save'), $connector->rules())->validate();
+        $connections = $request->except('_save');
 
-        $connections = $connector->process($request->except('_save'));
+        Validator::make(['connections' => $connections], ['connections' => ['list']])->validate();
+        Validator::make($connections, $connector->rules())->validate();
+
+        $connections = $connector->process($connections);
 
         if ($request->boolean('_save', true)) {
             $form->connections($form->connections()->put($connector->handle(), $connections))->save();

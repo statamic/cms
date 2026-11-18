@@ -14,7 +14,10 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionFinalized;
+use Statamic\Events\SubmissionSaved;
+use Statamic\Events\SubmissionSaving;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
@@ -727,6 +730,304 @@ class SubmitFormTest extends TestCase
 
         Mail::assertSent(Email::class, 1);
         Mail::assertSent(Email::class, fn (Email $email) => $email->getSubmission()->get('photo') === 'photo.jpg');
+    }
+
+    #[Test]
+    public function listeners_see_the_real_asset_path_and_the_asset_already_exists()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $seen = [];
+
+        foreach ([FormSubmitted::class, SubmissionCreated::class, SubmissionSaved::class, SubmissionFinalized::class] as $event) {
+            Event::listen($event, function ($event) use (&$seen) {
+                $path = $event->submission->get('avatar')[0] ?? null;
+                $seen[class_basename($event)] = [$path, (bool) Asset::find("avatars::{$path}")];
+            });
+        }
+
+        app(SubmitForm::class)->form($form)->page('main')->submit(
+            data: ['email' => 'test@example.com'],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $this->assertEquals([
+            'FormSubmitted' => ['avatar.jpg', true],
+            'SubmissionCreated' => ['avatar.jpg', true],
+            'SubmissionSaved' => ['avatar.jpg', true],
+            'SubmissionFinalized' => ['avatar.jpg', true],
+        ], $seen);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function assets_created_for_a_listener_are_removed_when_the_listener_rejects_the_submission()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        try {
+            app(SubmitForm::class)->form($form)->page('main')->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        $this->assertCount(0, Asset::whereContainer('avatars'));
+        $this->assertEmpty($form->submissions());
+    }
+
+    #[Test]
+    public function vetoing_the_creating_event_when_marking_as_not_spam_keeps_the_temporary_upload_instead_of_the_asset()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Event::forget(FormSubmitted::class);
+
+        $id = $action->submission()->id();
+        $submission = $form->submission($id);
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        try {
+            (new MarkAsNotSpam)->run(collect([$submission]), []);
+        } catch (\Exception $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $form->submission($id)->get('avatar'));
+        $this->assertEquals('spam', $form->submission($id)->status());
+
+        Event::forget(SubmissionCreating::class);
+        (new MarkAsNotSpam)->run(collect([$form->submission($id)]), []);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
+        $this->assertEquals('finalized', $form->submission($id)->status());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function a_submission_marked_as_spam_by_a_listener_keeps_its_temporary_upload_instead_of_the_asset()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $saved = null;
+        Event::listen(SubmissionSaved::class, function ($event) use (&$saved) {
+            $saved = $event->submission->get('avatar');
+        });
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        $submission = $form->submission($id);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $saved);
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], YAML::parse(File::get($submission->path()))['avatar']);
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $submission->get('avatar'));
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        Event::forget(FormSubmitted::class);
+        (new MarkAsNotSpam)->run(collect([$submission]), []);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function submission_created_only_fires_when_a_multi_page_submission_is_finalized()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionSaved::class]);
+
+        $form = $this->multiPageForm();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaved::class, 1);
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionCreated::class, fn ($event) => $event->submission->get('email') === 'bob@example.com');
+
+        $form->submissions()->each->delete();
+    }
+
+    private function recordSubmissionEvents(): \ArrayObject
+    {
+        $events = new \ArrayObject;
+
+        foreach ([SubmissionCreating::class, SubmissionSaving::class, SubmissionCreated::class, SubmissionSaved::class, SubmissionFinalized::class] as $event) {
+            Event::listen($event, fn () => $events->append(class_basename($event)));
+        }
+
+        return $events;
+    }
+
+    private function takeEvents(\ArrayObject $events): array
+    {
+        return tap($events->getArrayCopy(), fn () => $events->exchangeArray([]));
+    }
+
+    #[Test]
+    public function a_single_page_submission_fires_the_same_creation_events_as_before()
+    {
+        Bus::fake();
+        $events = $this->recordSubmissionEvents();
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionSaving', 'SubmissionCreated', 'SubmissionSaved', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNotNull($this->form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function a_single_page_submission_for_a_form_that_doesnt_store_submissions_only_fires_the_created_event()
+    {
+        Bus::fake();
+        $this->form->store(false)->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreated', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($this->form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function partial_saves_only_fire_saving_events_and_finalizing_fires_the_creation_events()
+    {
+        Bus::fake();
+        $form = $this->multiPageForm();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $creating = null;
+        Event::listen(SubmissionCreating::class, function ($event) use (&$creating) {
+            $creating = [$event->submission->get('message'), $event->submission->get('_partial')];
+        });
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+        $this->assertEquals(['SubmissionCreating', 'SubmissionSaving', 'SubmissionCreated', 'SubmissionSaved', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertEquals(['Hi', null], $creating);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function a_multi_page_submission_for_a_form_that_doesnt_store_submissions_never_fires_the_creating_event()
+    {
+        Bus::fake();
+        $form = tap($this->multiPageForm()->store(false))->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertEquals(['SubmissionSaving', 'SubmissionSaved'], $this->takeEvents($events));
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+        $this->assertEquals(['SubmissionCreated', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function vetoing_the_creating_event_on_the_final_page_deletes_the_partial_but_still_finalizes()
+    {
+        Bus::fake();
+        $form = tap($this->multiPageForm()->connections(['email' => [['to' => 'test@example.com']]]))->save();
+        $events = $this->recordSubmissionEvents();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+        $this->assertNotNull($form->submission($result->submission->id()));
+        $this->takeEvents($events);
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        $result = app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($form->submission($result->submission->id()));
+        Bus::assertDispatched(SendEmail::class, 1);
+    }
+
+    #[Test]
+    public function vetoing_the_creating_event_on_a_single_page_form_doesnt_store_it_but_still_finalizes()
+    {
+        Bus::fake();
+        $this->form->connections(['email' => [['to' => 'test@example.com']]])->save();
+        $events = $this->recordSubmissionEvents();
+
+        Event::listen(SubmissionCreating::class, fn () => false);
+
+        $result = $this->action()->submit(['email' => 'bob@example.com']);
+
+        $this->assertEquals(['SubmissionCreating', 'SubmissionFinalized'], $this->takeEvents($events));
+        $this->assertNull($this->form->submission($result->submission->id()));
+        Bus::assertDispatched(SendEmail::class, 1);
     }
 
     #[Test]
@@ -1483,7 +1784,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->submission->get('_partial'));
         $this->assertEquals('Olaf', $result->submission->get('name'));
 
-        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
@@ -1744,8 +2045,8 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('olaf@example.com', $stored->get('email'));
         $this->assertEquals('Hello', $stored->get('message'));
 
-        // Finalizing fires the completion events once; it doesn't re-create the submission.
-        Event::assertNotDispatched(SubmissionCreated::class);
+        // Finalizing fires the completion events once.
+        Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
 
@@ -1800,6 +2101,123 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->isFinalized());
 
         $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    public function a_file_posted_inside_a_group_is_ignored_and_the_groups_other_values_are_kept()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('grouped')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'details', 'field' => ['type' => 'group', 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text']],
+                ]]],
+            ],
+        ]))->save();
+
+        $files = ['details' => ['x' => UploadedFile::fake()->create('resume.pdf', 10)]];
+
+        $result = app(SubmitForm::class)->form($form)->submit(
+            data: array_replace_recursive(['email' => 'test@example.com', 'details' => ['name' => 'Bob']], $files),
+            files: $files,
+        );
+
+        $this->assertEquals(['name' => 'Bob'], $result->submission->get('details'));
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function a_file_posted_under_a_field_that_isnt_an_upload_field_is_ignored()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('injected')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'notes', 'field' => ['type' => 'long_answer']],
+            ],
+        ]))->save();
+
+        $files = [
+            'notes' => UploadedFile::fake()->create('notes.pdf', 10),
+            'unknown' => UploadedFile::fake()->create('unknown.pdf', 10),
+        ];
+
+        $result = app(SubmitForm::class)->form($form)->submit(
+            data: array_replace_recursive(['email' => 'test@example.com'], $files),
+            files: $files,
+        );
+
+        $this->assertNull($result->submission->get('notes'));
+        $this->assertNull($result->submission->get('unknown'));
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function files_posted_for_an_upload_field_on_another_page_are_ignored()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $fieldset = Fieldset::make('uploads')->setContents([
+            'fields' => [
+                ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                ['handle' => 'attachment', 'field' => ['type' => 'files']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('uploads')->andReturn($fieldset);
+
+        $form = tap(Form::make('signup')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => [
+                        ['import' => 'uploads'],
+                        ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => false]],
+                    ]]],
+                ],
+            ],
+        ]))->save();
+
+        $files = [
+            'photo' => [UploadedFile::fake()->create('evil.php', 10)],
+            'attachment' => [UploadedFile::fake()->create('evil.php', 10)],
+            'resume' => [UploadedFile::fake()->create('evil.php', 10)],
+        ];
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: array_replace_recursive(['name' => 'Bob'], $files),
+            files: $files,
+        );
+
+        $this->assertEquals('two', $result->nextPage);
+        $this->assertEmpty(Storage::disk('avatars')->allFiles());
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+        $this->assertNull($result->submission->get('photo'));
+        $this->assertNull($result->submission->get('attachment'));
+        $this->assertNull($result->submission->get('resume'));
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(data: $files, files: $files);
+            $this->fail('The files should have been validated on their own page.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('photo.0', $e->errors());
+        }
+
+        $this->assertEmpty(Storage::disk('avatars')->allFiles());
+
+        $form->submissions()->each->delete();
     }
 
     private function uploadForm(bool $honeypot = false)

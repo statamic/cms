@@ -142,9 +142,8 @@ class ViewFormListingTest extends TestCase
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
                 ->component('forms/Index')
-                ->count('initialColumns', 2)
+                ->count('initialColumns', 1)
                 ->where('initialColumns.0.field', 'title')
-                ->where('initialColumns.1.field', 'connections')
             );
     }
 
@@ -168,9 +167,9 @@ class ViewFormListingTest extends TestCase
     }
 
     #[Test]
-    public function it_includes_the_connection_count_when_the_user_can_edit_the_form()
+    public function it_includes_the_connection_count_when_the_user_can_edit_the_forms_connections()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         Form::make('test')->connections([
             'email' => [['id' => 'abc', 'to' => 'foo@example.com'], ['id' => 'def', 'to' => 'bar@example.com']],
@@ -184,7 +183,30 @@ class ViewFormListingTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('forms/Index')
                 ->where('forms.0.can_edit', true)
+                ->where('forms.0.can_edit_connections', true)
                 ->where('forms.0.connections', 3)
+            );
+    }
+
+    #[Test]
+    public function it_excludes_the_connections_when_the_user_can_edit_the_form_but_not_view_its_submissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        Form::make('test')->connections([
+            'email' => [['id' => 'abc', 'to' => 'foo@example.com']],
+        ])->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.index'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Index')
+                ->count('initialColumns', 1)
+                ->where('forms.0.can_edit', true)
+                ->where('forms.0.can_edit_connections', false)
+                ->where('forms.0.connections', null)
             );
     }
 
@@ -204,6 +226,7 @@ class ViewFormListingTest extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('forms/Index')
                 ->where('forms.0.can_edit', false)
+                ->where('forms.0.can_edit_connections', false)
                 ->where('forms.0.connections', null)
             );
     }

@@ -16,8 +16,10 @@ const props = defineProps({
 });
 
 const collapsed = ref([]);
+const rules = ref([]);
 
-const fieldHasLogic = (field) => field.hidden || KEYS.some(key => field[key]);
+const fieldHasConfiguredLogic = (field) => field.hidden || KEYS.some(key => field[key]);
+const fieldHasLogic = (field) => rules.value.includes(field._id) || fieldHasConfiguredLogic(field);
 
 const fieldsWithLogic = computed(() => props.fields.filter(fieldHasLogic));
 const fieldsWithoutLogic = computed(() => props.fields.filter(field => !fieldHasLogic(field)));
@@ -59,18 +61,22 @@ const getFieldConfig = (field) => ({
 const getConditionsConfig = (field) => ({
     handle: field.handle,
     hidden: field.hidden,
-    if: field.if,
-    unless: field.unless,
-    if_any: field.if_any,
-    unless_any: field.unless_any,
+    if: field.if ?? field.show_when,
+    unless: field.unless ?? field.hide_when,
+    if_any: field.if_any ?? field.show_when_any,
+    unless_any: field.unless_any ?? field.hide_when_any,
     always_save: field.always_save,
 });
+
+const withoutConditions = Object.fromEntries(KEYS.map((key) => [key, null]));
 
 const getSuggestableFieldsForField = (field) => {
     return props.suggestableFields.filter(f => f.pageIndex <= field.pageIndex && f.handle !== field.handle);
 };
 
 const addCondition = (fieldId) => {
+    rules.value.push(fieldId);
+
     const fields = props.fields.map(field =>
         field._id === fieldId ? { ...field, if: {} } : field
     );
@@ -83,11 +89,12 @@ const addCondition = (fieldId) => {
 const removeCondition = (fieldId) => {
     const fields = props.fields.map(field =>
         field._id === fieldId
-            ? { ...field, if: null, unless: null, if_any: null, unless_any: null, always_save: false }
+            ? { ...field, ...withoutConditions, hidden: false, always_save: false }
             : field
     );
 
     emit('update:fields', fields);
+    rules.value = rules.value.filter(id => id !== fieldId);
     collapsed.value = collapsed.value.filter(id => id !== fieldId);
 };
 
@@ -96,11 +103,9 @@ const updateConditions = (fieldId, conditions) => {
         field._id === fieldId
             ? {
                 ...field,
+                ...withoutConditions,
+                ...Object.fromEntries(KEYS.filter((key) => conditions[key]).map((key) => [key, conditions[key]])),
                 hidden: conditions.hidden ?? field.hidden,
-                if: conditions.if || null,
-                unless: conditions.unless || null,
-                if_any: conditions.if_any || null,
-                unless_any: conditions.unless_any || null,
                 always_save: conditions.always_save ?? field.always_save,
             }
             : field
@@ -115,6 +120,10 @@ watch(
         const oldIds = new Set((oldFields || []).map(f => f._id));
 
         fields.forEach(field => {
+            if (!rules.value.includes(field._id)) {
+                rules.value.push(field._id);
+            }
+
             if (!oldIds.has(field._id)) {
                 collapsed.value.push(field._id);
             }

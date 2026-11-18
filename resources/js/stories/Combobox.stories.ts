@@ -1025,6 +1025,28 @@ export const TestTaggableSingleCanAddOption: Story = {
     },
 };
 
+export const TestTaggableHideInputWhenClosed: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>('fm_84');
+            return { value, options: defaultOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable hide-input-when-closed />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        expect(canvasElement.querySelector('input')).toBeNull();
+        expect(canvas.getByText('FM-84')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('combobox'));
+
+        await waitFor(() => expect(canvasElement.querySelector('input')).toBeTruthy());
+    },
+};
+
 export const TestTaggableSingleCommitsOnBlur: Story = {
     tags: ['!dev', 'test'],
     args: {
