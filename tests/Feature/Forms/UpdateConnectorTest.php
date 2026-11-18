@@ -247,6 +247,9 @@ class UpdateConnectorTest extends TestCase
             'antlers in a legacy recipient string' => ['to', 'old@example.com, {{ config:mail.from.address }}'],
             'antlers in the bcc' => ['bcc', ['{{ config:mail.from.address }}']],
             'antlers in the id' => ['id', '{{ config:app.name }}'],
+            'antlers joined by an unknown mention' => ['subject', 'Hi {[[nope]]{ config:database.connections.secret.password }}'],
+            'env joined by an unknown mention' => ['subject', 'Hi {[[nope]]env:APP_KEY}'],
+            'antlers joined by an escaped mention' => ['subject', 'Hi {[[ nope ]]{[[ nope ]] config:app.name }[[nope]]}'],
         ];
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\User;
+use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Connectors\Email;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -55,7 +56,8 @@ class EmailConnectionTemplateSyntax implements DataAwareRule, ValidationRule
 
     private function containsTemplateSyntax(string $value): bool
     {
-        return Str::contains($value, ['{{', '{env:']);
+        return Str::contains($value, $syntax = ['{{', '{env:'])
+            || Str::contains(Mentions::replace($value, []), $syntax);
     }
 
     private function storedValues(mixed $id, string $key): array

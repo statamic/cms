@@ -268,6 +268,9 @@ class EmailConnectorTest extends TestCase
             'antlers in the html view' => ['html', '{{ config:app.name }}'],
             'antlers in the text view' => ['text', '{{ config:app.name }}'],
             'antlers in the mailer' => ['mailer', '{{ config:app.name }}'],
+            'antlers joined by an unknown mention' => ['subject', 'Hi {[[nope]]{ config:database.connections.secret.password }}'],
+            'env joined by an unknown mention' => ['subject', 'Hi {[[nope]]env:APP_KEY}'],
+            'antlers joined by an escaped mention' => ['subject', 'Hi {[[ nope ]]{[[ nope ]] config:app.name }[[nope]]}'],
         ];
     }
 
