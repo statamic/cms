@@ -53,15 +53,19 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     protected ?string $redirect = null;
 
+    protected $internal;
+
     public function __construct()
     {
         $this->data = collect();
+        $this->internal = collect();
         $this->supplements = collect();
     }
 
     public function __clone()
     {
         $this->data = clone $this->data;
+        $this->internal = clone $this->internal;
         $this->supplements = clone $this->supplements;
     }
 
@@ -71,23 +75,55 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this->traitData();
         }
 
-        $data = collect($data);
+        [$internal, $data] = collect($data)->partition(fn ($value, $key) => $this->isInternalKey($key));
 
         // A full data replacement would otherwise drop the internal lifecycle
         // keys, so carry over the existing _partial, _marked_spam_at and _site values
         // unless the incoming payload provides its own.
-        foreach (['_partial', '_marked_spam_at', '_site'] as $key) {
-            if ($this->has($key) && ! $data->has($key)) {
-                $data[$key] = $this->get($key);
-            }
-        }
+        $this->internal = $this->internal->only(['_partial', '_marked_spam_at', '_site'])->merge($internal);
 
         return $this->traitData($data);
     }
 
+    public function get($key, $fallback = null)
+    {
+        return ($this->isInternalKey($key) ? $this->internal : $this->data)->get($key, $fallback);
+    }
+
+    public function has($key)
+    {
+        return ($this->isInternalKey($key) ? $this->internal : $this->data)->has($key);
+    }
+
+    public function set($key, $value)
+    {
+        ($this->isInternalKey($key) ? $this->internal : $this->data)->put($key, $value);
+
+        return $this;
+    }
+
+    public function remove($key)
+    {
+        ($this->isInternalKey($key) ? $this->internal : $this->data)->forget($key);
+
+        return $this;
+    }
+
+    public function merge($data)
+    {
+        collect($data)->each(fn ($value, $key) => $this->set($key, $value));
+
+        return $this;
+    }
+
+    private function isInternalKey($key): bool
+    {
+        return is_string($key) && Str::startsWith($key, '_');
+    }
+
     public function values()
     {
-        return $this->data()->reject(fn ($value, $key) => Str::startsWith($key, '_'));
+        return $this->data();
     }
 
     /**
@@ -437,7 +473,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function fileData()
     {
-        return $this->data()->all();
+        return $this->data->merge($this->internal)->all();
     }
 
     public function getQueryableValue(string $field)

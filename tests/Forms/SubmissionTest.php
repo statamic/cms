@@ -15,9 +15,11 @@ use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionFinalized;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
@@ -144,17 +146,18 @@ class SubmissionTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $submission->values());
         $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->values()->all());
+        $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->data()->all());
         $this->assertEquals([
             'name' => 'Olaf',
             'email' => 'olaf@example.com',
             '_fake' => true,
             '_partial' => true,
             '_site' => 'en',
-        ], $submission->data()->all());
+        ], $submission->fileData());
     }
 
     #[Test]
-    public function data_remains_the_live_collection_including_internal_keys()
+    public function data_remains_the_live_collection_without_internal_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
@@ -162,7 +165,36 @@ class SubmissionTest extends TestCase
         $submission->data()->put('name', 'Olaf');
 
         $this->assertEquals(['name' => 'Olaf'], $submission->values()->all());
-        $this->assertEquals(['_partial' => true, 'name' => 'Olaf'], $submission->data()->all());
+        $this->assertEquals(['name' => 'Olaf'], $submission->data()->all());
+        $this->assertEquals(['name' => 'Olaf', '_partial' => true], $submission->fileData());
+        $this->assertTrue($submission->get('_partial'));
+        $this->assertTrue($submission->has('_partial'));
+    }
+
+    #[Test]
+    public function internal_keys_are_stored_but_kept_out_of_the_data_listeners_see()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $seen = null;
+        Event::listen(SubmissionSaved::class, function ($event) use (&$seen) {
+            $seen = $event->submission->data()->all();
+        });
+
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial()->site('en')->markAsSpam())->save();
+
+        $this->assertEquals(['name' => 'Olaf'], $seen);
+
+        $stored = YAML::parse(File::get($submission->path()));
+        $this->assertEquals('Olaf', $stored['name']);
+        $this->assertTrue($stored['_partial']);
+        $this->assertEquals('en', $stored['_site']);
+        $this->assertArrayHasKey('_marked_spam_at', $stored);
+
+        $fresh = $form->submission($submission->id());
+        $this->assertEquals(['name' => 'Olaf'], $fresh->data()->all());
+        $this->assertTrue($fresh->isSpam());
+        $this->assertEquals('en', $fresh->site()->handle());
     }
 
     #[Test]
