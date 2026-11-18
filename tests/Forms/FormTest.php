@@ -2,6 +2,7 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -349,6 +350,38 @@ class FormTest extends TestCase
         $saved = YAML::parse(File::get($form->path()));
 
         $this->assertEquals($fields, $saved['fields']);
+    }
+
+    #[Test]
+    public function it_saves_pages_to_yaml_when_forms_pro_is_not_installed()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $fields = [
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'button_label' => 'Continue',
+                    'rules' => [['conditions' => [['field' => 'name', 'operator' => 'equals', 'value' => 'Jamie']], 'destination' => 'contact']],
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]]],
+                ],
+                [
+                    'id' => 'contact',
+                    'previous_page_label' => 'Back',
+                    'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'email']]]]],
+                ],
+            ],
+        ];
+
+        $form = tap(Form::make('contact_us')->formFields($fields))->save();
+
+        $this->assertCount(1, $form->formFields()->pages());
+        $this->assertEquals($fields, YAML::parse(File::get($form->path()))['fields']);
+
+        $form->title('Contact Us')->save();
+
+        $this->assertEquals($fields, YAML::parse(File::get(Form::find('contact_us')->path()))['fields']);
     }
 
     #[Test]
