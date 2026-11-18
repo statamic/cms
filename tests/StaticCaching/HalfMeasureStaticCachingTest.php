@@ -2,12 +2,14 @@
 
 namespace Tests\StaticCaching;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Form;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Replacer;
 use Symfony\Component\HttpFoundation\Response;
@@ -608,6 +610,115 @@ EOT;
             ->get('/about')
             ->assertOk()
             ->assertSee('1 3', false);
+    }
+
+    #[Test]
+    public function it_does_not_cache_a_page_with_a_form_prefilled_from_a_partial_submission()
+    {
+        $form = $this->makeMultiPageForm();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ form:survey }}{{ fields }}{{ handle }}=[{{ value }}]{{ /fields }}{{ /form:survey }}');
+        $this->createPage('about');
+
+        $this
+            ->withSession(['form.survey.partial_submission' => $submission->id()])
+            ->get('/about?page=page_one')
+            ->assertOk()
+            ->assertSee('name=[Olaf]', false);
+
+        $this->flushSession();
+
+        $this
+            ->get('/about?page=page_one')
+            ->assertOk()
+            ->assertSee('name=[]', false)
+            ->assertDontSee('Olaf');
+    }
+
+    #[Test]
+    public function it_caches_a_page_with_a_form_when_there_is_no_partial_submission()
+    {
+        $this->makeMultiPageForm();
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                app()->instance('example_count', $count = app('example_count') + 1);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ form:survey }}{{ fields }}{{ handle }}{{ /fields }}{{ /form:survey }}');
+        $this->createPage('about');
+
+        $this->get('/about')->assertOk()->assertSee('1 <form', false);
+        $this->get('/about')->assertOk()->assertSee('1 <form', false);
+    }
+
+    #[Test]
+    public function it_still_caches_a_page_when_the_prefilled_form_is_inside_nocache_tags()
+    {
+        $form = $this->makeMultiPageForm();
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+
+        app()->instance('example_count', 0);
+
+        (new class extends \Statamic\Tags\Tags
+        {
+            public static $handle = 'example_count';
+
+            public function index()
+            {
+                app()->instance('example_count', $count = app('example_count') + 1);
+
+                return $count;
+            }
+        })::register();
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ example_count }} {{ nocache }}{{ form:survey }}{{ fields }}{{ handle }}=[{{ value }}]{{ /fields }}{{ /form:survey }}{{ /nocache }}');
+        $this->createPage('about');
+
+        $this
+            ->withSession(['form.survey.partial_submission' => $submission->id()])
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 <form', false)
+            ->assertSee('name=[Olaf]', false);
+
+        $this->flushSession();
+
+        $this
+            ->get('/about')
+            ->assertOk()
+            ->assertSee('1 <form', false)
+            ->assertSee('name=[]', false);
+    }
+
+    private function makeMultiPageForm()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $form = Form::make('survey')->formFields([
+            'pages' => [
+                ['id' => 'page_one', 'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]]],
+                ['id' => 'page_two', 'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]]],
+            ],
+        ]);
+
+        Form::shouldReceive('find')->with('survey')->andReturn($form);
+        Form::makePartial();
+
+        return tap($form)->save();
     }
 }
 

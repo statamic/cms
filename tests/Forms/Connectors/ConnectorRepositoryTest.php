@@ -35,7 +35,7 @@ class ConnectorRepositoryTest extends TestCase
 
         $this->assertNotNull($route);
         $this->assertEquals('forms/{form}/connect/routed', $route->uri());
-        $this->assertContains('can:edit,form', $route->middleware());
+        $this->assertContains('can:editConnections,form', $route->middleware());
     }
 }
 

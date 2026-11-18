@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
@@ -24,7 +25,7 @@ class EditConnectorTest extends TestCase
     #[Test]
     public function it_shows_the_edit_page()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test')->connections([
             'email' => [['id' => 'abc', 'to' => 'foo@example.com']],
@@ -53,7 +54,7 @@ class EditConnectorTest extends TestCase
     #[Test]
     public function it_404s_if_the_connector_doesnt_exist()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -61,6 +62,30 @@ class EditConnectorTest extends TestCase
             ->actingAs($user)
             ->get(cp_route('forms.connect.edit', [$form->handle(), 'unknown']))
             ->assertNotFound();
+    }
+
+    #[Test]
+    #[DataProvider('editOnlyPermissionsProvider')]
+    public function it_denies_access_with_only_edit_permissions(array $permissions)
+    {
+        $this->setTestRoles(['test' => ['access cp', ...$permissions]]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->get(cp_route('forms.connect.edit', [$form->handle(), 'email']))
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    public static function editOnlyPermissionsProvider(): array
+    {
+        return [
+            'edit forms' => [['edit forms']],
+            'edit test form' => [['edit test form']],
+        ];
     }
 
     #[Test]

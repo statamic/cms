@@ -23,3 +23,21 @@ test('trigger gives up its role and tab stop when the search input is shown', ()
     expect(trigger.attributes('aria-haspopup')).toBeUndefined();
     expect(trigger.attributes('tabindex')).toBe('-1');
 });
+
+test('a taggable combobox shows its search input while closed even with a selected-option slot', () => {
+    const wrapper = mount(Combobox, {
+        props: { options, modelValue: 'alfa', taggable: true },
+        slots: { 'selected-option': '<span>Selected</span>' },
+    });
+
+    expect(wrapper.find('input').exists()).toBe(true);
+});
+
+test('a taggable combobox can hide its search input while closed', () => {
+    const wrapper = mount(Combobox, {
+        props: { options, modelValue: 'alfa', taggable: true, hideInputWhenClosed: true },
+    });
+
+    expect(wrapper.find('input').exists()).toBe(false);
+    expect(wrapper.get('[data-ui-combobox-trigger]').attributes('role')).toBe('combobox');
+});

@@ -8,6 +8,7 @@ import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses, collectsValue } from './categories';
 import { writeFieldConditions } from '@/composables/forms/field-conditions';
+import { KEYS as FIELD_CONDITIONS_KEYS } from '@/components/field-conditions/Constants.js';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
@@ -188,6 +189,7 @@ const findSuggestableField = (handle: string) => suggestableConditionFields.valu
 
 const updateFieldConditions = (conditions: Record<string, any>) => {
     writeFieldConditions(field.value, conditions);
+    FIELD_CONDITIONS_KEYS.forEach((key) => delete values.value[key]);
     Object.assign(values.value, conditions);
     dirty();
 };
