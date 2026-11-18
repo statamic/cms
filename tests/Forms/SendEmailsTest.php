@@ -3,6 +3,7 @@
 namespace Tests\Forms;
 
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -149,7 +150,47 @@ class SendEmailsTest extends TestCase
             'field was filled in' => ['someone@example.com', true],
             'field was left blank' => [null, false],
             'field contains junk' => ['not an email', false],
+            'field contains an internationalized address' => ['user@bücher.de', true],
         ];
+    }
+
+    #[Test]
+    #[DataProvider('ccAndBccProvider')]
+    public function it_sends_emails_without_a_to_address_when_cc_or_bcc_resolves($key)
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => '', $key => 'someone@example.com'],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission());
+
+        Mail::assertSent(Email::class, 1);
+    }
+
+    public static function ccAndBccProvider()
+    {
+        return [
+            'cc' => ['cc'],
+            'bcc' => ['bcc'],
+        ];
+    }
+
+    #[Test]
+    public function it_logs_a_warning_when_an_email_is_skipped()
+    {
+        Mail::fake();
+        Log::spy();
+
+        $form = tap(FacadesForm::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => 'not an email'],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission());
+
+        Mail::assertNothingSent();
+        Log::shouldHaveReceived('warning')->once();
     }
 
     #[Test]

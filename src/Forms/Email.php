@@ -21,6 +21,7 @@ use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Cascade;
+use Symfony\Component\Mime\Address;
 
 use function Statamic\trans as __;
 
@@ -60,13 +61,15 @@ class Email extends Mailable
 
     public function hasRecipients(): bool
     {
-        if (blank($to = Arr::get($this->config, 'to'))) {
+        $recipients = array_filter(Arr::only($this->config, ['to', 'cc', 'bcc']), fn ($value) => filled($value));
+
+        if (empty($recipients)) {
             return false;
         }
 
         $this->submissionData = $this->submission->toAugmentedArray();
 
-        return filled($this->addresses($this->parseConfig(['to' => $to])->get('to')));
+        return $this->parseConfig($recipients)->contains(fn ($value) => filled($this->addresses($value)));
     }
 
     public function build()
@@ -327,9 +330,20 @@ class Email extends Mailable
                     'name' => $name,
                 ];
             })
-            ->filter(fn (array $address) => filter_var($address['email'], FILTER_VALIDATE_EMAIL))
+            ->filter(fn (array $address) => $this->isValidAddress($address['email']))
             ->values()
             ->all();
+    }
+
+    private function isValidAddress(string $email): bool
+    {
+        try {
+            new Address($email);
+        } catch (\InvalidArgumentException) {
+            return false;
+        }
+
+        return true;
     }
 
     private function sanitize(string $value): string

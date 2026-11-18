@@ -96,6 +96,9 @@ class EmailTest extends TestCase
             'single email' => ['foo@bar.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
+            'internationalized email' => ['user@bücher.de', [
+                ['address' => 'user@bücher.de', 'name' => null],
+            ]],
             'single email with name' => ['Foo Bar <foo@bar.com>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
             ]],
