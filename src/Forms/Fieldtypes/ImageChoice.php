@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades\AssetContainer;
 use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
@@ -19,6 +20,17 @@ class ImageChoice extends FormFieldtype
     protected $icon = 'image-select';
     protected $categories = ['choice', 'media'];
     protected $order = 5;
+
+    private function imageConfig(): array
+    {
+        $container = config('statamic.assets.image_choice_images.container');
+
+        if (! AssetContainer::find($container)) {
+            return ['container' => null, 'folder' => null];
+        }
+
+        return ['container' => $container, 'folder' => config('statamic.assets.image_choice_images.folder')];
+    }
 
     public function configFieldItems(): array
     {
@@ -55,8 +67,7 @@ class ImageChoice extends FormFieldtype
                             'mode' => 'grid',
                             'width' => 33,
                             'validate' => 'required',
-                            'container' => config('statamic.assets.image_choice_images.container'),
-                            'folder' => config('statamic.assets.image_choice_images.folder'),
+                            ...$this->imageConfig(),
                         ],
                     ],
                 ],

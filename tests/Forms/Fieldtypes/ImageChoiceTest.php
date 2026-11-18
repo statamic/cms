@@ -3,6 +3,8 @@
 namespace Tests\Forms\Fieldtypes;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\ImageChoice as ImageChoiceFieldtype;
 use Statamic\Forms\Charts\HorizontalBar;
@@ -10,10 +12,13 @@ use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Fieldtypes\ImageChoice as ImageChoiceFormFieldtype;
 use Statamic\Forms\Summary\FieldResponses;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ImageChoiceTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_normalizes_options()
     {
@@ -159,6 +164,39 @@ class ImageChoiceTest extends TestCase
         $this->assertEquals(['Cat', 'Dog'], $options->map->label->all());
         $this->assertEquals(['https://example.com/cat.jpg', 'https://example.com/dog.jpg'], $options->map->image->all());
         $this->assertEquals(['A', 'B'], $options->map->badge->all());
+    }
+
+    #[Test]
+    public function the_options_image_field_uses_the_configured_container()
+    {
+        AssetContainer::make('images')->disk('local')->save();
+        config(['statamic.assets.image_choice_images' => ['container' => 'images', 'folder' => 'choices']]);
+
+        $image = $this->optionsImageField();
+
+        $this->assertEquals('images', $image->get('container'));
+        $this->assertEquals('choices', $image->get('folder'));
+    }
+
+    #[Test]
+    public function the_options_image_field_ignores_a_configured_container_that_does_not_exist()
+    {
+        AssetContainer::make('images')->disk('local')->save();
+        config(['statamic.assets.image_choice_images' => ['container' => 'assets', 'folder' => 'choices']]);
+
+        $image = $this->optionsImageField();
+
+        $this->assertNull($image->get('container'));
+        $this->assertNull($image->get('folder'));
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        (new ImageChoiceFormFieldtype)->configFields()->preProcess()->meta();
+    }
+
+    private function optionsImageField(): Field
+    {
+        return (new ImageChoiceFormFieldtype)->configFields()->get('options')->fieldtype()->fields()->get('image');
     }
 
     private function responses(iterable $values): FieldResponses
