@@ -855,9 +855,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }} - {{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -893,9 +893,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -919,9 +919,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
     <div class="all-sections">{{ sections }}{{ display }},{{ /sections }}</div>
 {{ /form:survey }}
 EOT
@@ -985,6 +985,19 @@ EOT;
         );
 
         $this->assertStringContainsString('<p>/contact-us|published|page_one|open</p>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_pages_and_restriction_variables()
+    {
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ pages }}{{ title }},{{ /pages }}|{{ restricted }}|{{ restriction_message }}|{{ form_pages }}{{ id }},{{ /form_pages }}|{{ if form_restricted }}yes{{ else }}no{{ /if }}|{{ form_restriction_message ?? "none" }}</p>{{ /form:survey }}',
+            ['pages' => [['title' => 'Home'], ['title' => 'About']], 'restricted' => 'cascade-restricted', 'restriction_message' => 'cascade-message'],
+        );
+
+        $this->assertStringContainsString('<p>Home,About,|cascade-restricted|cascade-message|page_one,page_two,|no|none</p>', $output);
     }
 
     #[Test]

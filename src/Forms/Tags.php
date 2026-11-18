@@ -82,9 +82,9 @@ class Tags extends BaseTags
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
-        $data['pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
+        $data['form_pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
 
-        $data['form_page'] = Arr::except(collect($data['pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
+        $data['form_page'] = Arr::except(collect($data['form_pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -99,8 +99,8 @@ class Tags extends BaseTags
             $data['previous_page_url'] = $this->previousPageUrl();
         }
 
-        $data['restricted'] = $form->restricted();
-        $data['restriction_message'] = $form->restrictionMessage();
+        $data['form_restricted'] = $form->restricted();
+        $data['form_restriction_message'] = $form->restrictionMessage();
         $data['form_status'] = $form->status();
 
         if ($jsDriver) {
