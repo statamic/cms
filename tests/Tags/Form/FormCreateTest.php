@@ -958,7 +958,7 @@ EOT
 
         $template = <<<'EOT'
 {{ form:survey }}
-    <div class="page">{{ page:id }} - {{ page:display }}{{ if page:instructions }} ({{ page:instructions }}){{ /if }}{{ if page:previous_page_label }} - back:{{ page:previous_page_label }}{{ /if }} - button:{{ page:button_label }}</div>
+    <div class="page">{{ form_page:id }} - {{ form_page:display }}{{ if form_page:instructions }} ({{ form_page:instructions }}){{ /if }}{{ if form_page:previous_page_label }} - back:{{ form_page:previous_page_label }}{{ /if }} - button:{{ form_page:button_label }}</div>
 {{ /form:survey }}
 EOT;
 
@@ -970,6 +970,21 @@ EOT;
         request()->merge(['page' => 'page_two']);
         $output = $this->normalizeHtml($this->tag($template));
         $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit</div>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_page_and_status_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ page:url }}|{{ status }}|{{ form_page:id }}|{{ form_status }}</p>{{ /form:survey }}',
+            ['page' => ['url' => '/contact-us'], 'status' => 'published'],
+        );
+
+        $this->assertStringContainsString('<p>/contact-us|published|page_one|open</p>', $output);
     }
 
     #[Test]
