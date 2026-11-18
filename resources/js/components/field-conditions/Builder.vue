@@ -24,6 +24,7 @@ const customMethod = ref(null);
 const conditions = ref([]);
 const alwaysSave = ref(false);
 const reserveSpaceWhenHidden = ref(false);
+const whenBeforeHidden = ref(null);
 
 const whenOptions = computed(() => {
     return [
@@ -42,6 +43,7 @@ const joinOptions = [
 
 const isCustom = computed(() => type.value === 'custom');
 const hasConditions = computed(() => when.value !== 'always' && when.value !== 'always_hide');
+const conditionsWhen = computed(() => (when.value === 'always_hide' ? whenBeforeHidden.value : when.value));
 
 const add = () => {
     conditions.value.push({
@@ -59,8 +61,8 @@ const toggleCustom = () => type.value = isCustom.value ? 'all' : 'custom';
 const saveableConditions = computed(() => {
     const result = {};
 
-    if (hasConditions.value) {
-        const key = type.value === 'any' ? `${when.value}_any` : when.value;
+    if (conditionsWhen.value && conditionsWhen.value !== 'always') {
+        const key = type.value === 'any' ? `${conditionsWhen.value}_any` : conditionsWhen.value;
         const filtered = conditions.value.filter((c) => c.field && c.value);
         const prepared = new Converter().toBlueprint(filtered);
 
@@ -91,9 +93,7 @@ const prepareEditableOperator = (operator) => {
 };
 
 const getInitialWhenState = () => {
-    if (props.showAlwaysHideOption) {
-        when.value = props.config.hidden ? 'always_hide' : 'always';
-    }
+    if (props.showAlwaysHideOption && props.config.hidden) hide();
 };
 
 const getInitialConditions = () => {
@@ -122,12 +122,23 @@ const getInitialAlwaysSaveState = () => alwaysSave.value = props.config?.always_
 
 const getInitialReserveSpaceWhenHiddenState = () => reserveSpaceWhenHidden.value = props.config?.reserve_space_when_hidden ?? false;
 
+function hide() {
+    if (when.value === 'always_hide') return;
+
+    if (props.showAlwaysHideOption && when.value !== 'always') whenBeforeHidden.value = when.value;
+    when.value = 'always_hide';
+}
+
 watch(() => props.config.hidden, (hidden) => {
     if (hidden) {
-        when.value = 'always_hide';
+        hide();
     } else if (when.value === 'always_hide') {
-        when.value = 'always';
+        when.value = whenBeforeHidden.value ?? 'always';
     }
+});
+
+watch(when, (value) => {
+    if (value !== 'always_hide') whenBeforeHidden.value = null;
 });
 
 watch(saveableConditions, (conditions) => {
@@ -143,8 +154,8 @@ watch(reserveSpaceWhenHidden, (value) => {
 });
 
 onMounted(() => {
-    getInitialWhenState();
     getInitialConditions();
+    getInitialWhenState();
     getInitialAlwaysSaveState();
     getInitialReserveSpaceWhenHiddenState();
     if (conditions.value.length === 0) add();

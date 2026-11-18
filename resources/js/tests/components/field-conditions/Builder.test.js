@@ -1,5 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { expect, test } from 'vitest';
+import { reactive } from 'vue';
 import Builder from '@/components/field-conditions/Builder.vue';
 
 globalThis.__ = (key) => key;
@@ -88,4 +89,85 @@ test('incomplete conditions emit no condition keys', async () => {
     await flushPromises();
 
     expect(lastEmitted(wrapper)).toEqual({ hidden: false });
+});
+
+test('hiding a field from outside keeps its conditions and restores them when shown again', async () => {
+    const config = reactive({ handle: 'email', if: { name: 'bob' } });
+    const wrapper = await mountBuilder(config, { showAlwaysHideOption: true });
+
+    config.hidden = true;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('always_hide');
+    expect(lastEmitted(wrapper)).toEqual({ if: { name: 'equals bob' }, hidden: true });
+
+    config.hidden = false;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('if');
+    expect(lastEmitted(wrapper)).toEqual({ if: { name: 'equals bob' }, hidden: false });
+});
+
+test('hiding a field from outside keeps any and hide conditions', async () => {
+    const config = reactive({ handle: 'email', unless_any: { name: 'bob', age: 'equals 3' } });
+    const wrapper = await mountBuilder(config, { showAlwaysHideOption: true });
+
+    config.hidden = true;
+    await flushPromises();
+
+    expect(lastEmitted(wrapper)).toEqual({ unless_any: { name: 'equals bob', age: 'equals 3' }, hidden: true });
+
+    config.hidden = false;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('unless');
+    expect(wrapper.vm.type).toBe('any');
+});
+
+test('a hidden field with conditions loads as always hide and restores the conditions when shown', async () => {
+    const config = reactive({ handle: 'email', hidden: true, if: { name: 'bob' } });
+    const wrapper = await mountBuilder(config, { showAlwaysHideOption: true });
+
+    expect(wrapper.vm.when).toBe('always_hide');
+    expect(wrapper.emitted('updated')).toBeUndefined();
+
+    config.hidden = false;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('if');
+    expect(lastEmitted(wrapper)).toEqual({ if: { name: 'equals bob' }, hidden: false });
+});
+
+test('choosing a different option while hidden from outside discards the kept conditions', async () => {
+    const config = reactive({ handle: 'email', if: { name: 'bob' } });
+    const wrapper = await mountBuilder(config, { showAlwaysHideOption: true });
+
+    config.hidden = true;
+    await flushPromises();
+
+    wrapper.vm.when = 'always';
+    await flushPromises();
+
+    expect(lastEmitted(wrapper)).toEqual({ hidden: false });
+
+    wrapper.vm.when = 'always_hide';
+    await flushPromises();
+
+    expect(lastEmitted(wrapper)).toEqual({ hidden: true });
+});
+
+test('without the always hide option, hiding from outside behaves as before', async () => {
+    const config = reactive({ handle: 'email', if: { name: 'bob' } });
+    const wrapper = await mountBuilder(config);
+
+    config.hidden = true;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('always_hide');
+    expect(lastEmitted(wrapper)).toEqual({});
+
+    config.hidden = false;
+    await flushPromises();
+
+    expect(wrapper.vm.when).toBe('always');
 });

@@ -379,3 +379,52 @@ test('fields from linked fieldsets are suggested for conditions with their prefi
         { handle: 'work_company', config: { type: 'text', display: 'Company' }, icon: 'text' },
     ]);
 });
+
+test('hiding and showing a field on the canvas keeps its conditions', async () => {
+    const field = textField({ config: { type: 'text', display: 'Phone', width: 100, if: { method: 'equals phone' } } });
+
+    const { inspecting } = setup({
+        field,
+        fields: [{ _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } }],
+    });
+    await flushPromises();
+
+    inspecting.value.config.hidden = true;
+    await flushPromises();
+
+    expect(field.config).toMatchObject({ hidden: true, if: { method: 'equals phone' } });
+    expect(updateCalls().at(-1)[1].values).toMatchObject({ hidden: true, if: { method: 'equals phone' } });
+
+    inspecting.value.config.hidden = false;
+    await flushPromises();
+
+    expect(field.config).toMatchObject({ if: { method: 'equals phone' } });
+    expect(field.config.hidden).toBeFalsy();
+});
+
+test('hiding and showing a linked field on the canvas keeps its conditions as overrides', async () => {
+    const field = referenceField({
+        config: { type: 'text', display: 'Company', width: 100, unless: { method: 'equals phone' } },
+        config_overrides: ['unless'],
+    });
+
+    const { inspecting } = setup({
+        field,
+        fields: [{ _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } }],
+        originValues: { display: 'Company' },
+    });
+    await flushPromises();
+
+    inspecting.value.config.hidden = true;
+    await flushPromises();
+
+    expect(field.config).toMatchObject({ hidden: true, unless: { method: 'equals phone' } });
+    expect(field.config_overrides).toEqual(expect.arrayContaining(['hidden', 'unless']));
+
+    inspecting.value.config.hidden = false;
+    await flushPromises();
+
+    expect(field.config).toMatchObject({ unless: { method: 'equals phone' } });
+    expect(field.config_overrides).toContain('unless');
+    expect(field.config_overrides).not.toContain('hidden');
+});
