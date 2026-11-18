@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Tags\Tags;
@@ -138,6 +139,51 @@ EOT;
 
         $this->assertSame('wrapped', $this->renderString('{{ value = {test_value} }}{{ value }}', [], true));
         $this->assertSame('b', $this->renderString('{{ values = {test_values} }}{{ values:a }}', [], true));
+    }
+
+    public function test_raw_modifier_returns_raw_value_of_values_returned_from_tags()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test_augmented_value';
+
+            public function index()
+            {
+                $fieldtype = new class extends Fieldtype
+                {
+                    public function augment($data)
+                    {
+                        return strtoupper($data).'!';
+                    }
+                };
+
+                return new Value('wrapped', null, $fieldtype);
+            }
+        })::register();
+
+        $this->assertSame('WRAPPED!', $this->renderString('{{ test_augmented_value }}', [], true));
+        $this->assertSame('WRAPPED!', $this->renderString('{{ {test_augmented_value} }}', [], true));
+        $this->assertSame('wrapped', $this->renderString('{{ {test_augmented_value} | raw }}', [], true));
+        $this->assertSame('WRAPPED', $this->renderString('{{ {test_augmented_value} | raw | upper }}', [], true));
+        $this->assertSame('wrapped!', $this->renderString('{{ {test_augmented_value} | lower }}', [], true));
+    }
+
+    public function test_values_returned_from_tags_can_be_used_in_paths()
+    {
+        (new class extends Tags
+        {
+            public static $handle = 'test_key';
+
+            public function index()
+            {
+                return new Value('b');
+            }
+        })::register();
+
+        $data = ['arr' => ['a' => 'A', 'b' => 'B']];
+
+        $this->assertSame('B', $this->renderString('{{ arr[{test_key}] }}', $data, true));
+        $this->assertSame('b', $this->renderString('{{ arr:{test_key} }}', $data, true));
     }
 
     public function test_missing_assets_assign_nothing_to_a_variable()
