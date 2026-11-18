@@ -67,7 +67,7 @@ class SubmitFormTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->form->submissions()->each->delete();
+        $this->form->querySubmissions()->get()->each->delete();
 
         parent::tearDown();
     }
@@ -282,7 +282,7 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $submission = $this->form->submissions()->first();
+        $submission = $this->form->querySubmissions()->get()->first();
 
         $this->assertNotNull($submission);
         $this->assertTrue($submission->isSpam());
@@ -342,7 +342,7 @@ class SubmitFormTest extends TestCase
         // the asset container.
         Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -379,8 +379,8 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submissions()->first()->isSpam());
+        $this->assertCount(1, $this->form->querySubmissions()->get());
+        $this->assertTrue($this->form->querySubmissions()->get()->first()->isSpam());
         $this->assertTrue($action->submission()->isSpam());
 
         Event::assertNotDispatched(SubmissionFinalized::class);
@@ -429,7 +429,7 @@ class SubmitFormTest extends TestCase
 
         Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -476,8 +476,8 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(1, $this->form->submissions());
-        $this->assertTrue($this->form->submissions()->first()->isSpam());
+        $this->assertCount(1, $this->form->querySubmissions()->get());
+        $this->assertTrue($this->form->querySubmissions()->get()->first()->isSpam());
     }
 
     #[Test]
@@ -516,10 +516,10 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(1, $form->submissions());
-        $this->assertTrue($form->submissions()->first()->isSpam());
+        $this->assertCount(1, $form->querySubmissions()->get());
+        $this->assertTrue($form->querySubmissions()->get()->first()->isSpam());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -533,7 +533,7 @@ class SubmitFormTest extends TestCase
         $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
         $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'olaf@example.com']);
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
 
         try {
             app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hello']);
@@ -576,7 +576,7 @@ class SubmitFormTest extends TestCase
 
         Storage::disk('avatars')->assertExists('avatar.jpg');
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -602,7 +602,7 @@ class SubmitFormTest extends TestCase
         Storage::disk('avatars')->assertExists('avatar.jpg');
         $this->assertEquals('avatar.jpg', $result->submission->get('avatar'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -630,7 +630,7 @@ class SubmitFormTest extends TestCase
         $this->assertNotNull($path);
         Storage::disk('local')->assertExists('statamic/file-uploads/'.$path);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -676,7 +676,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('photo.jpg', $storedValue);
         $this->assertNotNull(Asset::find("avatars::{$storedValue}"));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -776,7 +776,7 @@ class SubmitFormTest extends TestCase
 
         $this->assertTrue($result->isFinalized());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -824,7 +824,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('avatar.0', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -869,7 +869,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('gallery', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -914,7 +914,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->isFinalized());
         $this->assertEquals([$first->submission->get('gallery')[0]], $result->submission->get('gallery'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -948,7 +948,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('avatar', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -982,7 +982,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('gallery', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1025,7 +1025,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('avatar', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1067,7 +1067,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->isFinalized());
         Storage::disk('local')->assertExists('statamic/form-uploads/'.$result->submission->get('document')[0]);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1092,11 +1092,11 @@ class SubmitFormTest extends TestCase
         }
 
         Storage::disk('avatars')->assertMissing('photo.jpg');
-        $this->assertCount(1, $form->submissions());
-        $this->assertTrue($form->submissions()->first()->isSpam());
-        $this->assertNull($form->submissions()->first()->get('photo'));
+        $this->assertCount(1, $form->querySubmissions()->get());
+        $this->assertTrue($form->querySubmissions()->get()->first()->isSpam());
+        $this->assertNull($form->querySubmissions()->get()->first()->get('photo'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1120,11 +1120,11 @@ class SubmitFormTest extends TestCase
         }
 
         Storage::disk('avatars')->assertMissing('photo.jpg');
-        $this->assertCount(1, $form->submissions());
-        $this->assertTrue($form->submissions()->first()->isSpam());
-        $this->assertNull($form->submissions()->first()->get('photo'));
+        $this->assertCount(1, $form->querySubmissions()->get());
+        $this->assertTrue($form->querySubmissions()->get()->first()->isSpam());
+        $this->assertNull($form->querySubmissions()->get()->first()->get('photo'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1154,7 +1154,7 @@ class SubmitFormTest extends TestCase
         Storage::disk('avatars')->assertMissing('photo.jpg');
         Storage::disk('local')->assertExists('statamic/form-uploads/'.$action->submission()->get('avatar')[0]);
 
-        $submission = $form->submissions()->first();
+        $submission = $form->querySubmissions()->get()->first();
         (new MarkAsNotSpam)->run(collect([$submission]), []);
 
         $submission = $form->submission($submission->id());
@@ -1164,7 +1164,7 @@ class SubmitFormTest extends TestCase
         $this->assertNull($submission->get('photo'));
         Storage::disk('avatars')->assertExists('avatar.jpg');
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1305,11 +1305,11 @@ class SubmitFormTest extends TestCase
             // Expected
         }
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
         Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
         Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1355,7 +1355,7 @@ class SubmitFormTest extends TestCase
         Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
         Storage::disk('local')->assertMissing("statamic/form-uploads/{$id}/resume/resume.jpg");
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1383,7 +1383,7 @@ class SubmitFormTest extends TestCase
         $id = $action->submission()->id();
         Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1478,7 +1478,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('two', $result->nextPage);
         $this->assertFalse($result->isFinalized());
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
         $this->assertTrue($result->submission->isPartial());
         $this->assertTrue($result->submission->get('_partial'));
         $this->assertEquals('Olaf', $result->submission->get('name'));
@@ -1489,7 +1489,7 @@ class SubmitFormTest extends TestCase
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmail::class);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1505,7 +1505,7 @@ class SubmitFormTest extends TestCase
         $advanced = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
         $this->assertEquals('two', $advanced->nextPage);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1522,7 +1522,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('Olaf', $result->submission->get('name'));
         $this->assertNull($result->submission->get('email'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1561,7 +1561,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('Glasgow', $result->submission->get('shipping_city'));
         $this->assertNull($result->submission->get('message'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1591,7 +1591,7 @@ class SubmitFormTest extends TestCase
             $this->assertArrayHasKey('email', $e->errors());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1628,7 +1628,7 @@ class SubmitFormTest extends TestCase
             $this->assertNotNull($action->submission());
         }
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1668,7 +1668,7 @@ class SubmitFormTest extends TestCase
         // The submission stays partial since completion was silently aborted.
         $this->assertTrue($form->submission($result->submission->id())->isPartial());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1692,7 +1692,7 @@ class SubmitFormTest extends TestCase
             ->submit(['email' => 'olaf@example.com']);
 
         $this->assertEquals($first->submission->id(), $result->submission->id());
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
         $this->assertEquals('three', $result->nextPage);
 
         $this->assertFalse($result->isFinalized());
@@ -1707,7 +1707,7 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('Olaf', $stored->get('name'));
         $this->assertEquals('olaf@example.com', $stored->get('email'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1749,7 +1749,7 @@ class SubmitFormTest extends TestCase
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1776,7 +1776,7 @@ class SubmitFormTest extends TestCase
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
         Bus::assertNotDispatched(SendEmail::class);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1799,7 +1799,7 @@ class SubmitFormTest extends TestCase
         $this->assertNull($result->nextPage);
         $this->assertTrue($result->isFinalized());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function uploadForm(bool $honeypot = false)

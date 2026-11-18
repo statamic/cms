@@ -487,7 +487,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return false;
         }
 
-        $this->submissions()->each->delete();
+        $this->querySubmissions()->get()->each->delete();
 
         File::delete($this->path());
 
@@ -543,7 +543,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function submissions()
     {
-        return FormSubmission::whereForm($this->handle());
+        return $this->querySubmissions()->whereStatus('finalized')->get();
     }
 
     public function querySubmissions(): SubmissionQueryBuilder

@@ -31,7 +31,7 @@ class MarkAsNotSpamTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->form->submissions()->each->delete();
+        $this->form->querySubmissions()->get()->each->delete();
 
         parent::tearDown();
     }

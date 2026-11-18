@@ -54,6 +54,29 @@ class DeleteFakeSubmissionsActionTest extends TestCase
     }
 
     #[Test]
+    public function it_deletes_partial_and_spam_fake_submissions()
+    {
+        $form = $this->makeForm('contact');
+        $user = $this->userWithConfigureFormsPermission();
+
+        $this->makeSubmission($form, ['name' => 'Real', '_fake' => false]);
+        $this->makeSubmission($form, ['name' => 'Fake partial', '_fake' => true, '_partial' => true]);
+        $this->makeSubmission($form, ['name' => 'Fake spam', '_fake' => true, '_marked_spam_at' => 1700000000]);
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.actions.run', $form->handle()), [
+                'action' => 'delete_fake_submissions',
+                'selections' => ['_all_fake_submissions_'],
+                'context' => ['form' => $form->handle()],
+                'values' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['Real'], $form->querySubmissions()->get()->map->get('name')->all());
+    }
+
+    #[Test]
     public function it_does_not_delete_fake_submissions_without_delete_permission()
     {
         $form = $this->makeForm('contact');

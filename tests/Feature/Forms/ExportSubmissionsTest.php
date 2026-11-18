@@ -80,17 +80,18 @@ class ExportSubmissionsTest extends TestCase
     }
 
     #[Test]
-    public function it_exports_all_submissions_including_partials()
+    public function it_only_exports_finalized_submissions()
     {
         $form = $this->createFormWithSubmissions();
         FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+        FormSubmission::make()->form($form)->id('1700000005')->data(['name' => 'Echo', '_marked_spam_at' => 1700000000])->save();
 
         $response = $this
             ->actingAs(tap(User::make()->makeSuper())->save())
             ->export($form, 'csv')
             ->assertOk();
 
-        $this->assertEqualsCanonicalizing(['Alice', 'Bravo', 'Charlie', 'Delta'], $this->namesFromCsv($response->getContent()));
+        $this->assertEqualsCanonicalizing(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($response->getContent()));
     }
 
     #[Test]

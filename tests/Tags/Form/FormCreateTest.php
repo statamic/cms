@@ -1235,7 +1235,7 @@ EOT;
         preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
         $this->assertEquals(['Submission successful.'], $success[1]);
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1251,7 +1251,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertRedirectContains('page=page_three');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1281,11 +1281,11 @@ EOT;
             ->assertRedirectContains('page=page_one');
 
         // The submission wasn't finalized; it's still partial.
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
         $this->assertCount(1, $submissions);
         $this->assertTrue($submissions->first()->isPartial());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1303,7 +1303,7 @@ EOT;
         $this->assertStringNotContainsString('evil.example', $response->headers->get('Location'));
         $response->assertRedirectContains('page=page_two');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1326,7 +1326,7 @@ EOT;
         $this->assertStringContainsString('page=page_one', $output);
         $this->assertStringNotContainsString('page=page_two', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function createMultiPageFormWithLogic($handle = 'survey')
@@ -1462,7 +1462,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $submissions = Form::find('contact')->submissions();
+        $submissions = Form::find('contact')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
@@ -1485,12 +1485,12 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertSessionMissing('form.survey.partial_submission');
 
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1890,7 +1890,7 @@ EOT
         $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
         $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1910,7 +1910,7 @@ EOT
         // The submission is no longer partial, so its values aren't loaded back in.
         $this->assertStringContainsString('name=,', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
