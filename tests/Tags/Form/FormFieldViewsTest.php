@@ -83,6 +83,25 @@ class FormFieldViewsTest extends FormTestCase
         $this->assertStringNotContainsString('name="summer[]"', $output);
     }
 
+    #[Test]
+    #[DataProvider('currencyStepProvider')]
+    public function currency_allows_amounts_with_the_currency_decimals($language, $currency, $step)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'price', 'field' => ['type' => 'currency', 'currency' => $currency]]);
+
+        $this->assertStringContainsString('step="'.$step.'"', $output);
+    }
+
+    public static function currencyStepProvider()
+    {
+        return collect(['antlers', 'blade'])->flatMap(fn ($language) => [
+            "two decimals ({$language})" => [$language, 'USD', '0.01'],
+            "no decimals ({$language})" => [$language, 'JPY', '1'],
+        ])->all();
+    }
+
     public static function templateLanguageProvider()
     {
         return [
