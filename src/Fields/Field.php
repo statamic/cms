@@ -504,7 +504,7 @@ class Field implements Arrayable
         return $this->form;
     }
 
-    public function setFormField(FormField $formField): self
+    public function setFormField(?FormField $formField): self
     {
         $this->formField = $formField;
 

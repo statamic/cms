@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\FormBlueprintFound;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
@@ -1167,6 +1168,28 @@ EOT
 
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Submission successful.'], $success[1]);
+    }
+
+    #[Test]
+    public function it_renders_and_submits_fields_added_by_a_form_blueprint_found_listener()
+    {
+        Event::listen(function (FormBlueprintFound $event) {
+            $event->blueprint->ensureField('source', ['type' => 'text', 'display' => 'Source']);
+        });
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}<label>{{ display }}</label>{{ /fields }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('<label>Source</label>', $output);
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'source' => 'newsletter',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertEquals('newsletter', Form::find('contact')->submissions()->first()->get('source'));
     }
 
     #[Test]
