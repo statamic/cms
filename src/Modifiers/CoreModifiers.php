@@ -1653,15 +1653,13 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
-        $params = collect($params);
-        $flags = collect(['substring:true', 'substring:false']);
+        [$flags, $params] = collect($params)->partition(
+            fn (mixed $param): bool => is_string($param) && in_array(strtolower($param), ['substring:true', 'substring:false'], true)
+        );
 
-        $substring = ! $params->contains(fn (mixed $param): bool => is_string($param) && strtolower($param) === 'substring:false');
+        $substring = ! $flags->contains(fn (string $flag): bool => strtolower($flag) === 'substring:false');
 
-        $params = $params
-            ->reject(fn (mixed $param): bool => is_string($param) && $flags->contains(strtolower($param)))
-            ->values()
-            ->all();
+        $params = $params->values()->all();
 
         if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
             return $value;
