@@ -12,7 +12,7 @@ const navItems = computed(() =>
     [
         can('editFields') && { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/builder`) },
         can('editFields') && { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
-        can('edit') && { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
+        can('editConnections') && { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
         can('viewSubmissions') && { label: __('Results'), href: cp_url(`forms/${form.value.handle}/submissions`) },
         can('edit') && { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
     ].filter(Boolean),

@@ -26,7 +26,7 @@ class ConnectorRepository
             $this->all()->each(function (Connector $connector) {
                 Route::name($connector::handle().'.')
                     ->prefix($connector::handle())
-                    ->middleware('can:edit,form')
+                    ->middleware('can:editConnections,form')
                     ->group(fn () => $connector->routes(Route::getFacadeRoot()));
             });
         });

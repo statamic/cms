@@ -7,6 +7,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Forms\Connectors\Rules\EmailConnectionAddress;
+use Statamic\Forms\Connectors\Rules\EmailConnectionTemplateSyntax;
 use Statamic\Forms\Connectors\Rules\EmailConnectionView;
 use Statamic\Http\Controllers\CP\Forms\EmailConnectionPreviewController;
 use Statamic\Statamic;
@@ -67,14 +68,19 @@ class Email extends Connector
 
     protected function connectionRules(): array
     {
+        $templateSyntax = new EmailConnectionTemplateSyntax($this->form());
+
         return [
-            'to' => [new EmailConnectionAddress($this->form())],
-            'cc' => [new EmailConnectionAddress($this->form())],
-            'bcc' => [new EmailConnectionAddress($this->form())],
-            'from' => [new EmailConnectionAddress($this->form())],
-            'reply_to' => [new EmailConnectionAddress($this->form())],
-            'html' => [new EmailConnectionView],
-            'text' => [new EmailConnectionView],
+            'id' => [$templateSyntax],
+            'to' => [new EmailConnectionAddress($this->form()), $templateSyntax],
+            'cc' => [new EmailConnectionAddress($this->form()), $templateSyntax],
+            'bcc' => [new EmailConnectionAddress($this->form()), $templateSyntax],
+            'from' => [new EmailConnectionAddress($this->form()), $templateSyntax],
+            'reply_to' => [new EmailConnectionAddress($this->form()), $templateSyntax],
+            'subject' => [$templateSyntax],
+            'html' => [new EmailConnectionView, $templateSyntax],
+            'text' => [new EmailConnectionView, $templateSyntax],
+            'mailer' => [$templateSyntax],
         ];
     }
 
