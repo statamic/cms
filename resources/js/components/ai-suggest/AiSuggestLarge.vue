@@ -1,13 +1,16 @@
 <script setup>
-import { computed, ref } from 'vue';
-import { Button, Stack } from '@ui';
+import { computed, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { Button } from '@ui';
+import useAiChat from '@/composables/use-ai-chat.js';
 import AiSuggestBlocks from './AiSuggestBlocks.vue';
+import AiSuggestList from './AiSuggestList.vue';
 import { changesOf, suggestForBard, toBard } from './mock-bard-suggestions.js';
 import { icon } from './use-ai-suggest.js';
+import useSidebarCard, { cardEntrance, onSuggestButton } from './use-sidebar-card.js';
 
-// Prototype: suggestions for a large field, like Bard, where a whole rewrite is too long to read in the small dropdown the other fields use
-// (see AiSuggest.vue). The suggest button opens a stack instead: the field as it is on the left, the suggestion on the right with its changes
-// marked, and a tab for each suggestion along the top.
+// Prototype: suggestions for a large field, like Bard. A whole rewrite is too long for the small dropdown the other fields use (see AiSuggest.vue),
+// so they open over the entry's sidebar (the column with Published and the slug), where there's room for all of each one. They behave like
+// that dropdown, though: clicking anywhere else, or Esc, closes them.
 const props = defineProps({
     config: { type: Object, required: true },
     value: { default: null },
@@ -15,13 +18,11 @@ const props = defineProps({
     buttonClass: { type: [String, Array, Object], default: null },
 });
 
-const emit = defineEmits(['apply']);
+const emit = defineEmits(['apply', 'preview']);
 
 const open = ref(false);
 const loading = ref(false);
 const suggestions = ref([]);
-// The suggestion being looked at
-const active = ref(0);
 // What was in the field when the suggestions were made
 const original = ref([]);
 let timer = null;
@@ -33,95 +34,155 @@ function generate(label = null) {
     timer = setTimeout(() => {
         original.value = props.value;
         suggestions.value = suggestForBard(props.value, label);
-        active.value = 0;
         loading.value = false;
     }, 900);
 }
 
 const changes = computed(() => suggestions.value.map((suggestion) => changesOf(original.value, suggestion)));
-// The field as it is, unmarked, for the left-hand side
-const current = computed(() => (changes.value[active.value] ?? []).map((change) => ({ ...change, after: change.before, changed: false })));
 
-function openStack() {
-    open.value = true;
-    generate();
+function toggled(isOpen) {
+    open.value = isOpen;
+    if (isOpen) generate();
 }
 
-function apply() {
-    emit('apply', toBard(suggestions.value[active.value].blocks));
+function apply(index) {
+    preview(null);
+    emit('apply', toBard(suggestions.value[index].blocks));
     open.value = false;
 }
 
-const instruction = ref('');
+// Hovering or focusing a suggestion shows it in the field in place of what's there, as the other fields do: just the text it would leave,
+// in the field's own type, without its changes marked. Moving off it puts the field back. Nothing changes until you pick one.
+// While it's previewing, the field's label gets a purple "Previewing Tighter" badge, like its "Changed by AI" one (see Field.vue).
+const previewing = ref(null);
+const previewLabel = computed(() => (previewing.value === null ? null : suggestions.value[previewing.value]?.label));
+watch(previewLabel, (label) => emit('preview', label));
+const previewTarget = ref(null);
+const proseClass = ref('');
+let hidden = null;
 
-function follow(text) {
-    if (!text.trim() || loading.value) return;
-    instruction.value = '';
-    generate(text.trim().replace(/^./, (letter) => letter.toUpperCase()));
+function editorOf() {
+    return anchor.value?.parentElement?.querySelector('.bard-editor .ProseMirror:not([data-ai-preview], [data-ai-preview] *)');
 }
 
-const tabButton = 'w-56 cursor-pointer rounded-lg px-2.5 py-1.5 text-start';
+function preview(index) {
+    if (index === previewing.value) return;
+    const prose = editorOf();
+
+    // Put the field back first
+    if (hidden) hidden.style.display = '';
+    hidden = null;
+    previewing.value = index;
+    previewTarget.value = null;
+    if (index === null || !prose) return;
+
+    // Shown in the editor's place, with its classes, so it takes the field's own type and spacing
+    proseClass.value = [...prose.classList].filter((name) => name !== 'ProseMirror-focused').join(' ');
+    previewTarget.value = prose.parentElement;
+    hidden = prose;
+    prose.style.display = 'none';
+}
+
+// Only what the suggestion keeps, as it reads
+const previewBlocks = computed(() =>
+    previewing.value === null
+        ? []
+        : (changes.value[previewing.value] ?? []).filter((change) => change.after !== null).map((change) => ({ ...change, before: change.after, changed: false })),
+);
+
+watch(open, (isOpen) => !isOpen && preview(null));
+
+const follow = (text) => generate(text.trim().replace(/^./, (letter) => letter.toUpperCase()));
+
+// The floating AI chat sits over the same corner, so it's put away while the suggestions are open. Bringing it back (with Ask or its shortcut)
+// puts the suggestions away instead. A docked chat has its own column, so it's left alone.
+const chat = useAiChat();
+watch(open, (isOpen) => isOpen && chat.floating.value && chat.close());
+watch(chat.open, (chatOpen) => chatOpen && (open.value = false));
+
+// Over the entry's sidebar (see use-sidebar-card.js)
+const anchor = useTemplateRef('anchor');
+const button = useTemplateRef('button');
+const panel = useTemplateRef('panel');
+const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => (open.value = false));
+
+// Like a dropdown: clicking anywhere else, or Esc, closes it. The suggest button toggles it itself.
+function onPointerDown(event) {
+    if (panel.value?.contains(event.target) || button.value?.$el?.contains(event.target) || onSuggestButton(event)) return;
+    open.value = false;
+}
+
+function onKeydown(event) {
+    if (event.key !== 'Escape') return;
+    open.value = false;
+    button.value?.$el?.focus();
+}
+
+watch(open, (isOpen) => {
+    document[isOpen ? 'addEventListener' : 'removeEventListener']('pointerdown', onPointerDown);
+    document[isOpen ? 'addEventListener' : 'removeEventListener']('keydown', onKeydown);
+});
+
+onBeforeUnmount(() => {
+    preview(null);
+    document.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('keydown', onKeydown);
+});
 </script>
 
 <template>
+    <span ref="anchor" hidden />
+
+    <!-- The suggest button at the end of Bard's toolbar. It stays highlighted, with a purple icon, while the suggestions are open. -->
     <Button
+        ref="button"
+        data-ai-suggest-button
         size="xs"
-        variant="ghost"
+        :variant="open ? 'default' : 'ghost'"
         :icon="icon"
-        :class="buttonClass"
-        class="[&_svg]:size-3.5! [&_svg]:text-gray-400! [&_svg]:opacity-100! dark:[&_svg]:text-gray-500!"
+        class="[&_svg]:size-3.5! [&_svg]:opacity-100!"
+        :class="[
+            buttonClass,
+            open ? '[&_svg]:text-ai! dark:[&_svg]:text-ai-light!' : '[&_svg]:text-gray-400! dark:[&_svg]:text-gray-500!',
+        ]"
         :aria-label="__('Suggest')"
+        :aria-expanded="open"
         v-tooltip="__('Suggest')"
-        @click="openStack"
+        @click="toggled(!open)"
     />
 
-    <Stack v-model:open="open" :title="__('Suggestions for :field', { field: __(config.display) })" :icon="icon" size="full">
-        <div class="flex h-full flex-col">
-            <!-- A tab for each, with what it does, so they can be told apart without reading them all -->
-            <div class="flex gap-1 pb-4">
-                <button
-                    v-for="(suggestion, i) in suggestions"
-                    :key="i"
-                    type="button"
-                    :class="[tabButton, active === i ? 'bg-gray-100 dark:bg-white/8' : 'hover:bg-gray-50 dark:hover:bg-white/5']"
-                    @click="active = i"
+    <!-- Over the entry's sidebar, styled like a dropdown (shadow, a quick fade and zoom in). It sticks 16px below the top of the scrolling area,
+         and is never taller than fits on screen (see use-sidebar-card.js). The wrapper lets clicks through to the page below the card. -->
+    <Teleport v-if="place" :to="scroller">
+        <div class="pointer-events-none absolute z-(--z-index-modal)" :style="place">
+            <div class="pointer-events-auto sticky top-4 flex flex-col" :style="fit">
+                <div
+                    ref="panel"
+                    class="flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800"
+                    :class="cardEntrance(switched)"
                 >
-                    <span class="block text-sm font-medium text-gray-900 dark:text-gray-100">{{ suggestion.label }}</span>
-                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ suggestion.summary }}</span>
-                </button>
-            </div>
-
-            <!-- While it "thinks", lines that pulse where the two sides will be -->
-            <div v-if="loading" class="grid flex-1 grid-cols-2 gap-6" aria-busy="true">
-                <div v-for="i in 2" :key="i" class="space-y-2 rounded-xl border border-gray-200 p-5 dark:border-white/10">
-                    <div v-for="j in 5" :key="j" class="h-3 animate-pulse rounded bg-gray-100 dark:bg-white/5" />
-                </div>
-            </div>
-
-            <!-- The field as it is, then the suggestion with its changes marked -->
-            <div v-else class="grid flex-1 grid-cols-2 gap-6">
-                <div>
-                    <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">{{ __('Now') }}</p>
-                    <div class="rounded-xl border border-gray-200 p-5 dark:border-white/10">
-                        <AiSuggestBlocks :changes="current" compact />
-                    </div>
-                </div>
-                <div>
-                    <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">{{ suggestions[active]?.label }}</p>
-                    <div class="rounded-xl border border-ai/25 p-5 dark:border-ai-light/25">
-                        <AiSuggestBlocks :changes="changes[active] ?? []" compact />
-                    </div>
+                    <AiSuggestList
+                        :suggestions
+                        :changes
+                        :loading
+                        :field="__(config.display)"
+                        list-class="min-h-0 flex-1"
+                        @apply="apply"
+                        @preview="preview"
+                        @follow="follow"
+                        @retry="generate()"
+                        @close="open = false"
+                    />
                 </div>
             </div>
         </div>
-        <template #footer-start>
-            <form class="w-80" @submit.prevent="follow(instruction)">
-                <input v-model="instruction" type="text" :placeholder="__('Make it…')" :aria-label="__('Rework the suggestions')" class="w-full rounded-md border border-gray-200 bg-white px-2 py-1 text-sm dark:border-white/10 dark:bg-gray-900" />
-            </form>
-        </template>
-        <template #footer-end>
-            <Button variant="ghost" icon="refresh" :text="__('Try again')" @click="generate()" />
-            <Button variant="primary" :text="__('Use this')" :disabled="loading" @click="apply" />
-        </template>
-    </Stack>
+    </Teleport>
+
+    <!-- The hovered suggestion, in the editor's place (see preview) -->
+    <Teleport v-if="previewTarget && previewing !== null" :to="previewTarget">
+        <div data-ai-preview :class="proseClass">
+            <AiSuggestBlocks :changes="previewBlocks" />
+        </div>
+    </Teleport>
+
 </template>

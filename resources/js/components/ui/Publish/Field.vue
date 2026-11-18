@@ -363,7 +363,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     v-on="fieldtypeComponentEvents"
                 />
                 <!-- Prototype: the suggest button floats in the field's top right corner -->
-                <!-- Prototype: Bard's suggest button sits at the end of its toolbar, and opens a stack, as its suggestions are too long for a dropdown (see AiSuggestLarge.vue) -->
+                <!-- Prototype: Bard's suggest button sits at the end of its toolbar, and its suggestions open over the entry's sidebar, as they're too long for a dropdown (see AiSuggestLarge.vue) -->
                 <AiSuggestLarge
                     v-if="canSuggest && config.type === 'bard'"
                     button-class="absolute! end-2 top-[9px] z-[calc(var(--z-index-above)+1)]"
