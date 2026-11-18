@@ -59,6 +59,7 @@ const previewLabel = computed(() => (previewing.value === null ? null : suggesti
 watch(previewLabel, (label) => emit('preview', label));
 const previewTarget = ref(null);
 const proseClass = ref('');
+const editorHeight = ref(null);
 let hidden = null;
 
 function editorOf() {
@@ -76,18 +77,17 @@ function preview(index) {
     previewTarget.value = null;
     if (index === null || !prose) return;
 
-    // Shown in the editor's place, with its classes, so it takes the field's own type and spacing
+    // Shown in the editor's place, with its classes, so it takes the field's own type and spacing. It's never shorter than the editor was.
     proseClass.value = [...prose.classList].filter((name) => name !== 'ProseMirror-focused').join(' ');
+    editorHeight.value = `${prose.offsetHeight}px`;
     previewTarget.value = prose.parentElement;
     hidden = prose;
     prose.style.display = 'none';
 }
 
-// Only what the suggestion keeps, as it reads
+// Only what each suggestion keeps, as it reads
 const previewBlocks = computed(() =>
-    previewing.value === null
-        ? []
-        : (changes.value[previewing.value] ?? []).filter((change) => change.after !== null).map((change) => ({ ...change, before: change.after, changed: false })),
+    changes.value.map((blocks) => blocks.filter((change) => change.after !== null).map((change) => ({ ...change, before: change.after, changed: false }))),
 );
 
 watch(open, (isOpen) => !isOpen && preview(null));
@@ -180,8 +180,12 @@ onBeforeUnmount(() => {
 
     <!-- The hovered suggestion, in the editor's place (see preview) -->
     <Teleport v-if="previewTarget && previewing !== null" :to="previewTarget">
-        <div data-ai-preview :class="proseClass">
-            <AiSuggestBlocks :changes="previewBlocks" />
+        <!-- All the suggestions are laid in one spot, with only the hovered one showing, so the field is as tall as the tallest of them (and at
+             least as tall as the editor was). Moving between them doesn't change its height, so the page doesn't jump about. -->
+        <div data-ai-preview :class="proseClass" :style="{ minHeight: editorHeight }" class="grid! content-start">
+            <div v-for="(blocks, i) in previewBlocks" :key="i" class="[grid-area:1/1]" :class="i !== previewing && 'invisible'" :aria-hidden="i !== previewing">
+                <AiSuggestBlocks :changes="blocks" />
+            </div>
         </div>
     </Teleport>
 
