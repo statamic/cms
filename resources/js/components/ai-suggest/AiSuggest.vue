@@ -20,7 +20,7 @@ const props = defineProps({
     buttonClass: { type: [String, Array, Object], default: null },
 });
 
-const emit = defineEmits(['apply']);
+const emit = defineEmits(['apply', 'preview']);
 
 const open = ref(false);
 const loading = ref(false);
@@ -174,14 +174,15 @@ function focusField() {
     );
 }
 
-// Hovering or focusing a suggestion previews it in the field, in grey (gray-500, the lightest that passes AA). It's laid over the field, matching its padding and font, until you move off it.
+// Hovering or focusing a suggestion previews it in the field. It's laid over the field, matching its padding, font and text colour, until you move off it.
 // The preview is an input or textarea like the field, so the browser places the text exactly where the field will. A div with the same styles sits half a pixel higher than an input's text.
 const preview = ref(null);
 const overlay = useTemplateRef('overlay');
 const overlayTag = ref('input');
 const overlayStyle = ref({});
 
-function showPreview(text) {
+function showPreview(text, label = null) {
+    previewLabel.value = label ? __(label) : '';
     const field = overlay.value?.parentElement?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
 
     if (field) {
@@ -217,6 +218,10 @@ function hidePreview() {
 }
 
 watch(open, (isOpen) => isOpen || (preview.value = null));
+
+// While it's previewing, the field's label gets a purple "Previewing Tighter" badge, like its "Changed by AI" one (see Field.vue)
+const previewLabel = ref('');
+watch([preview, previewLabel], ([text, label]) => emit('preview', text === null ? null : label));
 
 const isEmpty = computed(() => result.value && !result.value.suggestions.length);
 

@@ -5,6 +5,7 @@ import { injectFieldsContext } from './FieldsProvider.vue';
 import { useUiDirection } from '@/composables/ui-direction';
 import {
     Avatar,
+    Badge,
     Field,
     Icon,
     Label,
@@ -120,6 +121,8 @@ function valueUpdated(value) {
 
 // Prototype: whether the AI chat changed this field (and what it held before), until you edit it yourself or save
 const aiChanges = useAiChanges();
+// Prototype: the name of the suggestion the field is previewing, while you hover it ('' for one without a name; see AiSuggest.vue and AiSuggestLarge.vue)
+const previewingSuggestion = ref(null);
 const aiChange = computed(() => aiChanges.changeFor(containerName.value, fullPath.value));
 
 // Prototype: a picked suggestion goes in like you typing it, but is badged as the AI's change so you can see (and undo) what it changed
@@ -340,6 +343,13 @@ const fieldtypeComponentEvents = computed(() => ({
                     </template>
                     <!-- Prototype: the AI chat changed this field. The badge takes the theme's AI colour, with ways to see what changed and undo it (see AiChangeControls.vue). -->
                     <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="label" />
+                    <!-- Prototype: while the field previews a suggestion, a purple badge like "Changed by AI" says which one -->
+                    <Badge
+                        v-if="previewingSuggestion !== null"
+                        size="sm"
+                        class="ms-2 align-middle bg-ai/5 border-ai/40 text-ai dark:bg-ai/20 dark:text-ai-light"
+                        :text="previewingSuggestion ? __('Previewing :name', { name: previewingSuggestion }) : __('Previewing')"
+                    />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="unsynced" variant="ghost" v-tooltip="__('messages.field_desynced_from_origin')" v-if="!isReadOnly && isSyncable" v-show="!isSynced" @click="sync" />
                     <span v-if="shouldMarkReadOnly" class="ms-2 text-2xs font-normal text-gray-500 dark:text-gray-400">
@@ -371,6 +381,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     :value="value"
                     :values="values"
                     @apply="suggestionApplied"
+                    @preview="previewingSuggestion = $event"
                 />
                 <AiSuggest
                     v-else-if="canSuggest"
@@ -379,6 +390,7 @@ const fieldtypeComponentEvents = computed(() => ({
                     :value="value"
                     :values="values"
                     @apply="suggestionApplied"
+                    @preview="previewingSuggestion = $event"
                 />
             </div>
             <!-- Prototype: what the AI chat changed, under the field, once you open it from the badge -->
