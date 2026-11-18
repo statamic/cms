@@ -52,6 +52,14 @@ class FormPolicy
             || $user->hasPermission("edit {$form->handle()} form");
     }
 
+    public function editConnections($user, $form)
+    {
+        $user = User::fromUser($user);
+
+        return $this->edit($user, $form)
+            && $this->viewSubmissions($user, $form);
+    }
+
     public function delete($user, $form)
     {
         $user = User::fromUser($user);

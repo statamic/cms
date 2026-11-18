@@ -83,7 +83,7 @@ const reloadPage = () => router.reload();
                 </template>
                 <template #cell-connections="{ row: form, value: connections }">
                     <Badge
-                        v-if="form.can_edit"
+                        v-if="form.can_edit_connections"
                         :href="form.connect_url"
                         :append="String(connections)"
                         :text="__('Connections')"
