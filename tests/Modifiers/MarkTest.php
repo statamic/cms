@@ -54,9 +54,9 @@ class MarkTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_the_last_substring_flag_regardless_of_case()
+    public function it_marks_whole_words_when_any_argument_is_substring_false()
     {
-        $this->assertEquals('Ne<mark>two</mark>rk', $this->modify('Network', 'two', 'SUBSTRING:FALSE', 'substring:true'));
+        $this->assertEquals('Network', $this->modify('Network', 'two', 'SUBSTRING:FALSE', 'substring:true'));
         $this->assertEquals('Network', $this->modify('Network', 'two', 'substring:true', 'SUBSTRING:FALSE'));
     }
 
