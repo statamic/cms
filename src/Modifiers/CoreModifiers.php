@@ -1653,14 +1653,35 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
+        $substring = true;
+
+        $params = collect($params)
+            ->reject(function ($param) use (&$substring) {
+                if (! is_string($param) || ! preg_match('/^substring:(true|false)$/i', $param, $match)) {
+                    return false;
+                }
+
+                $substring = strtolower($match[1]) === 'true';
+
+                return true;
+            })
+            ->values()
+            ->all();
+
         if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
             return $value;
         }
 
-        $params[0] = collect(preg_split('/\s+/', $words))
+        $pattern = collect(preg_split('/\s+/', $words))
             ->map(fn ($word) => preg_quote($word, '/'))
             ->filter()
             ->join('|');
+
+        if (! $substring && $pattern !== '') {
+            $pattern = '(?<!\w)(?:'.$pattern.')(?!\w)';
+        }
+
+        $params[0] = $pattern;
 
         return $this->regexMark($value, $params);
     }
