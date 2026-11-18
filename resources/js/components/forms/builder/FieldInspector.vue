@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { Button, Icon, PublishContainer, PublishFields, PublishFieldsProvider, TabContent, TabList, Tabs, TabTrigger } from '@ui';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import axios from 'axios';
+import { usePage } from '@inertiajs/vue3';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import FieldValidationBuilder from '@/components/field-validation/Builder.vue';
 import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses, collectsValue } from './categories';
-import { writeFieldConditions } from '@/composables/forms/field-conditions';
+import { LOGIC_KEYS, writeFieldConditions } from '@/composables/forms/field-conditions';
+import { addConfigOverrides } from '@/composables/forms/config-overrides';
+import { expandImportedFields } from '@/composables/forms/suggestable-fields';
 import { KEYS as FIELD_CONDITIONS_KEYS } from '@/components/field-conditions/Constants.js';
 import debounce from '@/util/debounce';
 
 const cache = new Map<string, { fieldtype: any; blueprint: any; values: any; meta: any; originValues: any; originMeta: any }>();
 
-const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, pages, showFieldDirection, withoutDirtying } = injectBuilderContext();
+const latestUpdates = new WeakMap<object, number>();
+let updateCount = 0;
+
+const { dirty, errors: contextErrors, fieldtypes, form, inspecting: field, onBeforeSave, pages, showFieldDirection, withoutDirtying } = injectBuilderContext();
 
 const errors = computed(() => {
     const result = {};
@@ -44,9 +50,13 @@ const originMeta = ref(null);
 const fieldtype = ref(null);
 const blueprint = ref(null);
 const activeTab = ref<FieldInspectorTabs>(FieldInspectorTabs.Settings);
-const modifiedFields = ref<string[]>([]);
 
 let skipNextPreviewUpdate = false;
+let valuesField = null;
+let previousValues = {};
+let pendingLoad: Promise<void> | null = null;
+let pendingUpdate: { field: any; values: any } | null = null;
+const updatesInFlight = new Set<Promise<void>>();
 
 const extraValues = computed(() => ({
     isNew: !!field.value.isNew,
@@ -66,17 +76,27 @@ const adjustedBlueprint = computed(() => {
     return bp;
 });
 
-const load = () => {
-    modifiedFields.value = field.value.config_overrides ?? [];
+const clone = (value) => JSON.parse(JSON.stringify(value ?? null));
 
-    const cached = cache.get(field.value._id);
+const setValues = (target, newValues) => {
+    valuesField = target;
+    previousValues = clone(newValues);
+    skipNextPreviewUpdate = true;
+    withoutDirtying(() => (values.value = newValues));
+};
+
+const load = () => {
+    valuesField = null;
+    pendingLoad = null;
+
+    const target = field.value;
+    const cached = cache.get(target._id);
 
     if (cached) {
         loading.value = false;
         fieldtype.value = cached.fieldtype;
         blueprint.value = cached.blueprint;
-        skipNextPreviewUpdate = true;
-        withoutDirtying(() => (values.value = cached.values));
+        setValues(target, cached.values);
         meta.value = cached.meta;
         originValues.value = cached.originValues;
         originMeta.value = cached.originMeta;
@@ -85,7 +105,7 @@ const load = () => {
 
     loading.value = true;
 
-    axios
+    pendingLoad = axios
         .post(cp_url(`forms/${form.handle}/builder/fields/edit`), {
             type: field.value.fieldtype,
             reference: field.value.type === 'reference' ? field.value.field_reference : false,
@@ -95,16 +115,17 @@ const load = () => {
             },
         })
         .then((response) => {
+            if (field.value !== target) return;
+
             loading.value = false;
             fieldtype.value = response.data.fieldtype;
             blueprint.value = response.data.blueprint;
-            skipNextPreviewUpdate = true;
-            withoutDirtying(() => (values.value = response.data.values));
+            setValues(target, response.data.values);
             meta.value = response.data.meta;
             originValues.value = response.data.originValues;
             originMeta.value = response.data.originMeta;
 
-            cache.set(field.value._id, {
+            cache.set(target._id, {
                 fieldtype: response.data.fieldtype,
                 blueprint: response.data.blueprint,
                 values: response.data.values,
@@ -123,35 +144,57 @@ const load = () => {
         });
 };
 
-const updatePreview = debounce(() => {
-    const fieldId = field.value._id;
+const sendPendingUpdate = () => {
+    if (!pendingUpdate) return;
 
-    axios
+    const { field: target, values: payload } = pendingUpdate;
+    const id = ++updateCount;
+    pendingUpdate = null;
+    latestUpdates.set(target, id);
+
+    const request = axios
         .post(cp_url(`forms/${form.handle}/builder/fields/update`), {
-            type: field.value.fieldtype,
-            values: values.value,
+            type: target.fieldtype,
+            values: payload,
         })
         .then((response) => {
-            if (field.value._id !== fieldId) return;
+            if (latestUpdates.get(target) !== id) return;
 
             const { handle, ...config } = response.data.values;
 
-            field.value.config = config;
+            target.config = config;
 
             if (response.data.preview) {
-                field.value.preview = {
+                target.preview = {
                     config: {
                         ...response.data.preview.config,
-                        handle: field.value.handle ?? field.value._id,
+                        handle: target.handle ?? target._id,
                     },
                     value: response.data.preview.value,
                     meta: response.data.preview.meta,
                 };
             }
 
-            cache.delete(field.value._id);
-        });
-}, 500);
+            cache.delete(target._id);
+        })
+        .finally(() => updatesInFlight.delete(request));
+
+    updatesInFlight.add(request);
+};
+
+const updatePreview = debounce(sendPendingUpdate, 500);
+
+const flushUpdates = () => {
+    updatePreview.cancel();
+    sendPendingUpdate();
+};
+
+const flush = async () => {
+    await pendingLoad?.catch(() => {});
+    await nextTick();
+    flushUpdates();
+    await Promise.allSettled([...updatesInFlight]);
+};
 
 const currentPageIndex = computed(() => {
     return pages.value.findIndex((page) =>
@@ -159,14 +202,18 @@ const currentPageIndex = computed(() => {
     );
 });
 
+const fieldsets = usePage().props.fieldsets;
+
 const suggestableConditionFields = computed(() => {
-    return pages.value
+    const fields = pages.value
         .slice(0, currentPageIndex.value + 1)
         .flatMap((page) => page.sections)
         .flatMap((section) => section.fields)
-        .filter((f) => f._id !== field.value._id)
-        .filter((f) => f.type === 'import' || f.handle)
-        .filter((f) => f.type === 'import' || collectsValue(getFieldtypeCategoryHandle(f.config.type)))
+        .filter((f) => f._id !== field.value._id);
+
+    return expandImportedFields(fields, fieldsets)
+        .filter((f) => f.handle)
+        .filter((f) => collectsValue(getFieldtypeCategoryHandle(f.config.type)))
         .map((f) => ({
             handle: f.handle,
             config: {
@@ -195,7 +242,10 @@ const updateFieldConditions = (conditions: Record<string, any>) => {
 };
 
 watch(field, () => {
-    updatePreview.cancel();
+    flushUpdates();
+
+    if (!field.value) return;
+
     loading.value = !cache.has(field.value._id);
     load();
 
@@ -204,28 +254,57 @@ watch(field, () => {
     }
 });
 
+const changedKeys = (before, after) => {
+    const keys = new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})]);
+
+    return [...keys].filter((key) => JSON.stringify(before?.[key]) !== JSON.stringify(after?.[key]));
+};
+
+const differsFromOrigin = (key) => !originValues.value || !(key in originValues.value)
+    || JSON.stringify(originValues.value[key]) !== JSON.stringify(values.value[key]);
+
 watch(values, () => {
     dirty();
+
+    const changed = changedKeys(previousValues, values.value);
+    previousValues = clone(values.value);
 
     if (skipNextPreviewUpdate) {
         skipNextPreviewUpdate = false;
         return;
     }
 
+    if (!valuesField) return;
+
+    addConfigOverrides(
+        valuesField,
+        changed.filter((key) => key !== 'handle' && !LOGIC_KEYS.includes(key) && differsFromOrigin(key))
+    );
+
+    pendingUpdate = { field: valuesField, values: clone(values.value) };
     updatePreview();
 }, { deep: true });
+
+watch(() => field.value?.config?.width, (width) => {
+    if (!values.value || valuesField !== field.value) return;
+    if ((values.value.width ?? 100) !== (width ?? 100)) values.value.width = width ?? 100;
+});
 
 watch(() => values.value?.handle, (handle: string) => {
     if (field.value.isNew && handle !== undefined) field.value.handle = handle;
 });
 
-watch(modifiedFields, (fields) => {
-    if (field.value.type === 'reference') {
-        field.value.config_overrides = fields;
-    }
-}, { deep: true });
+let removeBeforeSave = null;
 
-onMounted(() => load());
+onMounted(() => {
+    removeBeforeSave = onBeforeSave(flush);
+    load();
+});
+
+onBeforeUnmount(() => {
+    removeBeforeSave?.();
+    flushUpdates();
+});
 </script>
 
 <template>
@@ -263,7 +342,6 @@ onMounted(() => load());
                         :errors
                         :extra-values
                         v-model="values"
-                        v-model:modified-fields="modifiedFields"
                         :origin-values
                         :origin-meta
                         :track-dirty-state="false"

@@ -1,5 +1,5 @@
 import { mount, flushPromises } from '@vue/test-utils';
-import { expect, test, vi } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 import { ref } from 'vue';
 import axios from 'axios';
 import FieldInspector from '@/components/forms/builder/FieldInspector.vue';
@@ -12,62 +12,116 @@ vi.mock('@ui', async (importOriginal) => {
 });
 vi.mock('@/util/debounce', () => ({ default: (fn) => Object.assign(fn, { cancel: () => {} }) }));
 
+const pageProps = { fieldsets: {} };
+vi.mock('@inertiajs/vue3', async (importOriginal) => ({ ...(await importOriginal()), usePage: () => ({ props: pageProps }) }));
+
 const context = {};
 vi.mock('@/pages/forms/Builder.vue', () => ({ injectBuilderContext: () => context }));
 
 globalThis.__ = (key) => key;
 globalThis.cp_url = (url) => url;
 
-test('switching the condition key in the inspector drops the old key', async () => {
-    const field = {
-        _id: 'phone-id',
-        handle: 'phone',
-        fieldtype: 'text',
-        icon: 'text',
-        config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } },
-    };
+let wrapper;
+
+afterEach(() => {
+    wrapper?.unmount();
+    wrapper = null;
+    pageProps.fieldsets = {};
+});
+
+const deferred = () => {
+    let resolve;
+    const promise = new Promise((r) => (resolve = r));
+    return { promise, resolve };
+};
+
+const respondToEdit = (payload, originValues = {}) =>
+    Promise.resolve({
+        data: {
+            fieldtype: {},
+            blueprint: { tabs: [{ sections: [{ fields: [] }] }] },
+            values: { ...payload.values },
+            meta: {},
+            originValues,
+            originMeta: {},
+        },
+    });
+
+const updateResponse = (payload) => ({ data: { values: { ...payload.values } } });
+
+let updatePayloads = [];
+const updateCalls = () => updatePayloads.map((payload) => ['/update', payload]);
+
+function setup({ field, fields = [], originValues = {}, edit = respondToEdit, update = (payload) => Promise.resolve(updateResponse(payload)) }) {
+    const beforeSave = [];
+    const inspecting = ref(field);
 
     Object.assign(context, {
-        dirty: () => {},
+        dirty: vi.fn(),
         errors: ref({}),
-        fieldtypes: [{ handle: 'radio', categories: ['choice'] }, { handle: 'text', categories: ['text'] }],
+        fieldtypes: [
+            { handle: 'radio', categories: ['choice'] },
+            { handle: 'text', categories: ['text'] },
+            { handle: 'heading', categories: ['information'] },
+        ],
         form: { handle: 'contact' },
-        inspecting: ref(field),
-        pages: ref([
-            {
-                sections: [
-                    {
-                        fields: [
-                            { _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } },
-                            field,
-                        ],
-                    },
-                ],
-            },
-        ]),
+        inspecting,
+        onBeforeSave: (callback) => {
+            beforeSave.push(callback);
+            return () => beforeSave.splice(beforeSave.indexOf(callback), 1);
+        },
+        pages: ref([{ sections: [{ fields: [...fields, field] }] }]),
         showFieldDirection: false,
         withoutDirtying: (callback) => callback(),
     });
 
+    updatePayloads = [];
+    axios.post.mockReset();
     axios.post.mockImplementation((url, payload) => {
-        if (url.endsWith('/edit')) {
-            return Promise.resolve({
-                data: {
-                    fieldtype: {},
-                    blueprint: { tabs: [{ sections: [{ fields: [] }] }] },
-                    values: { ...payload.values },
-                    meta: {},
-                    originValues: {},
-                    originMeta: {},
-                },
-            });
-        }
+        if (url.endsWith('/edit')) return edit(payload, originValues);
 
-        return Promise.resolve({ data: { values: { ...payload.values } } });
+        updatePayloads.push(JSON.parse(JSON.stringify(payload)));
+        return update(payload);
     });
 
-    const wrapper = mount(FieldInspector, {
+    wrapper = mount(FieldInspector, {
         global: { stubs: { FieldValidationBuilder: true } },
+    });
+
+    return {
+        inspecting,
+        flushBeforeSave: () => Promise.all(beforeSave.map((callback) => callback())),
+        beforeSave,
+    };
+}
+
+const textField = (overrides = {}) => ({
+    _id: 'phone-id',
+    handle: 'phone',
+    fieldtype: 'text',
+    icon: 'text',
+    type: 'inline',
+    config: { type: 'text', display: 'Phone', width: 100, hidden: false },
+    ...overrides,
+});
+
+const referenceField = (overrides = {}) =>
+    textField({
+        _id: 'company-id',
+        handle: 'company',
+        type: 'reference',
+        field_reference: 'details.company',
+        config: { type: 'text', display: 'Company', placeholder: 'Acme', width: 100, hidden: false },
+        config_overrides: [],
+        ...overrides,
+    });
+
+test('switching the condition key in the inspector drops the old key', async () => {
+    const field = textField({ config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } } });
+
+    setup({
+        field,
+        fields: [{ _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } }],
     });
     await flushPromises();
 
@@ -77,8 +131,225 @@ test('switching the condition key in the inspector drops the old key', async () 
     expect(wrapper.vm.values).toMatchObject({ unless: { method: 'equals phone' } });
     expect(wrapper.vm.values).not.toHaveProperty('if');
 
-    const update = axios.post.mock.calls.filter(([url]) => url.endsWith('/update')).at(-1)[1];
+    const update = updateCalls().at(-1)[1];
     expect(update.values).toMatchObject({ unless: { method: 'equals phone' } });
     expect(update.values).not.toHaveProperty('if');
     expect(field.config).not.toHaveProperty('if');
+});
+
+test('settings edits on a linked field are tracked as overrides', async () => {
+    const field = referenceField({ config_overrides: ['instructions'] });
+
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme', instructions: null } });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Employer';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['instructions', 'display']);
+    expect(field.config.display).toBe('Employer');
+});
+
+test('values a fieldtype normalizes back to the fieldset value are not tracked as overrides', async () => {
+    const field = referenceField();
+
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme' } });
+    await flushPromises();
+
+    wrapper.vm.values.placeholder = 'Other';
+    await flushPromises();
+    wrapper.vm.values.placeholder = 'Acme';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['placeholder']);
+
+    wrapper.vm.values.display = 'Company';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['placeholder']);
+});
+
+test('validation edits on a linked field are tracked as overrides', async () => {
+    const field = referenceField();
+
+    setup({ field, originValues: { display: 'Company' } });
+    await flushPromises();
+
+    wrapper.vm.values.validate = ['required'];
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['validate']);
+    expect(field.config.validate).toEqual(['required']);
+});
+
+test('overrides are not tracked on inline fields', async () => {
+    const field = textField();
+
+    setup({ field });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+
+    expect(field).not.toHaveProperty('config_overrides');
+});
+
+test('saving waits for a pending settings update', async () => {
+    const field = textField();
+    const response = deferred();
+
+    const { flushBeforeSave } = setup({ field, update: () => response.promise });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+
+    let flushed = false;
+    flushBeforeSave().then(() => (flushed = true));
+    await flushPromises();
+
+    expect(flushed).toBe(false);
+    expect(field.config.display).toBe('Phone');
+
+    response.resolve(updateResponse(updateCalls().at(-1)[1]));
+    await flushPromises();
+
+    expect(flushed).toBe(true);
+    expect(field.config.display).toBe('Mobile');
+});
+
+test('saving waits for a new field to load', async () => {
+    const field = textField({ handle: null, isNew: true });
+    const response = deferred();
+
+    const { flushBeforeSave } = setup({ field, edit: () => response.promise });
+    await flushPromises();
+
+    let flushed = false;
+    flushBeforeSave().then(() => (flushed = true));
+    await flushPromises();
+
+    expect(flushed).toBe(false);
+
+    response.resolve((await respondToEdit({ values: { ...field.config, handle: 'phone' } })));
+    await flushPromises();
+
+    expect(flushed).toBe(true);
+    expect(field.handle).toBe('phone');
+});
+
+test('an edit is applied to its field when another field is selected before the update returns', async () => {
+    const field = textField();
+    const other = textField({ _id: 'email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+    const response = deferred();
+
+    const { inspecting } = setup({ field, fields: [other], update: () => response.promise });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+
+    inspecting.value = other;
+    await flushPromises();
+
+    response.resolve(updateResponse(updateCalls()[0][1]));
+    await flushPromises();
+
+    expect(field.config.display).toBe('Mobile');
+    expect(other.config.display).toBe('Email');
+});
+
+test('an edit is applied to its field when the inspector closes before the update returns', async () => {
+    const field = textField();
+    const response = deferred();
+
+    const { inspecting } = setup({ field, update: () => response.promise });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+
+    inspecting.value = null;
+    wrapper.unmount();
+    wrapper = null;
+
+    response.resolve(updateResponse(updateCalls()[0][1]));
+    await flushPromises();
+
+    expect(field.config.display).toBe('Mobile');
+});
+
+test('a stale update response does not overwrite a newer edit', async () => {
+    const field = textField();
+    const responses = [deferred(), deferred()];
+    let call = 0;
+
+    setup({ field, update: () => responses[call++].promise });
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+    wrapper.vm.values.display = 'Mobile Phone';
+    await flushPromises();
+
+    responses[1].resolve(updateResponse(updateCalls()[1][1]));
+    await flushPromises();
+    responses[0].resolve(updateResponse(updateCalls()[0][1]));
+    await flushPromises();
+
+    expect(field.config.display).toBe('Mobile Phone');
+});
+
+test('a width change on the canvas survives a later settings edit', async () => {
+    const field = referenceField();
+
+    const { inspecting } = setup({ field, originValues: { display: 'Company' } });
+    await flushPromises();
+
+    inspecting.value.config.width = 50;
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Employer';
+    await flushPromises();
+
+    expect(updateCalls().at(-1)[1].values).toMatchObject({ width: 50, display: 'Employer' });
+    expect(field.config.width).toBe(50);
+    expect(field.config_overrides).toEqual(expect.arrayContaining(['width', 'display']));
+});
+
+test('hiding a field on the canvas survives a later settings edit', async () => {
+    const field = textField();
+
+    const { inspecting } = setup({ field });
+    await flushPromises();
+
+    inspecting.value.config.hidden = true;
+    await flushPromises();
+
+    wrapper.vm.values.display = 'Mobile';
+    await flushPromises();
+
+    expect(updateCalls().at(-1)[1].values).toMatchObject({ hidden: true, display: 'Mobile' });
+    expect(field.config.hidden).toBe(true);
+});
+
+test('fields from linked fieldsets are suggested for conditions with their prefix', async () => {
+    pageProps.fieldsets = {
+        details: {
+            handle: 'details',
+            fields: [
+                { handle: 'company', type: 'inline', fieldtype: 'text', icon: 'text', config: { type: 'text', display: 'Company' } },
+                { handle: 'intro', type: 'inline', fieldtype: 'heading', config: { type: 'heading', display: 'Intro' } },
+            ],
+        },
+    };
+
+    const field = textField();
+
+    setup({ field, fields: [{ _id: 'import-id', type: 'import', fieldset: 'details', prefix: 'work_' }] });
+    await flushPromises();
+
+    expect(wrapper.vm.suggestableConditionFields).toEqual([
+        { handle: 'work_company', config: { type: 'text', display: 'Company' }, icon: 'text' },
+    ]);
 });
