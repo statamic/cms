@@ -598,6 +598,10 @@ class Tags extends BaseTags
             return null;
         }
 
+        if ($submission) {
+            request()->attributes->set('statamic.static_caching.uncacheable', true);
+        }
+
         return $submission;
     }
 

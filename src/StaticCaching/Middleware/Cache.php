@@ -231,6 +231,7 @@ class Cache
             || $response->headers->has('X-Statamic-Private')
             || $response->headers->has('X-Statamic-Protected')
             || $response->headers->has('X-Statamic-Uncacheable')
+            || $request->attributes->get('statamic.static_caching.uncacheable')
         ) {
             return false;
         }
