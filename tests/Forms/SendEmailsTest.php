@@ -2,12 +2,14 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -340,30 +342,33 @@ class SendEmailsTest extends TestCase
     }
 
     #[Test]
-    public function subclasses_can_still_check_whether_temporary_attachments_should_be_deleted()
+    #[DataProvider('temporaryAttachmentsProvider')]
+    public function subclasses_can_still_check_whether_temporary_attachments_should_be_deleted($fields, $expected)
     {
-        $withFiles = tap(FacadesForm::make('with_files')->formFields([
-            'fields' => [
-                ['handle' => 'attachments', 'field' => ['type' => 'files']],
-            ],
-        ]))->save();
+        $blueprint = Blueprint::makeFromFields($fields)->setHandle('contact')->setNamespace('forms');
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
 
-        $withoutFiles = tap(FacadesForm::make('without_files')->formFields([
-            'fields' => [
-                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
-            ],
-        ]))->save();
+        $form = tap(FacadesForm::make('contact'))->save();
 
-        $check = fn ($form) => (new class($form->makeSubmission(), Site::default()) extends SendEmails
+        $sendEmails = new class($form->makeSubmission(), Site::default()) extends SendEmails
         {
             public function check(): bool
             {
                 return $this->shouldDeleteTemporaryAttachments();
             }
-        })->check();
+        };
 
-        $this->assertTrue($check($withFiles));
-        $this->assertFalse($check($withoutFiles));
+        $this->assertSame($expected, $sendEmails->check());
+    }
+
+    public static function temporaryAttachmentsProvider()
+    {
+        return [
+            'files field' => [['attachments' => ['type' => 'files']], true],
+            'assets field' => [['attachments' => ['type' => 'assets', 'container' => 'uploads']], false],
+            'no upload fields' => [['name' => ['type' => 'text']], false],
+        ];
     }
 
     private function sendEmails(Submission $submission): void

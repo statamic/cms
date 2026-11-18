@@ -53,6 +53,6 @@ class SendEmails implements ShouldQueue
     protected function shouldDeleteTemporaryAttachments(): bool
     {
         return $this->submission->form()->blueprint()->fields()->all()
-            ->contains(fn (Field $field) => $field->fieldtype()->handle() === 'files');
+            ->contains(fn (Field $field) => $field->type() === 'files' || ($field->type() === 'form_upload' && ! $field->fieldtype()->config('store')));
     }
 }
