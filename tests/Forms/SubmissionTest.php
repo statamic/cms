@@ -135,6 +135,17 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function get_returns_the_fallback_for_null_values()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => null])->set('_site', null);
+
+        $this->assertEquals('fallback', $submission->get('name', 'fallback'));
+        $this->assertEquals('fallback', $submission->get('_site', 'fallback'));
+    }
+
+    #[Test]
     public function it_gets_values_without_internal_keys()
     {
         $form = tap(Form::make('contact_us'))->save();

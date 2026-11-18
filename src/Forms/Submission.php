@@ -88,7 +88,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function get($key, $fallback = null)
     {
-        return ($this->isInternalKey($key) ? $this->internal : $this->data)->get($key, $fallback);
+        return ($this->isInternalKey($key) ? $this->internal : $this->data)->get($key) ?? $fallback;
     }
 
     public function has($key)
