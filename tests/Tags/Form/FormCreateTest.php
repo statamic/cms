@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -1148,6 +1149,59 @@ EOT
             ->assertSessionMissing('_old_input.password')
             ->assertSessionMissing('_old_input.password_confirmation')
             ->assertSessionMissing('_old_input.current_password');
+    }
+
+    #[Test]
+    public function it_does_not_flash_custom_dont_flash_fields_back_to_the_session_when_validation_fails()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'email' => '',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.secret');
+    }
+
+    #[Test]
+    public function it_does_not_flash_dont_flash_fields_when_a_form_submitted_listener_throws_a_validation_exception()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this->createForm(['fields' => [
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'password' => 'pass',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['custom'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.secret');
     }
 
     #[Test]
