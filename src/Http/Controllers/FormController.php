@@ -130,7 +130,9 @@ class FormController extends Controller
             ? redirect($redirect)
             : back();
 
-        return $response->withInput()->withErrors($errors, 'form.'.$form);
+        return $response
+            ->withInput($request->except(['current_password', 'password', 'password_confirmation']))
+            ->withErrors($errors, 'form.'.$form);
     }
 
     /**

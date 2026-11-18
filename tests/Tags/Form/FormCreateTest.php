@@ -1097,6 +1097,32 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_flash_password_fields_back_to_the_session_when_validation_fails()
+    {
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'password_confirmation', 'field' => ['type' => 'text']],
+            ['handle' => 'current_password', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->post('/!/forms/login', [
+                'email' => '',
+                'password' => 'secret',
+                'password_confirmation' => 'secret',
+                'current_password' => 'old-secret',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation')
+            ->assertSessionMissing('_old_input.current_password');
+    }
+
+    #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
