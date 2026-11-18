@@ -237,10 +237,10 @@ class EmailTest extends TestCase
         $this->assertEquals('Tell us about yourself.', $pages[0]['instructions']);
         $this->assertEquals(['Name', 'Contact'], collect($pages[0]['sections'])->pluck('display')->all());
         $this->assertEquals('What should we call you?', $pages[0]['sections'][0]['instructions']);
-        $this->assertEquals(['name'], collect($pages[0]['sections'][0]['fields'])->pluck('handle')->all());
+        $this->assertEquals(['intro', 'name'], collect($pages[0]['sections'][0]['fields'])->pluck('handle')->all());
         $this->assertEquals(['email'], collect($pages[0]['sections'][1]['fields'])->pluck('handle')->all());
         $this->assertEquals(['message'], collect($pages[1]['sections'][0]['fields'])->pluck('handle')->all());
-        $this->assertEquals('Jack Black', $pages[0]['sections'][0]['fields'][0]['value']->value());
+        $this->assertEquals('Jack Black', $pages[0]['sections'][0]['fields'][1]['value']->value());
     }
 
     #[Test]
@@ -303,7 +303,7 @@ class EmailTest extends TestCase
     }
 
     #[Test]
-    public function it_excludes_informational_and_structural_fields_from_the_fields_data()
+    public function it_excludes_only_spacers_from_the_fields_data()
     {
         $form = tap(Form::make('test')->formFields([
             'fields' => [
@@ -311,6 +311,10 @@ class EmailTest extends TestCase
                 ['handle' => 'intro', 'field' => ['type' => 'heading']],
                 ['handle' => 'gap', 'field' => ['type' => 'spacer']],
                 ['handle' => 'blurb', 'field' => ['type' => 'paragraph']],
+                ['handle' => 'notice', 'field' => ['type' => 'banner', 'display' => 'Notice']],
+                ['handle' => 'details', 'field' => ['type' => 'section', 'display' => 'Details']],
+                ['handle' => 'markup', 'field' => ['type' => 'html', 'html' => '<p>Hi</p>']],
+                ['handle' => 'tip', 'field' => ['type' => 'info']],
             ],
         ]))->save();
 
@@ -318,7 +322,10 @@ class EmailTest extends TestCase
 
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 
-        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals(
+            ['name', 'intro', 'blurb', 'notice', 'details', 'markup', 'tip'],
+            collect($email->viewData['fields'])->pluck('handle')->all()
+        );
     }
 
     #[Test]
