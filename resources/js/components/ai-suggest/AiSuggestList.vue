@@ -33,8 +33,9 @@ function follow(text) {
     emit('follow', text);
 }
 
-// The other fields' suggestion rows, without the lines between them
-const row = 'group relative block w-full cursor-pointer rounded-lg px-2.5 py-3 text-start hover:bg-gray-100 dark:hover:bg-white/5 focus-visible:outline-none focus-visible:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)]';
+// The other fields' suggestion rows (see AiSuggest.vue), with a little more room (16px above and below each), as these are whole paragraphs.
+// A gray-300 line between them is covered by a hovered or focused one's background.
+const row = 'group relative block w-full cursor-pointer rounded-lg px-2.5 py-4 text-start not-first:mt-[5px] not-first:before:absolute not-first:before:inset-x-2.5 not-first:before:-top-[3px] not-first:before:h-px not-first:before:bg-gray-300 after:absolute after:inset-x-0 after:-inset-y-[3px] first:after:top-0 last:after:bottom-0 after:z-(--z-index-below) after:rounded-lg hover:z-(--z-index-above) hover:before:opacity-0 hover:after:bg-gray-100 dark:not-first:before:bg-white/15 dark:hover:after:bg-white/5 focus-visible:z-[calc(var(--z-index-above)+1)] focus-visible:outline-none focus-visible:before:opacity-0 focus-visible:after:[outline:var(--focus-outline-width)_solid_var(--focus-outline-color,currentColor)] focus-visible:after:outline-offset-(--focus-outline-offset) [&:focus-visible+button]:before:opacity-0';
 </script>
 
 <template>
