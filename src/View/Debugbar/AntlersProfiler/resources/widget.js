@@ -1,4 +1,4 @@
-(function ($) {
+(function () {
     var csscls = PhpDebugBar.utils.makecsscls('phpdebugbar-widgets-'),
         performanceCategories = {
             executionTimeGreat: 1,
@@ -114,7 +114,9 @@
 </div>`;
                     }
 
-                    var $content = $(`
+                    var el = this.el || this.$el[0];
+
+                    el.innerHTML = `
 <div id="antlers-trace-toolbar">
     <h2>Antlers Profiler [Experimental]</h2>
     <div id="antlers-trace-metrics">
@@ -156,9 +158,7 @@
         </div>
     </div>
 </div>
-`);
-
-                    this.$el.empty().append($content);
+`;
 
                     var btnCallGraph = document.getElementById('btn-antlers-trace-view-graph'),
                         btnSourceGraph = document.getElementById('btn-antlers-trace-source-graph'),
@@ -166,17 +166,14 @@
                         btnCloseProperties = document.getElementById('btn-antlers-trace-close-properties'),
                         tabCallGraph = document.getElementById('antlers-trace-call-report'),
                         tabSourceGraph = document.getElementById('antlers-trace-source-graph'),
-                        $sourceGraph = $(tabSourceGraph),
                         metricsContainer = document.getElementById('antlers-trace-metrics'),
-                        $metricsContainer = $(metricsContainer),
                         antlersTracePanel = document.querySelector('.phpdebugbar-widgets-antlers'),
                         debugBarPanel = antlersTracePanel.closest('.phpdebugbar-panel'),
                         debugBarBody = document.querySelector('.phpdebugbar-body'),
                         reportViewElement = document.getElementById('antlers-trace-reports'),
                         propertiesView = document.getElementById('antlers-trace-properties'),
                         reportTable = document.getElementById('antlers-trace-call-table'),
-                        propertiesContent = document.getElementById('antlers-trace-properties-content'),
-                        $propertiesContent = $(propertiesContent);
+                        propertiesContent = document.getElementById('antlers-trace-properties-content');
 
                     function hidePropertiesWindow() {
                         propertiesView.style.display = 'none';
@@ -258,9 +255,7 @@
 `;
                         });
 
-                        var template = `<div class="antlers-trace-properties-window">${properties}</div>`;
-
-                        $propertiesContent.empty().append($(template));
+                        propertiesContent.innerHTML = `<div class="antlers-trace-properties-window">${properties}</div>`;
 
                         propertiesView.style.display = 'initial';
                     }
@@ -282,15 +277,14 @@
                     debugBarPanel.style.overflow = 'hidden';
 
                     function addMetric(name, display) {
-                        var metricContainer = $(`<div class="antlers-trace-metric">
+                        metricsContainer.insertAdjacentHTML(
+                            'beforeend',
+                            `<div class="antlers-trace-metric">
     <span class="antlers-trace-metric-name">${name}:</span>
     <span class="antlers-trace-metric-display">${display}</span>
-</div`);
-
-                        $metricsContainer.append(metricContainer);
+</div>`,
+                        );
                     }
-
-                    $sourceGraph.empty();
 
                     data.source_samples.forEach((item) => {
                         var backgroundColor = 'transparent',
@@ -317,15 +311,12 @@
 
                         var template = `<pre ${title} style="display:inline; line-height: 2; color: ${color}; background-color:${backgroundColor};${cursorStyle}">${item.escapedBufferOutput}</pre>`;
 
-                        if (!item.isNodeObject) {
-                            $sourceGraph.append(template);
-                        } else {
-                            $nodeEl = $(template)[0];
-                            $nodeEl.addEventListener('click', function () {
+                        tabSourceGraph.insertAdjacentHTML('beforeend', template);
+
+                        if (item.isNodeObject) {
+                            tabSourceGraph.lastElementChild.addEventListener('click', function () {
                                 openPropertiesWindow(item);
                             });
-
-                            $sourceGraph.append($nodeEl);
                         }
                     });
 
@@ -633,4 +624,4 @@
             );
         },
     }));
-})(PhpDebugBar.$);
+})();
