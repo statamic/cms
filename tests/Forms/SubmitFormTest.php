@@ -1979,6 +1979,67 @@ class SubmitFormTest extends TestCase
         $form->submissions()->each->delete();
     }
 
+    #[Test]
+    public function files_posted_for_an_upload_field_on_another_page_are_ignored()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $fieldset = Fieldset::make('uploads')->setContents([
+            'fields' => [
+                ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'avatars']],
+                ['handle' => 'attachment', 'field' => ['type' => 'files']],
+            ],
+        ]);
+        Fieldset::shouldReceive('find')->with('uploads')->andReturn($fieldset);
+
+        $form = tap(Form::make('signup')->formFields([
+            'pages' => [
+                [
+                    'id' => 'one',
+                    'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]]],
+                ],
+                [
+                    'id' => 'two',
+                    'sections' => [['fields' => [
+                        ['import' => 'uploads'],
+                        ['handle' => 'resume', 'field' => ['type' => 'upload', 'store' => false]],
+                    ]]],
+                ],
+            ],
+        ]))->save();
+
+        $files = [
+            'photo' => [UploadedFile::fake()->create('evil.php', 10)],
+            'attachment' => [UploadedFile::fake()->create('evil.php', 10)],
+            'resume' => [UploadedFile::fake()->create('evil.php', 10)],
+        ];
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(
+            data: array_replace_recursive(['name' => 'Bob'], $files),
+            files: $files,
+        );
+
+        $this->assertEquals('two', $result->nextPage);
+        $this->assertEmpty(Storage::disk('avatars')->allFiles());
+        $this->assertEmpty(Storage::disk('local')->allFiles());
+        $this->assertNull($result->submission->get('photo'));
+        $this->assertNull($result->submission->get('attachment'));
+        $this->assertNull($result->submission->get('resume'));
+
+        try {
+            app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(data: $files, files: $files);
+            $this->fail('The files should have been validated on their own page.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('photo.0', $e->errors());
+        }
+
+        $this->assertEmpty(Storage::disk('avatars')->allFiles());
+
+        $form->submissions()->each->delete();
+    }
+
     private function uploadForm(bool $honeypot = false)
     {
         $form = Form::make('uploads');

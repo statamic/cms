@@ -125,13 +125,15 @@ class SubmitForm
      * The assets fieldtype expects arrays, even for `max_files: 1`,
      * but we don't want to force that on the front end.
      *
-     * Only top-level upload fields accept files. Anything posted elsewhere is dropped.
+     * Only top-level upload fields on the current page accept files, since
+     * fields on other pages aren't validated. Anything else is dropped.
      */
     private function normalizeFiles(array $files): array
     {
         return $this->form->blueprint()->fields()->all()
             ->filter(fn ($field) => in_array($field->fieldtype()->handle(), ['assets', 'files', 'form_upload']))
             ->keys()
+            ->when($this->page, fn ($handles) => $handles->intersect($this->fieldHandles($this->page)))
             ->filter(fn ($handle) => isset($files[$handle]))
             ->mapWithKeys(fn ($handle) => [$handle => Arr::wrap($files[$handle])])
             ->all();
