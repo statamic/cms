@@ -194,6 +194,18 @@ class ImageChoiceTest extends TestCase
         (new ImageChoiceFormFieldtype)->configFields()->preProcess()->meta();
     }
 
+    #[Test]
+    public function the_options_image_field_has_no_container_when_none_is_configured()
+    {
+        AssetContainer::make('images')->disk('local')->save();
+        config(['statamic.assets.image_choice_images' => ['container' => null, 'folder' => null]]);
+
+        $image = $this->optionsImageField();
+
+        $this->assertNull($image->get('container'));
+        $this->assertNull($image->get('folder'));
+    }
+
     private function optionsImageField(): Field
     {
         return (new ImageChoiceFormFieldtype)->configFields()->get('options')->fieldtype()->fields()->get('image');
