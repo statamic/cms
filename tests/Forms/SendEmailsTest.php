@@ -324,6 +324,48 @@ class SendEmailsTest extends TestCase
         Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig()['to'] === 'override@recipient.com');
     }
 
+    #[Test]
+    public function it_sends_emails_when_handled_directly_outside_the_bus()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['to' => 'first@recipient.com'],
+            ['to' => 'second@recipient.com'],
+        ]))->save();
+
+        (new SendEmails($form->makeSubmission(), Site::default()))->handle();
+
+        Mail::assertSent(Email::class, 2);
+    }
+
+    #[Test]
+    public function subclasses_can_still_check_whether_temporary_attachments_should_be_deleted()
+    {
+        $withFiles = tap(FacadesForm::make('with_files')->formFields([
+            'fields' => [
+                ['handle' => 'attachments', 'field' => ['type' => 'files']],
+            ],
+        ]))->save();
+
+        $withoutFiles = tap(FacadesForm::make('without_files')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $check = fn ($form) => (new class($form->makeSubmission(), Site::default()) extends SendEmails
+        {
+            public function check(): bool
+            {
+                return $this->shouldDeleteTemporaryAttachments();
+            }
+        })->check();
+
+        $this->assertTrue($check($withFiles));
+        $this->assertFalse($check($withoutFiles));
+    }
+
     private function sendEmails(Submission $submission): void
     {
         Bus::chain([new SendEmails($submission, Site::default())])->dispatch();

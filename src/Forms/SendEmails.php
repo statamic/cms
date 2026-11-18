@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Fields\Field;
 use Statamic\Forms\Connectors\ConnectionLogic;
 use Statamic\Sites\Site;
 
@@ -31,12 +32,27 @@ class SendEmails implements ShouldQueue
         // form instance so in-memory changes are respected. Remove the fallback in v7.
         $emailConfigs = $this->config ?? $this->submission->form()->connections()->get('email', []);
 
-        $this->prependToChain(
-            collect($emailConfigs)
-                ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
-                ->map(fn (array $config) => new $class($submission, $this->site, $config))
-                ->values()
-                ->all()
-        );
+        $jobs = collect($emailConfigs)
+            ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
+            ->map(fn (array $config) => new $class($submission, $this->site, $config))
+            ->values()
+            ->all();
+
+        if (! $this->job) {
+            collect($jobs)->each(fn ($job) => dispatch($job));
+
+            return;
+        }
+
+        $this->prependToChain($jobs);
+    }
+
+    /**
+     * @deprecated Temporary files are deleted by Statamic\Forms\DeleteTemporaryFiles, dispatched by the submission.
+     */
+    protected function shouldDeleteTemporaryAttachments(): bool
+    {
+        return $this->submission->form()->blueprint()->fields()->all()
+            ->contains(fn (Field $field) => $field->fieldtype()->handle() === 'files');
     }
 }
