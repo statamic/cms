@@ -452,7 +452,7 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function saving_a_partial_submission_dispatches_the_same_events_as_any_other()
+    public function saving_a_partial_submission_doesnt_dispatch_the_created_event()
     {
         Event::fake();
 
@@ -461,9 +461,9 @@ class SubmissionTest extends TestCase
         $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
-        // A partial submission is still saved and created, so its events are never withheld.
+        // The created event means a complete submission arrived, so it waits for finalize.
         Event::assertDispatched(SubmissionCreating::class);
-        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionSaving::class);
         Event::assertDispatched(SubmissionSaved::class);
     }

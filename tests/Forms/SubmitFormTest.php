@@ -15,6 +15,7 @@ use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionFinalized;
+use Statamic\Events\SubmissionSaved;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
@@ -727,6 +728,126 @@ class SubmitFormTest extends TestCase
 
         Mail::assertSent(Email::class, 1);
         Mail::assertSent(Email::class, fn (Email $email) => $email->getSubmission()->get('photo') === 'photo.jpg');
+    }
+
+    #[Test]
+    public function listeners_see_the_real_asset_path_and_the_asset_already_exists()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+        $seen = [];
+
+        foreach ([FormSubmitted::class, SubmissionCreated::class, SubmissionSaved::class, SubmissionFinalized::class] as $event) {
+            Event::listen($event, function ($event) use (&$seen) {
+                $path = $event->submission->get('avatar')[0] ?? null;
+                $seen[class_basename($event)] = [$path, (bool) Asset::find("avatars::{$path}")];
+            });
+        }
+
+        app(SubmitForm::class)->form($form)->page('main')->submit(
+            data: ['email' => 'test@example.com'],
+            files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+        );
+
+        $this->assertEquals([
+            'FormSubmitted' => ['avatar.jpg', true],
+            'SubmissionCreated' => ['avatar.jpg', true],
+            'SubmissionSaved' => ['avatar.jpg', true],
+            'SubmissionFinalized' => ['avatar.jpg', true],
+        ], $seen);
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function assets_created_for_a_listener_are_removed_when_the_listener_rejects_the_submission()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn () => false);
+
+        try {
+            app(SubmitForm::class)->form($form)->page('main')->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        $this->assertCount(0, Asset::whereContainer('avatars'));
+        $this->assertEmpty($form->submissions());
+    }
+
+    #[Test]
+    public function a_submission_marked_as_spam_by_a_listener_keeps_its_temporary_upload_instead_of_the_asset()
+    {
+        Storage::fake('local');
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = $this->uploadForm();
+
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $action = app(SubmitForm::class)->form($form)->page('main');
+
+        try {
+            $action->submit(
+                data: ['email' => 'test@example.com'],
+                files: ['avatar' => [UploadedFile::fake()->image('avatar.jpg')]],
+            );
+        } catch (SilentFormFailureException $e) {
+            // Expected
+        }
+
+        $id = $action->submission()->id();
+        $submission = $form->submission($id);
+
+        Storage::disk('avatars')->assertMissing('avatar.jpg');
+        $this->assertEquals(["{$id}/avatar/avatar.jpg"], $submission->get('avatar'));
+        Storage::disk('local')->assertExists("statamic/form-uploads/{$id}/avatar/avatar.jpg");
+
+        Event::forget(FormSubmitted::class);
+        (new MarkAsNotSpam)->run(collect([$submission]), []);
+
+        Storage::disk('avatars')->assertExists('avatar.jpg');
+        $this->assertEquals(['avatar.jpg'], $form->submission($id)->get('avatar'));
+
+        $form->submissions()->each->delete();
+    }
+
+    #[Test]
+    public function submission_created_only_fires_when_a_multi_page_submission_is_finalized()
+    {
+        Bus::fake();
+        Event::fake([SubmissionCreated::class, SubmissionSaved::class]);
+
+        $form = $this->multiPageForm();
+
+        $result = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Bob']);
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaved::class, 1);
+
+        $result = app(SubmitForm::class)->form($form)->page('two')->resume($result->submission)->submit(['email' => 'bob@example.com']);
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($result->submission)->submit(['message' => 'Hi']);
+
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionCreated::class, fn ($event) => $event->submission->get('email') === 'bob@example.com');
+
+        $form->submissions()->each->delete();
     }
 
     #[Test]
@@ -1483,7 +1604,7 @@ class SubmitFormTest extends TestCase
         $this->assertTrue($result->submission->get('_partial'));
         $this->assertEquals('Olaf', $result->submission->get('name'));
 
-        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertNotDispatched(FormSubmitted::class);
         Event::assertNotDispatched(SubmissionFinalized::class);
         Bus::assertNotDispatched(CreateAssetsFromFileUploads::class);
@@ -1744,8 +1865,8 @@ class SubmitFormTest extends TestCase
         $this->assertEquals('olaf@example.com', $stored->get('email'));
         $this->assertEquals('Hello', $stored->get('message'));
 
-        // Finalizing fires the completion events once; it doesn't re-create the submission.
-        Event::assertNotDispatched(SubmissionCreated::class);
+        // Finalizing fires the completion events once.
+        Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
 

@@ -274,7 +274,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew) {
+            if ($isNew && ! $this->get('_partial')) {
                 SubmissionCreated::dispatch($this);
             }
 
@@ -288,25 +288,25 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
+        $persisted = ! is_null($this->form()->submission($this->id()));
+
         $this->remove('_partial');
 
+        // Assets need to exist before anything reads the submission, so this stays synchronous.
+        CreateAssetsFromFileUploads::dispatchSync($this);
+
+        // Partials don't fire the created event when they're persisted, so it fires here instead.
         if ($this->form()->store()) {
-            $this->save();
-        } else {
-            // Fire the created event here for submissions that were never saved.
-            // The event might have been dispatched when the submission persisted,
-            // so we don't want to fire it again.
-            if (is_null($this->form()->submission($this->id()))) {
+            if ($this->save() !== false && $persisted) {
                 SubmissionCreated::dispatch($this);
             }
+        } else {
+            SubmissionCreated::dispatch($this);
 
             $this->deleteQuietly();
         }
 
         SubmissionFinalized::dispatch($this);
-
-        // Assets need to exist before anything reads the submission, so this stays synchronous.
-        CreateAssetsFromFileUploads::dispatchSync($this);
 
         // Jobs that can't report success are treated as done once dispatched, so they go
         // first and the temporary files they may need survive until they've been handed off.

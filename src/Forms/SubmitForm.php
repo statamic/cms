@@ -59,6 +59,7 @@ class SubmitForm
 
         $nextPage = null;
         $uploadedAssets = [];
+        $createdAssets = null;
         $files = $this->normalizeFiles($files);
         $values = array_merge($data, $files);
 
@@ -91,15 +92,21 @@ class SubmitForm
                     $this->rejectHoneypotSubmission();
                 }
 
+                ($createdAssets = new CreateAssetsFromFileUploads($this->submission, keepTemporaryFiles: true))->handle();
+
                 $accepted = FormSubmitted::dispatch($this->submission) !== false;
 
                 if ($this->submission->isSpam()) {
+                    $createdAssets->revert();
                     $this->rejectSpamSubmission();
                 }
 
                 throw_unless($accepted, new SilentFormFailureException);
+
+                $createdAssets->deleteTemporaryFiles();
             }
         } catch (ValidationException|SilentFormFailureException $e) {
+            $createdAssets?->revert();
             $this->cleanUpUploads($uploadedAssets);
 
             throw $e;
