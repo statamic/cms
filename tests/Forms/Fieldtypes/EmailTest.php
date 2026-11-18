@@ -70,4 +70,20 @@ class EmailTest extends TestCase
             'append' => '@example.com',
         ], $fieldtype->toFieldArray());
     }
+
+    #[Test]
+    public function it_does_not_add_the_plain_email_rule_when_a_parameterized_one_exists()
+    {
+        $fieldtype = (new Email)->setField(new FormField('email', [
+            'type' => 'email',
+            'validate' => ['required', 'email:rfc,dns'],
+        ]));
+
+        $this->assertEquals([
+            'type' => 'text',
+            'input_type' => 'email',
+            'placeholder' => null,
+            'validate' => ['required', 'email:rfc,dns'],
+        ], $fieldtype->toFieldArray());
+    }
 }
