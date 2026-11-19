@@ -53,6 +53,29 @@ class ShowAssetTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_thumbnail_urls_for_images()
+    {
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $container
+            ->makeAsset('one.png')
+            ->upload(UploadedFile::fake()->image('one.png'));
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $encodedAsset = base64_encode('test::one.png');
+
+        $this
+            ->actingAs($user)
+            ->getJson('/cp/assets/'.$encodedAsset)
+            ->assertSuccessful()
+            ->assertJson(['data' => [
+                'thumbnail' => "http://localhost/cp/thumbnails/{$encodedAsset}/small",
+                'large_thumbnail' => "http://localhost/cp/thumbnails/{$encodedAsset}/large",
+            ]]);
+    }
+
+    #[Test]
     public function it_404s_when_the_asset_doesnt_exist()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
