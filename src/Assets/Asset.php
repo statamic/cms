@@ -237,7 +237,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function meta($key = null)
     {
-        if (func_num_args() === 1) {
+        if (! is_null($key)) {
             return $this->metaValue($key);
         }
 
