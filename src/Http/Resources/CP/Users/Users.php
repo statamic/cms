@@ -37,7 +37,7 @@ class Users extends ResourceCollection
 
     public static function listingColumns()
     {
-        return (new static(collect()))
+        return (new self(collect()))
             ->blueprint(User::blueprint())
             ->columnPreferenceKey('users.columns')
             ->setColumns()
