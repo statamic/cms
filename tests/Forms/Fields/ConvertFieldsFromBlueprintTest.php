@@ -70,11 +70,11 @@ class ConvertFieldsFromBlueprintTest extends TestCase
             ],
             'email, with parameterized email rule' => [
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => ['required', 'email:rfc,strict']],
-                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required', 'email:rfc,strict']],
             ],
             'email, pipe-string parameterized email rule' => [
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => 'required|email:rfc'],
-                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required', 'email:rfc']],
             ],
             'website' => [
                 ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['url']],
@@ -83,6 +83,10 @@ class ConvertFieldsFromBlueprintTest extends TestCase
             'website, with validation rules' => [
                 ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url']],
                 ['type' => 'website', 'display' => 'Website', 'validate' => ['required']],
+            ],
+            'website, with parameterized url rule' => [
+                ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url:https']],
+                ['type' => 'website', 'display' => 'Website', 'validate' => ['required', 'url:https']],
             ],
             'phone' => [
                 ['type' => 'text', 'display' => 'Phone', 'input_type' => 'tel'],
@@ -199,6 +203,55 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ],
             ],
         ], $form->formFields()->contents());
+    }
+
+    #[Test]
+    public function it_converts_the_children_of_groups()
+    {
+        $this->makeBlueprint([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'details', 'field' => [
+                                    'type' => 'group',
+                                    'display' => 'Details',
+                                    'fields' => [
+                                        ['handle' => 'name', 'field' => ['type' => 'text', 'display' => 'Name']],
+                                        ['handle' => 'phone', 'field' => ['type' => 'text', 'input_type' => 'tel']],
+                                        ['handle' => 'color', 'field' => ['type' => 'select', 'options' => ['red' => 'Red']]],
+                                        ['handle' => 'resume', 'field' => ['type' => 'files', 'max_files' => 1]],
+                                        ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'assets']],
+                                        ['import' => 'address'],
+                                        ['handle' => 'city', 'field' => 'address.city'],
+                                    ],
+                                ]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $form = Form::make('contact_us');
+
+        $this->assertEquals([
+            'handle' => 'details',
+            'field' => [
+                'type' => 'group',
+                'display' => 'Details',
+                'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                    ['handle' => 'phone', 'field' => ['type' => 'phone']],
+                    ['handle' => 'color', 'field' => ['type' => 'dropdown', 'options' => ['red' => 'Red']]],
+                    ['handle' => 'resume', 'field' => ['type' => 'files', 'max_files' => 1]],
+                    ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'assets']],
+                    ['import' => 'address'],
+                    ['handle' => 'city', 'field' => 'address.city'],
+                ],
+            ],
+        ], $form->formFields()->items()->first());
     }
 
     #[Test]

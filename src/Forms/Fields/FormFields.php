@@ -19,13 +19,6 @@ class FormFields
 {
     public function __construct(protected array $contents)
     {
-        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
-            $this->contents = [
-                'sections' => collect($this->contents['pages'])
-                    ->flatMap(fn (array $page): array => $page['sections'] ?? [])
-                    ->all(),
-            ];
-        }
     }
 
     public function contents(): array
@@ -38,6 +31,10 @@ class FormFields
         $pages = isset($this->contents['pages'])
             ? collect($this->contents['pages'])
             : collect([['sections' => $this->contents['sections'] ?? []]]);
+
+        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
+            $pages = collect([['sections' => $pages->flatMap(fn (array $page): array => $page['sections'] ?? [])->all()]]);
+        }
 
         return $pages->map(fn (array $page, int $index): array => [
             ...$page,
@@ -84,7 +81,7 @@ class FormFields
                         return [
                             ...$section,
                             'fields' => collect($section['fields'] ?? [])
-                                ->reject(fn (array $config): bool => $config['field']['hidden'] ?? false)
+                                ->reject(fn (array $config): bool => $this->isHidden($config))
                                 ->values()
                                 ->map(function (array $config): array {
                                     if (isset($config['import']) || is_string($config['field'])) {
@@ -114,6 +111,19 @@ class FormFields
             ->all();
 
         return Facades\Blueprint::make()->setContents(['tabs' => $tabs]);
+    }
+
+    private function isHidden(array $config): bool
+    {
+        if (isset($config['import'])) {
+            return false;
+        }
+
+        $fieldConfig = is_string($config['field'])
+            ? array_merge(FieldRepository::find($config['field'])?->config() ?? [], $config['config'] ?? [])
+            : $config['field'];
+
+        return (bool) ($fieldConfig['hidden'] ?? false);
     }
 
     /**

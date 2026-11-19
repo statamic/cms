@@ -41,6 +41,10 @@ class FormExportController extends CpController
     {
         $query = $form->querySubmissions();
 
+        if (! isset($request->filters['submission_status'])) {
+            $query->whereStatus('finalized');
+        }
+
         $this->queryFilters($query, $request->filters, [
             'form' => $form->handle(),
         ]);

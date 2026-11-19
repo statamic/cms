@@ -492,7 +492,7 @@ class Field implements Arrayable
         return $this->fieldtype()->isRelationship();
     }
 
-    public function setForm(Form $form): self
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -504,7 +504,7 @@ class Field implements Arrayable
         return $this->form;
     }
 
-    public function setFormField(FormField $formField): self
+    public function setFormField(?FormField $formField): self
     {
         $this->formField = $formField;
 

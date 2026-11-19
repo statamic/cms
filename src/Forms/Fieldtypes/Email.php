@@ -32,9 +32,18 @@ class Email extends FormFieldtype
             'type' => 'text',
             'input_type' => 'email',
             'placeholder' => $this->config('placeholder'),
-            'validate' => array_values(array_unique([...((array) $this->config('validate', [])), 'email'])),
+            'validate' => $this->validationRules(),
             ...Arr::except($this->config(), ['type', 'input_type', 'placeholder', 'validate']),
         ];
+    }
+
+    private function validationRules(): array
+    {
+        $rules = (array) $this->config('validate', []);
+
+        $hasRule = collect($rules)->contains(fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:')));
+
+        return $hasRule ? array_values($rules) : [...array_values($rules), 'email'];
     }
 
     public function example(): ?array

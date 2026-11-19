@@ -1,5 +1,5 @@
 <script lang="ts">
-import createContext from '@/util/createContext';
+export { injectBuilderContext, provideBuilderContext, builderContextKey } from '@/components/forms/builder/context';
 
 export enum InspectorType {
     Page = 'page',
@@ -15,11 +15,10 @@ export enum FieldView {
     Expanded = 'expanded',
     Collapsed = 'collapsed',
 }
-
-export const [injectBuilderContext, provideBuilderContext] = createContext('FormBuilder');
 </script>
 
 <script setup lang="ts">
+import { provideBuilderContext } from '@/components/forms/builder/context';
 import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
@@ -123,7 +122,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
             sectionsForNewPage.push({
                 _id: uniqid(),
                 collapsed: false,
-                display: __('Section'),
+                display: null,
                 fields: remainingFields,
             });
         }
@@ -137,7 +136,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
         sectionsForNewPage.push({
             _id: uniqid(),
             collapsed: false,
-            display: __('Section'),
+            display: null,
             fields: [],
         });
     }
@@ -163,7 +162,7 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     const section = {
         _id: uniqid(),
         collapsed: false,
-        display: __('Section'),
+        display: null,
         fields,
     };
 
@@ -427,7 +426,7 @@ onMounted(() => {
 
     document.addEventListener('keydown', onEscape);
 
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });

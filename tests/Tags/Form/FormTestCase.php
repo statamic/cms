@@ -152,6 +152,6 @@ abstract class FormTestCase extends TestCase
 
     protected function clearSubmissions()
     {
-        Form::find('contact')->submissions()->each->delete();
+        Form::find('contact')->querySubmissions()->get()->each->delete();
     }
 }
