@@ -84,7 +84,7 @@ class FormFields
                         return [
                             ...$section,
                             'fields' => collect($section['fields'] ?? [])
-                                ->reject(fn (array $config): bool => $config['field']['hidden'] ?? false)
+                                ->reject(fn (array $config): bool => $this->isHidden($config))
                                 ->values()
                                 ->map(function (array $config): array {
                                     if (isset($config['import']) || is_string($config['field'])) {
@@ -114,6 +114,19 @@ class FormFields
             ->all();
 
         return Facades\Blueprint::make()->setContents(['tabs' => $tabs]);
+    }
+
+    private function isHidden(array $config): bool
+    {
+        if (isset($config['import'])) {
+            return false;
+        }
+
+        $fieldConfig = is_string($config['field'])
+            ? array_merge(FieldRepository::find($config['field'])?->config() ?? [], $config['config'] ?? [])
+            : $config['field'];
+
+        return (bool) ($fieldConfig['hidden'] ?? false);
     }
 
     /**
