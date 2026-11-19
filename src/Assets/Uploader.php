@@ -10,8 +10,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
 {
+    /**
+     * Whether the uploaded file was run through the source preset.
+     */
+    protected bool $processedSourceFile = false;
+
     public function upload(UploadedFile $file)
     {
+        $this->processedSourceFile = false;
+
         $source = $this->processSourceFile($file);
 
         $this->write($source, $path = $this->uploadPath($file));
@@ -48,10 +55,14 @@ abstract class Uploader
         ]);
 
         try {
-            return $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
+            $path = $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
             return $file->getRealPath();
         }
+
+        $this->processedSourceFile = true;
+
+        return $path;
     }
 
     private function write($sourcePath, $destinationPath)
