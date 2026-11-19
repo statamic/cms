@@ -409,7 +409,7 @@ onMounted(() => {
 
     document.addEventListener('keydown', onEscape);
 
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });

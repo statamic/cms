@@ -59,7 +59,7 @@ const closeMobileNavPopover = () => {
                 </nav>
             </div>
 
-            <nav v-if="navItems.length > 1" class="global-header-nav hidden lg:block" :aria-label="__('form_navigation')">
+            <nav v-if="navItems.length > 1" class="global-header-nav hidden lg:block" :aria-label="__('messages.form_navigation')">
                 <ul>
                     <li v-for="navItem in navItems" :key="navItem.href">
                         <Link

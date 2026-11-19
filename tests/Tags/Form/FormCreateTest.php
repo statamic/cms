@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -576,6 +577,34 @@ EOT
         ]);
     }
 
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_multiple_image_choice_field_with_a_single_option($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $requiredCount = function (array $field) {
+            $handle = 'image_choice_'.str_shuffle('abcdefgh');
+
+            $this->createForm(['fields' => [['handle' => 'choice', 'field' => array_merge(['type' => 'image_choice', 'validate' => ['required']], $field)]]], $handle);
+
+            $html = $this->normalizeHtml($this->tag("{{ form:{$handle} }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}"));
+
+            preg_match_all('/<input[^>]*name="choice(\[\])?"[^>]*>/', $html, $inputs);
+
+            return collect($inputs[0])->filter(fn ($input) => preg_match('/\srequired[\s>]/', $input))->count();
+        };
+
+        $options = [
+            ['key' => 'cat', 'label' => 'Cat', 'image' => '/cat.jpg'],
+            ['key' => 'dog', 'label' => 'Dog', 'image' => '/dog.jpg'],
+        ];
+
+        $this->assertEquals(0, $requiredCount(['multiple' => true, 'options' => $options]));
+        $this->assertEquals(1, $requiredCount(['multiple' => true, 'options' => [$options[0]]]));
+        $this->assertEquals(2, $requiredCount(['multiple' => false, 'options' => $options]));
+    }
+
     public static function templateLanguageProvider()
     {
         return [
@@ -1146,6 +1175,85 @@ EOT
         $this->assertStringContainsString('<div class="array-field-by-itself">alpha</div>', $output);
         $this->assertStringContainsString('<div class="array-field-in-section">bravo (This field has instructions!)</div>', $output);
         $this->assertStringContainsString('<div class="array-field-by-itself">bravo (This field has instructions!)</div>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_flash_password_fields_back_to_the_session_when_validation_fails()
+    {
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'password_confirmation', 'field' => ['type' => 'text']],
+            ['handle' => 'current_password', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->post('/!/forms/login', [
+                'email' => '',
+                'password' => 'secret',
+                'password_confirmation' => 'secret',
+                'current_password' => 'old-secret',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation')
+            ->assertSessionMissing('_old_input.current_password');
+    }
+
+    #[Test]
+    public function it_does_not_flash_custom_dont_flash_fields_back_to_the_session_when_validation_fails()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'email' => '',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.secret');
+    }
+
+    #[Test]
+    public function it_does_not_flash_dont_flash_fields_when_a_form_submitted_listener_throws_a_validation_exception()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this->createForm(['fields' => [
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'password' => 'pass',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['custom'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.secret');
     }
 
     #[Test]

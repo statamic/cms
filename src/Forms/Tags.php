@@ -12,6 +12,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
+use Statamic\Facades\URL;
 use Statamic\Fields\Tab;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
 use Statamic\Forms\JsDrivers\JsDriver;
@@ -587,6 +588,16 @@ class Tags extends BaseTags
         }
 
         return $page;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function eventUrl($url, $relative = true)
+    {
+        return URL::prependSiteUrl(
+            config('statamic.routes.action').'/form/'.$url
+        );
     }
 
     private function getPartialSubmission(): ?Submission

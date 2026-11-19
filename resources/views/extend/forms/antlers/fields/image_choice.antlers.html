@@ -11,7 +11,7 @@
             {{ else }}
                 {{ if value == key }}checked{{ /if }}
             {{ /if }}
-            {{ if validate|contains:required }}required{{ /if }}
+            {{ if validate|contains:required && (! multiple || options|count == 1) }}required{{ /if }}
             {{ if error }}
                 aria-invalid="true" aria-describedby="{{ id }}-error"
             {{ elseif instructions }}
