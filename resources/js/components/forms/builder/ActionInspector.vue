@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Button, Field, Icon, Input, TabContent, TabList, Tabs, TabTrigger } from '@ui';
 import { computed, ref, watch } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import PageRuleBuilder from './pages/PageRuleBuilder.vue';
 import { injectBuilderContext } from '@/pages/forms/Builder.vue';
 import { __ } from '@/bootstrap/globals';
+import { expandImportedFields } from '@/composables/forms/suggestable-fields';
 
 const { dirty, fieldtypes, inspecting: page, pages } = injectBuilderContext();
 
@@ -22,12 +24,16 @@ const title = computed(() => isLastPage.value ? __('Submit button') : __('Page B
 const submitButtonLabel = computed(() => isLastPage.value ? __('Submit Button Label') : __('Next Button Label'));
 const submitButtonPlaceholder = computed(() => isLastPage.value ? __('Submit') : __('Next Page'));
 
+const fieldsets = usePage().props.fieldsets;
+
 const suggestableConditionFields = computed(() => {
-    return pages.value
+    const fields = pages.value
         .slice(0, pageIndex.value + 1)
         .flatMap((page) => page.sections)
-        .flatMap((section) => section.fields)
-        .filter((f) => f.type === 'import' || f.handle)
+        .flatMap((section) => section.fields);
+
+    return expandImportedFields(fields, fieldsets)
+        .filter((f) => f.handle)
         .map((f) => ({
             handle: f.handle,
             config: {

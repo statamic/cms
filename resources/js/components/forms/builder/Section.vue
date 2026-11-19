@@ -2,6 +2,7 @@
 import { Button, Card, ConfirmationModal, Heading, Panel, PanelHeader, PublishContainer } from '@ui';
 import { computed, ref } from 'vue';
 import { FieldView, injectBuilderContext, InspectorType } from '@/pages/forms/Builder.vue';
+import { addConfigOverrides } from '@/composables/forms/config-overrides';
 import ImportField from './ImportField.vue';
 import RegularFormField from './RegularFormField.vue';
 import { __, uniqid } from '@/bootstrap/globals';
@@ -72,11 +73,7 @@ const containerValues = computed(() => {
 
 const updateFieldWidth = (field, width) => {
     field.config.width = width;
-
-    if (field.type === 'reference' && !field.config_overrides.includes('width')) {
-        field.config_overrides.push('width');
-    }
-
+    addConfigOverrides(field, ['width']);
     dirty();
 };
 
@@ -259,7 +256,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                                     :field
                                     :is-first-row="isFieldInFirstRow(fieldIndex)"
                                     :is-last-row="isFieldInLastRow(fieldIndex)"
-                                    @remove="confirmRemoveField(field)"
+                                    @remove="confirmDeleteField(field)"
                                 />
 
                                 <RegularFormField

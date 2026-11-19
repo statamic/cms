@@ -1,6 +1,6 @@
 import { KEYS } from '@/components/field-conditions/Constants.js';
 
-const LOGIC_KEYS = ['hidden', ...KEYS, 'always_save'];
+export const LOGIC_KEYS = ['hidden', ...KEYS, 'always_save'];
 
 export function writeFieldConditions(field, conditions) {
     const config = { ...field.config };
