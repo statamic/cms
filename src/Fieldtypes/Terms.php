@@ -162,7 +162,7 @@ class Terms extends Relationship
 
         // Use the taxonomy-qualified IDs in the cache key, since a value stored by a field
         // limited to a single taxonomy will not contain the taxonomy handle on its own.
-        $key = 'terms-augment-' . $site . '-' . json_encode($this->convertAugmentationValuesToIds($values));
+        $key = 'terms-augment-'.$site.'-'.json_encode($this->convertAugmentationValuesToIds($values));
 
         if ($single && Blink::has($key)) {
             return Blink::get($key);
