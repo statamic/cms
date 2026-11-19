@@ -21,7 +21,7 @@
             value="{{ $key }}"
             @if (isset($js_driver)) {!! $js_attributes !!} @endif
             @checked($isSelected)
-            @required(in_array('required', $validate ?? []))
+            @required(in_array('required', $validate ?? []) && (! $isMultiple || count($options) === 1))
             @if ($error)
                 aria-invalid="true" aria-describedby="{{ $id }}-error"
             @elseif ($instructions)

@@ -142,7 +142,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject($isEmailRule)
+                                ->reject(fn ($rule) => $rule === 'email')
                                 ->values();
 
                             if ($remainingValidationRules->isEmpty()) {
@@ -159,7 +159,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject($isUrlRule)
+                                ->reject(fn ($rule) => $rule === 'url')
                                 ->values();
 
                             if ($remainingValidationRules->isEmpty()) {
@@ -487,7 +487,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return false;
         }
 
-        $this->submissions()->each->delete();
+        $this->querySubmissions()->get()->each->delete();
 
         File::delete($this->path());
 
@@ -543,7 +543,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function submissions()
     {
-        return FormSubmission::whereForm($this->handle());
+        return $this->querySubmissions()->whereStatus('finalized')->get();
     }
 
     public function querySubmissions(): SubmissionQueryBuilder
@@ -696,6 +696,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function editBlueprintUrl()
     {
         return cp_route('forms.show', $this->handle());
+    }
+
+    /**
+     * @deprecated
+     */
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Forms',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function hasFiles()

@@ -50,18 +50,24 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     protected $afterSaveCallbacks = [];
     protected $withEvents = true;
+    protected $finalizing = false;
+    protected $unmarkedSpamAt;
 
     protected ?string $redirect = null;
+
+    protected $internal;
 
     public function __construct()
     {
         $this->data = collect();
+        $this->internal = collect();
         $this->supplements = collect();
     }
 
     public function __clone()
     {
         $this->data = clone $this->data;
+        $this->internal = clone $this->internal;
         $this->supplements = clone $this->supplements;
     }
 
@@ -71,23 +77,55 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this->traitData();
         }
 
-        $data = collect($data);
+        [$internal, $data] = collect($data)->partition(fn ($value, $key) => $this->isInternalKey($key));
 
         // A full data replacement would otherwise drop the internal lifecycle
         // keys, so carry over the existing _partial, _marked_spam_at and _site values
         // unless the incoming payload provides its own.
-        foreach (['_partial', '_marked_spam_at', '_site'] as $key) {
-            if ($this->has($key) && ! $data->has($key)) {
-                $data[$key] = $this->get($key);
-            }
-        }
+        $this->internal = $this->internal->only(['_partial', '_marked_spam_at', '_site'])->merge($internal);
 
         return $this->traitData($data);
     }
 
+    public function get($key, $fallback = null)
+    {
+        return ($this->isInternalKey($key) ? $this->internal : $this->data)->get($key) ?? $fallback;
+    }
+
+    public function has($key)
+    {
+        return ($this->isInternalKey($key) ? $this->internal : $this->data)->has($key);
+    }
+
+    public function set($key, $value)
+    {
+        ($this->isInternalKey($key) ? $this->internal : $this->data)->put($key, $value);
+
+        return $this;
+    }
+
+    public function remove($key)
+    {
+        ($this->isInternalKey($key) ? $this->internal : $this->data)->forget($key);
+
+        return $this;
+    }
+
+    public function merge($data)
+    {
+        collect($data)->each(fn ($value, $key) => $this->set($key, $value));
+
+        return $this;
+    }
+
+    private function isInternalKey($key): bool
+    {
+        return is_string($key) && Str::startsWith($key, '_');
+    }
+
     public function values()
     {
-        return $this->data()->reject(fn ($value, $key) => Str::startsWith($key, '_'));
+        return $this->data();
     }
 
     /**
@@ -190,6 +228,10 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function markAsNotSpam(): self
     {
+        if ($this->isSpam()) {
+            $this->unmarkedSpamAt = $this->get('_marked_spam_at');
+        }
+
         $this->remove('_marked_spam_at');
 
         return $this;
@@ -217,17 +259,16 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function uploadFiles($uploadedFiles)
     {
-        return collect($uploadedFiles)->map(function ($files, $handle) {
-            $field = $this->fields()->get($handle);
+        $fields = $this->fields();
 
-            if ($field['type'] === 'form_upload') {
-                return FormFileUpload::field($field, $this->id())->upload($files);
-            }
-
-            return $field['type'] === 'assets'
-                ? AssetsUploader::field($field)->upload($files)
-                : FilesUploader::field($field)->upload($files);
-        })->all();
+        return collect($uploadedFiles)
+            ->filter(fn ($files, $handle) => in_array($fields->get($handle)['type'] ?? null, ['assets', 'files', 'form_upload']))
+            ->map(fn ($files, $handle) => match ($fields->get($handle)['type']) {
+                'form_upload' => FormFileUpload::field($fields->get($handle), $this->id())->upload($files),
+                'assets' => AssetsUploader::field($fields->get($handle))->upload($files),
+                'files' => FilesUploader::field($fields->get($handle))->upload($files),
+            })
+            ->all();
     }
 
     public function afterSave($callback)
@@ -249,6 +290,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
      */
     public function save()
     {
+        $finalizing = $this->finalizing;
+        $this->finalizing = false;
+
         $isNew = is_null($this->form()->submission($this->id()));
 
         $withEvents = $this->withEvents;
@@ -257,8 +301,11 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
+        // Partials aren't complete submissions yet, so they're only "created" once finalized.
+        $creating = $isNew && ! $this->get('_partial');
+
         if ($withEvents) {
-            if ($isNew && SubmissionCreating::dispatch($this) === false) {
+            if ($creating && ! $finalizing && SubmissionCreating::dispatch($this) === false) {
                 return false;
             }
 
@@ -274,7 +321,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         }
 
         if ($withEvents) {
-            if ($isNew) {
+            if ($finalizing || $creating) {
                 SubmissionCreated::dispatch($this);
             }
 
@@ -288,42 +335,73 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             return $this;
         }
 
+        $partial = $this->get('_partial');
+        $spamSince = $this->unmarkedSpamAt;
+        $this->unmarkedSpamAt = null;
+
+        // Rescuing a stored spam submission can be vetoed, which leaves it as spam, so its temporary files are kept until it's finalized.
+        $rescuingSpam = $spamSince && $this->form()->store() && $this->form()->submission($this->id());
+
         $this->remove('_partial');
 
+        // Assets need to exist before anything reads the submission, so this stays synchronous.
+        Bus::dispatchSync($assets = new CreateAssetsFromFileUploads($this, keepTemporaryFiles: $rescuingSpam));
+
+        // Partials don't fire the creation events when they're persisted, so they fire when they're finalized instead.
+        // Vetoing the creating event only prevents storage, like on a single page form, so the rest of finalizing still happens.
         if ($this->form()->store()) {
-            $this->save();
-        } else {
-            // Fire the created event here for submissions that were never saved.
-            // The event might have been dispatched when the submission persisted,
-            // so we don't want to fire it again.
-            if (is_null($this->form()->submission($this->id()))) {
-                SubmissionCreated::dispatch($this);
+            if (SubmissionCreating::dispatch($this) === false) {
+                if ($rescuingSpam) {
+                    $assets->revert();
+                    $this->set('_partial', $partial);
+                    $this->set('_marked_spam_at', $spamSince);
+
+                    return false;
+                }
+
+                $this->deleteQuietly();
+            } else {
+                $this->finalizing = true;
+                $this->save();
             }
+
+            $assets->deleteTemporaryFiles();
+        } else {
+            SubmissionCreated::dispatch($this);
 
             $this->deleteQuietly();
         }
 
         SubmissionFinalized::dispatch($this);
 
-        // Assets need to exist before anything reads the submission, so this stays synchronous.
-        CreateAssetsFromFileUploads::dispatchSync($this);
+        // Jobs that can't report success are treated as done once dispatched, so they go
+        // first and the temporary files they may need survive until they've been handed off.
+        [$countable, $uncountable] = collect($this->connectionJobs())
+            ->partition(fn ($job) => RecordConnectionSuccess::isAttachable($job))
+            ->map->values()
+            ->map->all();
 
-        $jobs = $this->connectionJobs();
+        $this->dispatchConnectionJobs($uncountable);
 
         if ($this->shouldDeleteTemporaryFiles()) {
-            if ($jobs) {
-                RecordConnectionSuccess::countDown($this, $jobs);
+            if ($countable) {
+                RecordConnectionSuccess::countDown($this, $countable);
             } else {
                 rescue(fn () => Bus::dispatch(new DeleteTemporaryFiles($this)));
             }
         }
 
+        $this->dispatchConnectionJobs($countable);
+
+        return $this;
+    }
+
+    private function dispatchConnectionJobs(array $jobs): void
+    {
         // Dispatched independently so one failing connection (e.g. on the sync queue) doesn't stop the others.
         foreach ($jobs as $job) {
             rescue(fn () => Bus::dispatch($job));
         }
-
-        return $this;
     }
 
     public function connectionJobs(): array
@@ -332,7 +410,6 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
             ->map(fn ($connections, $handle) => FormConnector::find($handle)?->setForm($this->form())->setConnections($connections)->finalized($this))
             ->flatten()
             ->filter()
-            ->each(fn ($job) => RecordConnectionSuccess::ensureAttachable($job))
             ->values()
             ->all();
     }
@@ -427,7 +504,7 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
 
     public function fileData()
     {
-        return $this->data()->all();
+        return $this->data->merge($this->internal)->all();
     }
 
     public function getQueryableValue(string $field)

@@ -123,7 +123,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
             sectionsForNewPage.push({
                 _id: uniqid(),
                 collapsed: false,
-                display: __('Section'),
+                display: null,
                 fields: remainingFields,
             });
         }
@@ -137,7 +137,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
         sectionsForNewPage.push({
             _id: uniqid(),
             collapsed: false,
-            display: __('Section'),
+            display: null,
             fields: [],
         });
     }
@@ -163,7 +163,7 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     const section = {
         _id: uniqid(),
         collapsed: false,
-        display: __('Section'),
+        display: null,
         fields,
     };
 
@@ -410,7 +410,7 @@ onMounted(() => {
 
     document.addEventListener('keydown', onEscape);
 
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });

@@ -92,6 +92,39 @@ class FormFieldTransformerTest extends TestCase
     }
 
     #[Test]
+    public function it_converts_inline_field_without_a_type_to_vue_as_a_short_answer()
+    {
+        $vue = FormFieldTransformer::toVue([
+            'handle' => 'my_field',
+            'field' => ['display' => 'My Field'],
+        ]);
+
+        $this->assertEquals('short_answer', $vue['fieldtype']);
+        $this->assertEquals('text-short', $vue['icon']);
+        $this->assertArrayNotHasKey('type', $vue['config']);
+    }
+
+    #[Test]
+    public function it_converts_reference_field_without_a_type_to_vue_as_a_short_answer()
+    {
+        $fieldset = (new \Statamic\Fields\Fieldset)
+            ->setHandle('my_fieldset')
+            ->setContents(['fields' => [
+                ['handle' => 'my_field', 'field' => ['display' => 'My Field']],
+            ]]);
+
+        \Statamic\Facades\Fieldset::shouldReceive('all')->andReturn(collect(['my_fieldset' => $fieldset]));
+
+        $vue = FormFieldTransformer::toVue([
+            'handle' => 'custom_handle',
+            'field' => 'my_fieldset.my_field',
+        ]);
+
+        $this->assertEquals('reference', $vue['type']);
+        $this->assertEquals('short_answer', $vue['fieldtype']);
+    }
+
+    #[Test]
     public function it_converts_from_vue_to_inline_field()
     {
         $submitted = [

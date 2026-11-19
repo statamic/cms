@@ -167,7 +167,7 @@ abstract class FormFieldtype implements Arrayable
             return [];
         }
 
-        return app($class)->extraConfigFieldItems();
+        return (fn () => $this->extraConfigFieldItems())->call(app($class));
     }
 
     public static function appendConfigFields(array $config): void

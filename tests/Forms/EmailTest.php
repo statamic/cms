@@ -96,6 +96,9 @@ class EmailTest extends TestCase
             'single email' => ['foo@bar.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
+            'internationalized email' => ['user@bücher.de', [
+                ['address' => 'user@bücher.de', 'name' => null],
+            ]],
             'single email with name' => ['Foo Bar <foo@bar.com>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
             ]],
@@ -252,6 +255,34 @@ class EmailTest extends TestCase
 
         $this->assertEquals(['Name', 'Contact', null], collect($sections)->pluck('display')->all());
         $this->assertEquals(['message'], collect($sections[2]['fields'])->pluck('handle')->all());
+    }
+
+    #[Test]
+    public function submitted_values_win_over_the_sections_and_pages_view_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'sections', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'pages', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $email = $this->makeEmailWithSubmission($form->makeSubmission()->data([
+            'sections' => 'submitted sections',
+            'pages' => 'submitted pages',
+        ]));
+
+        $this->assertEquals('submitted sections', (string) $email->viewData['sections']);
+        $this->assertEquals('submitted pages', (string) $email->viewData['pages']);
+    }
+
+    #[Test]
+    public function it_adds_the_rendered_subject_to_the_email_config_view_data()
+    {
+        $email = $this->makeEmailWithConfig(['subject' => 'Thanks {{ name }} via [[ email ]]']);
+
+        $this->assertEquals('Thanks Foo Bar via foo@bar.com', $email->subject);
+        $this->assertEquals('Thanks Foo Bar via foo@bar.com', $email->viewData['email_config']['subject']);
     }
 
     private function makeEmailForMultiPageForm(): Email

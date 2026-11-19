@@ -129,6 +129,36 @@ class DeleteTemporaryFilesTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_bring_back_a_submission_deleted_before_the_job_runs()
+    {
+        Storage::fake('local');
+
+        $form = tap(Form::make('contact')->formFields([
+            'sections' => [
+                ['fields' => [
+                    ['handle' => 'document', 'field' => ['type' => 'upload', 'store' => false, 'max_files' => 1]],
+                ]],
+            ],
+        ]))->save();
+
+        $submission = tap($form->makeSubmission())->save();
+
+        $documentPath = FormFileUpload::field(['handle' => 'document', 'max_files' => 1], $submission->id())
+            ->upload([UploadedFile::fake()->create('resume.pdf', 10)]);
+
+        $submission->set('document', $documentPath)->save();
+
+        $job = new DeleteTemporaryFiles($submission);
+
+        $form->submission($submission->id())->deleteQuietly();
+
+        $job->handle();
+
+        $this->assertNull($form->submission($submission->id()));
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$documentPath);
+    }
+
+    #[Test]
     public function it_deletes_temp_files_created_by_the_files_fieldtype()
     {
         Storage::fake('local');

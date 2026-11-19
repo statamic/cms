@@ -38,7 +38,7 @@ class DeleteSubmissionTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -57,7 +57,7 @@ class DeleteSubmissionTest extends TestCase
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -74,7 +74,7 @@ class DeleteSubmissionTest extends TestCase
             ->delete(cp_route('forms.submissions.destroy', [$form->handle(), $submission->id()]))
             ->assertNoContent();
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -91,7 +91,7 @@ class DeleteSubmissionTest extends TestCase
             ->delete(cp_route('forms.submissions.destroy', [$form->handle(), $submission->id()]))
             ->assertNoContent();
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -108,6 +108,6 @@ class DeleteSubmissionTest extends TestCase
             ->delete(cp_route('forms.submissions.destroy', [$form->handle(), $submission->id()]))
             ->assertNoContent();
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 }

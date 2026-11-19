@@ -4,6 +4,7 @@ namespace Tests\Feature\Forms;
 
 use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -219,6 +220,51 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_round_trips_sections_without_adding_a_display_or_losing_other_keys()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $sections = [
+            [
+                'instructions' => 'Tell us about yourself',
+                'custom' => 'value',
+                'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                ],
+            ],
+            [
+                'display' => 'Contact',
+                'fields' => [
+                    ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email']],
+                ],
+            ],
+        ];
+
+        $form = tap(Form::make('test')->formFields(['sections' => $sections]))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/Logic')
+                ->missing('formFields.pages.0.sections.0.display')
+                ->where('formFields.pages.0.sections.0.instructions', 'Tell us about yourself')
+                ->where('formFields.pages.0.sections.0.custom', 'value')
+                ->where('formFields.pages.0.sections.1.display', 'Contact')
+                ->etc()
+            );
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $response->viewData('page')['props']['formFields'])
+            ->assertSuccessful();
+
+        $this->assertSame($sections, Form::find('test')->formFields()->sections()->all());
+    }
+
+    #[Test]
     public function it_persists_field_reordering()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
@@ -420,5 +466,115 @@ class FormLogicTest extends TestCase
             ->patch(cp_route('forms.logic.update', $form->handle()), ['pages' => []])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
+    }
+
+    private function makeMultiPageForm($pages = 2)
+    {
+        $pages = collect(range(1, $pages))->map(fn ($i) => [
+            'id' => "page_{$i}",
+            'display' => "Page {$i}",
+            'sections' => [['fields' => [['handle' => "field_{$i}", 'field' => ['type' => 'short_answer', 'display' => "Field {$i}"]]]]],
+        ])->all();
+
+        return tap(Form::make('test')->formFields(['pages' => $pages]))->save();
+    }
+
+    private function multiPagePayload()
+    {
+        return [
+            'pages' => [
+                [
+                    '_id' => 'main',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'fields' => [
+                                ['_id' => 'f1', 'handle' => 'field_1', 'type' => 'inline', 'fieldtype' => 'short_answer', 'config' => ['type' => 'short_answer', 'display' => 'Field 1']],
+                                ['_id' => 'f2', 'handle' => 'field_2', 'type' => 'inline', 'fieldtype' => 'short_answer', 'config' => ['type' => 'short_answer', 'display' => 'Field 2']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function it_shows_the_forms_pro_required_page_for_a_multi_page_form_without_forms_pro()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeMultiPageForm();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('forms/FormsProRequired')
+                ->has('form')
+                ->missing('formFields')
+                ->missing('action')
+                ->etc()
+            );
+    }
+
+    #[Test]
+    public function it_refuses_to_save_a_multi_page_form_without_forms_pro()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeMultiPageForm();
+        $contents = $form->formFields()->contents();
+        $yaml = File::get($form->path());
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.logic.update', $form->handle()), $this->multiPagePayload())
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['pages' => __('statamic::messages.form_forms_pro_required')]);
+
+        $this->assertSame($contents, Form::find('test')->formFields()->contents());
+        $this->assertSame($yaml, File::get($form->path()));
+    }
+
+    #[Test]
+    public function it_edits_a_multi_page_form_with_forms_pro()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeMultiPageForm();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Logic')->has('formFields.pages', 2)->etc());
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.logic.update', $form->handle()), $this->multiPagePayload())
+            ->assertSuccessful();
+    }
+
+    #[Test]
+    public function it_edits_a_single_page_form_stored_as_pages_without_forms_pro()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = $this->makeMultiPageForm(1);
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('forms.logic.edit', $form->handle()))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->component('forms/Logic')->has('formFields.pages', 1)->etc());
+
+        $this
+            ->actingAs($user)
+            ->patchJson(cp_route('forms.logic.update', $form->handle()), $this->multiPagePayload())
+            ->assertSuccessful();
     }
 }

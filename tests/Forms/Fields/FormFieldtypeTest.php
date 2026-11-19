@@ -285,4 +285,32 @@ class FormFieldtypeTest extends TestCase
 
         $this->assertNull($formFieldtype->valueType());
     }
+
+    #[Test]
+    public function config_fields_include_extras_from_a_wrapped_fieldtype_overriding_extra_config_field_items_as_protected()
+    {
+        app('statamic.fieldtypes')->put('protected_extras', FieldtypeWithProtectedExtraConfigFieldItems::class);
+
+        $formFieldtype = new class extends FormFieldtype
+        {
+            protected static $fieldtype = 'protected_extras';
+
+            public function toFieldArray(): array
+            {
+                return [];
+            }
+        };
+
+        $this->assertEquals('toggle', $formFieldtype->configFields()->get('overridden_extra')->type());
+    }
+}
+
+class FieldtypeWithProtectedExtraConfigFieldItems extends Fieldtype
+{
+    protected static $handle = 'protected_extras';
+
+    protected function extraConfigFieldItems(): array
+    {
+        return ['overridden_extra' => ['type' => 'toggle']];
+    }
 }

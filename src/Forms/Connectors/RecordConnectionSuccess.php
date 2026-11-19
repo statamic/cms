@@ -3,12 +3,10 @@
 namespace Statamic\Forms\Connectors;
 
 use Closure;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LogicException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\DeleteTemporaryFiles;
 
@@ -20,12 +18,10 @@ class RecordConnectionSuccess
     {
     }
 
-    public static function ensureAttachable(object $job): void
+    public static function isAttachable(object $job): bool
     {
         // Queued jobs run through the middleware in their public $middleware property, which is where the countdown hooks in.
-        if (! $job instanceof ShouldQueue || ! array_key_exists('middleware', get_object_vars($job))) {
-            throw new LogicException('Form connection job ['.get_class($job).'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
-        }
+        return $job instanceof ShouldQueue && array_key_exists('middleware', get_object_vars($job));
     }
 
     public static function countDown(Submission $submission, array $jobs): void

@@ -171,7 +171,7 @@ watch(view, (view: View) => {
 watch(treeDensity, (density: TreeDensity) => preferences.set('forms.logic.tree.density', density));
 
 onMounted(() => {
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });
