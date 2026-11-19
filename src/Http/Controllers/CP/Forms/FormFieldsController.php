@@ -5,13 +5,17 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class FormFieldsController extends CpController
 {
@@ -63,15 +67,21 @@ class FormFieldsController extends CpController
         $request->validate([
             'type' => 'required',
             'values' => 'required|array',
+            'id' => 'nullable',
+            'fields' => 'sometimes|array',
         ]);
 
         $fieldtype = FormFieldtypeRepository::find($request->type);
 
         $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
-        $values = $blueprint
-            ->fields()
-            ->addValues($request->values)
+        $fields = $blueprint->fields()->addValues($request->values);
+
+        if ($request->has('fields')) {
+            $this->validateNestedField($request, $fields);
+        }
+
+        $values = $fields
             ->process()
             ->values()
             ->all();
@@ -82,6 +92,34 @@ class FormFieldsController extends CpController
             'values' => $values,
             'preview' => $this->fieldtypePreview($fieldtype, $values),
         ];
+    }
+
+    private function validateNestedField(Request $request, Fields $fields): void
+    {
+        $handle = $request->values['handle'] ?? null;
+
+        $siblingHandles = collect($request->fields)
+            ->when($request->filled('id'), fn ($siblings) => $siblings->reject(fn ($field) => ($field['_id'] ?? null) === $request->id))
+            ->flatMap(function ($field) {
+                if (($field['type'] ?? null) === 'import') {
+                    return Fieldset::find($field['fieldset'] ?? null)?->fields()->all()
+                        ->map(fn ($imported) => ($field['prefix'] ?? '').$imported->handle())
+                        ->values()
+                        ->all() ?? [];
+                }
+
+                return [$field['handle'] ?? null];
+            });
+
+        $fields->validate([
+            'handle' => [
+                function ($attribute, $value, $fail) use ($siblingHandles, $handle) {
+                    if ($siblingHandles->contains($handle)) {
+                        $fail(__('statamic::validation.duplicate_field_handle', ['handle' => $value]));
+                    }
+                },
+            ],
+        ], ['handle.not_in' => __('statamic::validation.reserved')]);
     }
 
     private function fieldtypePreview(FormFieldtype $fieldtype, array $config): ?array
