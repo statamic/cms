@@ -228,13 +228,13 @@ class FastParserTest extends TestCase
 
     private function assertParsesTheSameAsSymfony(string $yaml): void
     {
-        $expected = $this->attempt(fn () => (new Parser)->parse($yaml));
-        $actual = $this->attempt(fn () => (new FastParser)->parse($yaml));
+        $expected = $this->attemptToParse(fn () => (new Parser)->parse($yaml));
+        $actual = $this->attemptToParse(fn () => (new FastParser)->parse($yaml));
 
         $this->assertSame($expected, $actual, 'Failed parsing: '.json_encode($yaml));
     }
 
-    private function attempt(callable $parse): array
+    private function attemptToParse(callable $parse): array
     {
         try {
             // Serialized, so that types must match exactly and NAN equals NAN.
