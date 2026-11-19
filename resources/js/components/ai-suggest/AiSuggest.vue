@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Button, Icon } from '@ui';
+import { Button } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
 // Rewrites show what changed: words they added are highlighted in yellow and words they dropped are struck through in red, like a diff.
 // Screen readers don't announce either, so each suggestion is labelled with its clean text, rather than read out with the dropped words still in it.
@@ -298,8 +298,6 @@ function follow(text) {
                     <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
                     <div ref="panel" @keydown="onArrowKey">
                         <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
-                            <!-- The ! is needed for the size, as Icon sets its own. In dark mode the AI purple is too dark against the panel, so it's lightened. -->
-                            <Icon :name="icon" class="size-3.5! text-ai dark:text-ai-light" />
                             <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
                                 {{ __('Suggestions for :field', { field: __(config.display) }) }}
                             </span>

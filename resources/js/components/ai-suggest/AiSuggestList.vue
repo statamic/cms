@@ -1,9 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Button, Icon } from '@ui';
+import { Button } from '@ui';
 import AiSuggestBlocks from './AiSuggestBlocks.vue';
-import { icon } from './use-ai-suggest.js';
 
 // Prototype: what a large field's suggestions show (see AiSuggestLarge.vue): a heading, the suggestions, the "Make it…" box with the site's
 // saved field prompts, and Try again, as on the other fields (see AiSuggest.vue).
@@ -40,7 +39,6 @@ const row = 'group relative block w-full cursor-pointer rounded-lg px-2.5 py-4 t
 
 <template>
     <div class="flex items-center gap-2 border-b border-gray-200 px-3 py-2.5 dark:border-white/10">
-        <Icon :name="icon" class="size-3.5! text-ai dark:text-ai-light" />
         <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ field ? __('Suggestions for :field', { field }) : __('Suggestions') }}</span>
         <!-- Pulled into the padding, so the heading is the same height as the other fields' (see AiSuggest.vue) -->
         <Button v-if="field" class="-my-1 -me-1.5 ms-auto" size="xs" variant="ghost" icon="x" :aria-label="__('Close')" @click="emit('close')" />
