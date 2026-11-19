@@ -918,6 +918,35 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_regenerate_meta_when_a_value_is_null()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/video.mp4', '');
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/video.mp4');
+
+        $meta = [
+            'data' => [],
+            'size' => 0,
+            'last_modified' => 1614000000,
+            'width' => null,
+            'height' => null,
+            'mime_type' => 'video/mp4',
+            'duration' => null,
+        ];
+
+        Storage::disk('test')->put('foo/.meta/video.mp4.yaml', YAML::dump($meta));
+
+        \Facades\Statamic\Assets\Attributes::shouldReceive('asset')->never();
+
+        $this->assertNull($asset->width());
+        $this->assertNull($asset->height());
+        $this->assertNull($asset->duration());
+        $this->assertEquals($meta, YAML::parse(Storage::disk('test')->get('foo/.meta/video.mp4.yaml')));
+    }
+
+    #[Test]
     public function it_hydrates_data_from_meta_file()
     {
         $disk = Storage::fake('test');
