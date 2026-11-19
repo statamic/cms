@@ -142,7 +142,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject($isEmailRule)
+                                ->reject(fn ($rule) => $rule === 'email')
                                 ->values();
 
                             if ($remainingValidationRules->isEmpty()) {
@@ -159,7 +159,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
                             Arr::pull($field, 'field.input_type');
 
                             $remainingValidationRules = collect($validateRules)
-                                ->reject($isUrlRule)
+                                ->reject(fn ($rule) => $rule === 'url')
                                 ->values();
 
                             if ($remainingValidationRules->isEmpty()) {

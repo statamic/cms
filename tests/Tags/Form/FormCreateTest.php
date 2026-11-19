@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Facades\Form;
 use Statamic\Fields\Fieldset;
@@ -1186,6 +1187,42 @@ EOT
         $this->assertEquals($expected, $errors[1]);
         $this->assertEquals($expected[0], $emailError[1][0]);
         $this->assertEmpty($success[1]);
+    }
+
+    #[Test]
+    public function it_keeps_parameterized_email_and_url_rules_from_a_legacy_blueprint()
+    {
+        Blueprint::make()->setHandle('legacy')->setNamespace('forms')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'text', 'input_type' => 'email', 'validate' => ['required', 'email:filter']]],
+                                ['handle' => 'website', 'field' => ['type' => 'text', 'input_type' => 'url', 'validate' => ['required', 'url:https']]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $form = Form::make('legacy');
+        Form::shouldReceive('find')->with('legacy')->andReturn($form);
+
+        $this
+            ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
+            ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
+
+        $form->save();
+
+        $this->assertNull(Blueprint::find('forms.legacy'));
+
+        $this
+            ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
+            ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
+
+        $this->assertEmpty($form->submissions());
     }
 
     #[Test]

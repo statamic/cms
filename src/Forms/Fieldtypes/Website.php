@@ -33,9 +33,18 @@ class Website extends FormFieldtype
             'type' => 'text',
             'input_type' => 'url',
             'placeholder' => $this->config('placeholder'),
-            'validate' => array_values(array_unique([...((array) $this->config('validate', [])), 'url'])),
+            'validate' => $this->validationRules(),
             ...Arr::except($this->config(), ['type', 'input_type', 'placeholder', 'validate']),
         ];
+    }
+
+    private function validationRules(): array
+    {
+        $rules = (array) $this->config('validate', []);
+
+        $hasRule = collect($rules)->contains(fn ($rule) => is_string($rule) && ($rule === 'url' || str_starts_with($rule, 'url:')));
+
+        return $hasRule ? array_values($rules) : [...array_values($rules), 'url'];
     }
 
     public function example(): ?array

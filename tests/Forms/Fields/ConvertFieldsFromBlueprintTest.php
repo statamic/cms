@@ -70,11 +70,11 @@ class ConvertFieldsFromBlueprintTest extends TestCase
             ],
             'email, with parameterized email rule' => [
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => ['required', 'email:rfc,strict']],
-                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required', 'email:rfc,strict']],
             ],
             'email, pipe-string parameterized email rule' => [
                 ['type' => 'text', 'display' => 'Email', 'input_type' => 'email', 'validate' => 'required|email:rfc'],
-                ['type' => 'email', 'display' => 'Email', 'validate' => ['required']],
+                ['type' => 'email', 'display' => 'Email', 'validate' => ['required', 'email:rfc']],
             ],
             'website' => [
                 ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['url']],
@@ -83,6 +83,10 @@ class ConvertFieldsFromBlueprintTest extends TestCase
             'website, with validation rules' => [
                 ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url']],
                 ['type' => 'website', 'display' => 'Website', 'validate' => ['required']],
+            ],
+            'website, with parameterized url rule' => [
+                ['type' => 'text', 'display' => 'Website', 'input_type' => 'url', 'validate' => ['required', 'url:https']],
+                ['type' => 'website', 'display' => 'Website', 'validate' => ['required', 'url:https']],
             ],
             'phone' => [
                 ['type' => 'text', 'display' => 'Phone', 'input_type' => 'tel'],

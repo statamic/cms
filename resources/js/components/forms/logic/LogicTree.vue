@@ -264,8 +264,8 @@ onUnmounted(() => {
                                 :key="section._id"
                                 class="linked-list__section"
                             >
-                                <div class="linked-list__section-marker" :aria-label="__(section.display)">
-                                    <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ __(section.display) }}</span>
+                                <div class="linked-list__section-marker" :aria-label="__(section.display) || __('Section')">
+                                    <span class="linked-list__section-marker-label line-clamp-2 text-center">{{ __(section.display) || __('Section') }}</span>
                                 </div>
                                 <ul class="field-sort-container" :data-sort-section="section._id">
                                     <div v-if="! section.fields.length" class="linked-list__empty-section">
