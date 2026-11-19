@@ -28,13 +28,17 @@ jobs:
           files: |
             **.php
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        if: steps.changed-files.outputs.any_modified == 'true'
+        with:
+          php-version: 8.5
+          coverage: none
+          tools: pint:1.16.0
+
       - name: Check PHP code style issues
         if: steps.changed-files.outputs.any_modified == 'true'
-        uses: aglipanci/laravel-pint-action@36de00d5f5a8a4e12d443e01671daa12a18f4c79 # 2.6
-        with:
-          testMode: true
-          verboseMode: true
-          pintVersion: 1.16.0
+        run: pint --test -v
 
       - name: Check Statamic\trans imports
         run: bash scripts/check-trans-import.sh

@@ -49,6 +49,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     private $routeData;
     private $status;
     private $structure;
+    private $uri;
 
     public function __construct()
     {
@@ -120,6 +121,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setDepth($depth)
     {
         $this->depth = $depth;
+        $this->uri = null;
 
         return $this;
     }
@@ -170,6 +172,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
 
         $this->reference = $reference;
         $this->routeData = null;
+        $this->uri = null;
 
         return $this;
     }
@@ -205,6 +208,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setParent(?self $parent): self
     {
         $this->parent = $parent;
+        $this->uri = null;
 
         return $this;
     }
@@ -212,6 +216,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setRoute(?string $route): self
     {
         $this->route = $route;
+        $this->uri = null;
 
         return $this;
     }
@@ -247,14 +252,20 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
             return $cached;
         }
 
+        // With the shared cache off, a page still keeps its own URI,
+        // so siblings don't each rebuild their parent's.
+        if (! $this->tree->uriCacheEnabled() && ! is_null($this->uri)) {
+            return $this->uri;
+        }
+
         if (! $this->structure() instanceof CollectionStructure) {
-            return $uris[$this->reference] = $this->entry()->uri();
+            return $this->uri = $uris[$this->reference] = $this->entry()->uri();
         }
 
         $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
         $parentUri = Str::replace(['.html', '.htm'], '', $parentUri);
 
-        return $uris[$this->reference] = app(UrlBuilder::class)
+        return $this->uri = $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $parentUri,
@@ -299,6 +310,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setTree($tree)
     {
         $this->tree = $tree;
+        $this->uri = null;
 
         return $this;
     }
@@ -306,6 +318,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Cont
     public function setRoot(bool $isRoot)
     {
         $this->isRoot = $isRoot;
+        $this->uri = null;
 
         return $this;
     }
