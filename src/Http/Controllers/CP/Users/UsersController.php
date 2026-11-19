@@ -48,10 +48,7 @@ class UsersController extends CpController
         }
 
         return Inertia::render('users/Index', [
-            'columns' => (new Users(collect()))
-                ->blueprint(User::blueprint())
-                ->columnPreferenceKey('users.columns')
-                ->columns(),
+            'columns' => Users::listingColumns(),
             'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),

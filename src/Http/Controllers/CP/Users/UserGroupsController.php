@@ -75,10 +75,7 @@ class UserGroupsController extends CpController
             'listingConfig' => [
                 'listingKey' => 'usergroup-users',
                 'groupId' => $group->id(),
-                'columns' => (new Users(collect()))
-                    ->blueprint(User::blueprint())
-                    ->columnPreferenceKey('users.columns')
-                    ->columns(),
+                'columns' => Users::listingColumns(),
                 'actionUrl' => cp_route('users.actions.run'),
                 'allowFilterPresets' => false,
             ],
