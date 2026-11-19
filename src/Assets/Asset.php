@@ -71,6 +71,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     const VIDEO_EXTENSIONS = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov', 'mpeg', 'mpg', 'mkv'];
 
     protected $container;
+    protected $existsOnDisk;
     protected $path;
     protected $meta;
     protected $withEvents = true;
@@ -227,7 +228,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return false;
         }
 
-        return $this->container()->files()->contains($path);
+        if ($this->container()->contents()->isLoaded()) {
+            return $this->container()->files()->contains($path);
+        }
+
+        return $this->existsOnDisk ??= $this->disk()->exists($path);
     }
 
     public function getRawMeta()
@@ -315,7 +320,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     protected function metaExists()
     {
-        return $this->container()->metaFiles()->contains($this->metaPath());
+        return $this->disk()->exists($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -384,6 +389,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 if (str_contains($path, '../')) {
                     throw PathTraversalDetected::forPath($path);
                 }
+
+                $this->existsOnDisk = null;
 
                 return $path;
             })
@@ -706,6 +713,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     protected function clearCaches()
     {
+        $this->existsOnDisk = null;
         $this->meta = null;
         $this->cacheStore()->forget($this->metaCacheKey());
     }
