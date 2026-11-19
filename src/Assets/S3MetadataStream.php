@@ -21,8 +21,12 @@ class S3MetadataStream implements StreamInterface
     private ?string $etag = null;
     private float $deadline;
 
-    public function __construct(private AwsS3V3Adapter $disk, private string $path, private int $size)
-    {
+    public function __construct(
+        private AwsS3V3Adapter $disk,
+        private string $path,
+        private int $size,
+        private int $chunkSize = self::CHUNK_SIZE,
+    ) {
         $this->deadline = microtime(true) + 30;
         $this->stream = Utils::streamFor('');
     }
@@ -60,8 +64,8 @@ class S3MetadataStream implements StreamInterface
             throw new RuntimeException('S3 metadata extraction exceeded its read limit.');
         }
 
-        $start = intdiv($this->position, self::CHUNK_SIZE) * self::CHUNK_SIZE;
-        $end = min($start + self::CHUNK_SIZE, $this->size) - 1;
+        $start = intdiv($this->position, $this->chunkSize) * $this->chunkSize;
+        $end = min($start + $this->chunkSize, $this->size) - 1;
         $config = $this->disk->getConfig();
         $options = $config['options'] ?? [];
 
