@@ -82,9 +82,9 @@ class Tags extends BaseTags
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
-        $data['pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
+        $data['form_pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
 
-        $data['page'] = Arr::except(collect($data['pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
+        $data['form_page'] = Arr::except(collect($data['form_pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -92,16 +92,16 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
-        $data['button_label'] = Arr::get($data['page'], 'button_label');
+        $data['form_button_label'] = Arr::get($data['form_page'], 'button_label');
 
         if (! $this->isFirstPage()) {
-            $data['previous_page_label'] = Arr::get($data['page'], 'previous_page_label');
-            $data['previous_page_url'] = $this->previousPageUrl();
+            $data['form_previous_page_label'] = Arr::get($data['form_page'], 'previous_page_label');
+            $data['form_previous_page_url'] = $this->previousPageUrl();
         }
 
-        $data['restricted'] = $form->restricted();
-        $data['restriction_message'] = $form->restrictionMessage();
-        $data['status'] = $form->status();
+        $data['form_restricted'] = $form->restricted();
+        $data['form_restriction_message'] = $form->restrictionMessage();
+        $data['form_status'] = $form->status();
 
         if ($jsDriver) {
             $data['js_driver'] = $jsDriver->handle();

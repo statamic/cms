@@ -321,7 +321,7 @@ abstract class Fieldtype implements Arrayable
         return $this->configFields;
     }
 
-    public function extraConfigFieldItems(): array
+    protected function extraConfigFieldItems(): array
     {
         return array_merge(
             self::$extraConfigFields[static::class] ?? [],

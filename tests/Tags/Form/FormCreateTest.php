@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\FormBlueprintFound;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -855,9 +856,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }} - {{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -893,9 +894,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -919,9 +920,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
     <div class="all-sections">{{ sections }}{{ display }},{{ /sections }}</div>
 {{ /form:survey }}
 EOT
@@ -958,7 +959,7 @@ EOT
 
         $template = <<<'EOT'
 {{ form:survey }}
-    <div class="page">{{ page:id }} - {{ page:display }}{{ if page:instructions }} ({{ page:instructions }}){{ /if }}{{ if page:previous_page_label }} - back:{{ page:previous_page_label }}{{ /if }} - button:{{ page:button_label }}</div>
+    <div class="page">{{ form_page:id }} - {{ form_page:display }}{{ if form_page:instructions }} ({{ form_page:instructions }}){{ /if }}{{ if form_page:previous_page_label }} - back:{{ form_page:previous_page_label }}{{ /if }} - button:{{ form_page:button_label }}</div>
 {{ /form:survey }}
 EOT;
 
@@ -970,6 +971,56 @@ EOT;
         request()->merge(['page' => 'page_two']);
         $output = $this->normalizeHtml($this->tag($template));
         $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit</div>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_page_and_status_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ page:url }}|{{ status }}|{{ form_page:id }}|{{ form_status }}</p>{{ /form:survey }}',
+            ['page' => ['url' => '/contact-us'], 'status' => 'published'],
+        );
+
+        $this->assertStringContainsString('<p>/contact-us|published|page_one|open</p>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_pages_and_restriction_variables()
+    {
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ pages }}{{ title }},{{ /pages }}|{{ restricted }}|{{ restriction_message }}|{{ form_pages }}{{ id }},{{ /form_pages }}|{{ if form_restricted }}yes{{ else }}no{{ /if }}|{{ form_restriction_message ?? "none" }}</p>{{ /form:survey }}',
+            ['pages' => [['title' => 'Home'], ['title' => 'About']], 'restricted' => 'cascade-restricted', 'restriction_message' => 'cascade-message'],
+        );
+
+        $this->assertStringContainsString('<p>Home,About,|cascade-restricted|cascade-message|page_one,page_two,|no|none</p>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_button_and_previous_page_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                ['id' => 'page_one', 'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]]],
+                ['id' => 'page_two', 'previous_page_label' => 'Back', 'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]]],
+            ],
+        ], 'survey');
+
+        request()->merge(['page' => 'page_two']);
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ button_label }}|{{ previous_page_label }}|{{ previous_page_url }}|{{ form_button_label }}|{{ form_previous_page_label }}|{{ form_previous_page_url }}</p>{{ /form:survey }}',
+            ['button_label' => 'cascade-button', 'previous_page_label' => 'cascade-previous', 'previous_page_url' => '/cascade-url'],
+        );
+
+        $this->assertStringContainsString('<p>cascade-button|cascade-previous|/cascade-url|Submit|Back|http://localhost?page=page_one</p>', $output);
     }
 
     #[Test]
@@ -1100,7 +1151,7 @@ EOT
     #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1111,7 +1162,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1171,13 +1222,13 @@ EOT
             ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
             ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
 
-        $this->assertEmpty($form->submissions());
+        $this->assertEmpty($form->querySubmissions()->get());
     }
 
     #[Test]
     public function it_will_submit_form_and_render_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1187,7 +1238,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1204,6 +1255,28 @@ EOT
 
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Submission successful.'], $success[1]);
+    }
+
+    #[Test]
+    public function it_renders_and_submits_fields_added_by_a_form_blueprint_found_listener()
+    {
+        Event::listen(function (FormBlueprintFound $event) {
+            $event->blueprint->ensureField('source', ['type' => 'text', 'display' => 'Source']);
+        });
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}<label>{{ display }}</label>{{ /fields }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('<label>Source</label>', $output);
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'source' => 'newsletter',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertEquals('newsletter', Form::find('contact')->submissions()->first()->get('source'));
     }
 
     #[Test]
@@ -1234,7 +1307,7 @@ EOT;
         preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
         $this->assertEquals(['Submission successful.'], $success[1]);
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1250,7 +1323,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertRedirectContains('page=page_three');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1280,11 +1353,11 @@ EOT;
             ->assertRedirectContains('page=page_one');
 
         // The submission wasn't finalized; it's still partial.
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
         $this->assertCount(1, $submissions);
         $this->assertTrue($submissions->first()->isPartial());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1302,7 +1375,7 @@ EOT;
         $this->assertStringNotContainsString('evil.example', $response->headers->get('Location'));
         $response->assertRedirectContains('page=page_two');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1319,13 +1392,13 @@ EOT;
 
         request()->merge(['page' => 'page_three']);
 
-        $output = $this->tag('{{ form:survey }}{{ previous_page_url }}{{ /form:survey }}');
+        $output = $this->tag('{{ form:survey }}{{ form_previous_page_url }}{{ /form:survey }}');
 
         // "Back" returns to page one — the page actually visited — not page two.
         $this->assertStringContainsString('page=page_one', $output);
         $this->assertStringNotContainsString('page=page_two', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function createMultiPageFormWithLogic($handle = 'survey')
@@ -1358,7 +1431,7 @@ EOT;
     #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1369,7 +1442,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertLocation('/submission-successful');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1395,7 +1468,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_redirect_on_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->from('/contact')
@@ -1407,13 +1480,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/contact');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1424,7 +1497,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1461,7 +1534,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $submissions = Form::find('contact')->submissions();
+        $submissions = Form::find('contact')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
@@ -1484,12 +1557,12 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertSessionMissing('form.survey.partial_submission');
 
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1507,13 +1580,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1525,7 +1598,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/submission-error');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1552,7 +1625,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_error_redirect()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
             throw ValidationException::withMessages(['custom' => 'This is a custom message']);
@@ -1569,7 +1642,7 @@ EOT
             ->assertSessionHasErrors(['custom'], null, 'form.contact')
             ->assertLocation('/contact');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
@@ -1594,7 +1667,7 @@ EOT
     #[Test]
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1605,7 +1678,7 @@ EOT
             ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1889,7 +1962,7 @@ EOT
         $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
         $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1909,7 +1982,7 @@ EOT
         // The submission is no longer partial, so its values aren't loaded back in.
         $this->assertStringContainsString('name=,', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1988,7 +2061,7 @@ EOT
     {
         Bus::fake();
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->withPrecognition()
@@ -1997,7 +2070,7 @@ EOT
             ->assertNoContent()
             ->assertHeader('Precognition-Success', 'true');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
         Bus::assertNotDispatched(SendEmail::class);
     }
 
