@@ -83,7 +83,7 @@ const row = 'group relative block w-full cursor-pointer rounded-lg px-2.5 py-4 t
                 :key="saved.command"
                 type="button"
                 class="cursor-pointer rounded-full border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-100 dark:border-white/17 dark:text-gray-300 dark:hover:bg-white/8"
-                v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs' }"
+                v-tooltip="{ content: saved.instructions, class: 'max-w-48 text-xs text-pretty' }"
                 @click="follow(saved.name)"
             >
                 {{ saved.name }}
