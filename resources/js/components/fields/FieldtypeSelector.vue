@@ -60,6 +60,10 @@ export default {
         Icon,
     },
 
+    inject: {
+        fieldtypeSelectorSource: { default: null },
+    },
+
     props: {
         allowTitle: {
             default: false,
@@ -74,7 +78,7 @@ export default {
 
     data: function () {
         return {
-            categories: {
+            categories: this.fieldtypeSelectorSource?.categories ?? {
                 text: {
                     title: __('Text & Rich Content'),
                     description: __('fieldtypes.picker.category.text.description'),
@@ -112,11 +116,11 @@ export default {
         fieldtypes() {
             if (!this.fieldtypesLoaded) return;
 
-            return loadedFieldtypes.value;
+            return this.fieldtypeSelectorSource?.fieldtypes ?? loadedFieldtypes.value;
         },
 
         fieldtypesLoaded() {
-            return Array.isArray(loadedFieldtypes.value);
+            return !!this.fieldtypeSelectorSource || Array.isArray(loadedFieldtypes.value);
         },
 
         allFieldtypes() {
@@ -167,7 +171,7 @@ export default {
 
                 this.allFieldtypes.forEach((fieldtype) => {
                     let categories = fieldtype.categories;
-                    if (categories.length === 0) categories = ['special'];
+                    if (categories.length === 0) categories = [this.fieldtypeSelectorSource?.defaultCategory ?? 'special'];
                     if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
                 });
 
@@ -270,6 +274,10 @@ export default {
 
         createField(handle) {
             const fieldtype = this.fieldtypes.find((f) => f.handle === handle);
+
+            if (this.fieldtypeSelectorSource?.createField) {
+                return this.fieldtypeSelectorSource.createField(fieldtype);
+            }
 
             // Build the initial empty field. The event listener will assign display, handle,
             // and id keys. This will be 'field_n' etc, where n would be the total root

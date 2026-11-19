@@ -555,4 +555,38 @@ class FormFieldsTest extends TestCase
         $this->assertEquals('name', $fields[0]['handle']);
         $this->assertEquals('message', $fields[1]['handle']);
     }
+
+    #[Test]
+    public function it_excludes_hidden_linked_fields_from_blueprint()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'company', 'field' => ['type' => 'text', 'display' => 'Company']],
+                ['handle' => 'secret', 'field' => ['type' => 'text', 'display' => 'Secret', 'hidden' => true]],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('details')
+            ->andReturn($fieldset);
+
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                        ['handle' => 'company', 'field' => 'details.company'],
+                        ['handle' => 'hidden_company', 'field' => 'details.company', 'config' => ['hidden' => true]],
+                        ['handle' => 'secret', 'field' => 'details.secret'],
+                        ['handle' => 'unhidden_secret', 'field' => 'details.secret', 'config' => ['hidden' => false]],
+                        ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email', 'hidden' => true]],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = $formFields->toBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['name', 'company', 'unhidden_secret'], array_column($fields, 'handle'));
+    }
 }

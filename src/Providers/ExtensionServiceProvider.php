@@ -97,6 +97,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'grid' => Fieldtypes\Grid::class,
         'group' => Fieldtypes\Group::class,
         'form_fields' => Fieldtypes\FormFields::class,
+        'form_group_fields' => Fieldtypes\FormGroupFields::class,
         'form_heading' => Fieldtypes\FormHeading::class,
         'form_paragraph' => Fieldtypes\FormParagraph::class,
         'form_upload' => Fieldtypes\FormUpload::class,

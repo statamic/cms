@@ -10,7 +10,6 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
-use Statamic\Forms\Fields\FormField;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\GraphQL\Types\GroupType;
 use Statamic\Support\Arr;
@@ -180,7 +179,7 @@ class Group extends Fieldtype
         $field = $this->field();
 
         $formFields = new FormFields([
-            'sections' => [['fields' => $this->config('fields')]],
+            'sections' => [['fields' => $field->formField()?->config()['fields'] ?? $this->config('fields')]],
         ]);
 
         $data['fields'] = collect($this->fields()->all())
@@ -245,11 +244,6 @@ class Group extends Fieldtype
 
     private function sampleFields(): Collection
     {
-        // TODO: Use $this->fields() once the form Group fieldtype converts its nested fields to core fieldtypes.
-        return collect($this->field()->get('fields', []))
-            ->filter(fn ($config) => is_array($config) && isset($config['handle'], $config['field']))
-            ->mapWithKeys(fn (array $config) => [
-                $config['handle'] => new Field($config['handle'], (new FormField($config['handle'], $config['field']))->toFieldArray()),
-            ]);
+        return $this->fields()->all();
     }
 }
