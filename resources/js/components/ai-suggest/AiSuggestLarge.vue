@@ -7,6 +7,7 @@ import AiSuggestList from './AiSuggestList.vue';
 import { changesOf, suggestForBard, toBard } from './mock-bard-suggestions.js';
 import { icon } from './use-ai-suggest.js';
 import useSidebarCard, { cardEntrance, onSuggestButton } from './use-sidebar-card.js';
+import { editorIn, proseClassOf } from './field-overlay.js';
 
 // Prototype: suggestions for a large field, like Bard. A whole rewrite is too long for the small dropdown the other fields use (see AiSuggest.vue),
 // so they open over the entry's sidebar (the column with Published and the slug), where there's room for all of each one. They behave like
@@ -62,13 +63,9 @@ const proseClass = ref('');
 const editorHeight = ref(null);
 let hidden = null;
 
-function editorOf() {
-    return anchor.value?.parentElement?.querySelector('.bard-editor .ProseMirror:not([data-ai-preview], [data-ai-preview] *)');
-}
-
 function preview(index) {
     if (index === previewing.value) return;
-    const prose = editorOf();
+    const prose = editorIn(anchor.value?.parentElement);
 
     // Put the field back first
     if (hidden) hidden.style.display = '';
@@ -78,7 +75,7 @@ function preview(index) {
     if (index === null || !prose) return;
 
     // Shown in the editor's place, with its classes, so it takes the field's own type and spacing. It's never shorter than the editor was.
-    proseClass.value = [...prose.classList].filter((name) => name !== 'ProseMirror-focused').join(' ');
+    proseClass.value = proseClassOf(prose);
     editorHeight.value = `${prose.offsetHeight}px`;
     previewTarget.value = prose.parentElement;
     hidden = prose;

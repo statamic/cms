@@ -11,6 +11,7 @@ import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 
 import { Badge, Icon } from '@ui';
 import AiSuggestBlocks from '@/components/ai-suggest/AiSuggestBlocks.vue';
 import diffWords from '@/components/ai-suggest/diff-words.js';
+import { editorIn, proseClassOf, textBoxIn, textStyleOf } from '@/components/ai-suggest/field-overlay.js';
 import { blocksOf } from '@/components/ai-suggest/mock-bard-suggestions.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import { linkDetails, linkTooltip } from './mock-runs.js';
@@ -75,25 +76,13 @@ const proseClass = ref('');
 
 function measure() {
     const wrapper = anchor.value?.parentElement;
-    const prose = wrapper?.querySelector('.bard-editor .ProseMirror:not([data-ai-preview], [data-ai-preview] *)');
+    const prose = editorIn(wrapper);
     // A text box of the field's own, not one inside a Bard set or the like
-    const field = wrapper?.querySelector('.bard-fieldtype, .replicator-fieldtype, .grid-fieldtype') ? null : wrapper?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
-    bard.value = prose ?? null;
-    box.value = field ?? null;
-    if (prose) proseClass.value = [...prose.classList].filter((name) => name !== 'ProseMirror-focused').join(' ');
-    if (!field) return;
-    const css = getComputedStyle(field);
-    boxStyle.value = {
-        padding: css.padding,
-        fontFamily: css.fontFamily,
-        fontSize: css.fontSize,
-        fontWeight: css.fontWeight,
-        letterSpacing: css.letterSpacing,
-        lineHeight: css.lineHeight,
-        color: css.color,
-        borderWidth: css.borderWidth,
-        borderRadius: css.borderRadius,
-    };
+    const field = wrapper?.querySelector('.bard-fieldtype, .replicator-fieldtype, .grid-fieldtype') ? null : textBoxIn(wrapper);
+    bard.value = prose;
+    box.value = field;
+    if (prose) proseClass.value = proseClassOf(prose);
+    if (field) boxStyle.value = textStyleOf(field);
 }
 
 watch(open, () => props.part === 'field' && nextTick(measure), { immediate: true });

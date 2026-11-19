@@ -8,6 +8,7 @@ import { steer, suggestFor } from './mock-suggestions.js';
 import diffWords from './diff-words.js';
 import { icon, suggestionsEmpty, suggestionsFail, suggestionsSlow } from './use-ai-suggest.js';
 import useSidebarCard, { cardEntrance, onSuggestButton } from './use-sidebar-card.js';
+import { textBoxIn, textStyleOf } from './field-overlay.js';
 import useAiChat from '@/composables/use-ai-chat.js';
 // Prototype: whether the person can open Settings → AI, set by the demos in the nav
 import { canEditAi } from '@/components/ai-chat/mock-runs.js';
@@ -198,7 +199,7 @@ function apply(text) {
 function focusField() {
     nextTick(() =>
         setTimeout(() => {
-            const field = overlay.value?.parentElement?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
+            const field = textBoxIn(overlay.value?.parentElement);
             if (!field) return;
             field.focus();
             field.setSelectionRange(field.value.length, field.value.length);
@@ -212,29 +213,17 @@ const preview = ref(null);
 const overlay = useTemplateRef('overlay');
 const overlayTag = ref('input');
 const overlayStyle = ref({});
+// While it's previewing, the field's label gets a purple "Previewing Tighter" badge, like its "Changed by AI" one (see Field.vue)
+const previewLabel = ref('');
 
 function showPreview(text, label = null) {
     previewLabel.value = label ? __(label) : '';
-    const field = overlay.value?.parentElement?.querySelector('input:not([aria-hidden]), textarea:not([aria-hidden])');
+    const field = textBoxIn(overlay.value?.parentElement);
 
+    // With the field's own padding and type, so the preview wraps exactly where the text will once it's picked
     if (field) {
-        const css = getComputedStyle(field);
         overlayTag.value = field.tagName.toLowerCase();
-        overlayStyle.value = {
-            // The field's own padding, so the preview wraps exactly where the text will once it's picked
-            padding: css.padding,
-            // Longhands rather than the font shorthand, which the browser reports as empty when the field sets font features
-            fontFamily: css.fontFamily,
-            color: css.color,
-            fontSize: css.fontSize,
-            fontWeight: css.fontWeight,
-            letterSpacing: css.letterSpacing,
-            fontFeatureSettings: css.fontFeatureSettings,
-            fontVariationSettings: css.fontVariationSettings,
-            lineHeight: css.lineHeight,
-            borderWidth: css.borderWidth,
-            borderRadius: css.borderRadius,
-        };
+        overlayStyle.value = textStyleOf(field);
     }
 
     preview.value = text;
@@ -250,9 +239,6 @@ function hidePreview() {
 }
 
 watch(open, (isOpen) => isOpen || (preview.value = null));
-
-// While it's previewing, the field's label gets a purple "Previewing Tighter" badge, like its "Changed by AI" one (see Field.vue)
-const previewLabel = ref('');
 watch([preview, previewLabel], ([text, label]) => emit('preview', text === null ? null : label));
 
 const isEmpty = computed(() => result.value && !result.value.suggestions.length);
