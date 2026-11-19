@@ -16,10 +16,10 @@ const shortcuts = [
     { keys: ['Enter'], text: 'Send' },
     { keys: ['Shift', 'Enter'], text: 'New line' },
     { keys: ['↑'], text: 'Pick an example', or: ['↓'], needsExamples: true },
-    { keys: ['↑'], text: 'Pick a saved prompt', or: ['↓'], needsExamples: false },
+    { keys: ['↑'], text: 'Pick a skill', or: ['↓'], needsExamples: false },
     { keys: ['Tab'], text: 'Show what it does', needsExamples: false },
     { keys: ['Esc'], text: 'Back to the page' },
-    { keys: ['/name'], text: 'Run a saved prompt' },
+    { keys: ['/name'], text: 'Run a skill' },
     { keys: ['/clear'], text: 'Start a new chat' },
 ];
 

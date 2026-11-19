@@ -642,7 +642,7 @@ function stopFollowing() {
                         <AiChatPrompts v-if="commandMatches.length" :prompts="commandMatches" :active="activeCommand" :explain="explainPrompt" @pick="runCommand" />
                         <!-- When you can, offer to make it a saved prompt, named after what was typed: a row in a card, like the saved prompts it would join -->
                         <div v-else-if="canCreateCommand" class="space-y-2 p-2">
-                            <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No saved prompt matches.') }}</p>
+                            <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No skill matches.') }}</p>
                             <button
                                 type="button"
                                 :aria-selected="createHighlighted"
@@ -655,11 +655,11 @@ function stopFollowing() {
                             >
                                 <!-- Highlighted (with the arrow keys), it gets the same purple-to-blue pill as a highlighted saved prompt, so Enter opens it -->
                                 <span v-if="createHighlighted" aria-hidden="true" class="absolute inset-y-1 -start-2 w-1 rounded-full bg-linear-to-b from-ai to-ai-end" />
-                                {{ __('Create a saved prompt') }}
+                                {{ __('Create a skill') }}
                                 <span class="inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ commandQuery }}</span>
                             </button>
                         </div>
-                        <p v-else class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">{{ __('No saved prompt matches. Enter sends it as a message.') }}</p>
+                        <p v-else class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">{{ __('No skill matches. Enter sends it as a message.') }}</p>
                     </template>
                     <!-- The keyboard shortcuts on their own. Esc or ? puts them away. -->
                     <AiChatShortcuts v-else-if="helpView === 'shortcuts'" :has-examples="examplesVisible" />
@@ -693,7 +693,7 @@ function stopFollowing() {
                                 @mousedown.prevent
                                 @click="startNewPrompt()"
                             >
-                                <Icon name="plus" class="size-3" />{{ __('New prompt') }}
+                                <Icon name="plus" class="size-3" />{{ __('New skill') }}
                             </button>
                         </div>
                     </template>

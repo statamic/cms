@@ -99,8 +99,8 @@
                             size="xs"
                             variant="ghost"
                             :icon="collapsed.length === value.length ? 'expand' : 'collapse'"
-                            :aria-label="collapsed.length === value.length ? __('Expand all prompts') : __('Collapse all prompts')"
-                            v-tooltip="collapsed.length === value.length ? __('Expand all prompts') : __('Collapse all prompts')"
+                            :aria-label="collapsed.length === value.length ? __('Expand all') : __('Collapse all')"
+                            v-tooltip="collapsed.length === value.length ? __('Expand all') : __('Collapse all')"
                             @click="collapsed.length === value.length ? expandAll() : collapseAll()"
                         />
                     </Teleport>

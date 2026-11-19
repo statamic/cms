@@ -145,12 +145,12 @@ const groups = [
         ],
     },
     {
-        title: 'Saved prompts',
+        title: 'Skills',
         demos: [
             // Types a command that matches nothing, takes up the offer to create it, fills in the instructions and saves, then runs it.
             // The save is only pretend (see AiChatNewPrompt.vue), so nothing is left in Settings → AI and it can be played again.
             {
-                label: 'Create a prompt',
+                label: 'Create a skill',
                 text: '/price-check',
                 create: { instructions: 'Check every price on the page against the current price list, and flag any that don’t match.' },
                 canEditAi: true,

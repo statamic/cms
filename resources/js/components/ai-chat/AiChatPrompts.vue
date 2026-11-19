@@ -70,7 +70,7 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
     <div class="space-y-2 p-2">
         <div class="flex items-center justify-between gap-2 px-1">
             <!-- Small and quiet, but grey-500 (grey-400 in dark mode) keeps it at AA contrast -->
-            <p class="text-2xs text-gray-500 dark:text-gray-400">{{ __('Saved prompts') }}</p>
+            <p class="text-2xs text-gray-500 dark:text-gray-400">{{ __('Skills') }}</p>
             <!-- A small white key, like the /command keys but with a slight shadow, so it reads as a button. Regular weight, so it's quieter than the keys. -->
             <button
                 v-if="create"
@@ -83,7 +83,7 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
             </button>
         </div>
 
-        <div ref="list" role="listbox" :aria-label="__('Saved prompts')" class="divide-y divide-gray-200 rounded-lg bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">
+        <div ref="list" role="listbox" :aria-label="__('Skills')" class="divide-y divide-gray-200 rounded-lg bg-white ring ring-gray-200 dark:divide-gray-700/80 dark:bg-gray-850 dark:ring-gray-700/80">
             <!-- mousedown.prevent keeps focus in the input, so picking one doesn't hide the menu before the click lands -->
             <button
                 v-for="(prompt, index) in prompts"

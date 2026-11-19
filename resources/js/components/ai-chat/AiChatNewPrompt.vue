@@ -102,7 +102,7 @@ function onKeydown(event) {
 <template>
     <!-- A heading like the saved prompts', then the fields, then the buttons -->
     <div ref="root" class="space-y-2 p-2" @keydown="onKeydown">
-        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('New prompt') }}</p>
+        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('New skill') }}</p>
 
         <!-- No card round the fields: the popup is already white and the inputs have their own borders -->
         <div class="space-y-3 px-1 py-1">

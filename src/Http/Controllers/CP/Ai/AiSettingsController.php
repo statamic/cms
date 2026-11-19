@@ -82,7 +82,7 @@ class AiSettingsController extends CpController
 
         // Its command is its name as a slug, so two with the same slug couldn't both be run
         if (collect($prompts)->contains(fn ($prompt) => Str::slug($prompt['name'] ?? '') === Str::slug($request->name))) {
-            throw ValidationException::withMessages(['name' => __('There\'s already a prompt run with /:command.', ['command' => Str::slug($request->name)])]);
+            throw ValidationException::withMessages(['name' => __('There\'s already a skill run with /:command.', ['command' => Str::slug($request->name)])]);
         }
 
         $prompts[] = ['name' => $request->name, 'instructions' => $request->instructions, 'collections' => [], 'roles' => [], 'use_on' => 'page'];
@@ -258,20 +258,20 @@ class AiSettingsController extends CpController
     {
         return ['handle' => 'page_prompts', 'field' => [
             'type' => 'replicator',
-            'display' => __('Page Prompts'),
+            'display' => __('Page Skills'),
             'hide_display' => true,
             'full_width_setting' => true,
             'collapse' => true,
             'previews' => true,
-            'button_label' => __('Add Prompt'),
+            'button_label' => __('Add Skill'),
             // Prototype: new prompts go on the end, rather than between others from a + that shows on hover
             'insert_between' => false,
             // Prototype: instead of the usual expand, collapse and fullscreen controls above the list, one expand/collapse toggle in the section's header, by this id
             'actions' => false,
             'header_actions' => 'page-prompts-actions',
-            'sets' => ['main' => ['display' => __('Prompts'), 'sets' => [
+            'sets' => ['main' => ['display' => __('Skills'), 'sets' => [
                 // title_field (a prototype addition to Replicator) puts the name in the badge, so the preview leaves it out, and switch_labels says what its switch does
-                'prompt' => ['display' => __('Prompt'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
+                'prompt' => ['display' => __('Skill'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
                     ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Legal check'), 'replicator_preview' => false]],
                     // Plain multi-selects rather than the relationship fieldtypes, whose choices stack up below them as draggable rows and leave a gap beside the name. These show them as chips.
                     ['handle' => 'collections', 'field' => ['type' => 'select', 'display' => __('Collections'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => Collection::all()->mapWithKeys(fn ($collection) => [$collection->handle() => $collection->title()])->all(), 'width' => 50]],
@@ -289,10 +289,10 @@ class AiSettingsController extends CpController
     {
         return ['handle' => 'field_prompts', 'field' => [
             'type' => 'grid',
-            'display' => __('Field Prompts'),
+            'display' => __('Field Skills'),
             'hide_display' => true,
             'full_width_setting' => true,
-            'add_row' => __('Add Prompt'),
+            'add_row' => __('Add Skill'),
             'fullscreen' => false,
             'fields' => [
                 ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'width' => 33]],
@@ -502,14 +502,14 @@ class AiSettingsController extends CpController
                             ],
                         ],
                         [
-                            'display' => __('Page Prompts'),
+                            'display' => __('Page Skills'),
                             // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
                             'header_actions' => 'page-prompts-actions',
                             'instructions' => __('Jobs your team does often on a whole page, run in the AI chat by typing / and their name, like `/legal-check`. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
                             'fields' => [$this->pagePromptsField()],
                         ],
                         [
-                            'display' => __('Field Prompts'),
+                            'display' => __('Field Skills'),
                             'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
                             'fields' => [$this->fieldPromptsField()],
                         ],
