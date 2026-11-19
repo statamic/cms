@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { expect, test, vi } from 'vitest';
 import * as Globals from '@/bootstrap/globals';
 import FormGroupFieldsFieldtype from '@/components/fieldtypes/FormGroupFieldsFieldtype.vue';
+import { builderContextKey } from '@/components/forms/builder/context';
 import FieldtypeSelector from '@/components/fields/FieldtypeSelector.vue';
 import Settings from '@/components/fields/Settings.vue';
 
@@ -42,7 +43,7 @@ function mountWithin(builder, axios = {}) {
         shallow: true,
         props: { handle: 'fields', value: [], config: {}, meta: {} },
         global: {
-            provide: builder ? { FormBuilderContext: builder } : {},
+            provide: builder ? { [builderContextKey]: builder } : {},
             mocks: { $axios: axios, $toast: { success: () => {} } },
         },
     });

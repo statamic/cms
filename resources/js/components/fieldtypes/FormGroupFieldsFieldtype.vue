@@ -1,6 +1,7 @@
 <script>
 import FieldsFieldtype from './grid/FieldsFieldtype.vue';
 import { categories } from '@/components/forms/builder/categories';
+import { builderContextKey } from '@/components/forms/builder/context';
 
 const unsupportedChildFieldtypes = ['group', 'upload', 'form_upload', 'assets', 'files'];
 
@@ -8,7 +9,7 @@ export default {
     extends: FieldsFieldtype,
 
     inject: {
-        formBuilder: { from: 'FormBuilderContext', default: null },
+        formBuilder: { from: builderContextKey, default: null },
     },
 
     provide() {

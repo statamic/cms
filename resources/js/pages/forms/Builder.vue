@@ -1,5 +1,5 @@
 <script lang="ts">
-import createContext from '@/util/createContext';
+export { injectBuilderContext, provideBuilderContext, builderContextKey } from '@/components/forms/builder/context';
 
 export enum InspectorType {
     Page = 'page',
@@ -15,11 +15,10 @@ export enum FieldView {
     Expanded = 'expanded',
     Collapsed = 'collapsed',
 }
-
-export const [injectBuilderContext, provideBuilderContext] = createContext('FormBuilder');
 </script>
 
 <script setup lang="ts">
+import { provideBuilderContext } from '@/components/forms/builder/context';
 import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
