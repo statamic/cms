@@ -102,13 +102,19 @@ class AddonTest extends TestCase
     }
 
     #[Test]
-    public function it_throws_exception_for_invalid_edition()
+    public function it_falls_back_to_the_default_edition_when_the_configured_edition_does_not_exist()
     {
-        $this->expectExceptionMessage('Invalid edition [rad] for addon foo/bar');
-
         config(['statamic.editions.addons.foo/bar' => 'rad']);
 
-        $this->makeFromPackage(['id' => 'foo/bar', 'editions' => []])->edition();
+        $addon = $this->makeFromPackage(['id' => 'foo/bar', 'editions' => ['free', 'pro']]);
+
+        $this->assertEquals('free', $addon->edition());
+        $this->assertEquals('rad', $addon->configuredEdition());
+        $this->assertTrue($addon->hasUnknownEdition());
+
+        config(['statamic.editions.addons.foo/bar' => 'pro']);
+
+        $this->assertFalse($addon->hasUnknownEdition());
     }
 
     #[Test]

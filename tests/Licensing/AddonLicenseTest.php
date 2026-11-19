@@ -108,4 +108,14 @@ class FakeAddonLicenseAddon
     {
         return $this->edition;
     }
+
+    public function configuredEdition()
+    {
+        return $this->edition;
+    }
+
+    public function hasUnknownEdition()
+    {
+        return false;
+    }
 }
