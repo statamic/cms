@@ -1001,6 +1001,28 @@ EOT;
     }
 
     #[Test]
+    public function it_does_not_shadow_the_button_and_previous_page_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                ['id' => 'page_one', 'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]]],
+                ['id' => 'page_two', 'previous_page_label' => 'Back', 'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]]],
+            ],
+        ], 'survey');
+
+        request()->merge(['page' => 'page_two']);
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ button_label }}|{{ previous_page_label }}|{{ previous_page_url }}|{{ form_button_label }}|{{ form_previous_page_label }}|{{ form_previous_page_url }}</p>{{ /form:survey }}',
+            ['button_label' => 'cascade-button', 'previous_page_label' => 'cascade-previous', 'previous_page_url' => '/cascade-url'],
+        );
+
+        $this->assertStringContainsString('<p>cascade-button|cascade-previous|/cascade-url|Submit|Back|http://localhost?page=page_one</p>', $output);
+    }
+
+    #[Test]
     public function it_dynamically_renders_sections_array()
     {
         $this->createForm([
@@ -1333,7 +1355,7 @@ EOT;
 
         request()->merge(['page' => 'page_three']);
 
-        $output = $this->tag('{{ form:survey }}{{ previous_page_url }}{{ /form:survey }}');
+        $output = $this->tag('{{ form:survey }}{{ form_previous_page_url }}{{ /form:survey }}');
 
         // "Back" returns to page one — the page actually visited — not page two.
         $this->assertStringContainsString('page=page_one', $output);

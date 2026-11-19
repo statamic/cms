@@ -92,11 +92,11 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
-        $data['button_label'] = Arr::get($data['form_page'], 'button_label');
+        $data['form_button_label'] = Arr::get($data['form_page'], 'button_label');
 
         if (! $this->isFirstPage()) {
-            $data['previous_page_label'] = Arr::get($data['form_page'], 'previous_page_label');
-            $data['previous_page_url'] = $this->previousPageUrl();
+            $data['form_previous_page_label'] = Arr::get($data['form_page'], 'previous_page_label');
+            $data['form_previous_page_url'] = $this->previousPageUrl();
         }
 
         $data['form_restricted'] = $form->restricted();
