@@ -41,28 +41,27 @@ class FormFieldsTest extends TestCase
     }
 
     #[Test]
-    public function it_flattens_pages_to_sections_when_forms_pro_is_not_installed()
+    public function it_keeps_pages_in_contents_when_forms_pro_is_not_installed()
     {
-        $formFields = new FormFields([
+        $contents = [
             'pages' => [
                 [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
                     'sections' => [
                         ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]],
                     ],
                 ],
                 [
+                    'id' => 'page_two',
                     'sections' => [
                         ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'email']]]],
                     ],
                 ],
             ],
-        ]);
+        ];
 
-        $this->assertArrayNotHasKey('pages', $formFields->contents());
-        $this->assertArrayHasKey('sections', $formFields->contents());
-        $this->assertCount(2, $formFields->contents()['sections']);
-        $this->assertEquals('Section A', $formFields->contents()['sections'][0]['display']);
-        $this->assertEquals('Section B', $formFields->contents()['sections'][1]['display']);
+        $this->assertSame($contents, (new FormFields($contents))->contents());
     }
 
     #[Test]

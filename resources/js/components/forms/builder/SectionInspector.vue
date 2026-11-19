@@ -16,7 +16,7 @@ watch(() => section.value.display, dirty);
                     <Icon name="page" class="size-4 text-gray-500 dark:text-gray-300" />
                 </div>
                 <a :href="`#section-${section._id}`" class="inline-flex items-center gap-1.5 text-xl font-medium antialiased">
-                    {{ __(section.display) }}
+                    {{ __(section.display) || __('Section') }}
                     <div class="grid *:[grid-area:1/1]">
                         <Icon name="arrow-up" data-field-direction-up aria-hidden="true" />
                         <Icon name="arrow-down" data-field-direction-down aria-hidden="true" />
@@ -25,7 +25,7 @@ watch(() => section.value.display, dirty);
             </div>
 
             <Field :label="__('Label')">
-                <Input v-model="section.display" focus />
+                <Input v-model="section.display" :placeholder="__('Section')" focus />
             </Field>
         </div>
     </div>

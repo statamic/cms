@@ -19,13 +19,6 @@ class FormFields
 {
     public function __construct(protected array $contents)
     {
-        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
-            $this->contents = [
-                'sections' => collect($this->contents['pages'])
-                    ->flatMap(fn (array $page): array => $page['sections'] ?? [])
-                    ->all(),
-            ];
-        }
     }
 
     public function contents(): array
@@ -38,6 +31,10 @@ class FormFields
         $pages = isset($this->contents['pages'])
             ? collect($this->contents['pages'])
             : collect([['sections' => $this->contents['sections'] ?? []]]);
+
+        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
+            $pages = collect([['sections' => $pages->flatMap(fn (array $page): array => $page['sections'] ?? [])->all()]]);
+        }
 
         return $pages->map(fn (array $page, int $index): array => [
             ...$page,
