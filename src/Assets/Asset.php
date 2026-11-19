@@ -275,7 +275,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
     {
         $meta = $this->meta();
 
-        // A null value is a legitimate result, e.g. the duration of an image.
+        // A null value is a legitimate result, e.g. a video getID3 can't read.
         // Only meta that is missing the key entirely needs to be regenerated.
         if (Arr::has($meta, $key)) {
             return Arr::get($meta, $key);
