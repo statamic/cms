@@ -1222,7 +1222,7 @@ EOT
             ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
             ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
 
-        $this->assertEmpty($form->submissions());
+        $this->assertEmpty($form->querySubmissions()->get());
     }
 
     #[Test]
