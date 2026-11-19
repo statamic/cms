@@ -6,6 +6,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Asset;
 use Statamic\Fields\Field;
@@ -16,29 +17,46 @@ class CreateAssetsFromFileUploads
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public Submission $submission)
+    private array $created = [];
+    private array $assets = [];
+    private array $temporaryFiles = [];
+
+    public function __construct(public Submission $submission, public bool $keepTemporaryFiles = false)
     {
     }
 
     public function handle(): void
     {
-        $created = $this->submission->form()->blueprint()->fields()->all()
+        $this->submission->form()->blueprint()->fields()->all()
             ->filter(fn (Field $field): bool => $field->type() === 'form_upload' && $field->fieldtype()->config('store'))
-            ->reduce(function (bool $created, Field $field): bool {
-                $paths = $this->createAssets($field);
+            ->each(function (Field $field): void {
+                $original = $this->submission->get($field->handle());
 
-                if (! $paths) {
-                    return $created;
+                if ($paths = $this->createAssets($field)) {
+                    $this->created[$field->handle()] = $original;
+                    $this->submission->set($field->handle(), $paths);
                 }
+            });
+    }
 
-                $this->submission->set($field->handle(), $paths);
-
-                return true;
-            }, false);
-
-        if ($created && $this->submission->form()->store()) {
-            $this->submission->saveQuietly();
+    public function revert(): void
+    {
+        foreach ($this->created as $handle => $original) {
+            $this->assets[$handle]->each->delete();
+            $this->submission->set($handle, $original);
         }
+
+        $this->created = [];
+        $this->assets = [];
+    }
+
+    public function deleteTemporaryFiles(): void
+    {
+        foreach ($this->temporaryFiles as $path) {
+            $this->disk()->delete($path);
+        }
+
+        $this->temporaryFiles = [];
     }
 
     private function createAssets(Field $field): array|string|null
@@ -49,22 +67,26 @@ class CreateAssetsFromFileUploads
             return null;
         }
 
-        $assetPaths = Collection::wrap($value)
+        $assets = Collection::wrap($value)
             ->filter()
             ->map(fn (string $path) => $this->uploadAsset($field, $path))
             ->filter()
             ->values();
 
-        if ($assetPaths->isEmpty()) {
+        if ($assets->isEmpty()) {
             return null;
         }
+
+        $this->assets[$field->handle()] = $assets;
+
+        $assetPaths = $assets->map->path();
 
         return $field->get('max_files') === 1 ? $assetPaths->first() : $assetPaths->all();
     }
 
-    private function uploadAsset(Field $field, string $path): ?string
+    private function uploadAsset(Field $field, string $path): ?AssetContract
     {
-        $disk = Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
+        $disk = $this->disk();
         $basePath = config('statamic.forms.file_uploads_path', 'statamic/form-uploads');
         $diskPath = "{$basePath}/{$this->submission->id()}/{$field->handle()}/".basename($path);
 
@@ -91,8 +113,18 @@ class CreateAssetsFromFileUploads
         $assetId = is_array($assetId) ? $assetId[0] : $assetId;
 
         app('files')->delete($localPath);
-        $disk->delete($diskPath);
 
-        return Asset::findOrFail($assetId)->path();
+        if ($this->keepTemporaryFiles) {
+            $this->temporaryFiles[] = $diskPath;
+        } else {
+            $disk->delete($diskPath);
+        }
+
+        return Asset::findOrFail($assetId);
+    }
+
+    private function disk()
+    {
+        return Storage::disk(config('statamic.system.file_uploads_disk', 'local'));
     }
 }

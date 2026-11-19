@@ -76,4 +76,20 @@ class WebsiteTest extends TestCase
             'default' => 'https://statamic.com',
         ], $fieldtype->toFieldArray());
     }
+
+    #[Test]
+    public function it_does_not_add_the_plain_url_rule_when_a_parameterized_one_exists()
+    {
+        $fieldtype = (new Website)->setField(new FormField('website', [
+            'type' => 'website',
+            'validate' => ['required', 'url:https'],
+        ]));
+
+        $this->assertEquals([
+            'type' => 'text',
+            'input_type' => 'url',
+            'placeholder' => null,
+            'validate' => ['required', 'url:https'],
+        ], $fieldtype->toFieldArray());
+    }
 }

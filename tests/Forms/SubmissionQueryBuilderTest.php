@@ -531,12 +531,12 @@ class SubmissionQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function the_form_query_does_not_filter_by_status_by_default()
+    public function the_form_query_does_not_filter_by_status_by_default_but_submissions_only_include_finalized()
     {
         $form = $this->createSubmissionsWithStatuses();
 
         $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->querySubmissions()->get()));
-        $this->assertEquals(['a', 'b', 'c', 'd', 'e', 'f'], $this->ids($form->submissions()));
+        $this->assertEquals(['a', 'c'], $this->ids($form->submissions()));
         $this->assertEquals(['b', 'd'], $this->ids($form->querySubmissions()->whereStatus('partial')->get()));
     }
 }

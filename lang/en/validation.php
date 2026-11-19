@@ -196,6 +196,7 @@ return [
     'elevated_session_resend_code_unavailable' => 'Resend code is only available for verification code method.',
     'elevated_session_verification_code' => 'The verification code is incorrect.',
     'email_available' => 'A user with this email already exists.',
+    'email_connection_template_syntax' => 'Only users who can configure forms may use template syntax.',
     'email_field_reference' => "References a field that doesn't exist on this form.",
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
     'form_chart_hidden_field' => 'Field :field is hidden and cannot be charted.',

@@ -505,6 +505,39 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function unknown_mentions_cannot_join_template_syntax_in_the_subject()
+    {
+        config(['app.name' => 'Secret App']);
+        putenv('B1_SUBJECT_PROBE=leaked');
+
+        $email = $this->makeEmailWithConfig(['subject' => 'Hi {[[ nope ]]{ config:app.name }} {[[ nope ]]env:B1_SUBJECT_PROBE}']);
+
+        putenv('B1_SUBJECT_PROBE');
+
+        $this->assertEquals('Hi {{ config:app.name }} {env:B1_SUBJECT_PROBE}', $email->subject);
+    }
+
+    #[Test]
+    public function submitted_values_cannot_complete_template_syntax_in_the_subject()
+    {
+        config(['app.name' => 'Secret App']);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $email = tap(new Email(
+            $form->makeSubmission()->data(['name' => '{ config:app.name }}']),
+            ['to' => 'test@test.com', 'subject' => 'Hi {[[ name ]]'],
+            Site::default()
+        ))->build();
+
+        $this->assertEquals('Hi {{ config:app.name }}', $email->subject);
+    }
+
+    #[Test]
     public function it_falls_back_to_the_default_subject_when_empty()
     {
         $this->assertEquals('Form Submission', $this->makeEmailWithConfig([])->subject);

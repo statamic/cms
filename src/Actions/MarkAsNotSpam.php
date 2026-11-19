@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Exception;
 use Statamic\Contracts\Forms\Submission;
 
 use function Statamic\trans as __;
@@ -40,11 +41,25 @@ class MarkAsNotSpam extends Action
 
     public function run($items, $values)
     {
-        $items->each(function ($submission) {
+        $failures = $items->filter(function ($submission) {
             $submission->markAsNotSpam();
 
-            $submission->isPartial() ? $submission->finalize() : $submission->save();
+            if ($submission->isPartial()) {
+                return $submission->finalize() === false;
+            }
+
+            $submission->save();
+
+            return false;
         });
+
+        if ($failures->isNotEmpty()) {
+            $total = $items->count();
+
+            throw new Exception($failures->count() === $total
+                ? trans_choice('statamic::messages.mark_as_not_spam_action_failed', $total)
+                : __('statamic::messages.mark_as_not_spam_action_partially_failed', ['success' => $total - $failures->count(), 'total' => $total]));
+        }
 
         return [
             'message' => trans_choice('Submission marked as not spam|Submissions marked as not spam', $items->count()),

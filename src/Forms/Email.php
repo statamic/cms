@@ -99,7 +99,9 @@ class Email extends Mailable
 
     protected function renderSubject(string $subject): string
     {
-        $subject = Mentions::replace($subject, $this->mentionValues, using: fn ($text) => $this->parseConfigValue($text));
+        $values = [...array_fill_keys(Mentions::handles($subject), ''), ...$this->mentionValues];
+
+        $subject = Mentions::replace($subject, $values, using: fn ($text) => $this->parseConfigValue($text));
 
         return trim(preg_replace('/\s+/', ' ', $subject)) ?: __('Form Submission');
     }

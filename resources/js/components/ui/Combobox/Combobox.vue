@@ -12,7 +12,7 @@ import {
     ComboboxVirtualizer,
     FocusScope
 } from 'reka-ui';
-import { computed, nextTick, ref, toRef, useAttrs, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
 import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
@@ -47,6 +47,8 @@ interface Props {
     /** When `true`, the options dropdown will close after selecting an option. */
     closeOnSelect?: boolean;
     disabled?: boolean;
+    /** When `true`, a `taggable` combobox only shows its search input while the dropdown is open, so the selected option is displayed while it's closed. */
+    hideInputWhenClosed?: boolean;
     /** When `true`, the focus outline will be more discrete. */
     discreteFocusOutline?: boolean;
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
@@ -103,6 +105,7 @@ const props = withDefaults(defineProps<Props>(), {
     closeOnSelect: undefined,
     disabled: false,
     discreteFocusOutline: false,
+    hideInputWhenClosed: false,
     icon: null,
     id: null,
     ignoreFilter: false,
@@ -132,7 +135,6 @@ defineOptions({
 const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
 
 const attrs = useAttrs();
-const slots = useSlots();
 
 const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class as string));
 const wrapperAttrs = computed(() => {
@@ -280,10 +282,8 @@ const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelec
 const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
 
-    // When taggable, we always want to show the input unless the `selected-option`
-    // slot is provided, in which case we only want to show the input when the dropdown is open.
     if (props.taggable) {
-        return !!slots['selected-option'] ? dropdownOpen.value : true;
+        return props.hideInputWhenClosed ? dropdownOpen.value : true;
     }
 
     return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);

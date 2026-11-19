@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
-use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Blueprint as BlueprintFacade;
@@ -186,25 +185,62 @@ class ConnectionCleanupTest extends TestCase
     }
 
     #[Test]
-    public function a_job_without_a_public_middleware_property_throws()
+    public function a_job_without_a_public_middleware_property_runs_and_cleanup_still_happens()
     {
-        [$submission] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-middleware']]);
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Form connection job ['.JobWithoutMiddlewareProperty::class.'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
+        [$submission, $path] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-middleware']]);
 
         $submission->finalize();
+
+        $this->assertEquals([JobWithoutMiddlewareProperty::class], CountdownJob::$runs);
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$path);
     }
 
     #[Test]
-    public function a_job_that_doesnt_implement_should_queue_throws()
+    public function a_job_that_doesnt_implement_should_queue_runs_and_cleanup_still_happens()
     {
-        [$submission] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-should-queue']]);
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Form connection job ['.JobWithoutShouldQueue::class.'] must implement '.ShouldQueue::class.' and have a public $middleware property, e.g. by using the '.Queueable::class.' trait.');
+        [$submission, $path] = $this->submissionWithUpload([['id' => 'a', 'job' => 'without-should-queue']]);
 
         $submission->finalize();
+
+        $this->assertEquals([JobWithoutShouldQueue::class], CountdownJob::$runs);
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$path);
+    }
+
+    #[Test]
+    public function a_custom_send_email_job_that_isnt_queueable_still_sends()
+    {
+        config(['statamic.forms.send_email_job' => SyncSendEmail::class]);
+
+        [$submission, $path] = $this->submissionWithUpload([], [
+            'email' => [['to' => 'first@example.com']],
+        ]);
+
+        $submission->finalize();
+
+        $this->assertEquals([SyncSendEmail::class], CountdownJob::$runs);
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$path);
+    }
+
+    #[Test]
+    public function jobs_that_cant_count_down_run_before_the_others_and_dont_hold_up_cleanup()
+    {
+        [$submission, $path] = $this->submissionWithUpload([
+            ['id' => 'a'],
+            ['id' => 'b', 'job' => 'without-should-queue'],
+        ]);
+
+        CountdownJob::$outcomes = ['a' => 'throw'];
+
+        $submission->finalize();
+
+        $this->assertEquals([JobWithoutShouldQueue::class, 'a'], CountdownJob::$runs);
+        Storage::disk('local')->assertExists('statamic/form-uploads/'.$path);
+        $this->assertSame(1, Cache::get($this->counterKey($submission)));
+
+        CountdownJob::$outcomes = [];
+        $this->retry('a');
+
+        Storage::disk('local')->assertMissing('statamic/form-uploads/'.$path);
     }
 
     #[Test]
@@ -343,6 +379,7 @@ class JobWithoutMiddlewareProperty implements ShouldQueue
 {
     public function handle(): void
     {
+        CountdownJob::$runs[] = static::class;
     }
 }
 
@@ -361,5 +398,18 @@ class JobWithoutShouldQueue
 
     public function handle(): void
     {
+        CountdownJob::$runs[] = static::class;
+    }
+}
+
+class SyncSendEmail
+{
+    public function __construct(public Submission $submission, public $site, public array $config)
+    {
+    }
+
+    public function handle(): void
+    {
+        CountdownJob::$runs[] = static::class;
     }
 }
