@@ -7,7 +7,8 @@
 =================================================== */
 /* The floating card and the docked input share a look. At rest, the card has a plain grey 1px edge, and the input is a normal field. Focused, or while a run
    is working or waiting for you, they get a purple-to-blue gradient edge, a 1px blue line just inside it (2px in all, like a focused field's outline) and a
-   purple glow. The outline is drawn over the edge, so nothing moves. */
+   purple glow. The outline is drawn over the edge, so nothing moves. A card can take the dark look on its own with the dark class, as the image's prompt
+   card does (see AiImage.vue). */
 .ai-chat-card,
 .ai-dock-input {
     --ai-card-bg: white;
@@ -20,6 +21,7 @@
 }
 
 .dark .ai-chat-card,
+.ai-chat-card.dark,
 .dark .ai-dock-input {
     --ai-card-bg: var(--color-gray-900);
     --ai-edge-quiet: var(--color-gray-700);
@@ -38,6 +40,16 @@
     outline: 1px solid var(--color-blue-400);
     outline-offset: -2px;
     box-shadow: 0 10px 40px -10px color-mix(in oklab, var(--color-ai) 45%, transparent);
+}
+
+/* A see-through card, as the image's prompt card is (see AiImage.vue): 70% of its colour, with what's behind blurred (the blur is on the card).
+   It has no edge, at rest or focused: the photo behind gives it its shape. The purple glow still comes in while it's focused or working. */
+.ai-chat-card[data-glass],
+.ai-chat-card[data-glass]:focus-within,
+.ai-chat-card[data-glass][data-working] {
+    background: color-mix(in oklab, var(--ai-card-bg) 70%, transparent);
+    border-color: transparent;
+    outline: none;
 }
 
 /* Once a chat has started, hovering the floating card brings in a softer version of the glow, at about half its strength. Before then it's just an input,
