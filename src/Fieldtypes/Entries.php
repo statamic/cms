@@ -251,7 +251,7 @@ class Entries extends Relationship
     {
         $column = OrderBy::column($request->sort, 'title');
 
-        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+        if (! $request->sort && ! $request->search && $this->configuredCollectionsShareSort()) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -262,11 +262,26 @@ class Entries extends Relationship
     {
         $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+        if (! $request->sort && ! $request->search && $this->configuredCollectionsShareSort()) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
+    }
+
+    protected function configuredCollectionsShareSort(): bool
+    {
+        if (count($handles = $this->getConfiguredCollections()) < 2) {
+            return true;
+        }
+
+        $sorts = collect($handles)
+            ->map(fn ($handle) => Collection::findByHandle($handle))
+            ->map(fn ($collection) => $collection ? [$collection->sortField(), $collection->sortDirection()] : null)
+            ->unique();
+
+        // Structure order is per collection, so it can't order entries across collections.
+        return $sorts->count() === 1 && $sorts->first() && $sorts->first()[0] !== 'order';
     }
 
     public function initialSortColumn()
