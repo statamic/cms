@@ -95,7 +95,7 @@ class TermsTest extends TestCase
     }
 
     #[Test]
-    public function it_augments_to_the_term_of_the_configured_taxonomy_when_the_slug_exists_in_multiple_taxonomies()
+    public function it_augments_to_the_term_of_the_configured_term_when_the_slug_exists_in_multiple_taxonomies()
     {
         Term::make('shared')->taxonomy('tags')->dataForLocale('en', ['title' => 'Shared Tag'])->save();
         Term::make('shared')->taxonomy('categories')->dataForLocale('en', ['title' => 'Shared Category'])->save();
