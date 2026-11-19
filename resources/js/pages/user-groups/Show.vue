@@ -65,6 +65,7 @@ function handleDelete() {
         <UserListing
             :listing-key="listingConfig.listingKey"
             :group="listingConfig.groupId"
+            :columns="listingConfig.columns"
             :filters="filters"
             :allow-filter-presets="listingConfig.allowFilterPresets"
             :action-url="listingConfig.actionUrl"
