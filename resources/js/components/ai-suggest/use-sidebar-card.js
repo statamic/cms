@@ -1,9 +1,8 @@
 import { inject, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 
-// Prototype: lays a card over the entry's sidebar column (the one with Published and the slug), for suggestions too big for a dropdown
-// (see AiSuggestLarge.vue), level with the field it's for. The card scrolls with the page natively, so it never lags behind it. A wrapper is
-// put in the page's scrolling area beside the field, and the card sticks to its top while the field is in view (see position). Its height
-// fits the screen (see fill).
+// Prototype: lays a field's suggestions card over the entry's sidebar column (the one with Published and the slug), level with the field
+// and 12px from it. The card scrolls with the page natively, so it never lags behind it: a wrapper is put in the page's scrolling area
+// beside the field, and the card sticks to its top while the field is in view (see position). Its height fits the screen (see fill).
 // Only the wrapper is placed by hand, when the column moves or resizes, never on scroll.
 //
 // Only one field's card is open at a time. Opening another field's swaps it in, closing the first in the same moment, so there's never a gap
@@ -79,11 +78,15 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
         const columnTop = column.top - box.top + area.scrollTop;
         const top = field ? Math.max(columnTop, field.top - box.top + area.scrollTop) : columnTop;
         const bottom = field ? field.bottom - box.top + area.scrollTop : Math.max(page.bottom, column.bottom) - box.top + area.scrollTop;
+        // It starts 12px from the field, across the gap before the column, and reaches to the column's right edge, so it reads as the
+        // field's rather than the sidebar's
+        const columnLeft = column.left - box.left + area.scrollLeft;
+        const left = field ? field.right - box.left + area.scrollLeft + 12 : columnLeft;
+        const width = columnLeft + column.width - left;
         const height = Math.max(0, bottom - top);
         wrapperTop = top;
-        place.value = { top: `${top}px`, left: `${column.left - box.left + area.scrollLeft}px`, width: `${column.width}px`, height: `${height}px` };
+        place.value = { top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px` };
         fill();
-        nextTick(() => requestAnimationFrame(fadeNearby));
     }
 
     // The card's height is what fits below wherever it is now, down to 16px above the bottom of the screen. It's only worked out when you stop
