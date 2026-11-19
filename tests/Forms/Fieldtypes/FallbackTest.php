@@ -3,10 +3,15 @@
 namespace Tests\Forms\Fieldtypes;
 
 use Illuminate\Support\Facades\View;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fieldtypes\Assets\Assets;
 use Statamic\Fieldtypes\Code;
 use Statamic\Fieldtypes\Files;
+use Statamic\Fieldtypes\Html;
+use Statamic\Fieldtypes\Info;
+use Statamic\Fieldtypes\Section;
+use Statamic\Fieldtypes\Spacer;
 use Statamic\Fieldtypes\Text;
 use Statamic\Fieldtypes\Textarea;
 use Statamic\Forms\Fieldtypes\Fallback;
@@ -74,5 +79,27 @@ class FallbackTest extends TestCase
         $fallback = (new Fallback)->wrapping(new Assets);
 
         $this->assertEquals('statamic::forms.antlers.fields.assets', $fallback->view());
+    }
+
+    #[Test]
+    #[DataProvider('collectsValueProvider')]
+    public function it_determines_whether_the_wrapped_fieldtype_collects_a_value($class, $collectsValue)
+    {
+        $fallback = (new Fallback)->wrapping(new $class);
+
+        $this->assertSame($collectsValue, $fallback->collectsValue());
+        $this->assertSame($collectsValue, $fallback->toArray()['collects_value']);
+    }
+
+    public static function collectsValueProvider()
+    {
+        return [
+            'text' => [Text::class, true],
+            'code' => [Code::class, true],
+            'section' => [Section::class, false],
+            'html' => [Html::class, false],
+            'spacer' => [Spacer::class, false],
+            'info' => [Info::class, false],
+        ];
     }
 }

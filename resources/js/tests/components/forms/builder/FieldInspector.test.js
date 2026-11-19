@@ -82,3 +82,65 @@ test('switching the condition key in the inspector drops the old key', async () 
     expect(update.values).not.toHaveProperty('if');
     expect(field.config).not.toHaveProperty('if');
 });
+
+test('fields are offered as conditions and get a validation tab based on whether their fieldtype collects a value', async () => {
+    const field = { _id: 'email-id', handle: 'email', fieldtype: 'text', icon: 'text', config: { type: 'text', display: 'Email' } };
+
+    Object.assign(context, {
+        dirty: () => {},
+        errors: ref({}),
+        fieldtypes: [
+            { handle: 'text', categories: ['text'], collects_value: true },
+            { handle: 'group', categories: ['structure'], collects_value: true },
+            { handle: 'spacer', categories: ['structure'], collects_value: false },
+            { handle: 'heading', categories: ['information'], collects_value: false },
+        ],
+        form: { handle: 'contact' },
+        inspecting: ref(field),
+        pages: ref([
+            {
+                sections: [
+                    {
+                        fields: [
+                            { _id: 'address-id', handle: 'address', fieldtype: 'group', icon: 'group', config: { type: 'group', display: 'Address' } },
+                            { _id: 'gap-id', handle: 'gap', fieldtype: 'spacer', icon: 'spacer', config: { type: 'spacer', display: 'Gap' } },
+                            { _id: 'intro-id', handle: 'intro', fieldtype: 'heading', icon: 'heading', config: { type: 'heading', display: 'Intro' } },
+                            field,
+                        ],
+                    },
+                ],
+            },
+        ]),
+        showFieldDirection: false,
+        withoutDirtying: (callback) => callback(),
+    });
+
+    axios.post.mockImplementation((url, payload) => Promise.resolve({
+        data: {
+            fieldtype: {},
+            blueprint: { tabs: [{ sections: [{ fields: [] }] }] },
+            values: { ...payload.values },
+            meta: {},
+            originValues: {},
+            originMeta: {},
+        },
+    }));
+
+    const wrapper = mount(FieldInspector, {
+        global: { stubs: { FieldValidationBuilder: true } },
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.suggestableConditionFields.map((f) => f.handle)).toEqual(['address']);
+    expect(wrapper.vm.shouldShowValidationTab).toBe(true);
+
+    context.inspecting.value = context.pages.value[0].sections[0].fields[0];
+    await flushPromises();
+    expect(wrapper.vm.shouldShowValidationTab).toBe(true);
+
+    context.inspecting.value = context.pages.value[0].sections[0].fields[1];
+    await flushPromises();
+    expect(wrapper.vm.shouldShowValidationTab).toBe(false);
+
+    wrapper.unmount();
+});

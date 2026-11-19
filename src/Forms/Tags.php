@@ -422,6 +422,10 @@ class Tags extends BaseTags
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     $data['is_informative'] = in_array('information', $field->formField()?->fieldtype()?->categories() ?? []);
 
+                    if ($formFieldtype = $field->formField()?->fieldtype()) {
+                        $data = $formFieldtype->prepareFrontEndRenderable($data);
+                    }
+
                     return $jsDriver
                         ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
                         : $data;

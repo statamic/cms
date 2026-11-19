@@ -44,7 +44,8 @@ const pages = computed({
     set: (pages) => (formFields.value.pages = pages),
 });
 
-const fieldCategory = (field) => props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] ?? 'other';
+const findFieldtype = (field) => props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype);
+const fieldCategory = (field) => findFieldtype(field)?.categories?.[0] ?? 'other';
 
 const findField = (id) => pages.value
     .flatMap((page) => page.sections)
@@ -85,7 +86,7 @@ const fieldNumbers = computed(() => {
 provide('fieldNumbers', fieldNumbers);
 
 const suggestableFields = computed(() => flattenedFields.value
-    .filter(({ field }) => collectsValue(fieldCategory(field)))
+    .filter(({ field }) => collectsValue(findFieldtype(field)))
     .map(({ field, pageIndex }) => ({
         handle: field.handle,
         icon: field.icon,
