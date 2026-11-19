@@ -698,6 +698,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return cp_route('forms.show', $this->handle());
     }
 
+    /**
+     * @deprecated
+     */
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Forms',
+            url: $this->editBlueprintUrl(),
+        );
+    }
+
     public function hasFiles()
     {
         return $this->fields()->filter(function ($field) {
