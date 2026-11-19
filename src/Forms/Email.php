@@ -16,6 +16,10 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
 use Statamic\Fieldtypes\AutocompleteEditor;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
+use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fieldtypes\Banner;
+use Statamic\Forms\Fieldtypes\Heading;
+use Statamic\Forms\Fieldtypes\Paragraph;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -241,8 +245,14 @@ class Email extends Mailable
 
     private function getRenderablePageData($form, array $augmented): array
     {
+        $displayOnly = $form->formFields()->fields()
+            ->filter(fn (FormField $field) => $field->fieldtype() instanceof Banner
+                || $field->fieldtype() instanceof Heading
+                || $field->fieldtype() instanceof Paragraph)
+            ->keys();
+
         $fields = $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date', 'form']))
-            ->reject(fn ($field) => $field['fieldtype'] === 'spacer')
+            ->reject(fn ($field) => $field['fieldtype'] === 'spacer' || $displayOnly->contains($field['handle']))
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
