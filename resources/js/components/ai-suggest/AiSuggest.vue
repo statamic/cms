@@ -137,6 +137,8 @@ watch(body, (el) => {
 onBeforeUnmount(() => {
     observer?.disconnect();
     stopWaiting();
+    document.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('keydown', onEscape);
 });
 
 // Prototype: the suggestions open over the entry's sidebar, as Bard's do (see AiSuggestLarge.vue and use-sidebar-card.js), with the field's name in
@@ -169,13 +171,7 @@ watch(open, (isOpen) => {
     document[isOpen ? 'addEventListener' : 'removeEventListener']('keydown', onEscape);
 });
 
-onBeforeUnmount(() => {
-    document.removeEventListener('pointerdown', onPointerDown);
-    document.removeEventListener('keydown', onEscape);
-});
-
 // Arrow keys go round the suggestions and the "Make it…" box (which is below them), so Up from the box lands on the last suggestion.
-
 function onArrowKey(event) {
     if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
 
@@ -189,9 +185,7 @@ function onArrowKey(event) {
 
 function apply(text) {
     emit('apply', text);
-    open.value = false;
-    preview.value = null;
-
+    toggled(false);
     focusField();
 }
 
