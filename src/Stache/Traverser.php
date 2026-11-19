@@ -29,7 +29,20 @@ class Traverser
                 continue;
             }
 
-            $paths[Path::tidy($file->getPathname())] = $file->getMTime();
+            try {
+                $mtime = $file->getMTime();
+            } catch (\RuntimeException $e) {
+                // Skip the file only when a fresh listing shows it was removed after it was listed
+                $listing = @scandir($file->getPath());
+
+                if ($listing === false || in_array($file->getFilename(), $listing, true)) {
+                    throw $e;
+                }
+
+                continue;
+            }
+
+            $paths[Path::tidy($file->getPathname())] = $mtime;
         }
 
         // Sort by path, then (stably) by timestamp, so files with the same timestamp are

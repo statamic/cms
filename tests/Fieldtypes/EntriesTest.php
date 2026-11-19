@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -477,6 +478,37 @@ class EntriesTest extends TestCase
 
         $second = $field->fieldtype();
         $this->assertTrue($second->getItemData(['123'])->first()['invalid']);
+    }
+
+    #[Test]
+    #[DataProvider('sortProvider')]
+    public function it_sorts_by_the_collection_sort_when_the_configured_collections_share_it($collections, $params, $expectedColumn, $expectedDirection)
+    {
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('menu')->structureContents(['root' => false])->save();
+        Facades\Collection::make('footer')->structureContents(['root' => false])->save();
+        Facades\Collection::make('concerts')->sortField('dates->start')->sortDirection('asc')->save();
+        Facades\Collection::make('festivals')->sortField('dates->start')->sortDirection('asc')->save();
+
+        $fieldtype = $this->fieldtype(['collections' => $collections]);
+        $request = new Request($params);
+
+        $this->assertEquals($expectedColumn, $fieldtype->getSortColumn($request));
+        $this->assertEquals($expectedDirection, $fieldtype->getSortDirection($request));
+    }
+
+    public static function sortProvider()
+    {
+        return [
+            'single collection' => [['blog'], [], 'date', 'desc'],
+            'collections sharing a sort' => [['blog', 'events'], [], 'date', 'desc'],
+            'collections sharing a json sort' => [['concerts', 'festivals'], [], 'dates->start', 'asc'],
+            'collections with different sorts' => [['blog', 'pages'], [], 'title', 'asc'],
+            'collections with a missing one' => [['blog', 'events', 'missing'], [], 'title', 'asc'],
+            'structured collections' => [['menu', 'footer'], [], 'title', 'asc'],
+            'explicit sort' => [['blog', 'events'], ['sort' => 'title', 'order' => 'desc'], 'title', 'desc'],
+            'search' => [['blog', 'events'], ['search' => 'foo'], 'title', 'asc'],
+        ];
     }
 
     public function fieldtype($config = [], $parent = null)
