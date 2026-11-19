@@ -315,7 +315,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     protected function metaExists()
     {
-        return $this->container()->metaFiles()->contains($this->metaPath());
+        return $this->disk()->exists($this->metaPath());
     }
 
     public function writeMeta($meta)
