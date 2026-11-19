@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CollectionTreeSaving extends Event
 {
-    public $tree;
-
-    public function __construct($tree)
+    public function __construct(public $tree)
     {
-        $this->tree = $tree;
     }
 
     /**

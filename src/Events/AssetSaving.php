@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class AssetSaving extends Event
 {
-    public $asset;
-
-    public function __construct($asset)
+    public function __construct(public $asset)
     {
-        $this->asset = $asset;
     }
 
     /**

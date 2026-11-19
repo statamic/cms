@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
@@ -11,6 +12,7 @@ class TaxonomyTermsController extends ApiController
 {
     protected $resourceConfigKey = 'taxonomies';
     protected $routeResourceKey = 'taxonomy';
+    protected $siteConstrained = true;
     protected $taxonomyHandle;
 
     public function index($taxonomy)
@@ -24,7 +26,7 @@ class TaxonomyTermsController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(TermResource::class)::collection(
-            $this->filterSortAndPaginate($taxonomy->queryTerms()->with($with))
+            $this->updateAndPaginate($taxonomy->queryTerms()->with($with))
         );
     }
 
@@ -32,7 +34,11 @@ class TaxonomyTermsController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $term = Term::find($taxonomy.'::'.$term);
+        if ($site = $this->requestedSite()) {
+            throw_unless($taxonomy->sites()->contains($site), new NotFoundHttpException);
+        }
+
+        $term = $this->localize(Term::find($taxonomy->handle().'::'.$term));
 
         throw_unless($term, new NotFoundHttpException);
 
@@ -42,5 +48,10 @@ class TaxonomyTermsController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'taxonomies', $this->taxonomyHandle);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'taxonomies', $this->taxonomyHandle);
     }
 }

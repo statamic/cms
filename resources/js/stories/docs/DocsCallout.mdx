@@ -1,0 +1,15 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as DocsCalloutStories from '../DocsCallout.stories';
+
+<Meta of={DocsCalloutStories} />
+
+# DocsCallout
+A callout component linking to the Statamic Documentation. Displays as a badge encouraging users to learn more about a specific topic by visiting the relevant page on the docs.
+<Canvas of={DocsCalloutStories._DocsIntro} sourceState={'shown'} />
+
+## Third-party documentation
+The `DocsCallout` component will prepend `https://statamic.dev/` when you provide a relative URL. You can link to your own documentation site by providing an absolute URL:
+<Canvas of={DocsCalloutStories._ThirdParty} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={DocsCalloutStories} />

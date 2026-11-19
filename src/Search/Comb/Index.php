@@ -2,6 +2,9 @@
 
 namespace Statamic\Search\Comb;
 
+use Closure;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
@@ -14,6 +17,8 @@ use Statamic\Support\Arr;
 
 class Index extends BaseIndex
 {
+    protected ?Collection $pending = null;
+
     public function search($query)
     {
         return (new Query($this))->query($query);
@@ -88,26 +93,59 @@ class Index extends BaseIndex
 
     public function delete($document)
     {
-        try {
-            $data = $this->data();
-        } catch (IndexNotFoundException $e) {
+        $this->locked(function () use ($document) {
+            try {
+                $data = $this->data();
+            } catch (IndexNotFoundException $e) {
+                return;
+            }
+
+            $ref = $document->getSearchReference();
+
+            if (! $data->has($ref)) {
+                return;
+            }
+
+            $data->forget($ref);
+
+            $this->save($data);
+        });
+    }
+
+    public function insertDocuments(Documents $documents)
+    {
+        if (! is_null($this->pending)) {
+            $this->pending = $documents->union($this->pending);
+
             return;
         }
 
-        $data->forget($document->getSearchReference());
+        $this->locked(function () use ($documents) {
+            try {
+                $data = $this->data();
+            } catch (IndexNotFoundException $e) {
+                $data = collect();
+            }
 
-        $this->save($data);
+            $this->save($documents->union($data));
+        });
     }
 
-    protected function insertDocuments(Documents $documents)
+    public function update()
     {
+        $this->pending = collect();
+
         try {
-            $data = $this->data();
-        } catch (IndexNotFoundException $e) {
-            $data = collect();
+            parent::update();
+        } finally {
+            [$pending, $this->pending] = [$this->pending, null];
         }
 
-        $this->save($documents->union($data));
+        if ($pending->isNotEmpty()) {
+            $this->locked(fn () => $this->save($pending));
+        }
+
+        return $this;
     }
 
     public function deleteIndex()
@@ -120,6 +158,11 @@ class Index extends BaseIndex
         app('files')->ensureDirectoryExists(pathinfo($this->path())['dirname']);
 
         app('files')->put($this->path(), $documents->toJson(), lock: true);
+    }
+
+    private function locked(Closure $callback)
+    {
+        return Cache::lock('search-index-'.$this->name, 60)->block(30, $callback);
     }
 
     public function extraAugmentedResultData(Result $result)

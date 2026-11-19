@@ -4,9 +4,9 @@ namespace Statamic\Tags;
 
 use Rhukster\DomSanitizer\DOMSanitizer;
 use Statamic\Facades\File;
-use Statamic\Facades\URL;
-use Statamic\Fieldtypes\Icon;
+use Statamic\Facades\Path;
 use Statamic\Support\Str;
+use Statamic\Support\Svg as SvgSupport;
 use Stringy\StaticStringy;
 
 class Svg extends Tags
@@ -31,13 +31,14 @@ class Svg extends Tags
             resource_path(),
             public_path('svg'),
             public_path(),
-            statamic_path('resources/svg/icons/'.Icon::DEFAULT_FOLDER),
+            statamic_path('resources/svg/icons'),
+            base_path(),
         ];
 
         $svg = null;
 
         foreach ($cascade as $location) {
-            $file = Url::assemble($location, $name);
+            $file = Path::assemble($location, $name);
             if (File::exists($file)) {
                 $svg = StaticStringy::collapseWhitespace(
                     File::get($file)
@@ -105,9 +106,7 @@ class Svg extends Tags
         $this->setAllowedAttrs($sanitizer);
         $this->setAllowedTags($sanitizer);
 
-        return $sanitizer->sanitize($svg, [
-            'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
-        ]);
+        return SvgSupport::sanitize($svg, $sanitizer);
     }
 
     private function setAllowedAttrs(DOMSanitizer $sanitizer)

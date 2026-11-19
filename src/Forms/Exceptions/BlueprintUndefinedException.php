@@ -9,6 +9,9 @@ use Spatie\ErrorSolutions\Contracts\Solution;
 use Statamic\Forms\Form;
 use Statamic\Statamic;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class BlueprintUndefinedException extends LogicException implements ProvidesSolution
 {
     protected $form;

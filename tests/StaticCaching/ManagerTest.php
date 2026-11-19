@@ -7,10 +7,49 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Tests\TestCase;
 
 class ManagerTest extends TestCase
 {
+    #[Test]
+    public function application_driver_uses_the_default_cache_store_when_no_custom_store_is_defined()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.driver' => 'application',
+        ]);
+
+        $cacher = StaticCache::driver();
+
+        $this->assertInstanceOf(ApplicationCacher::class, $cacher);
+        $this->assertSame(Cache::store(), $this->getCacherCache($cacher));
+    }
+
+    #[Test]
+    public function application_driver_uses_the_custom_static_cache_store_when_defined()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.driver' => 'application',
+            'cache.stores.static_cache' => ['driver' => 'array'],
+        ]);
+
+        $cacher = StaticCache::driver();
+
+        $this->assertInstanceOf(ApplicationCacher::class, $cacher);
+        $this->assertSame(Cache::store('static_cache'), $this->getCacherCache($cacher));
+        $this->assertNotSame(Cache::store(), $this->getCacherCache($cacher));
+    }
+
+    private function getCacherCache(ApplicationCacher $cacher)
+    {
+        $property = new \ReflectionProperty($cacher, 'cache');
+        $property->setAccessible(true);
+
+        return $property->getValue($cacher);
+    }
+
     #[Test]
     public function it_flushes()
     {
@@ -28,8 +67,24 @@ class ManagerTest extends TestCase
 
         Cache::shouldReceive('store')->andReturnSelf();
         Cache::shouldReceive('flush')->once();
+        Cache::shouldReceive('forget')->with('statamic:cache-utility:page-statuses')->once();
 
         StaticCache::flush();
+    }
+
+    #[Test]
+    public function it_flushes_the_dedicated_store_for_drivers_that_do_not_flush_it_themselves()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'null',
+            'cache.stores.static_cache' => ['driver' => 'array'],
+        ]);
+
+        Cache::store('static_cache')->forever('nocache::urls', ['/one']);
+
+        StaticCache::flush();
+
+        $this->assertNull(Cache::store('static_cache')->get('nocache::urls'));
     }
 
     #[Test]
@@ -54,6 +109,7 @@ class ManagerTest extends TestCase
         Cache::shouldReceive('forget')->with('nocache::session.'.md5('/one'))->once();
         Cache::shouldReceive('forget')->with('nocache::session.'.md5('/two'))->once();
         Cache::shouldReceive('forget')->with('nocache::urls')->once();
+        Cache::shouldReceive('forget')->with('statamic:cache-utility:page-statuses')->once();
 
         StaticCache::flush();
     }

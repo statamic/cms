@@ -6,6 +6,8 @@ use Statamic\Actions\Concerns\MakesZips;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class DownloadAssetFolder extends Action
 {
     use MakesZips;

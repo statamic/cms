@@ -68,6 +68,8 @@ export default {
 
             __('vue script with/slash'),
             __('vue script with bracket(s)'),
+            __('vue script with (bracketed) words'),
+            __('vue script with bracketed (:param)', { param: label('test') }),
         ];
     }
 

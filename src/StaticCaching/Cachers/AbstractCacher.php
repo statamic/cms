@@ -2,12 +2,19 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\RecacheToken;
 use Statamic\StaticCaching\UrlExcluder;
 use Statamic\Support\Str;
 
@@ -53,12 +60,12 @@ abstract class AbstractCacher implements Cacher
             // This could potentially just be Site::current()->absoluteUrl() but at the
             // moment that method gets the URL based on the request. For now, we will
             // manually get it from the config, as to not break any existing sites.
-            $baseUrl = Str::startsWith($url = Site::current()->url(), '/')
-                ? Str::removeRight(config('app.url'), '/').$url
-                : $url;
+            $baseUrl = URL::isAbsolute($url = Site::current()->url())
+                ? $url
+                : config('app.url').$url;
         }
 
-        return rtrim($baseUrl, '/');
+        return URL::tidy($baseUrl, external: true, withTrailingSlash: false);
     }
 
     /**
@@ -66,7 +73,7 @@ abstract class AbstractCacher implements Cacher
      */
     public function getDefaultExpiration()
     {
-        return $this->config('expiry');
+        return (int) $this->config('expiry');
     }
 
     /**
@@ -143,6 +150,11 @@ abstract class AbstractCacher implements Cacher
         return collect($this->cache->get($key, []));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        return null;
+    }
+
     /**
      * Flush all the cached URLs.
      *
@@ -157,6 +169,17 @@ abstract class AbstractCacher implements Cacher
         $this->cache->forget($this->normalizeKey('domains'));
     }
 
+    protected function flushDedicatedStore(): void
+    {
+        if (! config()->has('cache.stores.static_cache')) {
+            return;
+        }
+
+        if ($this->cache === Cache::store('static_cache')) {
+            $this->cache->flush();
+        }
+    }
+
     /**
      * Save a URL to the cache.
      *
@@ -168,15 +191,15 @@ abstract class AbstractCacher implements Cacher
     {
         $domain = $domain ?? $this->getBaseUrl();
 
-        $this->cacheDomain($domain);
-
-        $urls = $this->getUrls($domain);
-
         $url = Str::removeLeft($url, $domain);
 
-        $urls->put($key, $url);
+        $this->withUrlsLock(function () use ($key, $url, $domain) {
+            $this->cacheDomain($domain);
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+            $urls = $this->getUrls($domain)->put($key, $url);
+
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
     }
 
     /**
@@ -187,11 +210,40 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls($domain);
+        $this->forgetUrls([$key], $domain);
+    }
 
-        $urls->forget($key);
+    /**
+     * Forget / remove multiple URLs from the cache by their keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function forgetUrls($keys, $domain = null)
+    {
+        if (empty($keys)) {
+            return;
+        }
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        $this->withUrlsLock(function () use ($keys, $domain) {
+            $urls = $this->getUrls($domain)->except($keys);
+
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
+    }
+
+    protected function withUrlsLock(callable $callback)
+    {
+        if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
+            return $callback();
+        }
+
+        try {
+            return $store->lock($this->normalizeKey('urls'), 10)->block(10, $callback);
+        } catch (LockTimeoutException $e) {
+            return $callback();
+        }
     }
 
     /**
@@ -227,6 +279,87 @@ abstract class AbstractCacher implements Cacher
             } else {
                 $this->invalidateUrl(...$this->getPathAndDomain($url));
             }
+        });
+    }
+
+    /**
+     * Refresh multiple URLs.
+     *
+     * @param  array  $urls
+     * @return void
+     */
+    public function refreshUrls($urls)
+    {
+        collect($urls)->each(function ($url) {
+            if (Str::contains($url, '*')) {
+                $this->refreshWildcardUrl($url);
+            } else {
+                $this->refreshUrl(...$this->getPathAndDomain($url));
+            }
+        });
+    }
+
+    /**
+     * Refresh an individual URL.
+     *
+     * @param  string  $url
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function refreshUrl($url, $domain = null)
+    {
+        $this->getUrls($domain)->filter(function ($value) use ($url) {
+            return $value === $url || Str::startsWith($value, $url.'?');
+        })->each(function ($url, $key) use ($domain) {
+            // Warming an error response would just fail with the same error,
+            // so invalidate it and let the next request cache a fresh copy.
+            if ($this->hasCachedErrorResponse($key)) {
+                $this->invalidateUrl($url, $domain);
+
+                return;
+            }
+
+            $url = ($domain ?: $this->getBaseUrl()).$url;
+
+            $url = RecacheToken::addToUrl($url);
+
+            $request = new GuzzleRequest('GET', $url);
+
+            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
+
+            $job::dispatch($request, [])
+                ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
+                ->onQueue(config('statamic.static_caching.warm_queue'));
+        });
+    }
+
+    /**
+     * Check if the cached response for a URL key is an error response.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function hasCachedErrorResponse($key)
+    {
+        return false;
+    }
+
+    /**
+     * Refresh a wildcard URL.
+     *
+     * @param  string  $wildcard
+     */
+    protected function refreshWildcardUrl($wildcard)
+    {
+        // Remove the asterisk
+        $wildcard = substr($wildcard, 0, -1);
+
+        [$wildcard, $domain] = $this->getPathAndDomain($wildcard);
+
+        $this->getUrls($domain)->filter(function ($url) use ($wildcard) {
+            return Str::startsWith($url, $wildcard);
+        })->each(function ($url) use ($domain) {
+            $this->refreshUrl($url, $domain);
         });
     }
 
@@ -278,9 +411,18 @@ abstract class AbstractCacher implements Cacher
         ];
     }
 
+    protected function removeBackgroundRecacheTokenFromUrl(string $url): string
+    {
+        if (! config('statamic.static_caching.background_recache', false)) {
+            return $url;
+        }
+
+        return RecacheToken::removeFromUrl($url);
+    }
+
     public function getUrl(Request $request)
     {
-        $url = $request->getUri();
+        $url = $this->removeBackgroundRecacheTokenFromUrl($request->getUri());
 
         if ($this->isExcluded($url)) {
             return $url;

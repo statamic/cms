@@ -10,12 +10,15 @@ class UserGroupModel extends Eloquent
 
     protected $table = 'groups';
 
-    protected $casts = [
-        'roles' => 'json',
-        'data' => 'json',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'roles' => 'json',
+            'data' => 'json',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     public function __construct(array $attributes = [])
     {

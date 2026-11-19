@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades;
+use Statamic\Facades\User;
 
 class AssetContainer extends Relationship
 {
@@ -10,6 +11,11 @@ class AssetContainer extends Relationship
     protected $statusIcons = false;
     protected $canEdit = false;
     protected $canCreate = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Facades\AssetContainer::find($id));
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -25,12 +31,14 @@ class AssetContainer extends Relationship
 
     public function getIndexItems($request)
     {
-        return Facades\AssetContainer::all()->map(function ($container) {
-            return [
-                'id' => $container->handle(),
-                'title' => $container->title(),
-            ];
-        })->values();
+        return Facades\AssetContainer::all()
+            ->filter(fn ($container) => User::current()->can('view', $container))
+            ->map(function ($container) {
+                return [
+                    'id' => $container->handle(),
+                    'title' => $container->title(),
+                ];
+            })->values();
     }
 
     public function augmentValue($value)

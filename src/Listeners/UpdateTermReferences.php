@@ -71,16 +71,34 @@ class UpdateTermReferences extends Subscriber implements ShouldQueue
 
         $taxonomy = $term->taxonomy()->handle();
 
-        $updatedItems = $this
+        $hasUpdatedItems = false;
+
+        $this
             ->getItemsContainingData()
-            ->map(function ($item) use ($taxonomy, $originalSlug, $newSlug) {
-                return TermReferenceUpdater::item($item)
+            ->each(function ($item) use ($taxonomy, $originalSlug, $newSlug, &$hasUpdatedItems) {
+                $updated = TermReferenceUpdater::item($item)
                     ->filterByTaxonomy($taxonomy)
                     ->updateReferences($originalSlug, $newSlug);
-            })
-            ->filter();
 
-        if ($updatedItems->isNotEmpty()) {
+                if ($updated) {
+                    $hasUpdatedItems = true;
+                }
+
+                if (method_exists($item, 'hasWorkingCopy') && $item->hasWorkingCopy()) {
+                    $workingCopyEntry = $item->makeFromRevision($item->workingCopy());
+
+                    $workingCopyUpdated = TermReferenceUpdater::item($workingCopyEntry)
+                        ->filterByTaxonomy($taxonomy)
+                        ->withoutSaving()
+                        ->updateReferences($originalSlug, $newSlug);
+
+                    if ($workingCopyUpdated) {
+                        $workingCopyEntry->saveToWorkingCopy();
+                    }
+                }
+            });
+
+        if ($hasUpdatedItems) {
             TermReferencesUpdated::dispatch($term);
         }
     }

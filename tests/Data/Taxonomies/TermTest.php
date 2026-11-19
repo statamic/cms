@@ -268,6 +268,25 @@ class TermTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_a_localization_using_a_site_instance()
+    {
+        $this->setSites([
+            'en' => ['url' => '/'],
+            'fr' => ['url' => '/fr/'],
+        ]);
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+
+        $term = (new Term)->taxonomy('tags');
+        $term->in('fr')->set('title', 'Le Test');
+
+        $localized = $term->in(Facades\Site::get('fr'));
+
+        $this->assertSame('fr', $localized->locale());
+        $this->assertEquals('Le Test', $localized->get('title'));
+    }
+
+    #[Test]
     public function it_gets_preview_targets()
     {
         $this->setSites([
@@ -432,6 +451,25 @@ class TermTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_template_when_scoped_to_a_collection()
+    {
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $collection = tap(Facades\Collection::make('blog'))->save();
+        $term = (new Term)->taxonomy('tags')->collection($collection);
+
+        // defaults to collection.taxonomy.show
+        $this->assertEquals('blog.tags.show', $term->template());
+
+        // a custom taxonomy level template is used as-is
+        $taxonomy->termTemplate('foo');
+        $this->assertEquals('foo', $term->template());
+
+        // term level overrides the origin
+        $term->template('baz');
+        $this->assertEquals('baz', $term->template());
+    }
+
+    #[Test]
     public function it_fires_a_deleting_event()
     {
         Event::fake();
@@ -480,5 +518,25 @@ class TermTest extends TestCase
         Event::assertNotDispatched(TermDeleted::class);
 
         $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar'])->inDefaultLocale();
+
+        $term->set('foo', 'A');
+        $term->setSupplement('bar', 'A');
+
+        $clone = clone $term;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $term->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $term->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

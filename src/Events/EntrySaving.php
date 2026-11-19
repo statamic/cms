@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class EntrySaving extends Event
 {
-    public $entry;
-
-    public function __construct($entry)
+    public function __construct(public $entry)
     {
-        $this->entry = $entry;
     }
 
     /**

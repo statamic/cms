@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class NavCreated extends Event
 {
-    public $nav;
-
-    public function __construct($nav)
+    public function __construct(public $nav)
     {
-        $this->nav = $nav;
     }
 }

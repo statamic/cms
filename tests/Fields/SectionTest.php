@@ -121,25 +121,26 @@ class SectionTest extends TestCase
                     'instructions' => 'One instructions',
                     'instructions_position' => 'above',
                     'listable' => 'hidden',
-                    'sortable' => true,
                     'visibility' => 'visible',
+                    'sortable' => true,
                     'replicator_preview' => true,
                     'duplicate' => true,
+                    'actions' => true,
                     'type' => 'text',
-                    'validate' => 'required|min:2',
                     'input_type' => 'text',
-                    'placeholder' => null,
-                    'default' => null,
-                    'character_limit' => 0,
+                    'character_limit' => null,
                     'autocomplete' => null,
+                    'placeholder' => null,
                     'prepend' => null,
                     'append' => null,
+                    'default' => null,
                     'antlers' => false,
                     'component' => 'text',
                     'prefix' => null,
                     'required' => true,
                     'read_only' => false, // deprecated
                     'always_save' => false,
+                    'reserve_space_when_hidden' => false,
                 ],
                 [
                     'display' => 'Two',
@@ -148,14 +149,15 @@ class SectionTest extends TestCase
                     'instructions' => 'Two instructions',
                     'instructions_position' => 'above',
                     'listable' => 'hidden',
-                    'sortable' => true,
                     'visibility' => 'visible',
+                    'sortable' => true,
                     'replicator_preview' => true,
                     'duplicate' => true,
+                    'actions' => true,
                     'type' => 'textarea',
-                    'validate' => 'min:2',
                     'placeholder' => null,
-                    'character_limit' => 0,
+                    'character_limit' => null,
+                    'rows' => null,
                     'default' => null,
                     'antlers' => false,
                     'component' => 'textarea',
@@ -163,8 +165,39 @@ class SectionTest extends TestCase
                     'required' => false,
                     'read_only' => false, // deprecated
                     'always_save' => false,
+                    'reserve_space_when_hidden' => false,
                 ],
             ],
         ], $section->toPublishArray());
+    }
+
+    #[Test]
+    public function it_can_be_given_resolved_fields()
+    {
+        $fields = (new Fields)->setFields(collect([
+            'seo_title' => (new Field('seo_title', ['type' => 'text']))->setPrefix('seo_'),
+        ]));
+
+        $section = new Section(['display' => 'SEO', 'fields' => [['handle' => 'ignored', 'field' => ['type' => 'text']]]], $fields);
+
+        $this->assertSame($fields, $section->fields());
+
+        $publish = $section->toPublishArray();
+        $this->assertEquals('SEO', $publish['display']);
+        $this->assertEquals(['seo_title'], collect($publish['fields'])->pluck('handle')->all());
+        $this->assertEquals('seo_', $publish['fields'][0]['prefix']);
+    }
+
+    #[Test]
+    public function resolved_fields_dont_share_cached_publish_arrays_with_fields_that_differ_by_prefix()
+    {
+        $inline = new Section(['fields' => [['handle' => 'home_city', 'field' => ['type' => 'text']]]]);
+
+        $imported = new Section([], (new Fields)->setFields(collect([
+            'home_city' => (new Field('home_city', ['type' => 'text']))->setPrefix('home_'),
+        ])));
+
+        $this->assertNull($inline->toPublishArray()['fields'][0]['prefix']);
+        $this->assertEquals('home_', $imported->toPublishArray()['fields'][0]['prefix']);
     }
 }

@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class UserSaved extends Event implements ProvidesCommitMessage
 {
-    public $user;
-
-    public function __construct($user)
+    public function __construct(public $user)
     {
-        $this->user = $user;
     }
 
     public function commitMessage()

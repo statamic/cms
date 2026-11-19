@@ -2,6 +2,9 @@
 
 namespace Statamic\Query;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class OrderBy
 {
     public $sort;
@@ -20,6 +23,15 @@ class OrderBy
 
         $this->sort = $sort;
         $this->direction = $direction;
+    }
+
+    public static function column(?string $value, ?string $default = null): ?string
+    {
+        if ($value && preg_match('/^[\w]+((\->|[.])[\w]+)*$/', $value)) {
+            return $value;
+        }
+
+        return $default;
     }
 
     /**

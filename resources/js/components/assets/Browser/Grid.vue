@@ -1,0 +1,305 @@
+<template>
+    <ui-card class="asset-browser-grid" :class="{
+        'space-y-8': folders.length || assets.length || creatingFolder,
+        '!p-0': folders.length === 0 && assets.length === 0 && !creatingFolder
+    }">
+        <!-- Folders -->
+        <TransitionGroup
+            v-if="folders.length || creatingFolder"
+            tag="section"
+            class="folder-grid-listing"
+            :move-class="reflowMoveClass"
+            :leave-active-class="reflowLeaveActiveClass"
+        >
+            <div
+                v-if="!restrictFolderNavigation"
+                v-for="folder in visibleFolders"
+                :key="folder.path"
+                class="group/folder relative rounded-xl p-1"
+                :class="[
+                    moveStateClasses(folder.path),
+                    { 'ring-2 ring-blue-400': dragOverFolder === folder.path },
+                ]"
+                :draggable="true"
+                @dragover="folderDragOver($event, folder)"
+                @dragleave="folderDragLeave"
+                @drop.prevent="handleFolderDrop(folder)"
+                @dragstart="draggingFolder = folder.path"
+                @dragend="
+                    draggingFolder = null;
+                    dragOverFolder = null;
+                "
+            >
+                <div
+                    v-if="isMoving(folder.path)"
+                    class="absolute inset-0 z-10 flex animate-in fade-in fill-mode-both items-center justify-center rounded-xl bg-white/75 [animation-delay:400ms] dark:bg-gray-900/75"
+                >
+                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                </div>
+                <ItemActions
+                    :url="folderActionUrl"
+                    :actions="folderActions(folder)"
+                    :item="folder.path"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                    v-slot="{ actions }"
+                >
+                    <Context>
+                        <template #trigger>
+                            <button @click="selectFolder(folder.path)" class="group h-[66px] w-[80px]">
+                                <AnimatedFolder :drop="dropFor(folder)" class="size-full text-blue-400/90 hover:text-blue-400" />
+                                <div
+                                    class="overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-300"
+                                    v-text="folder.basename"
+                                    :title="folder.basename"
+                                />
+                            </button>
+                        </template>
+                        <ContextMenu>
+                            <ContextItem
+                                v-for="action in actions"
+                                :key="action.handle"
+                                :text="__(action.title)"
+                                :icon="action.icon"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run"
+                            />
+                        </ContextMenu>
+                    </Context>
+                </ItemActions>
+            </div>
+            <div v-if="creatingFolder" key="creating-folder" class="group/folder relative p-1">
+                <div class="group h-[66px] w-[80px]">
+                    <FolderSvg class="size-full text-blue-400/90 hover:text-blue-400" />
+
+                    <Editable
+                        ref="newFolderInput"
+                        v-model:modelValue="newFolderName"
+                        :start-with-edit-mode="true"
+                        submit-mode="both"
+                        :placeholder="__('Name')"
+                        :class="[
+                            'flex w-[80px] items-center placeholder:lowercase justify-center overflow-hidden mt-2 text-center text-xs text-ellipsis whitespace-nowrap placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-500',
+                            { 'st-has-error': creatingFolderError }
+                        ]"
+                        @submit="$emit('create-folder', newFolderName)"
+                        @cancel="
+                            () => {
+                                newFolderName = null;
+                                $emit('cancel-creating-folder');
+                            }
+                        "
+                    />
+                </div>
+            </div>
+        </TransitionGroup>
+
+        <!-- Assets -->
+        <TransitionGroup
+            v-if="assets.length"
+            tag="section"
+            class="asset-grid-listing"
+            :style="{ gridTemplateColumns: gridSize }"
+            :move-class="reflowMoveClass"
+            :leave-active-class="reflowLeaveActiveClass"
+        >
+            <div
+                v-for="asset in visibleAssets"
+                :key="asset.id"
+                class="group relative"
+                :class="[
+                    moveStateClasses(asset.id),
+                    { selected: isSelected(asset.id) },
+                ]"
+            >
+                <ItemActions
+                    :url="actionUrl"
+                    :actions="asset.actions"
+                    :item="asset.id"
+                    @started="actionStarted"
+                    @completed="actionCompleted"
+                    v-slot="{ actions }"
+                >
+                    <Context>
+                        <template #trigger>
+                            <div
+                                class="asset-tile group relative bg-white dark:bg-gray-900"
+                                :class="[
+                                    { 'opacity-50!': isDragging(asset.id) && !isMoving(asset.id) },
+                                    asset.can_be_transparent && showCheckerboard ? `bg-checkerboard bg-checkerboard-${checkerboardMode}` : '',
+                                    asset.can_be_transparent && !showCheckerboard ? 'bg-checkerboard before:opacity-0 hover:before:opacity-100' : '',
+                                ]"
+                            >
+                                <div
+                                    v-if="isMoving(asset.id)"
+                                    class="absolute inset-0 z-10 flex animate-in fade-in fill-mode-both items-center justify-center rounded-[inherit] bg-white/75 [animation-delay:400ms] dark:bg-gray-900/75"
+                                >
+                                    <ui-icon name="loading" class="size-6 text-gray-700 dark:text-gray-200" />
+                                </div>
+                                <button
+                                    class="size-full"
+                                    :draggable="true"
+                                    @dragover.prevent
+                                    @dragstart="assetDragStarted($event, asset)"
+                                    @dragend="draggingAsset = null"
+                                    @click.stop="selectionClicked(assets.indexOf(asset), $event)"
+                                    @dblclick.stop="$emit('edit-asset', asset)"
+                                >
+                                    <div class="relative flex aspect-square size-full items-center justify-center" :class="{ 'cursor-pointer': maxFiles === 1 }">
+                                        <div class="asset-thumb">
+                                            <img
+                                                v-if="asset.thumbnail"
+                                                :src="asset.thumbnail"
+                                                loading="lazy"
+                                                :draggable="false"
+                                                :class="{
+                                                    'w-full p-4': asset.extension === 'svg',
+                                                    'rounded-lg p-1': asset.orientation === 'square',
+                                                }"
+                                                @error="asset.thumbnail = null"
+                                            />
+                                            <file-icon v-else :extension="asset.extension" class="size-1/2" />
+                                        </div>
+                                    </div>
+                                </button>
+                                <div class="absolute end-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity [&_button]:bg-white [&_button]:hover:bg-white [&_button]:dark:bg-gray-900 [&_button]:dark:hover:bg-gray-900">
+                                    <Dropdown placement="left-start">
+                                        <DropdownMenu>
+                                            <DropdownItem
+                                                :text="__(asset.editable ? 'Edit' : 'View')"
+                                                @click="edit(asset.id)"
+                                                icon="edit"
+                                            />
+                                            <DropdownSeparator v-if="asset.actions.length" />
+                                            <DropdownItem
+                                                v-for="action in actions"
+                                                :key="action.handle"
+                                                :text="__(action.title)"
+                                                :icon="action.icon"
+                                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                                @click="action.run"
+                                            />
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                </div>
+                            </div>
+                        </template>
+                        <ContextMenu>
+                            <ContextItem icon="edit" :text="__(asset.editable ? 'Edit' : 'View')" @click="edit(asset.id)" />
+                            <ContextSeparator />
+                            <ContextItem
+                                v-for="action in actions"
+                                :key="action.handle"
+                                :text="__(action.title)"
+                                :icon="action.icon"
+                                :variant="action.dangerous ? 'destructive' : 'default'"
+                                @click="action.run"
+                            />
+                        </ContextMenu>
+                    </Context>
+                </ItemActions>
+                <div class="asset-filename">
+                    <MiddleEllipsis :text="asset.basename" />
+                </div>
+            </div>
+        </TransitionGroup>
+
+        <!-- Empty state -->
+        <div v-if="folders.length === 0 && assets.length === 0 && !creatingFolder" class="text-center text-gray-500 text-sm py-4">
+            {{ __('No items found') }}
+        </div>
+    </ui-card>
+</template>
+
+<script>
+import AssetBrowserMixin from './AssetBrowserMixin';
+import AnimatedFolder from './AnimatedFolder.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
+import {
+    Context,
+    ContextMenu,
+    ContextItem,
+    ContextLabel,
+    ContextSeparator,
+    Editable,
+    Dropdown,
+    DropdownMenu,
+    DropdownLabel,
+    DropdownItem,
+    DropdownSeparator,
+    MiddleEllipsis
+} from '@ui';
+import { injectListingContext } from '@/components/ui/Listing/Listing.vue';
+import ItemActions from '@/components/actions/ItemActions.vue';
+import FolderSvg from '@/../svg/folder.svg';
+
+export default {
+    mixins: [AssetBrowserMixin],
+
+    components: {
+        AnimatedFolder,
+        Breadcrumbs,
+        ContextItem,
+        ContextLabel,
+        ContextMenu,
+        ContextSeparator,
+        Context,
+        Editable,
+        Dropdown,
+        DropdownMenu,
+        DropdownLabel,
+        DropdownItem,
+        DropdownSeparator,
+        ItemActions,
+        FolderSvg,
+        MiddleEllipsis,
+    },
+
+    props: {
+        assets: { type: Array },
+        thumbnailSize: { type: Number },
+        maxFiles: { type: Number },
+        showCheckerboard: { type: Boolean, default: false },
+        checkerboardMode: { type: String, default: 'transparent' },
+        reflowing: { type: Boolean, default: false },
+    },
+
+    data() {
+        return {
+            shifting: false,
+        };
+    },
+
+    computed: {
+        gridSize() {
+            return `repeat(auto-fill, minmax(${this.thumbnailSize}px, 1fr))`;
+        },
+
+        visibleAssets() {
+            return this.assets.filter((asset) => !this.isRemoved(asset.id));
+        },
+
+        // Only slide items into place after a move, not on every listing change like resizing or paginating.
+        reflowMoveClass() {
+            return this.reflowing ? 'transition-transform duration-300 ease-out' : undefined;
+        },
+
+        // Leaving items have to drop out of the layout for the others to slide into their space.
+        reflowLeaveActiveClass() {
+            return this.reflowing ? 'absolute' : undefined;
+        },
+    },
+
+    setup() {
+        const { selectionClicked } = injectListingContext();
+
+        return { selectionClicked };
+    },
+
+    methods: {
+        isSelected(id) {
+            return this.selectedAssets.includes(id);
+        },
+    },
+};
+</script>

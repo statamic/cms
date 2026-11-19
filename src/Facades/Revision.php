@@ -14,7 +14,7 @@ use Statamic\Contracts\Revisions\RevisionRepository;
  * @method static void delete(\Statamic\Contracts\Revisions\Revision $revision)
  *
  * @see \Statamic\Revisions\RevisionRepository
- * @see \Statamic\Revisions\Revision
+ * @link \Statamic\Revisions\Revision
  */
 class Revision extends Facade
 {

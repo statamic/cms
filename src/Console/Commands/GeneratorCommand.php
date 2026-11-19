@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Exception;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
+use Illuminate\Support\Arr;
 use Statamic\Facades\Antlers;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
@@ -191,6 +192,21 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         else {
             $basePath = $basePath.'/resources/js';
         }
+
+        return $basePath.Str::ensureLeft($file, '/');
+    }
+
+    /**
+     * Get appropriate views path for generating Blade views.
+     *
+     * @param  string  $file
+     * @return string
+     */
+    protected function getViewsPath($file)
+    {
+        $basePath = ($addon = $this->argument('addon'))
+            ? $this->getAddonPath($addon).'/resources/views'
+            : Arr::first($this->laravel['view.finder']->getPaths());
 
         return $basePath.Str::ensureLeft($file, '/');
     }

@@ -9,14 +9,14 @@ trait TracksLastModified
 {
     public function lastModified()
     {
-        return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
+        return $this->get('updated_at')
+            ? Carbon::createFromTimestamp($this->get('updated_at'), config('app.timezone'))
             : $this->fileLastModified();
     }
 
     public function lastModifiedBy()
     {
-        return $this->has('updated_by')
+        return $this->get('updated_by')
             ? User::find($this->get('updated_by'))
             : null;
     }

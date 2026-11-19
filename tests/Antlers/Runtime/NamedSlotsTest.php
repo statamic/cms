@@ -21,7 +21,7 @@ EOT;
         ];
 
         $expected = <<<'EOT'
-<div class="max-w-sm rounded overflow-hidden shadow-lg">
+<div class="max-w-sm rounded-sm overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
     <div class="px-16 py-8">
         <div class="font-bold text-xl mb-4">Test Title</div>
@@ -57,7 +57,7 @@ EOT;
         ];
 
         $expected = <<<'EOT'
-<div class="max-w-sm rounded overflow-hidden shadow-lg">
+<div class="max-w-sm rounded-sm overflow-hidden shadow-lg">
     <img class="w-full" src="image/path.jpg" alt="Test Title">
     <div class="px-16 py-8">
         <div class="font-bold text-xl mb-4">Test Title</div>

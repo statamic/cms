@@ -12,12 +12,22 @@ use Statamic\View\Antlers\Language\Errors\ErrorFactory;
 use Statamic\View\Antlers\Language\Nodes\Modifiers\ModifierChainNode;
 use Statamic\View\Antlers\Language\Nodes\Parameters\ParameterNode;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
+use Statamic\View\Slot;
 
 class ModifierManager
 {
     public static $statamicModifiers = null;
     public static $lastModifierName = null;
     const METHOD_MODIFIER = '{__method_args}';
+
+    /**
+     * Modifiers that should still run when the value is null.
+     *
+     * @var string[]
+     */
+    protected static $nullAwareModifiers = [
+        'bool_string',
+    ];
 
     public static function isModifier(ParameterNode $node)
     {
@@ -38,10 +48,34 @@ class ModifierManager
         self::$lastModifierName = $modifierName;
 
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentModifierPaths;
             $guardList = GlobalRuntimeState::$bannedContentModifierPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedModifierPaths;
+
+            $isAllowed = Str::is($allowList, $modifierName);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $modifierName);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$modifierName, [
+                    'modifier' => $modifierName,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_MODIFIER_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedModifierPaths;
 
         if (empty($guardList)) {
             return true;
@@ -68,6 +102,11 @@ class ModifierManager
         return true;
     }
 
+    protected static function acceptsNull($modifierName)
+    {
+        return in_array($modifierName, self::$nullAwareModifiers, true);
+    }
+
     public static function evaluate($value, Environment $env, ModifierChainNode $modifierChain, $context)
     {
         self::clearModifierState();
@@ -76,8 +115,12 @@ class ModifierManager
             return $value;
         }
 
-        if ($value === null) {
+        if ($value === null && ! self::acceptsNull($modifierChain->modifierChain[0]->nameNode->name)) {
             return null;
+        }
+
+        if ($value instanceof Slot) {
+            $value = (string) $value;
         }
 
         $returnValue = $value;
@@ -118,12 +161,12 @@ class ModifierManager
                 }
             }
 
-            if ($returnValue === null) {
-                break;
-            }
-
             if ($returnValue instanceof Value) {
                 $returnValue = $value->value();
+            }
+
+            if ($returnValue === null && ! self::acceptsNull($modifierName)) {
+                break;
             }
 
             try {

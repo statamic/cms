@@ -3,8 +3,11 @@
 namespace Tests\Auth;
 
 use Illuminate\Support\Facades\Hash;
+use ParagonIE\ConstantTime\Base64UrlSafe;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Auth\File\Passkey;
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
@@ -15,11 +18,13 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Webauthn\PublicKeyCredentialSource;
 
 #[Group('user')]
+#[Group('2fa')]
 class FileUserTest extends TestCase
 {
-    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UserContractTests;
+    use PermissibleContractTests, PreventSavingStacheItemsToDisk, UnsafeEmailPayloads, UserContractTests;
 
     public function makeUser()
     {
@@ -35,6 +40,32 @@ class FileUserTest extends TestCase
     public function it_gets_path()
     {
         $this->assertEquals($this->fakeStacheDirectory.'/users/john@example.com.yaml', $this->user()->path());
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_cannot_get_a_path_for_an_unsafe_email($email)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->makeUser()->email($email)->path();
+    }
+
+    #[Test]
+    #[DataProvider('dotEmailProvider')]
+    public function it_cannot_get_a_path_for_a_dot_email($email)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->makeUser()->email($email)->path();
+    }
+
+    public static function dotEmailProvider(): array
+    {
+        return [
+            'dot' => ['.'],
+            'dot dot' => ['..'],
+        ];
     }
 
     #[Test]
@@ -167,5 +198,47 @@ class FileUserTest extends TestCase
         $user->addToGroup(['a', 'b', 'c']);
 
         $this->assertEquals(['a', 'b', 'c'], $user->get('groups'));
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $user = $this->user();
+        $user->set('foo', 'A');
+        $user->setSupplement('bar', 'A');
+
+        $clone = clone $user;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $user->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $user->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_gets_passkeys()
+    {
+        $user = $this->user();
+        $this->assertCount(0, $user->passkeys());
+
+        $mockCredentialA = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialA->publicKeyCredentialId = 'key-a';
+        $mockCredentialB = \Mockery::mock(PublicKeyCredentialSource::class);
+        $mockCredentialB->publicKeyCredentialId = 'key-b';
+
+        $user->setPasskeys(collect([
+            $passkeyA = (new Passkey)->setCredential($mockCredentialA),
+            $passkeyB = (new Passkey)->setCredential($mockCredentialB),
+        ]));
+
+        $this->assertCount(2, $passkeys = $user->passkeys());
+        $this->assertEquals([
+            Base64UrlSafe::encodeUnpadded('key-a') => $passkeyA,
+            Base64UrlSafe::encodeUnpadded('key-b') => $passkeyB,
+        ], $passkeys->all());
     }
 }

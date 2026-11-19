@@ -50,6 +50,10 @@ class BroadcastServiceProvider extends ServiceProvider
 
     protected function enabled()
     {
+        if (config('broadcasting.default') === 'null') {
+            return false;
+        }
+
         return in_array(
             \Illuminate\Broadcasting\BroadcastServiceProvider::class,
             array_keys($this->app->getLoadedProviders())

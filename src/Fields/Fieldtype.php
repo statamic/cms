@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Blink;
@@ -11,6 +12,9 @@ use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use WeakMap;
+
+use function Statamic\trans as __;
 
 abstract class Fieldtype implements Arrayable
 {
@@ -20,6 +24,7 @@ abstract class Fieldtype implements Arrayable
 
     protected static $title;
     protected static $binding = 'fieldtypes';
+    protected static $preloadable = null;
 
     protected $field;
     protected $localizable = true;
@@ -35,6 +40,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected static $extraConfigFields = [];
+    private static ?WeakMap $configDefaults = null;
     protected $icon;
 
     public static function title()
@@ -101,12 +107,21 @@ abstract class Fieldtype implements Arrayable
 
     public function selectableInForms(): bool
     {
-        return $this->selectableInForms ?: FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        if (FieldtypeRepository::selectableInFormIsOverriden($this->handle())) {
+            return FieldtypeRepository::hasBeenMadeSelectableInForms($this->handle());
+        }
+
+        return $this->selectableInForms;
     }
 
     public static function makeSelectableInForms()
     {
         FieldtypeRepository::makeSelectableInForms(self::handle());
+    }
+
+    public static function makeUnselectableInForms()
+    {
+        FieldtypeRepository::makeUnselectableInForms(self::handle());
     }
 
     public function categories(): array
@@ -147,6 +162,11 @@ abstract class Fieldtype implements Arrayable
     public function preProcessValidatable($value)
     {
         return $value;
+    }
+
+    public function preProcessTagRenderable($data, $recursiveCallback)
+    {
+        return $data;
     }
 
     public function defaultValue()
@@ -193,46 +213,57 @@ abstract class Fieldtype implements Arrayable
     private function configSections()
     {
         $fields = $this->configFieldItems();
-        $extras = $this->extraConfigFieldItems();
-
-        if (empty($fields) && empty($extras)) {
-            return [];
-        }
-
-        $extras = collect($extras)
+        $extras = collect($this->extraConfigFieldItems());
+        $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
+        $extraFields = $extras
+            ->reject(fn ($_, $key) => is_int($key))
             ->map(fn ($field, $handle) => compact('handle', 'field'))
             ->values()->all();
 
-        if (! $this->configFieldsUseSections()) {
-            return [
-                [
-                    'fields' => collect($fields)
-                        ->map(fn ($field, $handle) => compact('handle', 'field'))
-                        ->merge($extras)
-                        ->values()->all(),
-                ],
-            ];
+        if (empty($fields) && $extras->isEmpty()) {
+            return [];
         }
 
-        $sections = collect($fields)->map(function ($section) {
-            $section['fields'] = collect($section['fields'])
+        if (! $this->configFieldsUseSections()) {
+            $sections = [];
+
+            if (! empty($fields) || ! empty($extraFields)) {
+                $sections[] = [
+                    'fields' => collect($fields)
+                        ->map(fn ($field, $handle) => compact('handle', 'field'))
+                        ->merge($extraFields)
+                        ->values()->all(),
+                ];
+            }
+        } else {
+            $sections = collect($fields)->map(function ($section) {
+                $section['fields'] = collect($section['fields'])
+                    ->map(fn ($field, $handle) => compact('handle', 'field'))
+                    ->values()->all();
+
+                return $section;
+            });
+
+            if (! empty($extraFields)) {
+                if ($sections->containsOneItem()) {
+                    $section = $sections[0];
+                    $section['fields'] = array_merge($section['fields'], $extraFields);
+                    $sections[0] = $section;
+                } else {
+                    $sections[] = ['fields' => $extraFields];
+                }
+            }
+
+            $sections = $sections->all();
+        }
+
+        return array_merge($sections, $extraSections->map(function ($section) {
+            $section['fields'] = collect($section['fields'] ?? [])
                 ->map(fn ($field, $handle) => compact('handle', 'field'))
                 ->values()->all();
 
             return $section;
-        });
-
-        if (! empty($extras)) {
-            if ($sections->containsOneItem()) {
-                $section = $sections[0];
-                $section['fields'] = array_merge($section['fields'], $extras);
-                $sections[0] = $section;
-            } else {
-                $sections[] = ['fields' => $extras];
-            }
-        }
-
-        return $sections->all();
+        })->values()->all());
     }
 
     private function configFieldsUseSections()
@@ -251,13 +282,17 @@ abstract class Fieldtype implements Arrayable
         }
 
         $fields = collect($this->configFieldItems());
+        $extras = collect($this->extraConfigFieldItems());
+        $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
+        $extraFields = $extras->reject(fn ($_, $key) => is_int($key));
 
         if ($this->configFieldsUseSections()) {
             $fields = $fields->flatMap(fn ($section) => $section['fields']);
         }
 
         $fields = $fields
-            ->merge($this->extraConfigFieldItems())
+            ->merge($extraSections->flatMap(fn ($section) => $section['fields'] ?? []))
+            ->merge($extraFields)
             ->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });
@@ -276,7 +311,10 @@ abstract class Fieldtype implements Arrayable
 
     protected function extraConfigFieldItems(): array
     {
-        return self::$extraConfigFields[static::class] ?? [];
+        return array_merge(
+            self::$extraConfigFields[static::class] ?? [],
+            Fieldtype::$extraConfigFields[Fieldtype::class] ?? [],
+        );
     }
 
     public static function appendConfigFields(array $config): void
@@ -293,7 +331,7 @@ abstract class Fieldtype implements Arrayable
 
     public function icon()
     {
-        return $this->icon ?? $this->handle();
+        return $this->icon ?? "fieldtype-{$this->handle()}";
     }
 
     public function process($data)
@@ -311,6 +349,11 @@ abstract class Fieldtype implements Arrayable
         return $this->preProcess($data);
     }
 
+    public function migrateConfig(array $values): array
+    {
+        return $values;
+    }
+
     public function preProcessIndex($data)
     {
         return $data;
@@ -318,11 +361,17 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        $default = 'statamic::forms.fields.'.$this->handle();
+        $language = config('statamic.templates.language', 'antlers');
+        $handle = $this->handle();
 
-        return view()->exists($default)
-            ? $default
-            : 'statamic::forms.fields.default';
+        $views = [
+            "statamic::forms.fields.{$handle}",
+            "statamic::forms.{$language}.fields.{$handle}",
+            'statamic::forms.fields.default',
+            "statamic::forms.{$language}.fields.default",
+        ];
+
+        return collect($views)->first(fn ($view) => view()->exists($view));
     }
 
     public function config(?string $key = null, $fallback = null)
@@ -331,13 +380,55 @@ abstract class Fieldtype implements Arrayable
             return $fallback;
         }
 
-        $config = $this->configFields()->all()
-            ->map->defaultValue()
-            ->merge($this->field->config());
+        $fieldConfig = $this->field->config();
+        $fields = $this->configFields()->all();
+
+        // Most calls ask for a single key, so answer those without building the whole config.
+        if (is_string($key) && $key !== '') {
+            if (array_key_exists($key, $fieldConfig)) {
+                return $fieldConfig[$key] ?? $fallback;
+            }
+
+            return ($fields->has($key) ? self::configDefault($fields, $key) : null) ?? $fallback;
+        }
+
+        $config = [];
+
+        foreach ($fields as $handle => $field) {
+            if (! array_key_exists($handle, $fieldConfig)) {
+                $config[$handle] = self::configDefault($fields, $handle);
+            }
+        }
+
+        $config = array_merge($config, $fieldConfig);
 
         return $key
-            ? ($config->get($key) ?? $fallback)
-            : $config->all();
+            ? ($config[$key] ?? $fallback)
+            : $config;
+    }
+
+    /**
+     * A config field's default value. It's worked out once per config fields
+     * collection, which Blink keeps for the request. Computed defaults are
+     * still resolved on every read.
+     */
+    private static function configDefault(Collection $fields, string $handle)
+    {
+        $field = $fields->get($handle);
+
+        if ($field->hasComputedDefault()) {
+            return $field->defaultValue();
+        }
+
+        self::$configDefaults ??= new WeakMap;
+        $defaults = self::$configDefaults[$fields] ?? [];
+
+        if (! array_key_exists($handle, $defaults)) {
+            $defaults[$handle] = $field->defaultValue();
+            self::$configDefaults[$fields] = $defaults;
+        }
+
+        return $defaults[$handle];
     }
 
     public function preload()
@@ -370,6 +461,16 @@ abstract class Fieldtype implements Arrayable
         return $this->relationship;
     }
 
+    public function relationshipQueryBuilder()
+    {
+        return false;
+    }
+
+    public function relationshipQueryIdMapFn(): ?\Closure
+    {
+        return null;
+    }
+
     public function toQueryableValue($value)
     {
         return $value;
@@ -378,5 +479,15 @@ abstract class Fieldtype implements Arrayable
     public function extraRenderableFieldData(): array
     {
         return [];
+    }
+
+    public function hasJsDriverDataBinding(): bool
+    {
+        return true;
+    }
+
+    public function shouldParseAntlersFromRawString(): bool
+    {
+        return false;
     }
 }

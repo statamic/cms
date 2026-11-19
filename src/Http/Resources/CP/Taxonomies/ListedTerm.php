@@ -2,14 +2,15 @@
 
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
+use ArrayObject;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
 class ListedTerm extends JsonResource
 {
     protected $blueprint;
     protected $columns;
+    protected ?ArrayObject $taxonomies = null;
 
     public function blueprint($blueprint)
     {
@@ -25,10 +26,19 @@ class ListedTerm extends JsonResource
         return $this;
     }
 
+    /**
+     * A place to keep each taxonomy's array, shared by every term in a listing.
+     */
+    public function taxonomies(ArrayObject $taxonomies)
+    {
+        $this->taxonomies = $taxonomies;
+
+        return $this;
+    }
+
     public function toArray($request)
     {
         $term = $this->resource;
-        $taxonomy = $term->taxonomy();
 
         return [
             'id' => $term->id(),
@@ -42,11 +52,21 @@ class ListedTerm extends JsonResource
 
             'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
-            'taxonomy' => $term->taxonomy()->toArray(),
+            'has_template' => view()->exists($term->template()),
+            'taxonomy' => $this->taxonomyArray($term->taxonomy()),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),
-            'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
         ];
+    }
+
+    protected function taxonomyArray($taxonomy)
+    {
+        // Every term in a listing would otherwise augment its taxonomy again, URLs and all.
+        if (! $this->taxonomies) {
+            return $taxonomy->toArray();
+        }
+
+        return $this->taxonomies[$taxonomy->handle()] ??= $taxonomy->toArray();
     }
 
     protected function values($extra = [])
@@ -55,7 +75,7 @@ class ListedTerm extends JsonResource
             $key = $column->field;
             $field = $this->blueprint->field($key);
 
-            if ($key == 'taxonomy') {
+            if ($key == 'type') {
                 return [$key => $this->resource->taxonomy()->title()];
             } else {
                 $value = $extra[$key] ?? $this->resource->value($key) ?? $field?->defaultValue();

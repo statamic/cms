@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class CollectionCreating extends Event
 {
-    public $collection;
-
-    public function __construct($collection)
+    public function __construct(public $collection)
     {
-        $this->collection = $collection;
     }
 
     /**

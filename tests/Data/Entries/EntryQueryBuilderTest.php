@@ -6,9 +6,12 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\Scope;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -75,6 +78,71 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function nothing_is_found_in_an_empty_list()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame([], Entry::query()->whereIn('id', [])->get()->map->id()->all());
+        $this->assertSame([], Entry::query()->whereIn('title', [])->get()->map->id()->all());
+        $this->assertSame(['id-1'], Entry::query()->where('title', 'Post 1')->orWhereIn('id', [])->get()->map->id()->all());
+        $this->assertSame(['id-1', 'id-2', 'id-3'], Entry::query()->whereNotIn('id', [])->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function entries_are_ordered_the_way_a_data_collection_sorts_their_values()
+    {
+        $values = [
+            'a' => ['rank' => 3, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => ['b', 'z']],
+            'b' => ['rank' => null, 'published_on' => Carbon::parse('2024-01-01'), 'tags' => []],
+            'c' => ['rank' => 1, 'published_on' => null, 'tags' => ['a']],
+            'd' => ['rank' => 3, 'published_on' => Carbon::parse('2024-02-01'), 'tags' => 'c'],
+            'e' => ['rank' => 2, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => null],
+            'left-out' => ['rank' => 0, 'published_on' => Carbon::parse('2025-01-01'), 'tags' => ['a']],
+        ];
+
+        foreach ($values as $id => $data) {
+            EntryFactory::id($id)->slug($id)->collection('posts')->data($data + ['title' => $id, 'listed' => $id !== 'left-out'])->create();
+        }
+
+        $listed = collect($values)->except('left-out');
+
+        foreach (['rank', 'rank:desc', 'published_on', 'published_on:desc', 'tags', 'tags:desc', 'rank:desc|published_on', 'published_on:desc|rank'] as $sort) {
+            $query = Entry::query()->where('listed', true);
+
+            foreach (explode('|', $sort) as $orderBy) {
+                $query->orderBy(...explode(':', $orderBy.':asc'));
+            }
+
+            $this->assertSame(
+                \Statamic\Data\DataCollection::make($listed->all())->multisort($sort)->keys()->all(),
+                $query->get()->map->id()->all(),
+                $sort
+            );
+        }
+    }
+
+    #[Test]
+    public function ordering_by_a_field_whose_handle_is_a_number_leaves_entries_as_they_were()
+    {
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['title' => 'a', '1' => 3])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['title' => 'b', '1' => 1])->create();
+        EntryFactory::id('c')->slug('c')->collection('posts')->data(['title' => 'c', '1' => 2])->create();
+
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1')->get()->map->id()->all());
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1', 'desc')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function where_in_and_where_not_in_are_case_insensitive()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post Two'])->create();
+
+        $this->assertSame(['Post One'], Entry::query()->whereIn('title', ['POST ONE'])->get()->map->title->all());
+        $this->assertSame(['Post Two'], Entry::query()->whereNotIn('title', ['POST ONE'])->get()->map->title->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_or_where_not_in()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
@@ -87,6 +155,87 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereIn('category', ['news', null])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_in_with_booleans()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'featured' => true])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'featured' => false])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // featured is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'featured' => true])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'featured' => false])->create();
+
+        $entries = Entry::query()->whereIn('featured', [false, null])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 3', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_not_in_with_null()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'category' => 'news'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'category' => 'blog'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // category is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'category' => 'news'])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create(); // category is null
+
+        $entries = Entry::query()->whereNotIn('category', ['news', null])->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_not_in_with_booleans()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'featured' => true])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'featured' => false])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3'])->create(); // featured is null
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'featured' => true])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'featured' => false])->create();
+
+        $entries = Entry::query()->whereNotIn('featured', [false, null])->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_with_dates_regardless_of_display_format()
+    {
+        $this->createWhereDateTestEntries();
+
+        Carbon::setToStringFormat('F jS, Y');
+        $this->beforeApplicationDestroyed(fn () => Carbon::resetToStringFormat());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T23:31:00+03:00'))
+            ->get();
+
+        $this->assertEquals(['1'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T20:31:01Z'))
+            ->get();
+
+        $this->assertCount(0, $entries);
     }
 
     #[Test]
@@ -105,6 +254,36 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereDate('test_date', '>=', '2021-11-15')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_date_with_a_carbon_instance_in_a_different_timezone()
+    {
+        $this->createWhereDateTestEntries();
+
+        // 2021-11-15 02:00 in Moscow (+03:00) is 2021-11-14 23:00 in the app's (UTC) timezone,
+        // so it should match Post 2 (stored as 2021-11-14) and not Post 1 or Post 3 (2021-11-15).
+        $value = Carbon::create(2021, 11, 15, 2, 0, 0, 'Europe/Moscow');
+
+        $entries = Entry::query()->whereDate('test_date', $value)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_date_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        // The entries are indexed in UTC, so Post 3 (2021-11-15 00:00 in Zurich) is stored
+        // as 2021-11-14 23:00. It should still be found when querying for the 15th.
+        $entries = Entry::query()->whereDate('test_date', Carbon::parse('2021-11-15', 'Europe/Zurich'))->get();
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
@@ -188,6 +367,36 @@ class EntryQueryBuilderTest extends TestCase
         $this->assertEquals(['Post 2'], $entries->map->title->all());
     }
 
+    #[Test]
+    public function entries_are_found_using_where_time_with_a_carbon_instance_in_a_different_timezone()
+    {
+        $this->createWhereDateTestEntries();
+
+        // 2021-11-13 12:00 in Moscow (+03:00) is 09:00 in the app's (UTC) timezone,
+        // matching Post 2's stored time.
+        $value = Carbon::create(2021, 11, 13, 12, 0, 0, 'Europe/Moscow');
+
+        $entries = Entry::query()->whereTime('test_date', $value)->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_time_when_the_app_timezone_is_not_utc()
+    {
+        config()->set('app.timezone', 'Europe/Zurich');
+
+        $this->createWhereDateTestEntries();
+
+        // Post 2's 09:00 in Zurich (+01:00) is indexed as 08:00 in UTC, so it should
+        // still be found when querying for 09:00.
+        $entries = Entry::query()->whereTime('test_date', Carbon::parse('2021-11-13 09:00', 'Europe/Zurich'))->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
     private function createWhereDateTestEntries()
     {
         $blueprint = Blueprint::makeFromFields(['test_date' => ['type' => 'date', 'time_enabled' => true]]);
@@ -200,6 +409,7 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_date' => null])->create();
     }
 
+    #[Test]
     public function entries_are_found_using_where_null()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'text' => 'Text 1'])->create();
@@ -331,6 +541,35 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function entries_are_found_using_nested_where_on_collection()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1'])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2'])->create();
+        EntryFactory::id('3')->slug('page-1')->collection('pages')->data(['title' => 'Page 1'])->create();
+        EntryFactory::id('4')->slug('page-2')->collection('pages')->data(['title' => 'Page 2'])->create();
+        EntryFactory::id('5')->slug('event-1')->collection('events')->data(['title' => 'Event 1'])->create();
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts');
+            })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '2'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where(function ($query) {
+                $query->where('collection', 'posts')->orWhereIn('collection', ['events']);
+            })
+            ->orWhere('title', 'Page 2')
+            ->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '2', '5', '4'], $entries->map->id()->all());
+    }
+
+    #[Test]
     public function entries_are_found_using_where_between()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'number_field' => 8])->create();
@@ -399,10 +638,10 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
         EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
 
-        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Entry::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 3'], $entries->map->title->all());
 
         $entries = Entry::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -473,6 +712,76 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(3, $entries);
         $this->assertEquals(['Post 2', 'Post 5', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_json_overlaps()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_json_doesnt_overlap()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 2', 'Post 4', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_or_where_json_overlaps()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 5'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_or_where_json_doesnt_overlap()
+    {
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->create();
+        EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'test_taxonomy' => ['taxonomy-3']])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->create();
+        EntryFactory::id('4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4', 'test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->create();
+        EntryFactory::id('5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5', 'test_taxonomy' => ['taxonomy-5']])->create();
+
+        $entries = Entry::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['Post 1', 'Post 3', 'Post 2', 'Post 4'], $entries->map->title->all());
     }
 
     #[Test]
@@ -570,6 +879,42 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(1, $entries);
         $this->assertEquals(['Post 1'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_by_id_in_any_collection()
+    {
+        Collection::make('posts')->save();
+        Collection::make('pages')->save();
+        EntryFactory::id('post-a')->slug('a')->collection('posts')->data(['title' => 'Post A'])->create();
+        EntryFactory::id('page-a')->slug('a')->collection('pages')->data(['title' => 'Page A'])->create();
+
+        $this->assertSame('page-a', Entry::find('page-a')->id());
+        $this->assertSame('post-a', Entry::query()->where('id', 'post-a')->where('title', 'Post A')->first()->id());
+        $this->assertNull(Entry::query()->where('collection', 'posts')->where('id', 'page-a')->first());
+        $this->assertNull(Entry::query()->where('id', 'post-a')->where('title', 'Page A')->first());
+        $this->assertNull(Entry::find('missing'));
+        $this->assertSame(['page-a', 'post-a'], Entry::query()->where('id', 'page-a')->orWhere('id', 'post-a')->get()->map->id()->sort()->values()->all());
+    }
+
+    #[Test]
+    public function entries_of_a_collection_queried_twice_are_found_once()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame(1, Entry::query()->whereIn('collection', ['posts', 'posts'])->where('title', 'Post 1')->count());
+        $this->assertSame(1, Entry::query()->whereIn('collection', ['posts', 'posts'])->where('id', 'id-1')->count());
+        $this->assertSame(2, Entry::query()->whereIn('collection', ['posts', 'posts'])->whereIn('title', ['Post 1', 'Post 2'])->count());
+    }
+
+    #[Test]
+    public function ids_are_compared_case_insensitively()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::id('Mixed-Case')->slug('a')->collection('posts')->create();
+
+        $this->assertSame('Mixed-Case', Entry::query()->where('id', 'mixed-case')->first()?->id());
+        $this->assertSame('Mixed-Case', Entry::query()->where('id', 'Mixed-Case')->first()?->id());
     }
 
     #[Test]
@@ -697,6 +1042,128 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_an_empty_page_when_the_offset_overflows()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        // A page number large enough to overflow the offset arithmetic used to crash
+        // array_slice() with a float; it should just yield an empty page.
+        $entries = Entry::query()->forPage(PHP_INT_MAX, 6)->get();
+
+        $this->assertCount(0, $entries);
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries', 'max_items' => 1]]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => 'id-2',
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => 'id-1',
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 1'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereHas('entries_field')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereHas('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+
+        $entries = Entry::query()->whereDoesntHave('entries_field', function ($subquery) {
+            $subquery->where('title', 'Post 2');
+        })
+            ->get();
+
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['Post 2'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['entries_field' => ['type' => 'entries']]);
+        Blueprint::shouldReceive('in')->with('collections/posts')->andReturn(collect(['posts' => $blueprint]));
+
+        $this->createDummyCollectionAndEntries();
+
+        Entry::find('id-1')
+            ->merge([
+                'entries_field' => ['id-2', 'id-1'],
+            ])
+            ->save();
+
+        Entry::find('id-3')
+            ->merge([
+                'entries_field' => ['id-1', 'id-2'],
+            ])
+            ->save();
+
+        $entries = Entry::query()->whereRelation('entries_field', 'title', 'Post 2')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+
+    #[Test]
     #[DataProvider('likeProvider')]
     public function entries_are_found_using_like($like, $expected)
     {
@@ -724,6 +1191,9 @@ class EntryQueryBuilderTest extends TestCase
             '/ test',
             'test /',
             'test / test',
+            'Über dem Meer',
+            'über dem meer',
+            'Ärger',
         ])->each(function ($val, $i) {
             EntryFactory::id($i)
                 ->slug('post-'.$i)
@@ -756,6 +1226,10 @@ class EntryQueryBuilderTest extends TestCase
             '%/' => ['/', 'test /'],
             '/%' => ['/', '/ test'],
             '%/%' => ['/', '/ test', 'test /', 'test / test'],
+            '%über%' => ['Über dem Meer', 'über dem meer'],
+            '%Über%' => ['Über dem Meer', 'über dem meer'],
+            '%ärger%' => ['Ärger'],
+            '%Ärger%' => ['Ärger'],
         ])->mapWithKeys(function ($expected, $like) {
             return [$like => [$like, $expected]];
         });
@@ -766,10 +1240,131 @@ class EntryQueryBuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $count = 0;
-        Entry::query()->chunk(2, function ($entries) use (&$count) {
-            $this->assertCount($count++ == 0 ? 2 : 1, $entries);
+        $chunks = 0;
+
+        Entry::query()->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            }
+
+            $chunks++;
         });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_less_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(2)->chunk(1, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 1'], $entries->map->title->all());
+            } else {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 2'], $entries->map->title->all());
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_where_limit_is_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->limit(10)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 1', 'Post 2'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(1)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 2', 'Post 3'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had one page.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(1, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_offset_where_more_than_total()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $chunks = 0;
+
+        Entry::query()->offset(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            $chunks++;
+        });
+
+        $this->assertEquals(0, $chunks);
+    }
+
+    #[Test]
+    public function entries_are_found_using_chunk_with_limits_and_offsets()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        EntryFactory::id('id-4')->slug('post-4')->collection('posts')->data(['title' => 'Post 4'])->create();
+        EntryFactory::id('id-5')->slug('post-5')->collection('posts')->data(['title' => 'Post 5'])->create();
+        EntryFactory::id('id-6')->slug('post-6')->collection('posts')->data(['title' => 'Post 6'])->create();
+        EntryFactory::id('id-7')->slug('post-7')->collection('posts')->data(['title' => 'Post 7'])->create();
+
+        $chunks = 0;
+
+        Entry::query()->orderBy('id', 'asc')->offset(2)->limit(3)->chunk(2, function ($entries, $page) use (&$chunks) {
+            if ($page === 1) {
+                $this->assertCount(2, $entries);
+                $this->assertEquals(['Post 3', 'Post 4'], $entries->map->title->all());
+            } elseif ($page === 2) {
+                $this->assertCount(1, $entries);
+                $this->assertEquals(['Post 5'], $entries->map->title->all());
+            } else {
+                $this->fail('Should only have had two pages.');
+            }
+
+            $chunks++;
+        });
+
+        $this->assertEquals(2, $chunks);
     }
 
     #[Test]
@@ -794,11 +1389,23 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_where_status_column_writes_deprecation_log()
+    public function entries_are_sorted_naturally()
+    {
+        Collection::make('headings')->save();
+        EntryFactory::id('a')->slug('heading-10')->collection('headings')->data(['title' => 'Heading 10'])->create();
+        EntryFactory::id('b')->slug('heading-2')->collection('headings')->data(['title' => 'Heading 2'])->create();
+        EntryFactory::id('c')->slug('heading-1')->collection('headings')->data(['title' => 'Heading 1'])->create();
+
+        $this->assertSame(['heading-1', 'heading-2', 'heading-10'], Entry::query()->where('collection', 'headings')->orderBy('title')->get()->map->slug()->all());
+        $this->assertSame(['heading-10', 'heading-2', 'heading-1'], Entry::query()->where('collection', 'headings')->orderBy('title', 'desc')->get()->map->slug()->all());
+    }
+
+    #[Test]
+    public function filtering_using_where_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -806,11 +1413,11 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
-    public function filtering_using_whereIn_status_column_writes_deprecation_log()
+    public function filtering_using_whereIn_status_column_throws_exception()
     {
         $this->withoutDeprecationHandling();
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Filtering by status is deprecated. Use whereStatus() instead.');
+        $this->expectException(StatusFilterNotSupportedException::class);
+        $this->expectExceptionMessage('Filtering by status is not supported. Use whereStatus() instead.');
 
         $this->createDummyCollectionAndEntries();
 
@@ -851,6 +1458,24 @@ class EntryQueryBuilderTest extends TestCase
         EntryFactory::collection('calendar')->id('calendar-past')->published(true)->date(now()->subDay())->create();
         EntryFactory::collection('calendar')->id('calendar-past-draft')->published(false)->date(now()->subDay())->create();
 
+        Collection::make('news')->dated(true)->futureDateBehavior('unlisted')->pastDateBehavior('public')->save();
+        EntryFactory::collection('news')->id('news-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('news')->id('news-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('news')->id('news-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('alerts')->dated(true)->futureDateBehavior('public')->pastDateBehavior('unlisted')->save();
+        EntryFactory::collection('alerts')->id('alerts-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('alerts')->id('alerts-past-draft')->published(false)->date(now()->subDay())->create();
+
+        Collection::make('promos')->dated(true)->futureDateBehavior('private')->pastDateBehavior('private')->save();
+        EntryFactory::collection('promos')->id('promo-future')->published(true)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-future-draft')->published(false)->date(now()->addDay())->create();
+        EntryFactory::collection('promos')->id('promo-past')->published(true)->date(now()->subDay())->create();
+        EntryFactory::collection('promos')->id('promo-past-draft')->published(false)->date(now()->subDay())->create();
+
         // Undated, but with customized date behavior. Nonsensical situation, but it can happen.
         // See https://github.com/statamic/eloquent-driver/issues/288
         Collection::make('undated')->dated(false)->futureDateBehavior('private')->pastDateBehavior('private')->save();
@@ -871,6 +1496,12 @@ class EntryQueryBuilderTest extends TestCase
                 'event-past-draft',
                 'calendar-future-draft',
                 'calendar-past-draft',
+                'news-future-draft',
+                'news-past-draft',
+                'alerts-future-draft',
+                'alerts-past-draft',
+                'promo-future-draft',
+                'promo-past-draft',
                 'undated-draft',
             ]],
             'published' => ['published', [
@@ -879,17 +1510,24 @@ class EntryQueryBuilderTest extends TestCase
                 'event-future',
                 'calendar-future',
                 'calendar-past',
+                'news-future',
+                'news-past',
+                'alerts-future',
+                'alerts-past',
                 'undated',
             ]],
             'scheduled' => ['scheduled', [
                 'blog-future',
+                'promo-future',
             ]],
             'expired' => ['expired', [
                 'event-past',
+                'promo-past',
             ]],
         ];
     }
 
+    #[Test]
     public function values_can_be_plucked()
     {
         $this->createDummyCollectionAndEntries();
@@ -921,6 +1559,288 @@ class EntryQueryBuilderTest extends TestCase
             'post-3',
             'thing-2',
         ], Entry::query()->where('type', 'b')->pluck('slug')->all());
+    }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(2, Entry::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(5, Entry::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(14, Entry::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(10, Entry::query()->where('type', 'b')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, Entry::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        $this->createDummyCollectionAndEntries();
+        Entry::find('id-2')->set('type', 'b')->set('quantity', 2)->save();
+        Entry::find('id-3')->set('type', 'b')->set('quantity', 3)->save();
+        Collection::make('things')->save();
+        EntryFactory::id('id-4')->slug('thing-1')->collection('things')->data(['type' => 'a', 'quantity' => 4])->create();
+        EntryFactory::id('id-5')->slug('thing-2')->collection('things')->data(['type' => 'b', 'quantity' => 5])->create();
+
+        $this->assertEquals(3.5, Entry::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(4, Entry::query()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Entry::query()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or_fail()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOrFail();
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function exception_is_thrown_when_entry_does_not_exist_using_first_or_fail()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'ze-hoff')
+            ->firstOrFail();
+    }
+
+    #[Test]
+    public function entry_can_be_found_using_first_or()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame($entry, $firstOrFail);
+    }
+
+    #[Test]
+    public function callback_is_called_when_entry_does_not_exist_using_first_or()
+    {
+        $firstOrFail = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->firstOr(function () {
+                return 'fallback';
+            });
+
+        $this->assertSame('fallback', $firstOrFail);
+    }
+
+    #[Test]
+    public function sole_entry_is_returned()
+    {
+        Collection::make('posts')->save();
+        $entry = EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+
+        $sole = Entry::query()
+            ->where('collection', 'posts')
+            ->where('id', 'hoff')
+            ->sole();
+
+        $this->assertSame($entry, $sole);
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_multiple_entries_are_returned_from_query()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::collection('posts')->id('hoff')->slug('david-hasselhoff')->data(['title' => 'David Hasselhoff'])->create();
+        EntryFactory::collection('posts')->id('smoff')->slug('joe-hasselsmoff')->data(['title' => 'Joe Hasselsmoff'])->create();
+
+        $this->expectException(MultipleRecordsFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exception_is_thrown_by_sole_when_no_entries_are_returned_from_query()
+    {
+        $this->expectException(RecordsNotFoundException::class);
+
+        Entry::query()
+            ->where('collection', 'posts')
+            ->sole();
+    }
+
+    #[Test]
+    public function exists_returns_true_when_results_are_found()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertTrue(Entry::query()->exists());
+    }
+
+    #[Test]
+    public function exists_returns_false_when_no_results_are_found()
+    {
+        $this->assertFalse(Entry::query()->exists());
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $count = Entry::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Entry::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Entry::all());
+    }
+
+    #[Test]
+    #[DataProvider('equalsProvider')]
+    public function entries_are_found_by_what_a_value_equals($value, $expected)
+    {
+        Collection::make('posts')->save();
+        collect([
+            'a' => 'Red', 'b' => 'red', 'c' => 'RED ', 'd' => null, 'e' => '', 'f' => true, 'g' => false,
+            'h' => 1, 'i' => '1', 'j' => 0, 'k' => 1.5, 'l' => '1.5', 'm' => 'Ünï',
+        ])->each(fn ($thing, $id) => EntryFactory::id($id)->slug($id)->collection('posts')->data(['thing' => $thing])->create());
+
+        $this->assertEquals($expected, Entry::query()->where('thing', $value)->get()->map->id()->all());
+        $this->assertEquals($expected, Entry::query()->where('thing', '=', $value)->get()->map->id()->all());
+    }
+
+    public static function equalsProvider()
+    {
+        return [
+            'string' => ['red', ['a', 'b']],
+            'string in another case' => ['RED', ['a', 'b']],
+            'string with a space' => ['red ', ['c']],
+            'empty string' => ['', ['d', 'e', 'g']],
+            'null' => [null, ['d', 'e', 'g']],
+            'true' => [true, ['f', 'h', 'i']],
+            'false' => [false, ['d', 'e', 'g']],
+            'one' => [1, ['f', 'h', 'i']],
+            'one as a string' => ['1', ['f', 'h', 'i']],
+            'zero' => [0, ['j']],
+            'float' => [1.5, ['k', 'l']],
+            'accented' => ['Ünï', ['m']],
+        ];
+    }
+
+    #[Test]
+    public function a_date_is_found_by_the_date_it_equals()
+    {
+        Collection::make('posts')->dated(true)->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->date('2021-11-15')->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->date('2021-11-14')->create();
+
+        $this->assertEquals(['a'], Entry::query()->where('date', \Illuminate\Support\Carbon::parse('2021-11-15'))->get()->map->id()->all());
+        $this->assertEquals(['a'], Entry::query()->where('date', '2021-11-15 00:00:00')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function a_query_builder_with_its_own_idea_of_equal_gets_to_use_it()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['thing' => 'Red'])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['thing' => 'red'])->create();
+
+        $query = new CaseSensitiveEntryQueryBuilder(app(\Statamic\Stache\Stache::class)->store('entries'));
+
+        $this->assertEquals(['b'], $query->where('thing', 'red')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function the_pattern_for_a_like_is_worked_out_once_for_all_the_entries_it_is_tested_against()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        \Statamic\Facades\Pattern::partialMock()->shouldReceive('sqlLikeToRegex')->with('%post 1%')->once()->passthru();
+
+        $this->assertEquals(['Post 1'], Entry::query()->where('title', 'like', '%post 1%')->get()->map->title->all());
+    }
+
+    #[Test]
+    public function each_like_in_a_query_looks_for_its_own_thing()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()
+            ->where('title', 'like', 'post%')
+            ->where('title', 'not like', '%2')
+            ->where(fn ($query) => $query->where('title', 'like', '%1')->orWhere('title', 'like', '%3'))
+            ->get();
+
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+}
+
+class CaseSensitiveEntryQueryBuilder extends \Statamic\Stache\Query\EntryQueryBuilder
+{
+    protected function filterTestEquals($item, $value)
+    {
+        return $item === $value;
     }
 }
 

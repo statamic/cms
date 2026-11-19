@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\CP\Column;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\User;
 use Statamic\GraphQL\Types\CollectionType;
 
 class Collections extends Relationship
@@ -15,6 +16,11 @@ class Collections extends Relationship
     protected $canCreate = false;
     protected $canSearch = false;
     protected $statusIcons = false;
+
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Collection::findByHandle($id));
+    }
 
     protected function toItemArray($id, $site = null)
     {
@@ -30,13 +36,16 @@ class Collections extends Relationship
 
     public function getIndexItems($request)
     {
-        return Collection::all()->sortBy('title')->map(function ($collection) {
-            return [
-                'id' => $collection->handle(),
-                'title' => $collection->title(),
-                'entries' => $collection->queryEntries()->count(),
-            ];
-        })->values();
+        return Collection::all()
+            ->filter(fn ($collection) => User::current()->can('view', $collection))
+            ->sortBy('title')
+            ->map(function ($collection) {
+                return [
+                    'id' => $collection->handle(),
+                    'title' => $collection->title(),
+                    'entries' => $collection->queryEntries()->count(),
+                ];
+            })->values();
     }
 
     protected function getColumns()

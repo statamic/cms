@@ -539,11 +539,11 @@ class Comb
                 $escaped_chunk = preg_quote($chunk, '#');
                 $chunk_is_word = ! preg_match('#\s#', $chunk);
                 $regex = [
-                    'partial_anywhere' => '#'.$escaped_chunk.'#i',
-                    'partial_from_start_anywhere' => '#(^|\s)'.$escaped_chunk.'#i',
-                    'whole_anywhere' => '#(^|\s)'.$escaped_chunk.'($|\s)#i',
-                    'partial_from_start' => '#^'.$escaped_chunk.'#i',
-                    'whole' => '#^'.$escaped_chunk.'$#i',
+                    'partial_anywhere' => '#'.$escaped_chunk.'#iu',
+                    'partial_from_start_anywhere' => '#(^|\s)'.$escaped_chunk.'#iu',
+                    'whole_anywhere' => '#(^|\s)'.$escaped_chunk.'($|\s)#iu',
+                    'partial_from_start' => '#^'.$escaped_chunk.'#iu',
+                    'whole' => '#^'.$escaped_chunk.'$#iu',
                 ];
 
                 // loop over each data property
@@ -605,7 +605,7 @@ class Comb
                     }
 
                     // snippet extraction (only needs to run during one chunk)
-                    if ($matched && $j === 0) {
+                    if ($matched && ! isset($snippets[$name])) {
                         $snippets[$name] = $this->extractSnippets($property, $params['chunks']);
                     }
                 }
@@ -710,8 +710,7 @@ class Comb
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#'.implode('|', $params['disallowed']).'#i';
-        $required = '#(?=.*'.implode(')(?=.*', $params['required']).')#i';
+        $disallowed = $this->pattern($params['disallowed']);
         $new_data = [];
 
         // this only applies to boolean mode
@@ -726,7 +725,11 @@ class Comb
 
                 // string pruned results together
                 foreach ($item['pruned'] as $pruned) {
-                    $record .= ' '.$pruned;
+                    if (is_array($pruned)) {
+                        $record .= ' '.$this->flattenArray($pruned);
+                    } else {
+                        $record .= ' '.$pruned;
+                    }
                 }
 
                 // check for disallowed
@@ -735,10 +738,12 @@ class Comb
                     throw new CombException('');
                 }
 
-                // check for disallowed
-                if (count($params['required']) && ! preg_match($required, $record)) {
-                    // a disallowed was found, we don't want this
-                    throw new CombException('');
+                // check for required, one word at a time so each is a single linear scan
+                foreach ($params['required'] as $word) {
+                    if (! preg_match($this->pattern([$word]), $record)) {
+                        // a required word is missing, we don't want this
+                        throw new CombException('');
+                    }
                 }
 
                 array_push($new_data, $item);
@@ -748,6 +753,11 @@ class Comb
         }
 
         return $new_data;
+    }
+
+    private function pattern(array $words): string
+    {
+        return '#'.implode('|', array_map(fn (string $word) => preg_quote($word, '#'), $words)).'#iu';
     }
 
     /**
@@ -1005,8 +1015,12 @@ class Comb
             return $words;
         }
 
+        $lowercasedStopWords = collect($this->stop_words)
+            ->map(fn ($word) => Str::lower($word))
+            ->all();
+
         foreach ($words as $key => $word) {
-            if (in_array($word, $this->stop_words)) {
+            if (in_array(Str::lower($word), $lowercasedStopWords)) {
                 unset($words[$key]);
             }
         }
@@ -1058,7 +1072,7 @@ class Comb
         $escaped_chunks = collect($chunks)
             ->map(fn ($chunk) => preg_quote($chunk, '#'))
             ->join('|');
-        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#i';
+        $regex = '#(.*?)('.$escaped_chunks.')(.{0,'.$length.'}(?:\s|$))#iu';
         if (! preg_match_all($regex, $value, $matches, PREG_SET_ORDER)) {
             return [];
         }
@@ -1069,19 +1083,19 @@ class Comb
             [, $before, $chunk, $after] = $match;
             $before = $surplus.$before;
             $surplus = '';
-            $half = floor(($length - Str::length($chunk)) / 2);
+            $half = max(0, floor(($length - Str::length($chunk)) / 2));
             if (Str::length($after) < $half) {
                 $snippet = $chunk.$after;
-                $snippet = Str::safeTruncateReverse($before, $length - Str::length($snippet)).$snippet;
+                $snippet = Str::safeTruncateReverse($before, max(0, $length - Str::length($snippet))).$snippet;
             } else {
                 $snippet = Str::safeTruncateReverse($before, $half).$chunk;
-                $trimmed = Str::safeTruncate($after, $length - Str::length($snippet));
+                $trimmed = Str::safeTruncate($after, max(0, $length - Str::length($snippet)));
                 $surplus = Str::substr($after, Str::length($trimmed));
                 $snippet = $snippet.$trimmed;
             }
             $snippets[] = trim($snippet);
         }
-        if (preg_match('#('.$escaped_chunks.')#i', $surplus)) {
+        if (preg_match('#('.$escaped_chunks.')#iu', $surplus)) {
             $snippets[] = trim($surplus);
         }
 

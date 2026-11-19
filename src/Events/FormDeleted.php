@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class FormDeleted extends Event implements ProvidesCommitMessage
 {
-    public $form;
-
-    public function __construct($form)
+    public function __construct(public $form)
     {
-        $this->form = $form;
     }
 
     public function commitMessage()

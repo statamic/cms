@@ -1,82 +1,77 @@
 <template>
-
     <div>
-        <template v-if="isToggleMode">
-            <div class="toggle-fieldtype-wrapper">
-                <toggle-input :value="isRevealed" @input="update" :read-only="isReadOnly" />
-                <label v-if="config.input_label" class="rtl:mr-2 ltr:ml-2 font-normal">{{ __(config.input_label) }}</label>
-            </div>
-        </template>
-
-        <template v-else>
-            <button
-                @click="buttonReveal"
-                class="btn"
-                :disabled="isReadOnly"
-                :v-tooltip="__(config.instructions)"
-                v-text="config.input_label || __('Show Fields')" />
-        </template>
+        <div class="flex items-center gap-2" v-if="isToggleMode">
+            <Switch
+                :model-value="isRevealed"
+                :disabled="config.disabled || isReadOnly"
+                :label="config.input_label ? null : (__(config.display) || __('Show Fields'))"
+                :aria-labelledby="config.input_label ? inputLabelId : undefined"
+                :id="id"
+                @update:model-value="onToggleUpdate"
+            />
+            <Heading
+                v-if="config.input_label"
+                :id="inputLabelId"
+                v-html="$markdown(__(config.input_label), { openLinksInNewTabs: true })"
+            />
+        </div>
+        <Button
+            v-else
+            icon="eye-closed"
+            :disabled="config.disabled || isReadOnly"
+            :text="config.input_label || __('Show Fields')"
+            :v-tooltip="__(config.instructions)"
+            :data-readonly="isReadOnly ? true : undefined"
+            :class="isReadOnly ? revealerReadOnlyButtonClass : undefined"
+            @click="buttonReveal"
+        />
     </div>
-
 </template>
 
-<script>
-export default {
+<script setup>
+import Fieldtype from '@/components/fieldtypes/fieldtype.js';
+import { Switch, Heading, Button, injectPublishContext as injectContainerContext } from '@ui';
+import { onMounted, onBeforeUnmount, watch, nextTick, computed, useId } from 'vue';
 
-    mixins: [Fieldtype],
+const emit = defineEmits(Fieldtype.emits);
+const props = defineProps(Fieldtype.props);
+const { update, expose, isReadOnly, defineReplicatorPreview } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
-    computed: {
+const { setRevealerField, unsetRevealerField, setHiddenField } = injectContainerContext();
+const isRevealed = computed(() => props.value);
+const isToggleMode = computed(() => data_get(props.config, 'mode') === 'toggle');
+const fieldPath = computed(() => props.fieldPathPrefix ? `${props.fieldPathPrefix}.${props.handle}` : props.handle);
+const inputLabelId = useId();
 
-        isRevealed() {
-            return this.value;
-        },
+/** Dashed read-only aesthetic on the control (matches radio/checkbox field controls). */
+const revealerReadOnlyButtonClass =
+    'data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100 data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!';
 
-        isToggleMode() {
-            return data_get(this.config, 'mode') === 'toggle';
-        },
+onMounted(() => setRevealerField(fieldPath.value));
+onBeforeUnmount(() => unsetRevealerField(fieldPath.value));
 
-        fieldPath() {
-            return this.fieldPathPrefix || this.handle;
-        },
+watch(fieldPath, (fieldPath, oldFieldPath) => {
+    unsetRevealerField(oldFieldPath);
+    nextTick(() => setRevealerField(fieldPath));
+});
 
-    },
-
-    inject: ['storeName'],
-
-    mounted() {
-        this.$store.commit(`publish/${this.storeName}/setRevealerField`, this.fieldPath);
-    },
-
-    beforeDestroy() {
-        this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, this.fieldPath);
-    },
-
-    watch: {
-        fieldPath(fieldPath, oldFieldPath) {
-            this.$store.commit(`publish/${this.storeName}/unsetRevealerField`, oldFieldPath);
-            this.$nextTick(() => {
-                this.$store.commit(`publish/${this.storeName}/setRevealerField`, fieldPath);
-            });
-        }
-    },
-
-    methods: {
-
-        buttonReveal() {
-            if (this.isReadOnly) {
-                return;
-            }
-
-            this.$store.commit(`publish/${this.storeName}/setHiddenField`, {
-                dottedKey: this.fieldPath,
-                hidden: 'force',
-                omitValue: true,
-            });
-
-            this.update(true)
-        }
-
-    }
-
+function onToggleUpdate(value) {
+    if (isReadOnly.value) return;
+    update(value);
 }
+
+function buttonReveal() {
+    if (isReadOnly.value) return;
+
+    setHiddenField({
+        dottedKey: fieldPath.value,
+        hidden: 'force',
+        omitValue: true,
+    });
+
+    update(true);
+}
+
+defineReplicatorPreview(() => null);
 </script>

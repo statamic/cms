@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class AssetReuploaded extends Event implements ProvidesCommitMessage
 {
-    public $asset;
-
-    public function __construct($asset)
+    public function __construct(public $asset, public $originalFilename)
     {
-        $this->asset = $asset;
     }
 
     public function commitMessage()

@@ -82,7 +82,8 @@ class DataResponse implements Responsable
         // they might have set one of the magic values like @child or entry::some-id.
         $redirect = ResolveRedirect::resolve($redirect, $this->data);
 
-        if ($redirect === 404) {
+        // Missing target (404) or a redirect loop (null).
+        if ($redirect === 404 || $redirect === null) {
             throw new NotFoundHttpException;
         }
 
@@ -95,7 +96,7 @@ class DataResponse implements Responsable
 
         $protection->protect();
 
-        if ($protection->scheme()) {
+        if ($protection->scheme() && ! $protection->cacheable()) {
             $this->headers['X-Statamic-Protected'] = true;
         }
 
@@ -112,7 +113,7 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->isLivePreviewing(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Draft'] = true;
 
@@ -129,11 +130,16 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        throw_unless($this->request->isLivePreview(), new NotFoundHttpException);
+        throw_unless($this->isLivePreviewing(), new NotFoundHttpException);
 
         $this->headers['X-Statamic-Private'] = true;
 
         return $this;
+    }
+
+    private function isLivePreviewing()
+    {
+        return $this->request->isLivePreviewOf($this->data);
     }
 
     protected function view()
@@ -149,7 +155,7 @@ class DataResponse implements Responsable
     {
         $contents = $this->view()->render();
 
-        if ($this->request->isLivePreview()) {
+        if ($this->request->isLivePreview() && config('statamic.live_preview.force_reload_js_modules', true)) {
             $contents = $this->versionJavascriptModules($contents);
         }
 
@@ -210,13 +216,13 @@ class DataResponse implements Responsable
     {
         switch ($type) {
             case 'html':
-                return 'text/html; charset=UTF-8';
+                return 'text/html; charset=utf-8';
             case 'xml':
                 return 'text/xml';
             case 'rss':
                 return 'application/rss+xml';
             case 'atom':
-                return 'application/atom+xml; charset=UTF-8';
+                return 'application/atom+xml; charset=utf-8';
             case 'json':
                 return 'application/json';
             case 'text':

@@ -47,9 +47,39 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function isWithinRoot($path)
     {
-        $path = $this->normalizePath($path);
+        $path = $this->resolveDotSegments($this->normalizePath($path));
+        $root = $this->resolveDotSegments(Path::tidy($this->root));
 
-        return Str::startsWith($path, Path::tidy($this->root));
+        if ($path === null || $root === null) {
+            return false;
+        }
+
+        return $path === $root || Str::startsWith($path, Str::finish($root, '/'));
+    }
+
+    private function resolveDotSegments(string $path): ?string
+    {
+        $segments = [];
+
+        foreach (explode('/', $path) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+
+            if ($segment === '..') {
+                if (empty($segments)) {
+                    return null;
+                }
+
+                array_pop($segments);
+
+                continue;
+            }
+
+            $segments[] = $segment;
+        }
+
+        return (Str::startsWith($path, '/') ? '/' : '').implode('/', $segments);
     }
 
     protected function relativePath($path)

@@ -1,0 +1,20 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as CreateFormStories from '../CreateForm.stories';
+
+<Meta of={CreateFormStories} />
+
+# CreateForm
+A pre-built form component for creating new resources with automatic slug generation. Includes title and handle fields with customizable instructions and automatic form submission.
+
+<Canvas of={CreateFormStories._DocsIntro} sourceState={'shown'} />
+
+## Without Handle
+Use the `withoutHandle` prop to hide the handle field for resources that don't need slugs.
+<Canvas of={CreateFormStories._WithoutHandle} sourceState={'shown'} />
+
+## With Instructions
+Add helpful instructions to guide users when filling out the form.
+<Canvas of={CreateFormStories._WithInstructions} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={CreateFormStories} />

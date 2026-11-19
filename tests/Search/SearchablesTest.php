@@ -9,6 +9,7 @@ use Mockery;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Exceptions\AllSearchablesNotSupported;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Entry;
@@ -44,32 +45,73 @@ class SearchablesTest extends TestCase
         AssetContainer::make('audio')->disk('audio')->save();
     }
 
+    public function tearDown(): void
+    {
+        Searchables::clearCpSearchables();
+        Searchables::clearContentSearchables();
+
+        parent::tearDown();
+    }
+
     #[Test]
-    public function it_checks_all_providers_for_whether_an_item_is_searchable()
+    public function it_throws_an_exception_when_all_searchables_are_configured()
+    {
+        $this->expectException(AllSearchablesNotSupported::class);
+
+        $this->makeSearchables(['searchables' => 'all']);
+    }
+
+    #[Test]
+    public function it_checks_content_providers_for_whether_an_item_is_searchable()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
         app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
-        app(Providers::class)->register($users = Mockery::mock(Users::class)->makePartial());
 
         $searchable = Mockery::mock();
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
         // Check twice.
         // First time they'll all return false, so contains() will return false.
-        // Second time, assets will return true, so contains() will return true early, and users won't be checked.
+        // Second time, assets will return true, so contains() will return true early.
 
         $entries->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
         $terms->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, false);
         $assets->shouldReceive('contains')->with($searchable)->twice()->andReturn(false, true);
-        $users->shouldReceive('contains')->with($searchable)->once()->andReturn(false);
 
         $this->assertFalse($searchables->contains($searchable));
         $this->assertTrue($searchables->contains($searchable));
     }
 
     #[Test]
-    public function all_searchables_include_entries_terms_assets_and_users()
+    public function content_searchables_include_entries_terms_and_assets()
+    {
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+
+        $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
+        $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
+        $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
+
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
+
+        $everything = [
+            $entryA,
+            $entryB,
+            $termA,
+            $termB,
+            $assetA,
+            $assetB,
+        ];
+
+        $items = $searchables->all();
+        $this->assertInstanceOf(Collection::class, $items);
+        $this->assertEquals($everything, $items->all());
+    }
+
+    #[Test]
+    public function content_searchables_dont_include_users()
     {
         app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
         app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
@@ -79,24 +121,55 @@ class SearchablesTest extends TestCase
         $entries->shouldReceive('provide')->andReturn(collect([$entryA = Entry::make(), $entryB = Entry::make()]));
         $terms->shouldReceive('provide')->andReturn(collect([$termA = Term::make(), $termB = Term::make()]));
         $assets->shouldReceive('provide')->andReturn(collect([$assetA = Asset::make(), $assetB = Asset::make()]));
-        $users->shouldReceive('provide')->andReturn(collect([$userA = User::make(), $userB = User::make()]));
+        $users->shouldNotReceive('provide');
 
-        $searchables = $this->makeSearchables(['searchables' => 'all']);
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
 
-        $everything = [
-            $entryA,
-            $entryB,
-            $termA,
-            $termB,
-            $assetA,
-            $assetB,
-            $userA,
-            $userB,
-        ];
+        $searchables->all()->each(fn ($item) => $this->assertNotInstanceOf(User::class, $item));
+    }
 
-        $items = $searchables->all();
-        $this->assertInstanceOf(Collection::class, $items);
-        $this->assertEquals($everything, $items->all());
+    #[Test]
+    public function can_add_content_searchable()
+    {
+        app(Providers::class)->register($entries = Mockery::mock(Entries::class)->makePartial());
+        app(Providers::class)->register($terms = Mockery::mock(Terms::class)->makePartial());
+        app(Providers::class)->register($assets = Mockery::mock(Assets::class)->makePartial());
+
+        $entries->shouldReceive('provide')->andReturn(collect([$entry = Entry::make()]));
+        $terms->shouldReceive('provide')->andReturn(collect([$term = Term::make()]));
+        $assets->shouldReceive('provide')->andReturn(collect([$asset = Asset::make()]));
+
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        app()->instance('all-custom-searchables', collect([$a, $b]));
+
+        Search::registerSearchableProvider(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
+        $this->assertEquals([$entry, $term, $asset], $searchables->all()->all());
+
+        Search::addContentSearchable(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'content']);
+        $this->assertEquals([$entry, $term, $asset, $a, $b], $searchables->all()->all());
+    }
+
+    #[Test]
+    public function can_add_cp_searchable()
+    {
+        $a = new TestCustomSearchable(['title' => 'Custom 1']);
+        $b = new TestCustomSearchable(['title' => 'Custom 2']);
+        app()->instance('all-custom-searchables', collect([$a, $b]));
+
+        Search::registerSearchableProvider(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'addons']);
+        $this->assertEquals([], $searchables->all()->all());
+
+        Search::addCpSearchable(TestCustomSearchables::class);
+
+        $searchables = $this->makeSearchables(['searchables' => 'addons']);
+        $this->assertEquals([$a, $b], $searchables->all()->all());
     }
 
     #[Test]

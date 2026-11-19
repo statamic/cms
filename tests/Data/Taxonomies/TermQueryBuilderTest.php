@@ -6,7 +6,6 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Query\Scopes\Scope;
@@ -47,6 +46,57 @@ class TermQueryBuilderTest extends TestCase
             ->sortBy->slug()
             ->map(fn ($t) => $t->locale().' '.$t->title())
             ->values()->all());
+    }
+
+    #[Test]
+    public function it_finds_terms_by_id_across_taxonomies()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Taxonomy::make('keywords')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Bravo'])->save();
+        Term::make('a')->taxonomy('categories')->data(['title' => 'Category Alfa'])->save();
+        Term::make('a')->taxonomy('keywords')->data(['title' => 'Keyword Alfa'])->save();
+
+        $ids = fn ($query) => $query->get()->map->id()->all();
+
+        // In the order the taxonomies and their terms are stored, not the order asked for.
+        $this->assertSame(['tags::a', 'categories::a'], $ids(Term::query()->whereIn('id', ['categories::a', 'tags::a'])));
+        $this->assertSame(['tags::b'], $ids(Term::query()->where('id', 'tags::b')));
+        $this->assertSame(['tags::a'], $ids(Term::query()->whereIn('id', ['tags::a', 'tags::b'])->whereIn('id', ['tags::a', 'keywords::a'])));
+        $this->assertSame([], $ids(Term::query()->whereIn('id', ['tags::a'])->whereIn('id', ['keywords::a'])));
+        $this->assertSame([], $ids(Term::query()->whereIn('id', ['tags::missing', 'nowhere::a'])));
+        $this->assertSame('Keyword Alfa', Term::find('keywords::a')->title());
+    }
+
+    #[Test]
+    public function ids_name_their_taxonomy_without_regard_to_case()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('a')->taxonomy('categories')->data(['title' => 'Category Alfa'])->save();
+
+        $this->assertSame(['tags::a'], Term::query()->whereIn('id', ['TAGS::A'])->get()->map->id()->all());
+        $this->assertSame(['categories::a'], Term::query()->where('id', 'Categories::a')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function an_or_where_can_still_reach_a_taxonomy_the_ids_dont_name()
+    {
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alfa'])->save();
+        Term::make('b')->taxonomy('categories')->data(['title' => 'Bravo'])->save();
+
+        $this->assertSame(
+            ['tags::a', 'categories::b'],
+            Term::query()->whereIn('id', ['tags::a'])->orWhere('title', 'Bravo')->get()->map->id()->all()
+        );
+
+        // An id with no taxonomy in it matches nothing, and doesn't stop the others being found.
+        $this->assertSame(['tags::a'], Term::query()->whereIn('id', ['tags::a', 'a'])->get()->map->id()->all());
     }
 
     #[Test]
@@ -296,6 +346,58 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function it_supplies_collection_context_without_filtering_usage()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+
+        $terms = Term::query()
+            ->whereIn('id', ['tags::a', 'tags::b'])
+            ->withCollectionContext('blog')
+            ->get();
+
+        $this->assertEquals(['tags::a', 'tags::b'], $terms->map->id()->sort()->values()->all());
+        $this->assertEquals(['blog', 'blog'], $terms->map(fn ($term) => $term->collection()->handle())->all());
+
+        $this->assertEquals('blog', Term::query()
+            ->whereIn('id', ['tags::b'])
+            ->withCollectionContext('blog')
+            ->first()
+            ->collection()
+            ->handle());
+    }
+
+    #[Test]
+    public function it_filters_by_entries_count_using_only_published_entries()
+    {
+        Taxonomy::make('tags')->save();
+        Collection::make('blog')->taxonomies(['tags'])->save();
+
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['a']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['b']])->published(true)->create();
+        EntryFactory::collection('blog')->data(['tags' => ['c']])->published(false)->create();
+
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data([])->save();
+        Term::make('c')->taxonomy('tags')->data([])->save();
+        Term::make('d')->taxonomy('tags')->data([])->save();
+
+        $this->assertEquals(['a', 'b'],
+            Term::query()->where('entries_count', '>=', 1)->get()->map->slug()->sort()->values()->all()
+        );
+
+        $this->assertEquals(['a'],
+            Term::query()->where('entries_count', '>=', 2)->get()->map->slug()->sort()->values()->all()
+        );
+    }
+
+    #[Test]
     public function it_substitutes_terms_by_id()
     {
         Taxonomy::make('tags')->save();
@@ -509,10 +611,10 @@ class TermQueryBuilderTest extends TestCase
         Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
         Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
 
-        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+        $entries = Term::query()->whereJsonContains('test_taxonomy', ['taxonomy-1', 'taxonomy-3'])->get();
 
-        $this->assertCount(3, $entries);
-        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+        $this->assertCount(1, $entries);
+        $this->assertEquals(['3'], $entries->map->slug()->all());
 
         $entries = Term::query()->whereJsonContains('test_taxonomy', 'taxonomy-1')->get();
 
@@ -574,6 +676,80 @@ class TermQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function terms_are_found_using_where_json_overlaps()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1', 'taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(2, $entries);
+        $this->assertEquals(['1', '3'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_where_json_doesnt_overlap()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonDoesntOverlap('test_taxonomy', ['taxonomy-1'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+
+        $entries = Term::query()->whereJsonDoesntOverlap('test_taxonomy', 'taxonomy-1')->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['2', '4', '5'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_or_where_json_overlaps()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonOverlaps('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(3, $entries);
+        $this->assertEquals(['1', '3', '5'], $entries->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_or_where_json_doesnt_overlap()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('1')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-2']])->save();
+        Term::make('2')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3']])->save();
+        Term::make('3')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-1', 'taxonomy-3']])->save();
+        Term::make('4')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-3', 'taxonomy-4']])->save();
+        Term::make('5')->taxonomy('tags')->data(['test_taxonomy' => ['taxonomy-5']])->save();
+
+        $entries = Term::query()->whereJsonOverlaps('test_taxonomy', ['taxonomy-1'])->orWhereJsonDoesntOverlap('test_taxonomy', ['taxonomy-5'])->get();
+
+        $this->assertCount(4, $entries);
+        $this->assertEquals(['1', '3', '2', '4'], $entries->map->slug()->all());
+    }
+
+    #[Test]
     public function terms_are_found_using_where_json_length()
     {
         Taxonomy::make('tags')->save();
@@ -617,6 +793,176 @@ class TermQueryBuilderTest extends TestCase
 
         $terms = Term::query()->offset(1)->get();
         $this->assertEquals(['b', 'c'], $terms->map->slug()->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_where_has_when_max_items_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'max_items' => 1, 'taxonomies' => ['tags']]]);
+        Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data(['terms_field' => 'a'])->save();
+        Term::make('c')->taxonomy('tags')->data(['terms_field' => 'b'])->save();
+
+        $terms = Term::query()->whereHas('terms_field')->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['b', 'c'], $terms->map->slug->all());
+
+        $terms = Term::query()->whereHas('terms_field', function ($subquery) {
+            $subquery->where('title', 'a');
+        })
+            ->get();
+
+        $this->assertCount(1, $terms);
+        $this->assertEquals(['b'], $terms->map->slug->all());
+
+        $terms = Term::query()->whereDoesntHave('terms_field', function ($subquery) {
+            $subquery->where('title', 'a');
+        })
+            ->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['a', 'c'], $terms->map->slug->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_where_has_when_max_items_not_1()
+    {
+        $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'taxonomies' => ['tags']]]);
+        Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data(['terms_field' => ['a', 'c']])->save();
+        Term::make('c')->taxonomy('tags')->data(['terms_field' => ['b', 'a']])->save();
+
+        $terms = Term::query()->whereHas('terms_field')->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['b', 'c'], $terms->map->slug->all());
+
+        $terms = Term::query()->whereHas('terms_field', function ($subquery) {
+            $subquery->where('slug', 'b');
+        })
+            ->get();
+
+        $this->assertCount(1, $terms);
+        $this->assertEquals(['c'], $terms->map->slug->all());
+
+        $terms = Term::query()->whereDoesntHave('terms_field', function ($subquery) {
+            $subquery->where('title', 'b');
+        })
+            ->get();
+
+        $this->assertCount(2, $terms);
+        $this->assertEquals(['a', 'b'], $terms->map->slug->all());
+    }
+
+    #[Test]
+    public function terms_are_found_using_where_relation()
+    {
+        $blueprint = Blueprint::makeFromFields(['terms_field' => ['type' => 'terms', 'max_items' => 1, 'taxonomies' => ['tags']]]);
+        Blueprint::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data([])->save();
+        Term::make('b')->taxonomy('tags')->data(['terms_field' => ['a', 'c']])->save();
+        Term::make('c')->taxonomy('tags')->data(['terms_field' => ['b', 'a']])->save();
+
+        $terms = Term::query()->whereRelation('terms_field', 'slug', 'b')->get();
+
+        $this->assertCount(1, $terms);
+        $this->assertEquals(['c'], $terms->map->slug->all());
+    }
+
+    #[Test]
+    public function can_get_min_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(1, Term::query()->min('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->min('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->min('quantity'));
+    }
+
+    #[Test]
+    public function can_get_max_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(4, Term::query()->max('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->max('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->max('quantity'));
+    }
+
+    #[Test]
+    public function can_sum_values()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(10, Term::query()->sum('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->sum('quantity'));
+
+        // Assert falls back to 0 when there's no results.
+        $this->assertEquals(0, Term::query()->where('type', 'c')->sum('quantity'));
+    }
+
+    #[Test]
+    public function can_get_average_value()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 1])->save();
+        Term::make('b')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 2])->save();
+        Term::make('c')->taxonomy('tags')->data(['type' => 'a', 'quantity' => 3])->save();
+        Term::make('d')->taxonomy('tags')->data(['type' => 'b', 'quantity' => 4])->save();
+
+        $this->assertEquals(2.5, Term::query()->average('quantity'));
+
+        // Assert only queried values are plucked.
+        $this->assertEquals(3, Term::query()->where('type', 'a')->average('quantity'));
+
+        // Assert returns null when there's no results.
+        $this->assertNull(Term::query()->where('type', 'c')->average('quantity'));
+    }
+
+    #[Test]
+    public function sorting_by_unsafe_method_does_not_invoke_it()
+    {
+        Taxonomy::make('tags')->save();
+        Term::make('a')->taxonomy('tags')->data(['title' => 'Alpha'])->save();
+        Term::make('b')->taxonomy('tags')->data(['title' => 'Bravo'])->save();
+
+        $count = Term::all()->count();
+        $this->assertGreaterThan(0, $count);
+
+        Term::query()->orderBy('delete', 'asc')->get();
+
+        $this->assertCount($count, Term::all());
     }
 }
 

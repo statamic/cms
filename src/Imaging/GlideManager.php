@@ -6,8 +6,11 @@ use Closure;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
+use Statamic\Events\GlideAssetCacheCleared;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\Path;
+use Statamic\Facades\URL;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 use Statamic\Support\Str;
 
@@ -47,7 +50,9 @@ class GlideManager
 
     private function wantsCustomFilesystem()
     {
-        return is_string(Config::get('statamic.assets.image_manipulation.cache'));
+        $cache = Config::get('statamic.assets.image_manipulation.cache');
+
+        return is_string($cache) && $cache !== 'hybrid';
     }
 
     private function localCacheFilesystem()
@@ -75,19 +80,26 @@ class GlideManager
      */
     private function cachePath()
     {
-        return $this->shouldServeDirectly()
+        return ($this->shouldServeDirectly() || $this->isUsingHybridCaching())
             ? Config::get('statamic.assets.image_manipulation.cache_path')
             : storage_path('statamic/glide');
     }
 
     public function shouldServeDirectly()
     {
-        return (bool) Config::get('statamic.assets.image_manipulation.cache');
+        $cache = Config::get('statamic.assets.image_manipulation.cache');
+
+        return $cache === true || $this->wantsCustomFilesystem();
     }
 
     public function shouldServeByHttp()
     {
-        return ! $this->shouldServeDirectly();
+        return ! $this->shouldServeDirectly() && ! $this->isUsingHybridCaching();
+    }
+
+    public function isUsingHybridCaching()
+    {
+        return Config::get('statamic.assets.image_manipulation.cache') === 'hybrid';
     }
 
     public function route()
@@ -95,13 +107,27 @@ class GlideManager
         return Config::get('statamic.assets.image_manipulation.route');
     }
 
+    public function cachePathIsServedByRoute()
+    {
+        $publicPath = Path::tidy(public_path());
+        $cachePath = Path::tidy(Config::get('statamic.assets.image_manipulation.cache_path'));
+
+        if (! Str::startsWith($cachePath, $publicPath)) {
+            return false;
+        }
+
+        $servedPath = trim(Str::after($cachePath, $publicPath), '/');
+
+        return $servedPath === trim(URL::makeRelative($this->route()), '/');
+    }
+
     public function url()
     {
         $url = $this->wantsCustomFilesystem()
             ? self::cacheDisk()->url('/')
-            : Str::start(self::route(), '/');
+            : self::route();
 
-        return Str::removeRight($url, '/');
+        return URL::tidy($url, withTrailingSlash: false, external: true);
     }
 
     public function cacheStore()
@@ -116,7 +142,7 @@ class GlideManager
         return Cache::store('glide');
     }
 
-    public function clearAsset($asset)
+    public function clearAsset($asset, bool $preserveHybridMappings = false)
     {
         $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
@@ -130,13 +156,24 @@ class GlideManager
             $server->setCachePathCallable($customCallable);
         });
 
-        // Use manifest to clear each manipulation key from cache store.
-        collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
-            $this->cacheStore()->forget($manipulationKey);
-        });
+        $remainingKeys = collect($this->cacheStore()->get($manifestKey, []))
+            ->filter(function ($key) use ($preserveHybridMappings) {
+                if ($preserveHybridMappings && Str::startsWith($key, 'hybrid::')) {
+                    return true;
+                }
 
-        // Clear manifest itself from cache store.
-        $this->cacheStore()->forget($manifestKey);
+                $this->cacheStore()->forget($key);
+
+                return false;
+            })->values()->all();
+
+        if ($remainingKeys) {
+            $this->cacheStore()->forever($manifestKey, $remainingKeys);
+        } else {
+            $this->cacheStore()->forget($manifestKey);
+        }
+
+        GlideAssetCacheCleared::dispatch($asset);
     }
 
     public function normalizeParameters($params)
@@ -157,9 +194,15 @@ class GlideManager
             'watermark' => 'mark',
         ];
 
-        return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
+        $params = collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+
+        if (isset($params['fm']) && strtolower($params['fm']) === 'jpeg') {
+            $params['fm'] = 'jpg';
+        }
+
+        return $params;
     }
 
     private function getCachePathCallable()

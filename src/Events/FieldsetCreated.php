@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class FieldsetCreated extends Event
 {
-    public $fieldset;
-
-    public function __construct($fieldset)
+    public function __construct(public $fieldset)
     {
-        $this->fieldset = $fieldset;
     }
 }

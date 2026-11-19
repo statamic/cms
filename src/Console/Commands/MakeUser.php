@@ -16,6 +16,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
+use function Statamic\trans as __;
 
 class MakeUser extends Command
 {

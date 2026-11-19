@@ -1,78 +1,86 @@
 <template>
-
-    <button
-        class="blueprint-tab tab-button"
-        role="tab"
-        :class="{ 'active': isActive }"
-        :aria-controls="`tab-panel-${tab._id}`"
-        :aria-selected="isActive"
-        :id="`tab-${tab._id}`"
-        :tabindex="isActive ? 0 : -1"
-        @click="$emit('selected')"
-        @mouseenter="$emit('mouseenter')"
+    <div
+        class="blueprint-tab flex items-center"
+        :class="{ 'pe-4': currentTab === tab._id }"
     >
-        <svg-icon v-if="tab.icon" :name="iconName(tab.icon)" :directory="iconBaseDirectory" class="w-4 h-4 rtl:ml-1 ltr:mr-1" />
-
-        {{ __(tab.display) }}
-
-        <dropdown-list v-if="isActive" ref="dropdown" placement="bottom-start" class="rtl:text-right ltr:text-left">
-            <template #trigger>
-                <button class="rtl:mr-2 ltr:ml-2 hover:text-gray-900 dark:hover:text-gray-400 active:text-gray-900" :aria-label="__('Open Dropdown')">
-                    <svg-icon name="micro/chevron-down-xs" class="w-2" />
-                </button>
-            </template>
-            <dropdown-item @click="edit" v-text="__('Edit')" />
-            <dropdown-item @click="remove" class="warning" v-text="__('Delete')" />
-        </dropdown-list>
-
-        <confirmation-modal
-            v-if="editing"
-            :title="editText"
-            @opened="$refs.title.focus()"
-            @confirm="editConfirmed"
-            @cancel="editCancelled"
+        <TabTrigger
+            :name="tab._id"
+            class="flex items-center [--focus-outline-offset:-3px] focus-visible:rounded-md! focus-visible:bg-gray-100 dark:focus-visible:bg-gray-800"
         >
-            <div class="publish-fields @container">
-                <div class="form-group w-full">
-                    <label v-text="__('Title')" />
-                    <input ref="title" type="text"
-                        :value="display"
-                        @input="fieldUpdated('display', $event.target.value)"
-                        class="input-text" />
-                </div>
-                <div class="form-group w-full">
-                    <label v-text="__('Handle')" />
-                    <input type="text"
-                        :value="handle"
-                        @input="fieldUpdated('handle', $event.target.value)"
-                        class="input-text font-mono text-sm" />
-                </div>
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Instructions')" />
-                    <input type="text"
-                        :value="instructions"
-                        @input="fieldUpdated('instructions', $event.target.value)"
-                        class="input-text text-sm" />
-                </div>
+            <Icon
+                v-if="tab.icon"
+                :name="tab.icon"
+                :set="iconSet"
+                class="h-4 w-4 me-1"
+            />
 
-                <div class="form-group w-full" v-if="showInstructions">
-                    <label v-text="__('Icon')" />
-                    <publish-field-meta
-                        :config="{ handle: 'icon', type: 'icon', directory: this.iconBaseDirectory, folder: this.iconSubFolder }"
-                        :initial-value="icon"
-                        v-slot="{ meta, value, loading }"
-                    >
-                        <icon-fieldtype v-if="!loading" handle="icon" :meta="meta" :value="value" @input="fieldUpdated('icon', $event)" />
-                    </publish-field-meta>
+            <span class="block max-w-48 overflow-clip text-ellipsis whitespace-nowrap" v-tooltip="__(tab.display).length > 24 ? __(tab.display) : null">{{ __(tab.display) }}</span>
+        </TabTrigger>
+
+        <Stack
+            size="narrow"
+            :open="editing"
+            @opened="() => $nextTick(() => $refs.title.select())"
+            @update:open="editCancelled"
+            :title="editText"
+        >
+            <div class="">
+                <div class="space-y-6">
+                    <Field :label="__('Title')" class="form-group field-w-100">
+                        <Input ref="title" :model-value="display" @update:model-value="fieldUpdated('display', $event)" />
+                    </Field>
+                    <Field :label="__('Handle')" class="form-group field-w-100">
+                        <Input class="font-mono" :model-value="handle" @update:model-value="fieldUpdated('handle', $event)">
+                            <template #append>
+                                <Button
+                                    icon="sync"
+                                    size="sm"
+                                    variant="ghost"
+                                    :aria-label="__('Regenerate from: :field', { field: __('Title') })"
+                                    @click="regenerateHandle"
+                                    v-tooltip="__('Regenerate from: :field', { field: __('Title') })"
+                                />
+                            </template>
+                        </Input>
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Instructions')" class="form-group field-w-100">
+                        <Input :model-value="instructions" @update:model-value="fieldUpdated('instructions', $event)" />
+                    </Field>
+                    <Field v-if="showInstructions" :label="__('Icon')" class="form-group field-w-100">
+                        <publish-field-meta
+                            :config="{
+                            handle: 'icon',
+                            type: 'icon',
+                            set: iconSet,
+                        }"
+                            :initial-value="icon"
+                            v-slot="{ meta, value, loading, config }"
+                        >
+                            <icon-fieldtype
+                                v-if="!loading"
+                                handle="icon"
+                                :config="config"
+                                :meta="meta"
+                                :value="value"
+                                @update:value="fieldUpdated('icon', $event)"
+                            />
+                        </publish-field-meta>
+                    </Field>
+                    <div class="py-6 space-x-2 -mx-6 px-6 border-t border-gray-200 dark:border-gray-700">
+                        <ui-button :text="isSoloNarrowStack ? __('Save') : __('Confirm')" @click="handleSaveOrConfirm" variant="primary" />
+                        <ui-button :text="__('Cancel')" @click="editCancelled" variant="ghost" />
+                    </div>
                 </div>
             </div>
-        </confirmation-modal>
-    </button>
-
+        </Stack>
+    </div>
 </template>
 
 <script>
+import { TabTrigger, Button, Icon, Field, Input, Stack, StackClose } from '@/components/ui';
+
 export default {
+    components: { TabTrigger, Button, Icon, Field, Input, Stack, StackClose },
 
     props: {
         tab: {
@@ -89,7 +97,7 @@ export default {
         },
         editText: {
             type: String,
-        }
+        },
     },
 
     data() {
@@ -100,42 +108,60 @@ export default {
             icon: this.tab.icon,
             editing: false,
             handleSyncedWithDisplay: false,
-        }
-    },
-
-    created() {
-        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
-        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
-        if (!this.handle || this.handle == 'new_tab' || this.handle == 'new_set_group') {
-            this.handleSyncedWithDisplay = true;
-        }
+            saveKeyBinding: null,
+        };
     },
 
     computed: {
-
-        isActive() {
-            return this.currentTab === this.tab._id;
+        iconSet() {
+            return this.$config.get('replicatorSetIcons') || undefined;
         },
 
-        iconBaseDirectory() {
-            return this.$config.get('setIconsDirectory');
+        isSoloNarrowStack() {
+            const stacks = this.$stacks.stacks();
+            return stacks.length === 1 && stacks[0]?.data?.vm?.size === 'narrow';
         },
+    },
 
-        iconSubFolder() {
-            return this.$config.get('setIconsFolder');
+    watch: {
+        editing: {
+            handler(isEditing) {
+                if (isEditing) {
+                    // Bind Cmd+S and Cmd+Shift+S to trigger save or confirm based on stack type
+                    this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+shift+s'], (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleSaveOrConfirm();
+                    });
+                } else {
+                    // Unbind when stack is closed
+                    if (this.saveKeyBinding) {
+                        this.saveKeyBinding.destroy();
+                        this.saveKeyBinding = null;
+                    }
+                }
+            },
+            immediate: false,
         },
-
     },
 
     methods: {
+        regenerateHandle() {
+            this.handle = snake_case(this.display);
+        },
 
         edit() {
+            this.display = this.tab.display;
+            this.handle = this.tab.handle;
+            this.instructions = this.tab.instructions;
+            this.icon = this.tab.icon;
+            this.handleSyncedWithDisplay = !this.tab.handle || ['new_tab', 'new_set_group'].includes(this.tab.handle);
             this.editing = true;
         },
 
         editConfirmed() {
-            if (! this.handle) {
-                this.handle = snake_case(this.display)
+            if (!this.handle) {
+                this.handle = snake_case(this.display);
             }
 
             this.$emit('updated', {
@@ -147,6 +173,24 @@ export default {
             });
 
             this.editing = false;
+        },
+
+        handleSaveOrConfirm() {
+            if (this.isSoloNarrowStack) {
+                this.editAndSave();
+            } else {
+                this.editConfirmed();
+            }
+        },
+
+        editAndSave() {
+            // First confirm the tab changes
+            this.editConfirmed();
+            
+            // Then trigger the blueprint save
+            this.$nextTick(() => {
+                this.$events.$emit('root-form-save');
+            });
         },
 
         editCancelled() {
@@ -170,16 +214,12 @@ export default {
         remove() {
             this.$emit('removed');
         },
+    },
 
-        iconName(name) {
-            if (! name) return null;
-
-            return this.iconSubFolder
-                ? this.iconSubFolder+'/'+name
-                : name;
-        },
-
-    }
-
-}
+    beforeUnmount() {
+        if (this.saveKeyBinding) {
+            this.saveKeyBinding.destroy();
+        }
+    },
+};
 </script>

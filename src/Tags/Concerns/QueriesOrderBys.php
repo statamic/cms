@@ -32,7 +32,7 @@ trait QueriesOrderBys
 
         return collect(explode('|', $piped ?? ''))->filter()->map(function ($orderBy) {
             return OrderBy::parse($orderBy);
-        });
+        })->filter(fn ($orderBy) => OrderBy::column($orderBy->sort));
     }
 
     protected function preParsedOrderBys()

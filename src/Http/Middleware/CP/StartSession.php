@@ -6,10 +6,15 @@ use Illuminate\Session\Middleware\StartSession as Middleware;
 
 class StartSession extends Middleware
 {
+    protected $routesExcludedFromExtendingSession = [
+        'statamic.cp.session.timeout',
+        'statamic.cp.token',
+    ];
+
     protected function saveSession($request)
     {
         if (
-            $request->route()->named('statamic.cp.session.timeout')
+            $request->route()->named($this->routesExcludedFromExtendingSession)
             && $request->session()->has('last_activity')
         ) {
             return;

@@ -6,8 +6,12 @@ use Illuminate\Support\Str;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Facades\Term as Terms;
 
+use function Statamic\trans as __;
+
 class DuplicateTerm extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()

@@ -125,7 +125,7 @@ return [
 
     'nocache' => 'cache',
 
-    'nocache_js_position' => 'body',
+    'nocache_db_connection' => env('STATAMIC_NOCACHE_DB_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------
@@ -144,17 +144,59 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Script Delivery
+    |--------------------------------------------------------------------------
+    |
+    | Full measure static caching injects small <script> snippets into cached
+    | pages to swap CSRF tokens and hydrate nocache regions. By default these
+    | are inlined. Sites with a Content Security Policy that disallows inline
+    | scripts may set this to "external" to have the snippets served from
+    | dedicated routes and referenced with a <script src> tag instead.
+    |
+    | Supported: "inline", "external"
+    |
+    */
+
+    'script_delivery' => env('STATAMIC_STATIC_CACHING_SCRIPT_DELIVERY', 'inline'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Warm Queue
     |--------------------------------------------------------------------------
     |
     | Here you may define the queue name and connection
-    | that will be used when warming the static cache.
+    | that will be used when warming the static cache and
+    | optionally set the "--insecure" flag by default.
+    |
+    | You may also define the job class used to warm each URL. It should
+    | extend Statamic\Console\Commands\StaticWarmJob, for example to
+    | change its uniqueness or add a delay.
     |
     */
 
     'warm_queue' => env('STATAMIC_STATIC_WARM_QUEUE'),
 
     'warm_queue_connection' => env('STATAMIC_STATIC_WARM_QUEUE_CONNECTION'),
+
+    'warm_insecure' => env('STATAMIC_STATIC_WARM_INSECURE', false),
+
+    'warm_job' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Background Re-cache
+    |--------------------------------------------------------------------------
+    |
+    | When this is enabled, Statamic will re-cache URLs in the background,
+    | overwriting the existing cache, without removing it first.
+    |
+    */
+
+    'background_recache' => env('STATAMIC_BACKGROUND_RECACHE', false),
+
+    'recache_token' => env('STATAMIC_RECACHE_TOKEN'),
+
+    'recache_token_parameter' => '__recache',
 
     /*
     |--------------------------------------------------------------------------

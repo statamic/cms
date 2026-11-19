@@ -356,7 +356,7 @@ class UpdateBlueprintTest extends TestCase
     private function submit($collection, $blueprint, $params = [])
     {
         return $this->patch(
-            cp_route('taxonomies.blueprints.update', [$collection, $blueprint]),
+            cp_route('blueprints.taxonomies.update', [$collection, $blueprint]),
             $this->validParams($params)
         );
     }

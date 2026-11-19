@@ -4,6 +4,7 @@ namespace Statamic\StarterKits;
 
 use Exception;
 use Illuminate\Support\Collection;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\StarterKits\Exceptions\StarterKitException;
 use Statamic\Support\Str;
 
@@ -34,14 +35,6 @@ class ExportableModule extends Module
             ->exportPaths()
             ->each(fn ($path) => $this->exportRelativePath(
                 from: $path,
-                starterKitPath: $starterKitPath,
-            ));
-
-        $this
-            ->exportAsPaths()
-            ->each(fn ($to, $from) => $this->exportRelativePath(
-                from: $from,
-                to: $to,
                 starterKitPath: $starterKitPath,
             ));
     }
@@ -86,7 +79,7 @@ class ExportableModule extends Module
      */
     protected function exportDependenciesFromComposerRequire(string $requireKey, Collection $exportableDependencies): mixed
     {
-        $composerJson = json_decode($this->files->get(base_path('composer.json')), true);
+        $composerJson = json_decode($this->files->get(ComposerJson::path()), true);
 
         $dependencies = collect($composerJson[$requireKey] ?? [])
             ->filter(function ($version, $dependency) use ($exportableDependencies) {
@@ -105,18 +98,13 @@ class ExportableModule extends Module
      */
     protected function ensureNotExportingComposerJson(): self
     {
-        // Here we'll ensure both `export_as` values and keys are included,
-        // because we want to make sure `composer.json` is referenced on either end.
-        $flattenedExportPaths = $this
-            ->exportPaths()
-            ->merge($this->exportAsPaths())
-            ->merge($this->exportAsPaths()->keys());
+        $paths = $this->exportPaths();
 
-        if ($flattenedExportPaths->contains('starter-kit.yaml')) {
+        if ($paths->contains('starter-kit.yaml')) {
             throw new StarterKitException('Cannot export [starter-kit.yaml] config.');
         }
 
-        if ($flattenedExportPaths->contains('composer.json')) {
+        if ($paths->contains('composer.json')) {
             throw new StarterKitException('Cannot export [composer.json]. Please use `dependencies` array.');
         }
 
@@ -132,7 +120,6 @@ class ExportableModule extends Module
     {
         $this
             ->exportPaths()
-            ->merge($this->exportAsPaths()->keys())
             ->reject(fn ($path) => $this->files->exists(base_path($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Cannot export [{$path}], because it does not exist in your app.");
@@ -148,7 +135,7 @@ class ExportableModule extends Module
      */
     protected function ensureExportableDependenciesExist(): self
     {
-        $installedDependencies = collect(json_decode($this->files->get(base_path('composer.json')), true))
+        $installedDependencies = collect(json_decode($this->files->get(ComposerJson::path()), true))
             ->only(['require', 'require-dev'])
             ->map(fn ($dependencies) => array_keys($dependencies))
             ->flatten();

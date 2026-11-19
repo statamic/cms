@@ -3,20 +3,33 @@
 namespace Statamic\Http\Controllers\CP\Navigation;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Contracts\Structures\Nav as NavContract;
+use Statamic\CP\Column;
+use Statamic\CP\PublishForm;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Query\Scopes\Filter;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class NavigationController extends CpController
 {
     public function index()
     {
         $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
+
+        $columns = [
+            Column::make('title')->label(__('Title')),
+        ];
 
         $navs = Nav::all()->filter(function ($nav) {
             return User::current()->can('configure navs')
@@ -27,13 +40,19 @@ class NavigationController extends CpController
                 'title' => $structure->title(),
                 'show_url' => $structure->showUrl(),
                 'edit_url' => $structure->editUrl(),
-                'delete_url' => $structure->deleteUrl(),
-                'deleteable' => User::current()->can('delete', $structure),
-                'available_in_selected_site' => $structure->sites()->contains(Site::selected()->handle()),
+                'available_in_selected_site' => Site::hasMultiple()
+                    ? $structure->sites()->contains(Site::selected()->handle())
+                    : true,
             ];
         })->values();
 
-        return view('statamic::navigation.index', compact('navs'));
+        return Inertia::render('navigation/Index', [
+            'navs' => $navs->all(),
+            'columns' => $columns,
+            'actionUrl' => cp_route('navigation.actions.run'),
+            'canCreate' => User::current()->can('create', NavContract::class),
+            'createUrl' => cp_route('navigation.create'),
+        ]);
     }
 
     public function edit($nav)
@@ -46,28 +65,23 @@ class NavigationController extends CpController
             'title' => $nav->title(),
             'handle' => $nav->handle(),
             'collections' => $nav->collections()->map->handle()->all(),
+            'collections_query_scopes' => $nav->collectionsQueryScopes(),
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
             'max_depth' => $nav->maxDepth(),
             'select_across_sites' => $nav->canSelectAcrossSites(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint($nav))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::navigation.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'nav' => $nav,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($nav))
+            ->title(__('Configure Navigation'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo($nav->showUrl());
     }
 
     public function show(Request $request, $nav)
     {
-        abort_if(! $nav = Nav::find($nav), 404);
+        throw_unless($nav = Nav::find($nav), NotFoundHttpException::class);
 
         $site = $request->site ?? Site::selected()->handle();
 
@@ -81,11 +95,42 @@ class NavigationController extends CpController
 
         $this->authorize('view', $nav->in($site), __('You are not authorized to view navs.'));
 
-        return view('statamic::navigation.show', [
+        $collectionTree = null;
+
+        // Don't offer a tree for a collection the user isn't allowed to view.
+        // The selector falls back to the list.
+        if (
+            $nav->collections()->count() === 1
+            && ($collection = $nav->collections()->first())->hasStructure()
+            && User::current()->can('view', $collection)
+        ) {
+            $collectionBlueprints = $collection
+                ->entryBlueprints()
+                ->reject->hidden()
+                ->map(function ($blueprint) {
+                    return [
+                        'handle' => $blueprint->handle(),
+                        'title' => $blueprint->title(),
+                    ];
+                })->values();
+
+            $collectionTree = [
+                'title' => $collection->title(),
+                'url' => cp_route('collections.tree.index', $collection),
+                'showSlugs' => $collection->structure()->showSlugs(),
+                'expectsRoot' => $collection->structure()->expectsRoot(),
+                'blueprints' => $collectionBlueprints,
+            ];
+        }
+
+        return Inertia::render('navigation/Show', [
+            'title' => $nav->title(),
+            'handle' => $nav->handle(),
+            'pagesUrl' => cp_route('navigation.tree.index', $nav->handle()),
+            'submitUrl' => cp_route('navigation.tree.update', $nav->handle()),
+            'editUrl' => $nav->editUrl(),
+            'blueprintUrl' => cp_route('blueprints.navigation.edit', $nav->handle()),
             'site' => $site,
-            'nav' => $nav,
-            'expectsRoot' => $nav->expectsRoot(),
-            'collections' => $nav->collections()->map->handle()->all(),
             'sites' => $this->getAuthorizedTreesForNav($nav)->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
@@ -93,7 +138,17 @@ class NavigationController extends CpController
                     'url' => $tree->showUrl(),
                 ];
             })->values()->all(),
+            'collections' => $nav->collections()->map->handle()->all(),
+            'entryQueryScopes' => $nav->collectionsQueryScopes(),
+            'initialMaxDepth' => $nav->maxDepth(),
+            'expectsRoot' => $nav->expectsRoot(),
             'blueprint' => $nav->blueprint()->toPublishArray(),
+            'initialItemActions' => Action::for($nav, ['view' => 'form']),
+            'itemActionUrl' => cp_route('navigation.actions.run'),
+            'canEdit' => User::current()->can('edit', $nav),
+            'canSelectAcrossSites' => $nav->canSelectAcrossSites(),
+            'canEditBlueprint' => User::current()->can('configure fields'),
+            'collectionTree' => $collectionTree,
         ]);
     }
 
@@ -120,6 +175,7 @@ class NavigationController extends CpController
             ->title($values['title'])
             ->expectsRoot($values['root'])
             ->collections($values['collections'])
+            ->collectionsQueryScopes(Arr::get($values, 'collections_query_scopes', []))
             ->maxDepth($values['max_depth']);
 
         $existingSites = $nav->trees()->keys()->all();
@@ -148,7 +204,9 @@ class NavigationController extends CpController
     {
         $this->authorize('create', NavContract::class, __('You are not authorized to configure navs.'));
 
-        return view('statamic::navigation.create');
+        return Inertia::render('navigation/Create', [
+            'submitUrl' => cp_route('navigation.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -199,18 +257,32 @@ class NavigationController extends CpController
                 'display' => __('Options'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.navigation_configure_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('navigation.blueprint.edit', $nav->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.navigation.edit', $nav->handle()),
+                            ],
+                        ],
                     ],
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::messages.navigation_configure_collections_instructions'),
                         'type' => 'collections',
                         'mode' => 'select',
+                    ],
+                    'collections_query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.entries.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
                     ],
                     'root' => [
                         'display' => __('Expect a root page'),
@@ -242,15 +314,22 @@ class NavigationController extends CpController
             ];
         }
 
-        return Blueprint::makeFromTabs($contents);
-    }
-
-    public function destroy($nav)
-    {
-        $nav = Nav::findByHandle($nav);
-
-        $this->authorize('delete', $nav, __('You are not authorized to delete navs.'));
-
-        $nav->delete();
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($contents)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
     }
 }

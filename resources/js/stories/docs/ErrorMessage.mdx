@@ -1,0 +1,15 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ErrorMessageStories from '../ErrorMessage.stories';
+
+<Meta of={ErrorMessageStories} />
+
+# ErrorMessage
+Display validation errors and other error messages with consistent styling. Error messages are styled in red with proper text formatting and support for links.
+<Canvas of={ErrorMessageStories._DocsIntro} sourceState={'shown'} />
+
+## With Slot
+Use the default slot to include HTML content, links, or formatted text in your error messages.
+<Canvas of={ErrorMessageStories._WithSlot} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={ErrorMessageStories} />

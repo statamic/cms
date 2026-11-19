@@ -8,6 +8,7 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\View\ComponentSlot;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Antlers;
@@ -22,19 +23,32 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Fields\Values;
 use Statamic\Fieldtypes\Bard;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Fieldtypes\Link\ArrayableLink;
+use Statamic\Fieldtypes\Video\Embed;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Dumper;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
+use Statamic\Support\Traits\ChecksDumpability;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Stringy\StaticStringy as Stringy;
+
+use function Statamic\trans;
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
 
 class CoreModifiers extends Modifier
 {
+    use ChecksDumpability {
+        dumpingAllowed as traitDumpingAllowed;
+    }
+
     /**
      * Adds values together with science. Context aware.
      *
@@ -119,7 +133,9 @@ class CoreModifiers extends Modifier
      */
     public function antlers($value, $params, $context)
     {
-        return (string) Antlers::parse($value, $context);
+        $trusted = Arr::get($params, 0) === 'trusted' && ! GlobalRuntimeState::$isEvaluatingUserData;
+
+        return (string) Antlers::parse($value, $context, $trusted);
     }
 
     /**
@@ -283,6 +299,7 @@ class CoreModifiers extends Modifier
         }
 
         $text = '';
+
         while (count($value)) {
             $item = array_shift($value);
 
@@ -291,8 +308,13 @@ class CoreModifiers extends Modifier
             }
 
             if ($item['type'] === 'text') {
-                $text .= ' '.($item['text'] ?? '');
+                $text .= ($item['text'] ?? '');
             }
+
+            if ($item['type'] === 'paragraph' && $text !== '') {
+                $text .= ' ';
+            }
+
             array_unshift($value, ...($item['content'] ?? []));
         }
 
@@ -552,8 +574,12 @@ class CoreModifiers extends Modifier
     /**
      * Dump, Die, and Debug using Ignition.
      */
-    public function ddd($value)
+    public function ddd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         ddd(Dumper::resolve($value));
     }
 
@@ -609,16 +635,24 @@ class CoreModifiers extends Modifier
     /**
      * Dump and die the output of a variable.
      */
-    public function dd($value)
+    public function dd($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dd(Dumper::resolve($value));
     }
 
     /**
      * Dump a variable.
      */
-    public function dump($value)
+    public function dump($value, $params)
     {
+        if (! $this->dumpingAllowed($params)) {
+            return;
+        }
+
         dump(Dumper::resolve($value));
     }
 
@@ -691,7 +725,7 @@ class CoreModifiers extends Modifier
      */
     public function explode($value, $params)
     {
-        return explode(Arr::get($params, 0), $value);
+        return explode(Arr::get($params, 0), $value, Arr::get($params, 1, PHP_INT_MAX));
     }
 
     /**
@@ -736,6 +770,10 @@ class CoreModifiers extends Modifier
     {
         if (is_array($value)) {
             return Arr::first($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->first();
         }
 
         return Stringy::first($value, Arr::get($params, 0));
@@ -790,6 +828,20 @@ class CoreModifiers extends Modifier
     public function formatTranslated($value, $params)
     {
         return $this->carbon($value)->translatedFormat(Arr::get($params, 0));
+    }
+
+    /**
+     * Format a time string without timezone conversion.
+     *
+     * @return string
+     */
+    public function formatTime($value, $params)
+    {
+        if (! $value) {
+            return $value;
+        }
+
+        return Date::parse($value)->format(Arr::get($params, 0, 'g:ia'));
     }
 
     /**
@@ -849,14 +901,8 @@ class CoreModifiers extends Modifier
         // available data. Then grab the requested variable from there.
         $array = $item instanceof Augmentable ? $item->toDeferredAugmentedArray() : $item->toArray();
 
-        if ($arrayValue = Arr::get($array, $var)) {
-            return $arrayValue;
-        }
-
-        // Finally, try to call a method on the object
-        $method = Str::slug($var);
-        if (method_exists($item, $method)) {
-            return $item->$method();
+        if (Arr::has($array, $var)) {
+            return Arr::get($array, $var);
         }
 
         // If after all is said and done, there's still nothing, just show the original value.
@@ -983,6 +1029,50 @@ class CoreModifiers extends Modifier
         }
     }
 
+    /**
+     * Returns true if the array contains $needle, false otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function overlaps($haystack, $params, $context)
+    {
+        $needle = $this->getFromContext($context, $params);
+
+        if ($needle instanceof Collection) {
+            $needle = $needle->values()->all();
+        }
+
+        if (! is_array($needle)) {
+            $needle = [$needle];
+        }
+
+        if ($haystack instanceof Collection) {
+            $haystack = $haystack->values()->all();
+        }
+
+        if (! is_array($haystack)) {
+            return false;
+        }
+
+        return count(array_intersect($haystack, $needle)) > 0;
+    }
+
+    /**
+     * Returns false if the array contains $needle, true otherwise
+     *
+     * @param  string|array  $haystack
+     * @param  array  $params
+     * @param  array  $context
+     * @return bool
+     */
+    public function doesnt_overlap($haystack, $params, $context)
+    {
+        return ! $this->overlaps($haystack, $params, $context);
+    }
+
     private function renderAPStyleHeadline($value)
     {
         $exceptions = [
@@ -1028,6 +1118,11 @@ class CoreModifiers extends Modifier
         })->implode(' ');
 
         return $headline;
+    }
+
+    public function hasActualContent($value)
+    {
+        return (new ComponentSlot($value))->hasActualContent();
     }
 
     /**
@@ -1096,7 +1191,9 @@ class CoreModifiers extends Modifier
     /**
      * Check if an item exists in an array using "dot" notation.
      *
-     * @param  $value
+     * @param  array  $haystack
+     * @param  array  $params
+     * @param  array  $context
      * @return bool
      */
     public function inArray($haystack, $params, $context)
@@ -1305,6 +1402,11 @@ class CoreModifiers extends Modifier
         return $this->carbon($value)->isPast();
     }
 
+    public function isString($value)
+    {
+        return is_string($value);
+    }
+
     /**
      * Determines if the date is today.
      *
@@ -1422,14 +1524,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the last $params[0] characters of a string, or the last element of an array.
+     * Returns the last $params[0] characters of a string, or the last element of an array or Collection.
      *
-     * @return string
+     * @return mixed
      */
     public function last($value, $params)
     {
         if (is_array($value)) {
             return Arr::last($value);
+        }
+
+        if ($value instanceof Collection) {
+            return $value->last();
         }
 
         return Stringy::last($value, Arr::get($params, 0));
@@ -1456,7 +1562,7 @@ class CoreModifiers extends Modifier
             return $value->count();
         }
 
-        if ($value instanceof Arrayable) {
+        if ($value instanceof Arrayable && ! $value instanceof ArrayableString) {
             $value = $value->toArray();
         }
 
@@ -1601,7 +1707,6 @@ class CoreModifiers extends Modifier
     /**
      * Generate an md5 hash of a value.
      *
-     * @param  $params
      * @return string
      */
     public function md5($value)
@@ -1818,7 +1923,7 @@ class CoreModifiers extends Modifier
 
         $partial = 'partials/'.$name.'.html';
 
-        return Parse::template(File::disk('resources')->get($partial), $value);
+        return Parse::template(File::disk('resources')->get($partial), $value, trusted: true);
     }
 
     /**
@@ -1929,6 +2034,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function rawurlencode($value)
+    {
+        return rawurlencode($value);
+    }
+
+    /**
+     * URL-encode according to RFC 3986, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function rawurlencode_except_slashes($value)
     {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
     }
@@ -2119,6 +2234,24 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Resolves a specific index or all items from an array, a Collection, or a Query Builder.
+     */
+    public function resolve($value, $params)
+    {
+        $key = Arr::get($params, 0);
+
+        if (Compare::isQueryBuilder($value)) {
+            $value = $value->get();
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->all();
+        }
+
+        return Arr::get($value, $key);
+    }
+
+    /**
      * Reverses the order of a string or list.
      *
      * @param  string|array|Collection  $value
@@ -2214,14 +2347,8 @@ class CoreModifiers extends Modifier
             $segment = $this->getFromContext($context, $params);
         }
 
-        $url = parse_url($value);
-
-        // Get everything after a possible domain
-        // and make sure it starts with a /
-        $uris = Stringy::ensureLeft(Arr::get($url, 'path'), '/');
-
-        //Boom
-        $segments = explode('/', $uris);
+        // Explode segments
+        $segments = explode('/', URL::makeRelative($value));
 
         return Arr::get($segments, $segment);
     }
@@ -2677,7 +2804,15 @@ class CoreModifiers extends Modifier
      */
     public function toJson($value, $params)
     {
-        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : 0;
+        $options = 0;
+
+        if (in_array('pretty', $params)) {
+            $options |= JSON_PRETTY_PRINT;
+        }
+
+        if (in_array('safe', $params)) {
+            $options |= JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+        }
 
         if (Compare::isQueryBuilder($value)) {
             $value = $value->get();
@@ -2771,7 +2906,6 @@ class CoreModifiers extends Modifier
      * Converts a Carbon instance to a timestamp.
      *
      * @param  Carbon  $value
-     * @param  array  $params
      * @return int
      */
     public function timestamp($value)
@@ -2791,9 +2925,9 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
+        $timezone = Arr::get($params, 0, Statamic::displayTimezone());
 
-        return $this->carbon($value)->tz($timezone);
+        return $this->carbon($value)->clone()->tz($timezone);
     }
 
     public function typeOf($value)
@@ -2839,6 +2973,16 @@ class CoreModifiers extends Modifier
      * @return string
      */
     public function urlencode($value)
+    {
+        return urlencode($value);
+    }
+
+    /**
+     * URL-encodes string, but allowing slashes to persist
+     *
+     * @return string
+     */
+    public function urlencode_except_slashes($value)
     {
         return implode('/', array_map('urlencode', explode('/', $value)));
     }
@@ -3045,7 +3189,7 @@ class CoreModifiers extends Modifier
      */
     public function yearsAgo($value, $params)
     {
-        return $this->carbon($value)->diffInYears(Arr::get($params, 0));
+        return (int) abs($this->carbon($value)->diffInYears(Arr::get($params, 0)));
     }
 
     /**
@@ -3057,60 +3201,11 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
-        if (Str::contains($url, 'vimeo')) {
-            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
-
-            [$url, $hash] = $this->handleUnlistedVimeoUrls($url);
-
-            $paramsToAdd = '?dnt=1';
-            if ($hash) {
-                $paramsToAdd .= '&h='.$hash;
-            }
-
-            if (Str::contains($url, '?')) {
-                $url = str_replace('?', $paramsToAdd.'&', $url);
-            } else {
-                $url .= $paramsToAdd;
-            }
-
-            return $url;
+        if ($url instanceof Embed) {
+            return $url->embedUrl() ?? $url->url();
         }
 
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-
-            if (Str::contains($url, '&t=')) {
-                $url = str_replace('&t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/shorts/')) {
-            $url = str_replace('shorts/', 'embed/', $url);
-        }
-
-        if (Str::contains($url, 'youtube.com')) {
-            $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
-        }
-
-        // This avoids SSL issues when using the non-www version
-        if (Str::contains($url, '//youtube-nocookie.com')) {
-            $url = str_replace('//youtube-nocookie.com', '//www.youtube-nocookie.com', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::embedUrlFor($url);
     }
 
     /**
@@ -3122,28 +3217,11 @@ class CoreModifiers extends Modifier
      */
     public function trackableEmbedUrl($url)
     {
-        if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        if ($url instanceof Embed) {
+            return $url->trackableEmbedUrl();
         }
 
-        if (Str::contains($url, 'youtu.be')) {
-            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
-
-            // Check for start at point and replace it with correct parameter.
-            if (Str::contains($url, '?t=')) {
-                $url = str_replace('?t=', '?start=', $url);
-            }
-        }
-
-        if (Str::contains($url, 'youtube.com/watch?v=')) {
-            $url = str_replace('watch?v=', 'embed/', $url);
-        }
-
-        if (Str::contains($url, '&') && ! Str::contains($url, '?')) {
-            $url = Str::replaceFirst('&', '?', $url);
-        }
-
-        return $url;
+        return Embed::trackableEmbedUrlFor($url);
     }
 
     /**
@@ -3154,7 +3232,11 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
-        return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
+        if ($url instanceof Embed) {
+            return $url->isEmbeddable();
+        }
+
+        return Embed::isEmbeddableUrl($url);
     }
 
     /**
@@ -3209,8 +3291,16 @@ class CoreModifiers extends Modifier
 
     private function carbon($value)
     {
+        if (! $value) {
+            return optional();
+        }
+
         if (! $value instanceof Carbon) {
-            $value = (is_numeric($value)) ? Date::createFromTimestamp($value) : Date::parse($value);
+            $value = (is_numeric($value)) ? Date::createFromTimestamp($value, config('app.timezone')) : Date::parse($value);
+        }
+
+        if (config('statamic.system.localize_dates_in_modifiers')) {
+            $value = $value->copy()->setTimezone(Statamic::displayTimezone());
         }
 
         return $value;
@@ -3231,21 +3321,8 @@ class CoreModifiers extends Modifier
                 Arr::get($context, $params[$key], $params[$key]);
     }
 
-    // unlisted vimeo urls are in the form vimeo.com/id/hash, but embeds pass the hash as a get param
-    private function handleUnlistedVimeoUrls($url)
+    private function dumpingAllowed(array $params): bool
     {
-        $hash = '';
-
-        if (! Str::contains($url, 'progressive_redirect') && Str::substrCount($url, '/') > 4) {
-            $hash = Str::afterLast($url, '/');
-            $url = Str::beforeLast($url, '/');
-
-            if (Str::contains($hash, '?')) {
-                $url .= '?'.Str::after($hash, '?');
-                $hash = Str::before($hash, '?');
-            }
-        }
-
-        return [$url, $hash];
+        return $this->traitDumpingAllowed() || (Arr::get($params, 0) === 'force');
     }
 }

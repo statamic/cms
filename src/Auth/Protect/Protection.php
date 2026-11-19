@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Protect;
 
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Facades\URL;
@@ -69,6 +70,12 @@ class Protection
             ->protect();
     }
 
+    public function cacheable()
+    {
+        return $this->driver()
+            ->cacheable();
+    }
+
     protected function url()
     {
         return URL::tidy(request()->fullUrl());
@@ -76,7 +83,7 @@ class Protection
 
     protected function log($message)
     {
-        \Log::debug(vsprintf('%s Denying access to %s.', [
+        Log::debug(vsprintf('%s Denying access to %s.', [
             $message,
             $this->url(),
         ]));

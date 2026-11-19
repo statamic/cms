@@ -1,69 +1,81 @@
 <template>
-
     <div
-        class="replicator-set shadow-sm mb-4 rounded border dark:border-dark-900"
-        :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
+        tabindex="-1"
+        data-reorder-focus
+        class="relative @container/panel bg-white dark:bg-gray-850 rounded-xl ring ring-gray-300 dark:ring-x-0 dark:ring-b-0 dark:ring-gray-700 shadow-ui-md"
+        :class="[
+            sortableItemClass,
+            {
+                'opacity-50': isExcessive,
+                'ring-red-500': hasError,
+                'focus-outline': moving,
+            },
+        ]"
+        :data-error="hasError ?? undefined"
+        :data-moving="moving || undefined"
     >
-
-        <div class="replicator-set-header">
-            <div class="item-move cursor-grab sortable-handle" :class="{ [sortableHandleClass]: grid.isReorderable }" />
-            <div class="py-2 rtl:pr-2 ltr:pl-2 replicator-set-header-inner flex justify-end items-end w-full">
-                <button v-if="canAddRows" class="flex self-end group items-center rtl:ml-2 ltr:mr-2" @click="$emit('duplicate', index)" :aria-label="__('Duplicate Row')">
-                    <svg-icon name="light/duplicate" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
-                <button v-if="canDelete" class="flex self-end group items-center" @click="$emit('removed', index)" :aria-label="__('Delete Row')">
-                    <svg-icon name="micro/trash" class="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
-                </button>
-            </div>
-        </div>
-
-        <div class="replicator-set-body publish-fields @container">
-            <set-field
-                v-for="field in fields"
-                v-show="showField(field, fieldPath(field.handle))"
-                :key="field.handle"
-                :field="field"
-                :meta="meta[field.handle]"
-                :value="values[field.handle]"
-                :parent-name="name"
-                :set-index="index"
-                :errors="errors(field.handle)"
-                :field-path="fieldPath(field.handle)"
-                class="p-4"
-                :read-only="grid.isReadOnly"
-                @updated="updated(field.handle, $event)"
-                @meta-updated="metaUpdated(field.handle, $event)"
-                @focus="$emit('focus')"
-                @blur="$emit('blur')"
+        <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
+        <header class="bg-gray-50 dark:bg-gray-900 rounded-t-xl border-b border-gray-300 dark:border-gray-700 ps-4 pe-2 py-1.5 flex items-center justify-between">
+            <ui-drag-handle
+                :keyboard-reorder="canReorder"
+                :class="{ [sortableHandleClass]: grid.isReorderable }"
+                @keyboard-reorder="startMovingFromHandle"
             />
+            <div v-if="showRowControls" class="flex flex-1 items-center justify-end">
+                <button
+                    ref="rootEl"
+                    type="button"
+                    class="sr-only"
+                    :tabindex="moving ? 0 : -1"
+                    :aria-label="__('messages.keyboard_item_reorder_instructions')"
+                />
+                <Dropdown placement="left-start">
+                    <DropdownMenu>
+                        <DropdownItem
+                            v-if="canReorder"
+                            :text="__('Move')"
+                            icon="move-vertical"
+                            @click="startMovingFromMenu"
+                        />
+                        <DropdownItem v-if="canAddRows" :text="__('Duplicate Row')" icon="duplicate" @click="$emit('duplicate', index)" />
+                        <DropdownItem v-if="canDelete" :text="__('Delete Row')" icon="trash" variant="destructive" @click="$emit('removed', index)" />
+                    </DropdownMenu>
+                </Dropdown>
+                <div class="sr-only" aria-live="polite">{{ status }}</div>
+            </div>
+        </header>
+        <div class="px-4 py-3">
+            <FieldsProvider
+                :fields="fields"
+                :as-config="false"
+                :read-only
+                :field-path-prefix="`${fieldPathPrefix}.${index}`"
+                :meta-path-prefix="`${metaPathPrefix}.existing.${values._id}`"
+            >
+                <PublishFields />
+            </FieldsProvider>
         </div>
     </div>
-
 </template>
-
-<style scoped>
-    .draggable-mirror {
-        position: relative;
-        z-index: 1000;
-    }
-    .draggable-source--is-dragging {
-        opacity: 0.5;
-    }
-</style>
 
 <script>
 import Row from './Row.vue';
-import SetField from '../replicator/Field.vue';
-import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
+import { Dropdown, DropdownMenu, DropdownItem, PublishFields, PublishFieldsProvider as FieldsProvider } from '@ui';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
+import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 export default {
+    mixins: [Row],
 
-    mixins: [
-        Row,
-        ValidatesFieldConditions,
-    ],
+    components: { Dropdown, DropdownMenu, DropdownItem, PublishFields, FieldsProvider, KeyboardReorderIndicator },
 
-    components: { SetField },
-
-}
+    // Vue does not run setup() from mixins — declare it here so stacked mode works.
+    setup(props, { emit }) {
+        return useKeyboardItemReorder({
+            index: () => props.index,
+            total: () => props.totalRows,
+            onMove: (from, to) => emit('moved', from, to),
+        });
+    },
+};
 </script>

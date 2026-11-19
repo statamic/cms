@@ -5,11 +5,15 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Rules\AlphaDashSpace;
 
+use function Statamic\trans as __;
+
 class RenameAssetFolder extends Action
 {
+    protected $icon = 'folder-edit';
+
     public static function title()
     {
-        return __('Rename Folder');
+        return __('Rename');
     }
 
     public function visibleTo($item)

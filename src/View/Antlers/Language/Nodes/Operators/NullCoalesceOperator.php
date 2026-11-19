@@ -7,4 +7,5 @@ use Statamic\View\Antlers\Language\Nodes\OperatorNodeContract;
 
 class NullCoalesceOperator extends AbstractNode implements OperatorNodeContract
 {
+    public bool $strict = false;
 }

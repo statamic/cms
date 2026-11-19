@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Auth;
 
 use Illuminate\Events\NullDispatcher;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Statamic\Events\ImpersonationEnded;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\Controller;
@@ -41,6 +42,6 @@ class ImpersonationController extends Controller
             ImpersonationEnded::dispatch($originalUser, $impersonatedUser);
         }
 
-        return redirect()->route('statamic.cp.users.index');
+        return Inertia::location(route('statamic.cp.users.index'));
     }
 }

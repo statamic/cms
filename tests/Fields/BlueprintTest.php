@@ -20,6 +20,7 @@ use Statamic\Events\BlueprintDeleting;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Events\BlueprintSaving;
 use Statamic\Facades;
+use Statamic\Facades\Collection as StatamicCollection;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -30,6 +31,8 @@ use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
+    use \Tests\PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_gets_the_handle()
     {
@@ -414,6 +417,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
+
         $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
@@ -432,25 +446,26 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'One instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
-                                    'validate' => 'required|min:2',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => null,
                                     'required' => true,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'reserve_space_when_hidden' => false,
                                 ],
                             ],
                         ],
@@ -470,14 +485,15 @@ class BlueprintTest extends TestCase
                                     'instructions' => 'Two instructions',
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'textarea',
                                     'placeholder' => null,
-                                    'validate' => 'min:2',
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
+                                    'rows' => null,
                                     'default' => null,
                                     'antlers' => false,
                                     'component' => 'textarea',
@@ -485,6 +501,7 @@ class BlueprintTest extends TestCase
                                     'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'reserve_space_when_hidden' => false,
                                 ],
                             ],
                         ],
@@ -492,7 +509,9 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
-        ], $blueprint->toPublishArray());
+            'fqh' => 'test',
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]
@@ -541,6 +560,17 @@ class BlueprintTest extends TestCase
             ],
         ]);
 
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->actingAs($user);
+
+        $publishArray = $blueprint->toPublishArray();
+
+        $this->assertSame([
+            'fqh' => 'test',
+            'user_id' => $user->id(),
+        ], decrypt($publishArray['token']));
+        $publishArray['token'] = '__token__';
+
         $this->assertSame([
             'title' => 'Test',
             'handle' => 'test',
@@ -559,24 +589,26 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_',
                                     'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'reserve_space_when_hidden' => false,
                                 ],
                                 [
                                     'display' => 'Nested Deeper Two',
@@ -585,24 +617,26 @@ class BlueprintTest extends TestCase
                                     'instructions' => null,
                                     'instructions_position' => 'above',
                                     'listable' => 'hidden',
-                                    'sortable' => true,
                                     'visibility' => 'visible',
+                                    'sortable' => true,
                                     'replicator_preview' => true,
                                     'duplicate' => true,
+                                    'actions' => true,
                                     'type' => 'text',
                                     'input_type' => 'text',
-                                    'placeholder' => null,
-                                    'default' => null,
-                                    'character_limit' => 0,
+                                    'character_limit' => null,
                                     'autocomplete' => null,
+                                    'placeholder' => null,
                                     'prepend' => null,
                                     'append' => null,
+                                    'default' => null,
                                     'antlers' => false,
                                     'component' => 'text',
                                     'prefix' => 'nested_deeper_',
                                     'required' => false,
                                     'read_only' => false, // deprecated
                                     'always_save' => false,
+                                    'reserve_space_when_hidden' => false,
                                 ],
                             ],
                         ],
@@ -610,7 +644,9 @@ class BlueprintTest extends TestCase
                 ],
             ],
             'empty' => false,
-        ], $blueprint->toPublishArray());
+            'fqh' => 'test',
+            'token' => '__token__',
+        ], $publishArray);
     }
 
     #[Test]
@@ -752,12 +788,12 @@ class BlueprintTest extends TestCase
                     [
                         'fields' => [
                             ['handle' => 'existing_in_section_one', 'field' => ['type' => 'text']],
+                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
                         ],
                     ],
                     [
                         'fields' => [
                             ['handle' => 'existing_in_section_two', 'field' => ['type' => 'text']],
-                            ['handle' => 'new', 'field' => ['type' => 'textarea']],
                         ],
                     ],
                 ],
@@ -817,7 +853,7 @@ class BlueprintTest extends TestCase
             ->setHandle('blueprint_one');
 
         $entry = (new Entry)
-            ->collection('collection_one')
+            ->collection(tap(StatamicCollection::make('collection_one'))->save())
             ->blueprint($blueprint);
 
         $blueprint->setParent($entry);
@@ -830,6 +866,56 @@ class BlueprintTest extends TestCase
 
         $this->assertTrue($blueprint->hasField('field_two'));
 
+    }
+
+    #[Test]
+    public function it_keeps_the_fields_when_the_parent_changes_to_one_with_the_same_blueprint()
+    {
+        $finds = 0;
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_one')
+            ->andReturnUsing(function () use (&$finds) {
+                $finds++;
+
+                return new Field('field_one', ['type' => 'text']);
+            });
+
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one')
+            ->setContents(['fields' => [['handle' => 'one', 'field' => 'fieldset_one.field_one']]]);
+
+        $collection = tap(StatamicCollection::make('collection_one'))->save();
+        $entryA = (new Entry)->collection($collection)->blueprint('blueprint_one');
+        $entryB = (new Entry)->collection($collection)->blueprint('blueprint_one');
+
+        $this->assertSame($entryA, $blueprint->setParent($entryA)->field('one')->parent());
+        $findsForOneBuild = $finds;
+
+        foreach ([$entryB, $entryA, $entryB] as $entry) {
+            $this->assertSame($entry, $blueprint->setParent($entry)->field('one')->parent());
+        }
+
+        $this->assertSame($findsForOneBuild, $finds);
+    }
+
+    #[Test]
+    public function fields_keep_their_parent_when_the_blueprint_moves_to_another_parent()
+    {
+        $blueprint = (new Blueprint)
+            ->setNamespace('collections/collection_one')
+            ->setHandle('blueprint_one')
+            ->setContents(['fields' => [['handle' => 'one', 'field' => ['type' => 'text']]]]);
+
+        $collection = tap(StatamicCollection::make('collection_one'))->save();
+        $entryA = (new Entry)->collection($collection)->blueprint('blueprint_one');
+        $entryB = (new Entry)->collection($collection)->blueprint('blueprint_one');
+
+        $fieldA = $blueprint->setParent($entryA)->field('one');
+        $fieldB = $blueprint->setParent($entryB)->field('one');
+
+        $this->assertSame($entryA, $fieldA->parent());
+        $this->assertSame($entryB, $fieldB->parent());
     }
 
     #[Test]
@@ -869,6 +955,7 @@ class BlueprintTest extends TestCase
                     [
                         'fields' => [
                             ['handle' => 'the_field', 'field' => 'the_partial.the_field', 'config' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                            ['handle' => 'imported_field_without_config_key', 'field' => 'the_partial.the_field'],
                         ],
                     ],
                 ],
@@ -878,6 +965,7 @@ class BlueprintTest extends TestCase
         $fields = $blueprint
             ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
             ->ensureFieldHasConfig('the_field', ['visibility' => 'read_only'])
+            ->ensureFieldHasConfig('imported_field_without_config_key', ['visibility' => 'read_only'])
             ->fields();
 
         $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
@@ -891,9 +979,127 @@ class BlueprintTest extends TestCase
 
         $this->assertEquals($expectedConfig, $fields->get('author')->config());
         $this->assertEquals($expectedConfig, $fields->get('the_field')->config());
+        $this->assertEquals($expectedConfig, $fields->get('imported_field_without_config_key')->config());
     }
 
     // todo: duplicate or tweak above test but make the target field not in the first section.
+
+    #[Test]
+    public function it_ensures_a_field_within_an_imported_fieldset_has_config()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'author',
+                    'field' => ['type' => 'users', 'do_not_touch_other_config' => true],
+                ],
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+        $this->assertEquals(['type' => 'text'], $fields->get('the_field')->config());
+
+        $this->assertEquals([
+            'type' => 'users',
+            'do_not_touch_other_config' => true,
+            'visibility' => 'read_only',
+        ], $fields->get('author')->config());
+    }
+
+    #[Test]
+    public function it_ensures_a_prefixed_field_within_an_imported_fieldset_has_config()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'author',
+                    'field' => ['type' => 'users', 'do_not_touch_other_config' => true],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial', 'prefix' => 'prefixed_'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint
+            ->ensureFieldHasConfig('prefixed_author', ['visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals([
+            'type' => 'users',
+            'do_not_touch_other_config' => true,
+            'visibility' => 'read_only',
+        ], $fields->get('prefixed_author')->config());
+    }
+
+    #[Test]
+    public function it_can_ensure_an_deferred_ensured_field_has_specific_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'title', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        // Let's say somewhere else in the code ensures an `author` field
+        $blueprint->ensureField('author', ['type' => 'text', 'do_not_touch_other_config' => true, 'foo' => 'bar']);
+
+        // Then later, we try to ensure that `author` field has config, we should be able to successfully modify that deferred field
+        $fields = $blueprint
+            ->ensureFieldHasConfig('author', ['foo' => 'baz', 'visibility' => 'read_only'])
+            ->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'foo' => 'baz',
+            'visibility' => 'read_only',
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
+    }
 
     #[Test]
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
@@ -1039,6 +1245,55 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_merges_configs_in_correct_priority_order_when_ensuring_a_referenced_field_with_overrides()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text', 'display' => 'The Field'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $blueprint->ensureField('from_partial', ['validate' => 'max:200', 'required' => true]);
+
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['visibility' => 'read_only', 'validate' => 'max:543', 'required' => true]],
+                        ],
+                    ],
+                ],
+            ],
+        ]], $blueprint->contents());
+
+        $fieldConfig = $blueprint->fields()->get('from_partial')->config();
+
+        $this->assertEquals(true, $fieldConfig['required']);
+
+        $this->assertEquals('text', $fieldConfig['type']);
+        $this->assertEquals('The Field', $fieldConfig['display']);
+
+        $this->assertEquals('max:543', $fieldConfig['validate']);
+        $this->assertEquals('read_only', $fieldConfig['visibility']);
+    }
+
+    #[Test]
     public function it_merges_undefined_config_overrides_when_ensuring_a_field_that_already_exists_inside_an_imported_fieldset()
     {
         FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
@@ -1069,6 +1324,63 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['tabs' => [
             'tab_one' => [
                 'sections' => [
+                    [
+                        'fields' => [
+                            [
+                                'import' => 'the_partial',
+                                'config' => [
+                                    'one' => ['foo' => 'bar'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('one')->config());
+    }
+
+    #[Test]
+    public function it_merges_config_overrides_when_ensuring_a_field_inside_an_imported_fieldset_in_a_later_section()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                    [
+                        'fields' => [
+                            ['import' => 'the_partial'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('one', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertEquals(['tabs' => [
+            'tab_one' => [
+                'sections' => [
+                    [
+                        'fields' => [
+                            ['handle' => 'existing', 'field' => ['type' => 'text']],
+                        ],
+                    ],
                     [
                         'fields' => [
                             [
@@ -1272,6 +1584,39 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_leaves_fields_within_an_imported_fieldset_alone_when_removing_a_field()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                ['handle' => 'two', 'field' => ['type' => 'text']],
+                ['handle' => 'three', 'field' => ['type' => 'text']],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'tabs' => [
+                'tab_one' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'one', 'field' => ['type' => 'text']],
+                                ['import' => 'the_partial'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $blueprint->removeField('one')->removeField('two');
+
+        $this->assertFalse($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
+    }
+
+    #[Test]
     public function it_removes_a_specific_tab()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
@@ -1393,6 +1738,45 @@ class BlueprintTest extends TestCase
         $this->expectExceptionMessage('Duplicate field [one] on blueprint [test].');
 
         $blueprint->fields();
+    }
+
+    #[Test]
+    public function it_does_not_throw_for_duplicate_handles_between_imported_fieldsets()
+    {
+        $emailLink = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+                ['handle' => 'address', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $phoneLink = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+                ['handle' => 'number', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')->with('email_link')->andReturn($emailLink);
+        Facades\Fieldset::shouldReceive('find')->with('phone_link')->andReturn($phoneLink);
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['import' => 'email_link'],
+                                ['import' => 'phone_link'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['label', 'address', 'number'], $blueprint->fields()->all()->keys()->all());
     }
 
     #[Test]

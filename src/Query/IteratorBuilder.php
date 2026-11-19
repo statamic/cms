@@ -2,23 +2,38 @@
 
 namespace Statamic\Query;
 
+use Statamic\Support\Arr;
+
 abstract class IteratorBuilder extends Builder
 {
     protected $randomize = false;
+    private $itemsBeingPaginated;
 
     public function count()
     {
         return $this->getFilteredAndLimitedItems()->count();
     }
 
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    {
+        // The total and the page are both taken from the same items, so they only need working out once.
+        $this->itemsBeingPaginated = $this->getFilteredItems();
+
+        try {
+            return parent::paginate($perPage, $columns, $pageName, $page);
+        } finally {
+            $this->itemsBeingPaginated = null;
+        }
+    }
+
     protected function getCountForPagination()
     {
-        return $this->getFilteredItems()->count();
+        return ($this->itemsBeingPaginated ?? $this->getFilteredItems())->count();
     }
 
     public function get($columns = ['*'])
     {
-        $items = $this->getFilteredItems();
+        $items = $this->itemsBeingPaginated ?? $this->getFilteredItems();
 
         if ($this->randomize) {
             $items = $items->shuffle();
@@ -106,27 +121,43 @@ abstract class IteratorBuilder extends Builder
 
     private function intersectItems($entries, $filteredEntries)
     {
-        return $entries->filter(function ($entry) use ($filteredEntries) {
-            return $filteredEntries->contains($entry);
-        });
+        if ($filteredEntries->contains(fn ($entry) => ! is_object($entry))) {
+            return $entries->filter(fn ($entry) => $filteredEntries->contains($entry));
+        }
+
+        // Both are taken from the same items, so an object can be looked up rather than compared with each of the others.
+        $filtered = $filteredEntries->mapWithKeys(fn ($entry) => [spl_object_id($entry) => true])->all();
+
+        return $entries->filter(fn ($entry) => is_object($entry)
+            ? isset($filtered[spl_object_id($entry)])
+            : $filteredEntries->contains($entry));
     }
 
     protected function filterWhereIn($entries, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
+        $values = array_map($this->normalizeWhereInValue(...), $where['values']);
+
+        return $entries->filter(function ($entry) use ($where, $values) {
             $value = $this->getFilterItemValue($entry, $where['column']);
 
-            return in_array($value, $where['values']);
+            return in_array($this->normalizeWhereInValue($value), $values);
         });
     }
 
     protected function filterWhereNotIn($entries, $where)
     {
-        return $entries->filter(function ($entry) use ($where) {
+        $values = array_map($this->normalizeWhereInValue(...), $where['values']);
+
+        return $entries->filter(function ($entry) use ($where, $values) {
             $value = $this->getFilterItemValue($entry, $where['column']);
 
-            return ! in_array($value, $where['values']);
+            return ! in_array($this->normalizeWhereInValue($value), $values);
         });
+    }
+
+    private function normalizeWhereInValue($value)
+    {
+        return is_string($value) ? strtolower($value) : $value;
     }
 
     protected function filterWhereBasic($entries, $where)
@@ -180,7 +211,7 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -193,7 +224,7 @@ abstract class IteratorBuilder extends Builder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 
@@ -212,6 +243,40 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereJsonOverlaps($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value) || is_null($where['values'])) {
+                return false;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value === $where['values'];
+            }
+
+            return ! empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntOverlap($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+
+            if (is_null($value) || is_null($where['values'])) {
+                return true;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value !== $where['values'];
+            }
+
+            return empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
     protected function filterWhereDate($entries, $where)
     {
         $method = $this->operatorToCarbonMethod($where['operator']);
@@ -223,7 +288,9 @@ abstract class IteratorBuilder extends Builder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -282,6 +349,8 @@ abstract class IteratorBuilder extends Builder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 

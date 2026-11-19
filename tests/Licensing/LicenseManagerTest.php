@@ -153,6 +153,15 @@ class LicenseManagerTest extends TestCase
     {
         Carbon::setTestNow(now()->startOfMinute());
 
+        $this->assertFalse($this->managerWithResponse(['statamic' => ['valid' => true]])->requestFailed());
+
+        tap($this->managerWithResponse(['error' => 0]), function ($licenses) {
+            $this->assertTrue($licenses->requestFailed());
+            $this->assertEquals(0, $licenses->requestErrorCode());
+            $this->assertFalse($licenses->outpostIsOffline());
+            $this->assertNull($licenses->licensingAlert());
+        });
+
         tap($this->managerWithResponse(['error' => 500]), function ($licenses) {
             $this->assertTrue($licenses->requestFailed());
             $this->assertEquals(500, $licenses->requestErrorCode());
@@ -191,8 +200,7 @@ class LicenseManagerTest extends TestCase
     {
         $outpost = $this->mock(Outpost::class);
 
-        $this->addToAssertionCount(-1); // Dont want to assert this
-        $outpost->shouldReceive('response')->zeroOrMoreTimes()->andReturn($response);
+        $outpost->shouldReceive('response')->andReturn($response);
 
         return new LicenseManager($outpost);
     }

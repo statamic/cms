@@ -10,26 +10,25 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
+use Statamic\Console\Commands\Concerns\NormalizesPaginationHeader;
 use Statamic\Console\EnhancesCommands;
 use Statamic\Console\RunsInPlease;
 use Statamic\Entries\Collection as EntriesCollection;
-use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Http\Controllers\FrontendController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\StaticCaching\RecacheToken;
+use Statamic\StaticCaching\WarmableUrls;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\Hookable;
-use Statamic\Taxonomies\LocalizedTerm;
-use Statamic\Taxonomies\Taxonomy;
 
 class StaticWarm extends Command
 {
     use EnhancesCommands;
     use Hookable;
+    use NormalizesPaginationHeader;
     use RunsInPlease;
 
     protected $signature = 'statamic:static:warm
@@ -42,6 +41,7 @@ class StaticWarm extends Command
         {--include= : Only warm specific URLs}
         {--exclude= : Exclude specific URLs}
         {--max-requests= : Maximum number of requests to warm}
+        {--header=* : Set custom header (e.g. "Authorization: Bearer your_token")}
     ';
 
     protected $description = 'Warms the static cache by visiting all URLs';
@@ -50,6 +50,8 @@ class StaticWarm extends Command
     protected $queueConnection;
 
     private $uris;
+
+    private $paginated = [];
 
     public function handle()
     {
@@ -82,8 +84,6 @@ class StaticWarm extends Command
 
     private function warm(): void
     {
-        $client = new Client($this->clientConfig());
-
         $this->output->newLine();
         $this->line('Compiling URLs...');
 
@@ -97,7 +97,7 @@ class StaticWarm extends Command
 
             $jobClass = $this->option('uncached')
                 ? StaticWarmUncachedJob::class
-                : StaticWarmJob::class;
+                : (config('statamic.static_caching.warm_job') ?? StaticWarmJob::class);
 
             foreach ($requests as $request) {
                 $jobClass::dispatch($request, $this->clientConfig())
@@ -107,7 +107,7 @@ class StaticWarm extends Command
         } else {
             $this->line('Visiting '.count($requests).' URLs...');
 
-            $pool = new Pool($client, $requests, [
+            $pool = new Pool($this->client(), $requests, [
                 'concurrency' => $this->concurrency(),
                 'fulfilled' => [$this, 'outputSuccessLine'],
                 'rejected' => [$this, 'outputFailureLine'],
@@ -116,7 +116,40 @@ class StaticWarm extends Command
             $promise = $pool->promise();
 
             $promise->wait();
+
+            $this->warmPaginatedPages();
         }
+    }
+
+    /**
+     * Paginated pages are only known about once their first page has responded. They're
+     * warmed together afterwards, so the pool of other URLs is never left waiting on them.
+     */
+    private function warmPaginatedPages(): void
+    {
+        $urls = $this->paginatedUrls();
+
+        if ($urls->isEmpty()) {
+            return;
+        }
+
+        $headers = $this->parseHeaders($this->option('header'));
+
+        $requests = $urls->map(fn (string $url) => new Request('GET', $url, $headers))->all();
+
+        $pool = new Pool($this->client(), $requests, [
+            'concurrency' => $this->concurrency(),
+            'fulfilled' => function (Response $response, $index) use ($urls) {
+                $this->components->twoColumnDetail($this->getRelativeUri($urls->get($index)), '<info>✓ Cached</info>');
+            },
+            'rejected' => function ($exception, $index) use ($urls) {
+                $this->outputFailureLineFor($urls->get($index), $exception);
+            },
+        ]);
+
+        $promise = $pool->promise();
+
+        $promise->wait();
     }
 
     private function concurrency(): int
@@ -124,6 +157,11 @@ class StaticWarm extends Command
         $strategy = config('statamic.static_caching.strategy');
 
         return config("statamic.static_caching.strategies.$strategy.warm_concurrency", 25);
+    }
+
+    private function client(): Client
+    {
+        return app(Client::class, ['config' => $this->clientConfig()]);
     }
 
     private function clientConfig(): array
@@ -138,12 +176,56 @@ class StaticWarm extends Command
 
     public function outputSuccessLine(Response $response, $index): void
     {
-        $this->components->twoColumnDetail($this->getRelativeUri($index), '<info>✓ Cached</info>');
+        $url = $this->uris()->get($index);
+
+        $this->components->twoColumnDetail($this->getRelativeUri($url), '<info>✓ Cached</info>');
+
+        if ($this->shouldWarmPaginatedPages($response, $url)) {
+            $this->paginated[] = [$url, ...$this->paginationHeader($response)];
+        }
+    }
+
+    private function shouldWarmPaginatedPages(Response $response, string $url): bool
+    {
+        if (! $response->hasHeader('X-Statamic-Pagination')) {
+            return false;
+        }
+
+        [$currentPage, $totalPages, $pageName] = $this->paginationHeader($response);
+
+        return ! str_contains(parse_url($url, PHP_URL_QUERY) ?? '', "{$pageName}=");
+    }
+
+    private function paginatedUrls(): Collection
+    {
+        $cacher = app(StaticCacher::class);
+
+        return collect($this->paginated)->flatMap(function ($paginated) use ($cacher) {
+            [$url, $currentPage, $totalPages, $pageName] = $paginated;
+
+            $cachedAs = $cacher->getUrl(HttpRequest::create($url));
+
+            return collect(range($currentPage, $totalPages))
+                ->map(fn ($page) => $url.(str_contains($url, '?') ? '&' : '?')."{$pageName}={$page}")
+                // When query strings are ignored, a page is cached under the same URL
+                // as the one that has just been warmed, so there's nothing left to warm.
+                ->reject(fn ($pageUrl) => $cacher->getUrl(HttpRequest::create($pageUrl)) === $cachedAs)
+                ->map(function ($pageUrl) {
+                    return config('statamic.static_caching.background_recache', false)
+                        ? RecacheToken::addToUrl($pageUrl)
+                        : $pageUrl;
+                });
+        })->values();
     }
 
     public function outputFailureLine($exception, $index): void
     {
-        $uri = $this->getRelativeUri($index);
+        $this->outputFailureLineFor($this->uris()->get($index), $exception);
+    }
+
+    private function outputFailureLineFor(string $url, $exception): void
+    {
+        $uri = $this->getRelativeUri($url);
 
         if ($exception instanceof RequestException && $exception->hasResponse()) {
             $response = $exception->getResponse();
@@ -160,15 +242,25 @@ class StaticWarm extends Command
         $this->components->twoColumnDetail($uri, "<fg=cyan>$message</fg=cyan>");
     }
 
-    private function getRelativeUri(int $index): string
+    private function getRelativeUri(string $uri): string
     {
-        return Str::start(Str::after($this->uris()->get($index), config('app.url')), '/');
+        return Str::start(Str::after($uri, config('app.url')), '/');
     }
 
     private function requests()
     {
-        return $this->uris()->map(function ($uri) {
-            return new Request('GET', $uri);
+        $headers = $this->parseHeaders($this->option('header'));
+
+        return $this->uris()->map(function ($uri) use ($headers) {
+            if (config('statamic.static_caching.background_recache', false)) {
+                if (substr_count($uri, '/') == 2) {
+                    $uri .= '/';
+                }
+
+                $uri = RecacheToken::addToUrl($uri);
+            }
+
+            return new Request('GET', $uri, $headers);
         })->all();
     }
 
@@ -230,13 +322,9 @@ class StaticWarm extends Command
     {
         $uri = URL::makeRelative($uri);
 
-        if (Str::endsWith($pattern, '*')) {
-            $prefix = Str::removeRight($pattern, '*');
-
-            if (Str::startsWith($uri, $prefix) && ! (Str::endsWith($prefix, '/') && $uri === $prefix)) {
-                return true;
-            }
-        } elseif (Str::removeRight($uri, '/') === Str::removeRight($pattern, '/')) {
+        if (Str::endsWith($pattern, '*') && Str::startsWith($uri, Str::removeRight($pattern, '*'))) {
+            return true;
+        } elseif (URL::tidy($uri, '/') === URL::tidy($pattern, '/')) {
             return true;
         }
 
@@ -254,7 +342,7 @@ class StaticWarm extends Command
 
     private function shouldVerifySsl(): bool
     {
-        if ($this->option('insecure')) {
+        if ($this->option('insecure') || config('statamic.static_caching.warm_insecure')) {
             return false;
         }
 
@@ -265,20 +353,7 @@ class StaticWarm extends Command
     {
         $this->line('[ ] Entries...');
 
-        // "Warm" the structure trees
-        Facades\Collection::whereStructured()->each(fn ($collection) => $collection->structure()->trees()->each->tree());
-
-        $entries = Facades\Entry::all()->map(function (Entry $entry) {
-            if (! $entry->published() || $entry->private()) {
-                return null;
-            }
-
-            if ($entry->isRedirect()) {
-                return null;
-            }
-
-            return $entry->absoluteUrl();
-        })->filter();
+        $entries = app(WarmableUrls::class)->entries();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Entries");
 
@@ -289,19 +364,7 @@ class StaticWarm extends Command
     {
         $this->line('[ ] Taxonomies...');
 
-        $taxonomyUris = Facades\Taxonomy::all()
-            ->filter(function ($taxonomy) {
-                return view()->exists($taxonomy->template());
-            })
-            ->flatMap(function (Taxonomy $taxonomy) {
-                return $taxonomy->sites()->map(function ($site) use ($taxonomy) {
-                    // Needed because Taxonomy uses the current site. If the Taxonomy
-                    // class ever gets its own localization logic we can remove this.
-                    Site::setCurrent($site);
-
-                    return $taxonomy->absoluteUrl();
-                });
-            });
+        $taxonomyUris = app(WarmableUrls::class)->taxonomies();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomies");
 
@@ -312,16 +375,7 @@ class StaticWarm extends Command
     {
         $this->line('[ ] Taxonomy terms...');
 
-        $terms = Facades\Term::all()
-            ->merge($this->scopedTerms())
-            ->filter(function ($term) {
-                return view()->exists($term->template());
-            })
-            ->flatMap(function (LocalizedTerm $term) {
-                return $term->taxonomy()->sites()->map(function ($site) use ($term) {
-                    return $term->in($site)->absoluteUrl();
-                });
-            });
+        $terms = app(WarmableUrls::class)->terms($this->scopedTerms());
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Taxonomy terms");
 
@@ -338,26 +392,14 @@ class StaticWarm extends Command
 
     protected function getCollectionTerms($collection)
     {
-        return $collection->taxonomies()
-            ->flatMap(function (Taxonomy $taxonomy) {
-                return $taxonomy->queryTerms()->get();
-            })
-            ->map->collection($collection);
+        return app(WarmableUrls::class)->collectionTerms($collection);
     }
 
     protected function customRouteUris(): Collection
     {
         $this->line('[ ] Custom routes...');
 
-        $action = FrontendController::class.'@route';
-
-        $routes = collect(app('router')->getRoutes()->getRoutes())
-            ->filter(function (Route $route) use ($action) {
-                return $route->getActionName() === $action && ! Str::contains($route->uri(), '{');
-            })
-            ->map(function (Route $route) {
-                return URL::tidy(Str::start($route->uri(), config('app.url').'/'));
-            });
+        $routes = app(WarmableUrls::class)->customRoutes();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Custom routes");
 
@@ -368,10 +410,36 @@ class StaticWarm extends Command
     {
         $this->line('[ ] Additional...');
 
-        $uris = $this->runHooks('additional', collect());
+        $uris = $this->additionalUrls();
 
         $this->line("\x1B[1A\x1B[2K<info>[✔]</info> Additional");
 
-        return $uris->map(fn ($uri) => URL::makeAbsolute($uri));
+        return $uris;
+    }
+
+    public function additionalUrls(): Collection
+    {
+        return $this->runHooks('additional', collect())->map(fn ($uri) => URL::makeAbsolute($uri));
+    }
+
+    private function parseHeaders($headerOptions): array
+    {
+        $headers = [];
+        if (empty($headerOptions)) {
+            return $headers;
+        }
+        if (! is_array($headerOptions)) {
+            $headerOptions = [$headerOptions];
+        }
+        foreach ($headerOptions as $header) {
+            if (strpos($header, ':') !== false) {
+                [$key, $value] = explode(':', $header, 2);
+                $headers[trim($key)] = trim($value);
+            } else {
+                $this->line("<fg=yellow;options=bold>Warning:</> Invalid header format: '$header'. Headers should be in 'Key: Value' format.");
+            }
+        }
+
+        return $headers;
     }
 }

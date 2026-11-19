@@ -3,14 +3,20 @@
 namespace Tests\Tags;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Parse;
+use Statamic\Support\Str;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlideTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     #[DefineEnvironment('relativeRouteUrl')]
     public function it_outputs_a_relative_url_by_default_when_the_glide_route_is_relative()
@@ -50,9 +56,52 @@ class GlideTest extends TestCase
      */
     public function it_outputs_an_absolute_url_when_the_url_does_not_have_a_valid_extension()
     {
-        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}');
+        $parse = (string) Parse::template('{{ glide src="https://statamic.com/foo" }}', trusted: true);
 
         $this->assertSame('https://statamic.com/foo', $parse);
+    }
+
+    #[Test]
+    public function it_doesnt_error_when_a_url_cannot_be_resolved_to_an_asset()
+    {
+        $tag = '{{ glide src="http://external.com/bar (1).jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" fit="crop_focal" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('relativeRouteUrl')]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved_and_images_are_served_directly()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function it_doesnt_error_when_a_url_cannot_be_resolved_to_an_asset_and_hybrid_caching_is_enabled()
+    {
+        $tag = '{{ glide src="http://external.com/bar (1).jpg" width="100" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('hybridCaching')]
+    public function it_doesnt_error_when_an_asset_id_cannot_be_resolved_and_hybrid_caching_is_enabled()
+    {
+        $tag = '{{ glide src="test::bar.jpg" width="100" fit="crop_focal" }}{{ url }}{{ /glide }}';
+
+        $this->assertSame('', (string) Parse::template($tag, trusted: true));
     }
 
     #[Test]
@@ -64,7 +113,36 @@ class GlideTest extends TestCase
 {{ glide:data_url :src="foo" }}
 EOT;
 
-        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg']));
+        $this->assertStringStartsWith('data:image/jpeg;base64', (string) Parse::template($tag, ['foo' => 'bar.jpg'], trusted: true));
+    }
+
+    #[Test]
+    #[DefineEnvironment('absoluteHttpRouteUrlWithoutCache')]
+    /**
+     * https://github.com/statamic/cms/pull/11839
+     */
+    public function it_treats_assets_urls_starting_with_the_app_url_as_internal_assets()
+    {
+        $this->createImageInPublicDirectory();
+
+        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'http://localhost/glide/bar.jpg'], trusted: true);
+
+        $this->assertStringStartsWith('/img/glide/bar.jpg', $result);
+    }
+
+    #[Test]
+    /**
+     * https://github.com/statamic/cms/issues/13388
+     */
+    public function it_treats_absolute_asset_container_urls_as_internal_assets()
+    {
+        Storage::fake('s3', ['url' => 'https://bucket.s3.amazonaws.com/prefix/images']);
+        Storage::disk('s3')->put('bar.jpg', UploadedFile::fake()->image('bar.jpg')->getContent());
+        AssetContainer::make('images')->disk('s3')->save();
+
+        $result = (string) Parse::template('{{ glide:foo width="100" }}', ['foo' => 'https://bucket.s3.amazonaws.com/prefix/images/bar.jpg'], trusted: true);
+
+        $this->assertStringStartsWith('/img/asset/'.Str::toBase64Url('images/bar.jpg').'/bar.jpg', $result);
     }
 
     public function relativeRouteUrl($app)
@@ -77,12 +155,23 @@ EOT;
         $this->configureGlideCacheDiskWithUrl($app, 'http://localhost/glide');
     }
 
+    public function absoluteHttpRouteUrlWithoutCache($app)
+    {
+        $this->configureGlideCacheDiskWithUrl($app, 'http://localhost/glide', false);
+    }
+
     public function absoluteHttpsRouteUrl($app)
     {
         $this->configureGlideCacheDiskWithUrl($app, 'https://localhost/glide');
     }
 
-    private function configureGlideCacheDiskWithUrl($app, $url)
+    public function hybridCaching($app)
+    {
+        $app['config']->set('statamic.assets.image_manipulation.cache', 'hybrid');
+        $app['config']->set('statamic.assets.image_manipulation.cache_path', public_path('img'));
+    }
+
+    private function configureGlideCacheDiskWithUrl($app, $url, $cache = 'glide')
     {
         $app['config']->set('filesystems.disks.glide', [
             'driver' => 'local',
@@ -90,7 +179,7 @@ EOT;
             'url' => $url,
             'visibility' => 'public',
         ]);
-        $app['config']->set('statamic.assets.image_manipulation.cache', 'glide');
+        $app['config']->set('statamic.assets.image_manipulation.cache', $cache);
     }
 
     private function createImageInPublicDirectory()
@@ -113,6 +202,6 @@ EOT;
 {{ glide:foo width="100" $absoluteParam }}
 EOT;
 
-        return (string) Parse::template($tag, ['foo' => 'bar.jpg']);
+        return (string) Parse::template($tag, ['foo' => 'bar.jpg'], trusted: true);
     }
 }

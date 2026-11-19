@@ -1,0 +1,163 @@
+<script setup>
+import { cva } from 'cva';
+import { computed, provide, useId } from 'vue';
+import Description from './Description.vue';
+import Label from './Label.vue';
+import ErrorMessage from './ErrorMessage.vue';
+import markdown from '@/util/markdown.js';
+import { twMerge } from 'tailwind-merge';
+import { UI_FIELD_ID_KEY } from '@/composables/ui-field-id.js';
+
+defineOptions({
+    inheritAttrs: false,
+});
+
+const props = defineProps({
+    /** When `true`, the field is styled as a configuration field with a two-column grid layout. */
+    inline: { type: Boolean, default: false },
+    /** Badge text to display next to the label. */
+    badge: { type: String, default: '' },
+    /** The reading direction of the field's label, instructions, and errors. */
+    dir: { type: String, default: null },
+    disabled: { type: Boolean, default: false },
+    /** Error message to display below the field. */
+    error: { type: String },
+    /** Object or array of error messages to display below the field. */
+    errors: { type: Object },
+    /** When `true`, forces the field to use full width even when `asConfig` is enabled. */
+    fullWidthSetting: { type: Boolean, default: false },
+    /** ID shared by the label and control. Defaults to a generated id. */
+    id: { type: String, default: null },
+    /** Instructions text to display above or below the label. Supports Markdown. */
+    instructions: { type: String, default: '' },
+    /** When `true`, displays instructions below the control instead of below the label. */
+    instructionsBelow: { type: Boolean, default: false },
+    /** Label text for the field. */
+    label: { type: String },
+    readOnly: { type: Boolean, default: false },
+    required: { type: Boolean, default: false },
+});
+
+const generatedId = useId();
+const hasExplicitId = computed(() => props.id != null && props.id !== '');
+const fieldId = computed(() => (hasExplicitId.value ? props.id : generatedId));
+const labelId = computed(() => `${fieldId.value}-label`);
+const descriptionId = computed(() => `${fieldId.value}-description`);
+
+const instructions = computed(() => props.instructions ? markdown(__(props.instructions), { openLinksInNewTabs: true }) : null);
+
+const errorList = computed(() => {
+    if (props.error) {
+        return [props.error];
+    }
+
+    if (!props.errors) {
+        return [];
+    }
+
+    return Array.isArray(props.errors) ? props.errors : Object.values(props.errors);
+});
+
+const hasErrors = computed(() => errorList.value.length > 0);
+
+// Keep the first error id stable as `${fieldId}-error` for the common single-error case.
+const errorIds = computed(() =>
+    errorList.value.map((_, i) => (i === 0 ? `${fieldId.value}-error` : `${fieldId.value}-error-${i}`)),
+);
+
+const describedBy = computed(() => {
+    const ids = [];
+
+    if (instructions.value) {
+        ids.push(descriptionId.value);
+    }
+
+    ids.push(...errorIds.value);
+
+    return ids.length ? ids.join(' ') : null;
+});
+
+// Auto-generated ids may be claimed by the first nested control. Explicit ids (Publish)
+// stay on the fieldtype via its own `id` prop. describedBy/invalid are always available.
+provide(UI_FIELD_ID_KEY, {
+    id: fieldId,
+    labelId,
+    claimable: !hasExplicitId.value,
+    describedBy,
+    invalid: hasErrors,
+    claimed: false,
+});
+
+const labelProps = computed(() => ({
+    badge: props.badge,
+    for: fieldId.value,
+    id: labelId.value,
+    required: props.required,
+    text: props.label,
+}));
+
+const rootClasses = computed(() =>
+    twMerge(cva({
+        base: [
+            'min-w-0',
+        ],
+        variants: {
+            disabled: {
+                true: 'opacity-50',
+            },
+            inline: {
+                true: 'grid md:grid-cols-2 items-start px-4.5 py-4 gap-y-3 md:gap-y-0 md:gap-x-5!',
+                false: 'flex flex-col gap-2',
+            },
+            fullWidthSetting: {
+                true: 'md:grid-cols-1 md:gap-y-3',
+            },
+        },
+    })({
+        ...props,
+    })),
+);
+</script>
+
+<template>
+    <div :class="[rootClasses, $attrs.class]" :dir="dir" :inert="$attrs.inert" data-ui-input-group :data-ui-field-has-errors="hasErrors ? '' : null" :data-ui-field-read-only="readOnly ? '' : null">
+        <div
+            v-if="label || $slots.label || $slots.actions || (instructions && !instructionsBelow)"
+            class="flex flex-col gap-1.5"
+            data-ui-field-header
+        >
+            <div
+                v-if="$slots.actions"
+                class="flex items-center gap-x-1"
+                :class="label || $slots.label ? 'justify-between' : 'justify-end'"
+            >
+                <slot name="label">
+                    <Label v-if="label" v-bind="labelProps" class="flex-1" />
+                </slot>
+                <slot name="actions" />
+            </div>
+            <slot v-else name="label">
+                <Label v-if="label" v-bind="labelProps" />
+            </slot>
+            <Description
+                v-if="instructions && !instructionsBelow"
+                :id="descriptionId"
+                :text="instructions"
+            />
+        </div>
+        <slot :id="fieldId" />
+        <div v-if="(instructions && instructionsBelow) || hasErrors" class="flex flex-col gap-2">
+            <Description
+                v-if="instructions && instructionsBelow"
+                :id="descriptionId"
+                :text="instructions"
+            />
+            <ErrorMessage
+                v-for="(error, i) in errorList"
+                :id="errorIds[i]"
+                :key="i"
+                :text="error"
+            />
+        </div>
+    </div>
+</template>

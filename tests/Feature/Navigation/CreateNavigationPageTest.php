@@ -31,23 +31,24 @@ class CreateNavigationPageTest extends TestCase
 
     private function mockTextFieldtype()
     {
-        FieldtypeRepository::shouldReceive('find')->with('text')
-            ->andReturn(new class extends Fieldtype
+        $ft = new class extends Fieldtype
+        {
+            public function preProcess($value)
             {
-                public function preProcess($value)
-                {
-                    if (! $value) {
-                        return;
-                    }
-
-                    return $value.' (preprocessed)';
+                if (! $value) {
+                    return;
                 }
 
-                public function preload()
-                {
-                    return ['hello' => 'world'];
-                }
-            });
+                return $value.' (preprocessed)';
+            }
+
+            public function preload()
+            {
+                return ['hello' => 'world'];
+            }
+        };
+        FieldtypeRepository::shouldReceive('find')->with('text')->andReturn($ft);
+        FieldtypeRepository::shouldReceive('find')->with('slug')->andReturn($ft);
     }
 
     #[Test]
@@ -79,7 +80,6 @@ class CreateNavigationPageTest extends TestCase
                 'originValues' => null,
                 'originMeta' => null,
                 'localizedFields' => [],
-                'syncableFields' => [],
             ]);
     }
 
@@ -96,13 +96,14 @@ class CreateNavigationPageTest extends TestCase
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
-            'qux' => ['type' => 'text'],
+            'qux' => ['type' => 'text'], // Not in nav
         ]);
 
         $navBlueprint = Blueprint::makeFromFields([
             'foo' => ['type' => 'text'],
             'bar' => ['type' => 'text'],
             'baz' => ['type' => 'text'],
+            'alfa' => ['type' => 'text'], // Not in entry
         ]);
 
         BlueprintRepository::partialMock();
@@ -139,23 +140,115 @@ class CreateNavigationPageTest extends TestCase
                 ],
                 'originValues' => [
                     'title' => 'entry title (preprocessed)',
-                    'foo' => 'entry foo (preprocessed)',
-                    'bar' => 'entry bar (preprocessed)',
-                    'baz' => null,
                 ],
                 'originMeta' => [
                     'title' => ['hello' => 'world'],
-                    'url' => ['hello' => 'world'],
-                    'foo' => ['hello' => 'world'],
-                    'bar' => ['hello' => 'world'],
-                    'baz' => ['hello' => 'world'],
                 ],
                 'localizedFields' => [],
-                'syncableFields' => [
-                    'title',
-                    'foo',
-                    'bar',
-                    'baz',
+            ]);
+    }
+
+    #[Test]
+    public function it_denies_access_without_permission_to_view_the_nav()
+    {
+        $this->mockTextFieldtype();
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [])->save();
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'text']]);
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($blueprint);
+
+        $this
+            ->actingAs($user)
+            ->request($nav)
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_denies_access_to_an_entry_the_user_cannot_view()
+    {
+        $this->mockTextFieldtype();
+        $this->setTestRoles(['test' => ['access cp', 'view test nav']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [])->save();
+
+        $entryBlueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text'],
+        ]);
+
+        $navBlueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text'],
+        ]);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($navBlueprint);
+        BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect(['articles' => $entryBlueprint]));
+
+        tap(Collection::make('articles'))->save();
+
+        EntryFactory::id('123')
+            ->collection('articles')
+            ->data([
+                'title' => 'entry title',
+                'foo' => 'entry foo',
+                'bar' => 'entry bar',
+            ])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->request($nav, ['entry' => '123'])
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_allows_access_to_an_entry_the_user_can_view()
+    {
+        $this->mockTextFieldtype();
+        $this->setTestRoles(['test' => ['access cp', 'view test nav', 'view articles entries']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [])->save();
+
+        $entryBlueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text'],
+        ]);
+
+        $navBlueprint = Blueprint::makeFromFields([
+            'foo' => ['type' => 'text'],
+            'bar' => ['type' => 'text'],
+        ]);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn($navBlueprint);
+        BlueprintRepository::shouldReceive('in')->with('collections/articles')->andReturn(collect(['articles' => $entryBlueprint]));
+
+        tap(Collection::make('articles'))->save();
+
+        EntryFactory::id('123')
+            ->collection('articles')
+            ->data([
+                'title' => 'entry title',
+                'foo' => 'entry foo',
+                'bar' => 'entry bar',
+            ])
+            ->create();
+
+        $this
+            ->actingAs($user)
+            ->request($nav, ['entry' => '123'])
+            ->assertOk()
+            ->assertJson([
+                'originValues' => [
+                    'title' => 'entry title (preprocessed)',
+                    'foo' => 'entry foo (preprocessed)',
+                    'bar' => 'entry bar (preprocessed)',
                 ],
             ]);
     }

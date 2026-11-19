@@ -1,0 +1,71 @@
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Field, Input, Label} from '@statamic/cms/ui';
+
+const meta = {
+    title: 'Forms/Label',
+    component: Label,
+    argTypes: {},
+} satisfies Meta<typeof Label>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const _DocsIntro: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Label },
+        template: `
+            <Label text="Email Address" />
+        `,
+    }),
+};
+
+export const _Required: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Label },
+        template: `
+            <Label text="Email Address" required />
+        `,
+    }),
+};
+
+export const _WithBadge: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Label },
+        template: `
+            <div class="space-y-3">
+                <Label text="API Key" badge="Pro" />
+                <Label text="Theme Color" badge="New" />
+                <Label text="Advanced Settings" badge="Beta" />
+            </div>
+        `,
+    }),
+};
+
+export const _WithInput: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Label, Input, Field },
+        template: `
+            <Field>
+                <Label for="email" text="Email Address" required />
+                <Input id="email" type="email" placeholder="you@example.com" />
+            </Field>
+        `,
+    }),
+};
+
+export const _WithSlot: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Label },
+        template: `
+            <Label>
+                <strong>Email Address</strong>
+                <span class="text-gray-500 ml-1 text-sm">(optional)</span>
+            </Label>
+        `,
+    }),
+};

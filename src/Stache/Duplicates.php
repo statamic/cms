@@ -62,6 +62,10 @@ class Duplicates
     {
         $this->stache->cacheStore()->forget('stache::duplicates');
 
+        // What's remembered goes too. A duplicate that is found again is only
+        // written back if it's new, and it wouldn't look new if it were still here.
+        $this->items = [];
+
         return $this;
     }
 
@@ -79,12 +83,16 @@ class Duplicates
 
     public function find()
     {
+        $lock = tap($this->stache->lock('stache-warming'))->acquire(true);
+
         $this->stache->stores()->flatMap(function ($store) {
             return $store instanceof AggregateStore ? $store->discoverStores() : [$store];
         })->each(function ($store) {
             $store->clearCachedPaths();
             $store->paths();
         });
+
+        $lock->release();
 
         return $this;
     }

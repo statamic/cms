@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
@@ -13,7 +14,10 @@ use Statamic\Query\OrderedQueryBuilder;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Query\Scopes\Filters\Fields\User as UserFilter;
 use Statamic\Search\Result;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
+
+use function Statamic\trans as __;
 
 class Users extends Relationship
 {
@@ -35,30 +39,8 @@ class Users extends Relationship
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_items' => [
-                        'display' => __('Max Items'),
-                        'instructions' => __('statamic::messages.max_items_instructions'),
-                        'type' => 'integer',
-                        'min' => 1,
-                    ],
-                    'mode' => [
-                        'display' => __('UI Mode'),
-                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
-                        'type' => 'radio',
-                        'options' => [
-                            'default' => __('Stack Selector'),
-                            'select' => __('Select Dropdown'),
-                            'typeahead' => __('Typeahead Field'),
-                        ],
-                        'default' => 'select',
-                    ],
-                    'default' => [
-                        'display' => __('Default'),
-                        'instructions' => __('statamic::messages.fields_default_instructions'),
-                        'type' => 'users',
-                    ],
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.users.config.query_scopes'),
@@ -71,33 +53,106 @@ class Users extends Relationship
                     ],
                 ],
             ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.any.config.mode'),
+                        'type' => 'radio',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                        'default' => 'select',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'display' => __('Max Items'),
+                        'instructions' => __('statamic::messages.max_items_instructions'),
+                        'type' => 'integer',
+                        'min' => 1,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'users',
+                        'allow_current' => true,
+                    ],
+                ],
+            ],
         ];
     }
 
     public function preProcess($data)
     {
-        if ($data === 'current') {
-            $data = User::current()->id();
-        }
+        $data = collect(Arr::wrap($data))
+            ->map(function ($id) {
+                if ($id !== 'current' || $this->config('allow_current')) {
+                    return $id;
+                }
+
+                return User::current()?->id();
+            })
+            ->filter()
+            ->values()
+            ->all();
 
         return parent::preProcess($data);
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        if ($id === 'current' && $this->config('allow_current')) {
+            return true;
+        }
+
+        return $this->authorizeViewable($this->findUser($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
-        if ($user = User::find($id)) {
+        if ($id === 'current' && $this->config('allow_current')) {
+            return $this->currentUserOption();
+        }
+
+        if ($user = $this->findUser($id)) {
+            $canViewUsers = $this->canViewUser($user);
+
             return [
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
+                'editable' => User::current()->can('edit', $user),
             ];
         }
 
         return $this->invalidItemArray($id);
     }
 
+    protected function findUser($id)
+    {
+        return $this->itemCache[$id] ??= User::find($id);
+    }
+
     public function getIndexItems($request)
     {
+        // Don't reveal existence to a user who can't view the listing; return an empty
+        // result set instead of throwing, matching the picker's filter-to-viewable behavior.
+        if (! User::current()->can('index', UserContract::class)) {
+            return collect();
+        }
+
         $query = User::query();
 
         if ($search = $request->search) {
@@ -106,7 +161,9 @@ class Users extends Relationship
             } else {
                 $query->where(function ($query) use ($search) {
                     $query
-                        ->where('email', 'like', '%'.$search.'%')
+                        ->when($this->canViewUsers(), function ($query) use ($search) {
+                            $query->where('email', 'like', '%'.$search.'%');
+                        })
                         ->when(User::blueprint()->hasField('first_name'), function ($query) use ($search) {
                             foreach (explode(' ', $search) as $word) {
                                 $query
@@ -131,42 +188,108 @@ class Users extends Relationship
                 $user = $user->getSearchable();
             }
 
-            return [
+            $canViewUsers = $this->canViewUser($user);
+
+            $fields = [
                 'id' => $user->id(),
-                'title' => $user->name(),
-                'email' => $user->email(),
+                'title' => $this->userTitle($user, $canViewUsers),
             ];
+
+            if ($canViewUsers) {
+                $fields['email'] = $user->email();
+            }
+
+            return $fields;
         };
 
         if ($request->boolean('paginate', true)) {
-            $users = $query->paginate();
+            $users = $query->paginate($request->filled('perPage') ? Statamic::cpPerPage($request->integer('perPage')) : 15);
 
             $users->getCollection()->transform($userFields);
 
             return $users;
         }
 
-        return $query->get()->map($userFields);
+        $users = $query->get()->map($userFields);
+
+        // The "Current User" option is only offered to the select and typeahead modes, which don't paginate.
+        return $this->prependCurrentUserOption($users, $request);
+    }
+
+    private function prependCurrentUserOption(Collection $users, $request): Collection
+    {
+        if (! $this->config('allow_current')) {
+            return $users;
+        }
+
+        if (in_array('current', $request->exclusions ?? [])) {
+            return $users;
+        }
+
+        if (($search = $request->search) && ! str_contains(strtolower(__('Current User')), strtolower($search))) {
+            return $users;
+        }
+
+        return collect([$this->currentUserOption()])->concat($users);
+    }
+
+    private function currentUserOption(): array
+    {
+        return [
+            'id' => 'current',
+            'title' => __('Current User'),
+            'editable' => false,
+        ];
     }
 
     protected function getColumns()
     {
-        return [
+        $columns = [
             Column::make('title')->label('Name'),
-            Column::make('email'),
         ];
+
+        if ($this->canViewUsers()) {
+            $columns[] = Column::make('email');
+        }
+
+        return $columns;
     }
 
     public function preProcessIndex($data)
     {
-        return $this->getItemsForPreProcessIndex($data)->map(function ($user) {
+        $canViewUsers = $this->canViewUsers();
+
+        return $this->getItemsForPreProcessIndex($data)->map(function ($user) use ($canViewUsers) {
             return [
                 'id' => $user->id(),
-                'title' => $user->name(),
+                'title' => $this->userTitle($user, $canViewUsers),
                 'edit_url' => $user->editUrl(),
                 'published' => null,
             ];
         })->filter()->values();
+    }
+
+    private function userTitle($user, bool $canViewUsers): ?string
+    {
+        return $user->name() ?? ($canViewUsers ? $user->email() : $user->id());
+    }
+
+    private function canViewUsers(): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('index', UserContract::class);
+    }
+
+    private function canViewUser($user): bool
+    {
+        if (! $current = User::current()) {
+            return false;
+        }
+
+        return $current->can('view', $user);
     }
 
     protected function getItemsForPreProcessIndex($values): Collection
@@ -182,7 +305,11 @@ class Users extends Relationship
     {
         $single = $this->config('max_items') === 1;
 
-        $ids = Arr::wrap($values);
+        $ids = collect(Arr::wrap($values))
+            ->map(fn ($id) => $id === 'current' ? User::current()?->id() : $id)
+            ->filter()
+            ->values()
+            ->all();
 
         $query = (new OrderedQueryBuilder(User::query(), $ids))->whereIn('id', $ids);
 
@@ -227,5 +354,10 @@ class Users extends Relationship
     public function filter()
     {
         return new UserFilter($this);
+    }
+
+    public function relationshipQueryBuilder()
+    {
+        return User::query();
     }
 }

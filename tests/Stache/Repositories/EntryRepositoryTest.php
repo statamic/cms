@@ -72,6 +72,21 @@ class EntryRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function it_ignores_keys_in_indexes_that_no_longer_have_corresponding_files()
+    {
+        $store = $this->stache->store('entries')->store('alphabetical');
+
+        $store->index('title')->load();
+        (function () {
+            $this->paths = $this->paths()->forget('alphabetical-bravo');
+        })->call($store);
+
+        $entries = $this->repo->query()->whereIn('title', ['Alpha', 'Bravo', 'Zulu'])->get();
+
+        $this->assertEquals(['alphabetical-alpha', 'alphabetical-zulu'], $entries->map->id()->all());
+    }
+
+    #[Test]
     public function it_gets_entries_from_a_collection()
     {
         tap($this->repo->whereCollection('alphabetical'), function ($entries) {
@@ -191,6 +206,27 @@ class EntryRepositoryTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('entriesByIdsProvider')]
+    public function it_gets_entries_by_ids($ids, $expected)
+    {
+        $actual = $this->repo->whereInId($ids);
+
+        $this->assertInstanceOf(EntryCollection::class, $actual);
+        $this->assertEquals($expected, $actual->map->get('title')->all());
+    }
+
+    public static function entriesByIdsProvider()
+    {
+        return [
+            'no ids' => [[], []],
+            'single' => [['numeric-one'], ['One']],
+            'multiple' => [['numeric-one', 'numeric-two', 'numeric-three'], ['One', 'Two', 'Three']],
+            'missing' => [['numeric-one', 'unknown', 'numeric-three'], ['One', 'Three']],
+            'ordered' => [['numeric-three', 'numeric-one', 'numeric-two'], ['Three', 'One', 'Two']],
+        ];
+    }
+
+    #[Test]
     public function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
         $entry = EntryAPI::make()
@@ -245,4 +281,24 @@ class EntryRepositoryTest extends TestCase
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
         $this->assertFileDoesNotExist($path);
     }
+
+    #[Test]
+    public function it_gets_custom_entry_class()
+    {
+        $temp = EntryAPI::make()
+            ->id('custom')
+            ->collection(Collection::findByHandle('custom_class'))
+            ->slug('custom');
+
+        $this->unlinkAfter($this->directory.'/custom_class/custom.md');
+
+        $this->repo->save($temp);
+        $entry = $this->repo->find('custom');
+
+        $this->assertInstanceOf(CustomEntry::class, $entry);
+    }
+}
+
+class CustomEntry extends \Statamic\Entries\Entry
+{
 }

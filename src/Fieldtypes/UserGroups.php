@@ -4,8 +4,11 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\GraphQL\Types\UserGroupType;
+
+use function Statamic\trans as __;
 
 class UserGroups extends Relationship
 {
@@ -13,11 +16,16 @@ class UserGroups extends Relationship
     protected $canCreate = false;
     protected $statusIcons = false;
 
+    protected function authorizeItemData($id): bool
+    {
+        return User::current()->can('assign user groups');
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($group = UserGroup::find($id)) {
             return [
-                'title' => $group->title(),
+                'title' => __($group->title()),
                 'id' => $group->handle(),
             ];
         }
@@ -27,10 +35,14 @@ class UserGroups extends Relationship
 
     public function getIndexItems($request)
     {
+        if (! User::current()->can('assign user groups')) {
+            return collect();
+        }
+
         return UserGroup::all()->sortBy('title')->map(function ($group) {
             return [
                 'id' => $group->handle(),
-                'title' => $group->title(),
+                'title' => __($group->title()),
             ];
         })->values();
     }

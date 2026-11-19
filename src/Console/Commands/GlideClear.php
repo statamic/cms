@@ -47,6 +47,8 @@ class GlideClear extends Command
 
         $this->deleteEmptyDirectories($disk);
 
+        $this->clearCache();
+
         GlideCacheCleared::dispatch();
 
         $this->info('Your Glide image cache is now so very, very empty.');

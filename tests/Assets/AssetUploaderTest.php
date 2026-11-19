@@ -11,8 +11,9 @@ class AssetUploaderTest extends TestCase
 {
     #[Test]
     #[DataProvider('filenameReplacementsProvider')]
-    public function it_gets_safe_filename($originalFilename, $expectedFilename)
+    public function it_gets_safe_filename($originalFilename, $expectedFilename, $config = [])
     {
+        config(['statamic.assets.additional_filename_replacements' => $config]);
         $this->assertEquals($expectedFilename, AssetUploader::getSafeFilename($originalFilename));
     }
 
@@ -31,7 +32,28 @@ class AssetUploaderTest extends TestCase
             'question marks' => ['one?two.jpg', 'one-two.jpg'],
             'asterisks' => ['one*two.jpg', 'one-two.jpg'],
             'percentage' => ['one%two.jpg', 'one-two.jpg'],
+            'single quote' => ["one'two'three.jpg", 'one-two-three.jpg'],
+            'double dash' => ['one--two--three.jpg', 'one-two-three.jpg'],
             'ascii' => ['fòô-bàř', 'foo-bar'],
+            'additional config' => [
+                'one,two(6)',
+                'onetwo6',
+                [
+                    ',' => '',
+                    '(' => '',
+                    ')' => '',
+                ],
+            ],
+            'additional config does not override native replacements' => [
+                'one,two%three-(6)',
+                'onetwo-three-6',
+                [
+                    ',' => '',
+                    '(' => '',
+                    ')' => '',
+                    '%' => '_',
+                ],
+            ],
         ];
     }
 }

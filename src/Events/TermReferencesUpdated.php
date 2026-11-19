@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class TermReferencesUpdated extends Event implements ProvidesCommitMessage
 {
-    public $term;
-
-    public function __construct($term)
+    public function __construct(public $term)
     {
-        $this->term = $term;
     }
 
     public function commitMessage()

@@ -19,7 +19,7 @@ use Statamic\Contracts\Forms\SubmissionRepository;
  * @method static SubmissionContract make()
  *
  * @see \Statamic\Contracts\Forms\SubmissionRepository
- * @see \Statamic\Forms\Submission
+ * @link \Statamic\Forms\Submission
  */
 class FormSubmission extends Facade
 {

@@ -2,6 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
+use Closure;
+use Illuminate\Support\Carbon;
+use Statamic\Entries\Entry as EntryInstance;
 use Statamic\Entries\GetDateFromPath;
 use Statamic\Entries\GetSlugFromPath;
 use Statamic\Entries\GetSuffixFromPath;
@@ -19,11 +22,57 @@ use Statamic\Stache\Indexes\Index;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
+use WeakReference;
 
 class CollectionEntriesStore extends ChildStore
 {
     protected $collection;
     private bool $shouldBlinkEntryUris = true;
+    private int $makingItemsInBulk = 0;
+    private array $collectionsForBulk = [];
+
+    public function handleFileChanges()
+    {
+        // Entries get their uris, parents and order from the collection trees, so a tree file that
+        // changed on disk has to be picked up before this store's indexes are used. (Each store
+        // only checks once per request, so this can't loop.)
+        if (Stache::isWatcherEnabled() && ! $this->fileChangesHandled && $this->collection()?->hasStructure()) {
+            Stache::store('collection-trees')?->handleFileChanges();
+        }
+
+        $this->makeItemsInBulk(fn () => parent::handleFileChanges());
+    }
+
+    public function paths()
+    {
+        return $this->makeItemsInBulk(fn () => parent::paths());
+    }
+
+    /**
+     * While many files are being turned into entries at once, look up their
+     * collection once rather than once per file. They all share the same one.
+     */
+    private function makeItemsInBulk(callable $callback)
+    {
+        $this->makingItemsInBulk++;
+
+        try {
+            return $callback();
+        } finally {
+            if (--$this->makingItemsInBulk === 0) {
+                $this->collectionsForBulk = [];
+            }
+        }
+    }
+
+    private function findCollection($handle)
+    {
+        if (! $this->makingItemsInBulk) {
+            return Collection::findByHandle($handle);
+        }
+
+        return $this->collectionsForBulk[$handle] ??= Collection::findByHandle($handle);
+    }
 
     protected function collection()
     {
@@ -41,7 +90,9 @@ class CollectionEntriesStore extends ChildStore
 
         if (Site::multiEnabled()) {
             [$site, $relative] = explode('/', $relative, 2);
-            if (! $this->collection()->sites()->contains($site)) {
+            $collection = $this->collection ?? $this->findCollection($this->childKey);
+
+            if (! $collection->sites()->contains($site)) {
                 return false;
             }
         }
@@ -65,7 +116,7 @@ class CollectionEntriesStore extends ChildStore
         }
 
         $collectionHandle = $collection;
-        $collection = Collection::findByHandle($collectionHandle);
+        $collection = $this->findCollection($collectionHandle);
 
         $entry = Entry::make()
             ->id($id)
@@ -96,7 +147,7 @@ class CollectionEntriesStore extends ChildStore
         // }
 
         if ($collection->dated()) {
-            $entry->date((new GetDateFromPath)($path));
+            $entry->date($this->getDateFromPath($path));
         }
 
         // Blink the entry so that it can be used when building the URI. If it's not
@@ -106,6 +157,8 @@ class CollectionEntriesStore extends ChildStore
         if (isset($idGenerated) || isset($positionGenerated)) {
             $this->writeItemToDiskWithoutIncrementing($entry);
         }
+
+        $this->takeSnapshot($entry);
 
         return $entry;
     }
@@ -159,13 +212,13 @@ class CollectionEntriesStore extends ChildStore
     {
         $indexes = collect([
             'slug',
-            'uri',
-            'collection',
+            'collectionHandle',
             'published',
             'title',
-            'site' => Indexes\Site::class,
+            'site',
             'origin' => Indexes\Origin::class,
             'parent' => Indexes\Parents::class,
+            'uri',
         ]);
 
         if (! $collection = Collection::findByHandle($this->childKey())) {
@@ -214,9 +267,11 @@ class CollectionEntriesStore extends ChildStore
                 break;
             }
 
-            $itemFromDisk = $this->makeItemFromFile($path, $contents);
+            // Only parse the ID from the file rather than using makeItemFromFile,
+            // which would put a stale entry into the structure-entries blink store.
+            $id = Arr::get(YAML::file($path)->parse($contents), 'id');
 
-            if ($item->id() == $itemFromDisk->id()) {
+            if ($item->id() == $id) {
                 break;
             }
 
@@ -228,19 +283,104 @@ class CollectionEntriesStore extends ChildStore
 
     protected function getCachedItem($key)
     {
-        $cacheKey = $this->getItemCacheKey($key);
-
-        if (! $entry = Stache::cacheStore()->get($cacheKey)) {
+        if (! $entry = $this->getSnapshotCopy($key) ?? Stache::cacheStore()->get($this->getItemCacheKey($key))) {
             return null;
         }
 
-        $isLoadingIds = Index::currentlyLoading() === $this->key().'/id';
-
-        if (! $isLoadingIds && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
+        if (! Index::isLoading() && $this->shouldBlinkEntryUris && ($uri = $this->resolveIndex('uri')->load()->get($entry->id()))) {
             Blink::store('entry-uris')->put($entry->id(), $uri);
         }
 
         return $entry;
+    }
+
+    protected function cacheItem($item)
+    {
+        parent::cacheItem($item);
+
+        $key = $this->getItemKey($item);
+        $snapshot = $this->snapshots()->get($key);
+
+        // The first time the entry built from the file is cached, the cache holds exactly
+        // what the snapshot holds. Anything cached after that may differ from it.
+        if ($snapshot && ! $snapshot['cached'] && $snapshot['source']->get() === $item) {
+            $snapshot['cached'] = true;
+            $this->snapshots()->put($key, $snapshot);
+        } else {
+            $this->snapshots()->forget($key);
+        }
+    }
+
+    public function forgetItem($key)
+    {
+        $this->snapshots()->forget($key);
+
+        parent::forgetItem($key);
+    }
+
+    private function takeSnapshot(EntryInstance $entry): void
+    {
+        $this->snapshots()->put($entry->id(), [
+            'source' => WeakReference::create($entry),
+            'snapshot' => $this->copy($entry),
+            'cached' => false,
+        ]);
+    }
+
+    /**
+     * Snapshots are only good for the request they were taken in, since another process can
+     * cache a different version of an entry at any time. This store can outlive a request
+     * (it does under Octane), but Blink is new for each one, so they are kept there.
+     */
+    private function snapshots()
+    {
+        return Blink::store('entry-snapshots::'.$this->key());
+    }
+
+    public function resetMemoizedState()
+    {
+        parent::resetMemoizedState();
+
+        // Blink isn't cleared between a worker's jobs, so the snapshots
+        // would otherwise last for as long as the worker does.
+        $this->snapshots()->flush();
+    }
+
+    /**
+     * While indexes are being built, hand out a copy of the snapshot taken when the entry
+     * was made from its file, rather than unserialising a second full copy from the cache.
+     * Its data arrays are shared with the snapshot until the caller changes them.
+     */
+    private function getSnapshotCopy($key): ?EntryInstance
+    {
+        if (! Index::isLoading()) {
+            return null;
+        }
+
+        $snapshot = $this->snapshots()->get($key);
+
+        if (! $snapshot || ! $snapshot['cached']) {
+            return null;
+        }
+
+        return $this->copy($snapshot['snapshot']);
+    }
+
+    private function copy(EntryInstance $entry): EntryInstance
+    {
+        $copy = clone $entry;
+
+        Closure::bind(function () {
+            // A copy read from the cache doesn't carry these (see Entry::__sleep).
+            $this->cachedKeys = $this->computedCallbackCache = $this->siteCache = $this->augmentationReferenceKey = null;
+
+            // Carbon is mutable, so the copy needs its own date.
+            if (is_object($this->date)) {
+                $this->date = clone $this->date;
+            }
+        }, $copy, EntryInstance::class)();
+
+        return $copy;
     }
 
     public function withoutBlinkingEntryUris($callback)
@@ -270,24 +410,42 @@ class CollectionEntriesStore extends ChildStore
 
     private function updateEntriesWithinIndex($index, $ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             return $index->update();
         }
 
-        collect($ids)
-            ->map(fn ($id) => Entry::find($id))
-            ->filter()
-            ->each(fn ($entry) => $index->updateItem($entry));
+        $index->updateItems(collect($ids)->map(fn ($id) => Entry::find($id))->filter());
     }
 
     private function updateEntriesWithinStore($ids)
     {
-        if (empty($ids)) {
+        if (collect($ids)->isEmpty()) {
             $ids = $this->paths()->keys();
         }
 
         $entries = $this->withoutBlinkingEntryUris(fn () => collect($ids)->map(fn ($id) => Entry::find($id))->filter());
 
         $entries->each(fn ($entry) => $this->cacheItem($entry));
+    }
+
+    private function getDateFromPath($path)
+    {
+        if (! $date = (new GetDateFromPath)($path)) {
+            return null;
+        }
+
+        $format = match (strlen($date)) {
+            10 => 'Y-m-d',
+            15 => 'Y-m-d-Hi',
+            17 => 'Y-m-d-His',
+        };
+
+        $carbon = Carbon::createFromFormat($format, $date, config('app.timezone'));
+
+        if (strlen($date) === 10) {
+            $carbon->startOfDay();
+        }
+
+        return $carbon->utc();
     }
 }

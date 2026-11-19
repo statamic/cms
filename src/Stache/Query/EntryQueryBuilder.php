@@ -4,6 +4,7 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
+use Statamic\Exceptions\StatusFilterNotSupportedException;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
@@ -14,17 +15,24 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     use QueriesEntryStatus, QueriesTaxonomizedEntries;
 
     protected $collections = [];
+    protected $nested = false;
 
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column === 'collection') {
+            if ($this->nested) {
+                return parent::where('collectionHandle', $operator, $value, $boolean);
+            }
+
+            $this->verifyCollectionBeforeStatus();
+
             $this->collections[] = $operator;
 
             return $this;
         }
 
         if ($column === 'status') {
-            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
+            throw new StatusFilterNotSupportedException('Filtering by status is not supported. Use whereStatus() instead.');
         }
 
         return parent::where($column, $operator, $value, $boolean);
@@ -33,16 +41,37 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
     public function whereIn($column, $values, $boolean = 'and')
     {
         if (in_array($column, ['collection', 'collections'])) {
+            if ($this->nested) {
+                return parent::whereIn('collectionHandle', $values, $boolean);
+            }
+
+            $this->verifyCollectionBeforeStatus();
+
             $this->collections = array_merge($this->collections ?? [], $values);
 
             return $this;
         }
 
         if ($column === 'status') {
-            trigger_error('Filtering by status is deprecated. Use whereStatus() instead.', E_USER_DEPRECATED);
+            throw new StatusFilterNotSupportedException('Filtering by status is not supported. Use whereStatus() instead.');
         }
 
         return parent::whereIn($column, $values, $boolean);
+    }
+
+    public function forNestedWhere()
+    {
+        $query = parent::forNestedWhere();
+        $query->nested = true;
+
+        return $query;
+    }
+
+    private function verifyCollectionBeforeStatus()
+    {
+        if ($this->queriedByStatus) {
+            throw new \LogicException('The collection clause must come before the status clause.');
+        }
     }
 
     protected function collect($items = [])
@@ -92,13 +121,45 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
 
     protected function getKeysFromCollectionsWithWhere($collections, $where)
     {
-        $items = collect($collections)->flatMap(function ($collection) use ($where) {
-            return $this->getWhereColumnKeysFromStore($collection, $where);
-        });
+        // A collection can be queried twice (e.g. by a status query), but its keys must only appear once.
+        $collections = collect($collections)->unique()->values();
+
+        if ($keys = $this->getKeysFromCollectionsById($collections, $where)) {
+            return $keys;
+        }
 
         $method = 'filterWhere'.$where['type'];
 
+        // These filters only look at values, so each store's index can be filtered
+        // before its keys are prefixed, instead of prefixing every key first.
+        if (in_array($where['type'], ['Basic', 'In'])) {
+            return $collections->flatMap(function ($collection) use ($where, $method) {
+                $items = $this->store->store($collection)->index($where['column'])->items();
+
+                return $this->{$method}($items, $where)->keys()->map(fn ($key) => "{$collection}::{$key}");
+            })->values();
+        }
+
+        $items = $collections->flatMap(function ($collection) use ($where) {
+            return $this->getWhereColumnKeysFromStore($collection, $where);
+        });
+
         return $this->{$method}($items, $where)->keys();
+    }
+
+    protected function getKeysFromCollectionsById($collections, $where)
+    {
+        if ($where['type'] !== 'Basic' || $where['column'] !== 'id' || $where['operator'] !== '=' || ! is_string($where['value'])) {
+            return null;
+        }
+
+        $keys = $collections
+            ->filter(fn ($collection) => $this->store->store($collection)->paths()->has($where['value']))
+            ->map(fn ($collection) => "{$collection}::{$where['value']}")
+            ->values();
+
+        // Ids are compared case-insensitively, so a miss falls back to filtering.
+        return $keys->isEmpty() ? null : $keys;
     }
 
     protected function getOrderKeyValuesByIndex()
@@ -141,6 +202,23 @@ class EntryQueryBuilder extends Builder implements QueryBuilder
         return collect($collections)->flatMap(function ($collection) use ($column) {
             return $this->getWhereColumnKeysFromStore($collection, ['column' => $column]);
         });
+    }
+
+    protected function getBlueprintsForRelations()
+    {
+        $collections = empty($this->collections)
+            ? Facades\Collection::all()
+            : $this->collections;
+
+        return collect($collections)->flatMap(function ($collection) {
+            if (is_string($collection)) {
+                $collection = Facades\Collection::find($collection);
+            }
+
+            return $collection ? $collection->entryBlueprints() : false;
+        })
+            ->filter()
+            ->unique();
     }
 
     private function ensureCollectionsAreQueriedForStatusQuery(): void

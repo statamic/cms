@@ -6,8 +6,12 @@ use Illuminate\Support\Collection;
 
 trait QueriesEntryStatus
 {
+    private $queriedByStatus = false;
+
     public function whereStatus(string $status)
     {
+        $this->queriedByStatus = true;
+
         if ($status === 'any') {
             return $this;
         }
@@ -41,24 +45,28 @@ trait QueriesEntryStatus
             return;
         }
 
+        if ($status === 'scheduled' && $collection->futureDateBehavior() !== 'private') {
+            $query->where('date', 'invalid'); // intentionally trigger no results.
+
+            return;
+        }
+
+        if ($status === 'expired' && $collection->pastDateBehavior() !== 'private') {
+            $query->where('date', 'invalid'); // intentionally trigger no results.
+
+            return;
+        }
+
         if ($collection->futureDateBehavior() === 'private') {
             $status === 'scheduled'
                 ? $query->where('date', '>', now())
                 : $query->where('date', '<', now());
-
-            if ($status === 'expired') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
         }
 
         if ($collection->pastDateBehavior() === 'private') {
             $status === 'expired'
                 ? $query->where('date', '<', now())
                 : $query->where('date', '>', now());
-
-            if ($status === 'scheduled') {
-                $query->where('date', 'invalid'); // intentionally trigger no results.
-            }
         }
     }
 

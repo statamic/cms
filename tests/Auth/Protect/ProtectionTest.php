@@ -147,6 +147,46 @@ class ProtectionTest extends TestCase
         $this->assertTrue($state->protected);
     }
 
+    #[Test]
+    public function protector_driver_allows_static_caching()
+    {
+        config(['statamic.protect.default' => 'test']);
+        config(['statamic.protect.schemes.test' => [
+            'driver' => 'test',
+        ]]);
+
+        app(ProtectorManager::class)->extend('test', function ($app) {
+            return new class() extends Protector
+            {
+                public function protect()
+                {
+                    //
+                }
+
+                public function cacheable()
+                {
+                    return true;
+                }
+            };
+        });
+
+        $this->assertTrue($this->protection->cacheable());
+        $this->assertTrue($this->protection->driver()->cacheable());
+    }
+
+    #[Test]
+    public function protector_driver_disallows_static_caching()
+    {
+        config(['statamic.protect.default' => 'logged_in']);
+        config(['statamic.protect.schemes.logged_in' => [
+            'driver' => 'auth',
+            'form_url' => '/login',
+        ]]);
+
+        $this->assertFalse($this->protection->cacheable());
+        $this->assertFalse($this->protection->driver()->cacheable());
+    }
+
     private function createEntryWithScheme($scheme)
     {
         return EntryFactory::id('test')

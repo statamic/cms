@@ -11,6 +11,7 @@ use Statamic\Events\FormDeleted;
 use Statamic\Events\FormDeleting;
 use Statamic\Events\FormSaved;
 use Statamic\Events\FormSaving;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
 use Tests\TestCase;
@@ -22,6 +23,28 @@ class FormTest extends TestCase
         parent::setUp();
 
         Form::all()->each->delete();
+    }
+
+    #[Test]
+    public function it_falls_back_to_the_handle_for_the_title()
+    {
+        $form = Form::make('contact_us');
+
+        $this->assertEquals('Contact_us', $form->title());
+
+        $form->title('Contact Us');
+
+        $this->assertEquals('Contact Us', $form->title());
+    }
+
+    #[Test]
+    public function it_doesnt_save_the_fallback_title()
+    {
+        $form = Form::make('contact_us');
+
+        $form->save();
+
+        $this->assertStringNotContainsString('title', File::get($form->path()));
     }
 
     #[Test]
@@ -249,5 +272,23 @@ class FormTest extends TestCase
         Event::assertNotDispatched(FormDeleted::class);
 
         $this->assertTrue($return);
+    }
+
+    #[Test]
+    public function it_clones_internal_collections()
+    {
+        $form = Form::make('contact_us');
+        $form->set('foo', 'A');
+        $form->setSupplement('bar', 'A');
+
+        $clone = clone $form;
+        $clone->set('foo', 'B');
+        $clone->setSupplement('bar', 'B');
+
+        $this->assertEquals('A', $form->get('foo'));
+        $this->assertEquals('B', $clone->get('foo'));
+
+        $this->assertEquals('A', $form->getSupplement('bar'));
+        $this->assertEquals('B', $clone->getSupplement('bar'));
     }
 }

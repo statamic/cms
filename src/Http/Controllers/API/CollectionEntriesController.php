@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Facades\Statamic\API\FilterAuthorizer;
+use Facades\Statamic\API\QueryScopeAuthorizer;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Entry;
 use Statamic\Http\Resources\API\EntryResource;
@@ -16,6 +17,7 @@ class CollectionEntriesController extends ApiController
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
     protected $filterPublished = true;
+    protected $siteConstrained = true;
     protected $collectionHandle;
 
     public function index($collection)
@@ -29,7 +31,7 @@ class CollectionEntriesController extends ApiController
             ->filter->isRelationship()->keys()->all();
 
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($collection->queryEntries()->with($with))
+            $this->updateAndPaginate($collection->queryEntries()->with($with))
         );
     }
 
@@ -37,7 +39,7 @@ class CollectionEntriesController extends ApiController
     {
         $this->abortIfDisabled();
 
-        $entry = Entry::find($handle);
+        $entry = $this->resolveEntry($collection, $handle);
 
         $this->abortIfInvalid($entry, $collection);
         $this->abortIfUnpublished($entry);
@@ -70,6 +72,23 @@ class CollectionEntriesController extends ApiController
         $this->queryTaxonomyTerms($query, $modifier, $values);
     }
 
+    private function resolveEntry($collection, $handle)
+    {
+        if ($entry = Entry::find($handle)) {
+            return $this->localize($entry);
+        }
+
+        $query = $collection->queryEntries()->where('slug', $handle);
+
+        if ($site = $this->requestedSite()) {
+            $query->where('site', $site);
+        } elseif ($collection->sites()->count() > 1) {
+            $query->where('site', $collection->sites()->first());
+        }
+
+        return $query->first();
+    }
+
     private function abortIfInvalid($entry, $collection)
     {
         if (! $entry || $entry->collection()->id() !== $collection->id()) {
@@ -80,5 +99,10 @@ class CollectionEntriesController extends ApiController
     protected function allowedFilters()
     {
         return FilterAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
+    }
+
+    protected function allowedQueryScopes()
+    {
+        return QueryScopeAuthorizer::allowedForSubResources('api', 'collections', $this->collectionHandle);
     }
 }

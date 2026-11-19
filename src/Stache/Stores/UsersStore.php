@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Facades\Role as UserRole;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -9,6 +10,7 @@ use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Statamic\Stache\Indexes\Users\Role;
 use Statamic\Support\Arr;
+use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
@@ -36,6 +38,11 @@ class UsersStore extends BasicStore
         return 'users';
     }
 
+    public function getItemFilter(SplFileInfo $file)
+    {
+        return parent::getItemFilter($file) && $file->getRelativePath() === '';
+    }
+
     public function makeItemFromFile($path, $contents)
     {
         $data = YAML::file($path)->parse($contents);
@@ -45,12 +52,21 @@ class UsersStore extends BasicStore
             $id = app('stache')->generateId();
         }
 
+        /** @var \Statamic\Auth\File\User $user */
         $user = User::make()
             ->id($id)
             ->initialPath($path)
             ->email(pathinfo($path, PATHINFO_FILENAME))
             ->preferences(Arr::pull($data, 'preferences', []))
             ->data($data);
+
+        $user->setPasskeys(collect(Arr::pull($data, 'passkeys', []))
+            ->map(function ($keydata) use ($user) {
+                return app(Passkey::class)
+                    ->setUser($user)
+                    ->setName($keydata['name'])
+                    ->setCredential($keydata['credential']);
+            }));
 
         if (Arr::get($data, 'password') || isset($idGenerated)) {
             $user->writeFile();

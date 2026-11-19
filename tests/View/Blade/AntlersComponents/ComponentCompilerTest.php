@@ -328,7 +328,7 @@ BLADE;
 
         $this->assertSame(
             'Hello, Antlers!',
-            (string) Antlers::parse('{{ my_tag }}'),
+            (string) Antlers::parse('{{ my_tag }}', [], true),
         );
     }
 

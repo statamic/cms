@@ -4,9 +4,13 @@ namespace Statamic\CP\Navigation;
 
 use Facades\Statamic\CP\Navigation\NavItemIdHasher;
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class NavTransformer
 {
     protected $coreNav;
@@ -18,7 +22,10 @@ class NavTransformer
      */
     public function __construct(array $submitted)
     {
-        $this->coreNav = Nav::buildWithoutPreferences(true);
+        $this->coreNav = Nav::build(
+            preferences: false,
+            editing: true,
+        );
 
         $this->submitted = $this->removeEmptyCustomSections($submitted);
     }
@@ -233,7 +240,7 @@ class NavTransformer
             $url = str_replace(url('/'), '', $url);
         }
 
-        if (Str::startsWith($url, ['http://', 'https://'])) {
+        if (URL::isAbsolute($url)) {
             return $url;
         }
 
@@ -281,6 +288,25 @@ class NavTransformer
      */
     protected function calculateMinimumItemsForReorder($originalList, $newList): int
     {
+        // When the new list contains items not in the original (e.g. custom sections),
+        // we must include enough of newList to anchor the position of any custom items
+        // that appear before original items. Custom items at the end auto-append.
+        $originalSet = collect($originalList);
+        $newListValues = collect($newList)->values();
+        $lastCustomPositionInMiddle = 0;
+
+        foreach ($newListValues as $index => $item) {
+            if (! $originalSet->contains($item)) {
+                $hasOriginalItemsAfter = $newListValues
+                    ->slice($index + 1)
+                    ->contains(fn ($futureItem) => $originalSet->contains($futureItem));
+
+                if ($hasOriginalItemsAfter) {
+                    $lastCustomPositionInMiddle = $index + 1;
+                }
+            }
+        }
+
         $continueRejecting = true;
 
         $minimumItemsCount = collect($originalList)
@@ -295,7 +321,9 @@ class NavTransformer
             })
             ->count();
 
-        return max(1, $minimumItemsCount - 1);
+        $minimumFromReordering = max(1, $minimumItemsCount - 1);
+
+        return max($minimumFromReordering, $lastCustomPositionInMiddle);
     }
 
     /**
@@ -329,7 +357,7 @@ class NavTransformer
             ->values()
             ->all();
 
-        $this->config = $reorder
+        $this->config = ! empty($reorder)
             ? array_filter(compact('reorder', 'sections'))
             : $sections;
 

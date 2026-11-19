@@ -60,7 +60,7 @@ class Yaml
         }
 
         try {
-            $yaml = $this->yaml->parse($str);
+            $yaml = (new FastParser)->parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
         }
@@ -136,7 +136,6 @@ class Yaml
             'args' => $args,
         ]);
         $traceProperty = new ReflectionProperty('Exception', 'trace');
-        $traceProperty->setAccessible(true);
         $traceProperty->setValue($exception, $trace);
 
         return $exception;

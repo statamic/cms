@@ -5,8 +5,10 @@ namespace Statamic\View\Antlers\Language\Runtime;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\View\Compilers\BladeCompiler;
 use InvalidArgumentException;
 use ParseError;
 use Statamic\Contracts\Data\Augmentable;
@@ -31,6 +33,7 @@ use Statamic\View\Antlers\Language\Nodes\AbstractNode;
 use Statamic\View\Antlers\Language\Nodes\AntlersNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ConditionNode;
 use Statamic\View\Antlers\Language\Nodes\Conditions\ExecutionBranch;
+use Statamic\View\Antlers\Language\Nodes\DirectiveNode;
 use Statamic\View\Antlers\Language\Nodes\EscapedContentNode;
 use Statamic\View\Antlers\Language\Nodes\LiteralNode;
 use Statamic\View\Antlers\Language\Nodes\Operators\Assignment\LeftAssignmentOperator;
@@ -44,6 +47,7 @@ use Statamic\View\Antlers\Language\Nodes\Structures\StatementSeparatorNode;
 use Statamic\View\Antlers\Language\Nodes\Structures\SwitchGroup;
 use Statamic\View\Antlers\Language\Nodes\VariableNode;
 use Statamic\View\Antlers\Language\Parser\LanguageParser;
+use Statamic\View\Antlers\Language\Runtime\Concerns\ManagesIncludeSlots;
 use Statamic\View\Antlers\Language\Runtime\Debugging\GlobalDebugManager;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\Environment;
 use Statamic\View\Antlers\Language\Runtime\Sandbox\RuntimeValues;
@@ -51,11 +55,15 @@ use Statamic\View\Antlers\Language\Runtime\Sandbox\TypeCoercion;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Antlers\SyntaxError;
 use Statamic\View\Cascade;
+use Statamic\View\Slot;
 use Statamic\View\State\CachesOutput;
+use Stringable;
 use Throwable;
 
 class NodeProcessor
 {
+    use ManagesIncludeSlots;
+
     /**
      * @var Loader
      */
@@ -102,6 +110,20 @@ class NodeProcessor
      * @var bool
      */
     protected $isInterpolationProcessor = false;
+
+    /**
+     * Indicates if the processor is reducing a value being assigned to a variable.
+     *
+     * @var bool
+     */
+    protected $isAssignmentProcessor = false;
+
+    /**
+     * Indicates if the processor is reducing a value used within an expression.
+     *
+     * @var bool
+     */
+    protected $isExpressionProcessor = false;
 
     /**
      * Indicates if the processor is providing results for a parameter.
@@ -280,6 +302,32 @@ class NodeProcessor
     public function setIsInterpolationProcessor($isInterpolation)
     {
         $this->isInterpolationProcessor = $isInterpolation;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is reducing a value being assigned to a variable.
+     *
+     * @param  bool  $isAssignment  The value.
+     * @return $this
+     */
+    public function setIsAssignmentProcessor($isAssignment)
+    {
+        $this->isAssignmentProcessor = $isAssignment;
+
+        return $this;
+    }
+
+    /**
+     * Sets whether the NodeProcessor is reducing a value used within an expression.
+     *
+     * @param  bool  $isExpression  The value.
+     * @return $this
+     */
+    public function setIsExpressionProcessor($isExpression)
+    {
+        $this->isExpressionProcessor = $isExpression;
 
         return $this;
     }
@@ -952,12 +1000,30 @@ class NodeProcessor
             $interpolationScope = $this->getActiveData();
             $interpolationValue = $this->cloneProcessor()
                 ->setIsInterpolationProcessor(true)
+                ->setIsExpressionProcessor(true)
                 ->setData($interpolationScope)->reduce($node->interpolationNodes);
 
             $this->interpolationCache[$node->name] = $interpolationValue;
         }
 
         return $this->interpolationCache[$node->name];
+    }
+
+    /**
+     * Evaluates an interpolated variable being assigned to a variable, keeping tag objects intact.
+     *
+     * @param  VariableNode  $node  The interpolated variable.
+     * @return mixed
+     *
+     * @throws RuntimeException
+     * @throws SyntaxErrorException
+     */
+    public function reduceAssignedInterpolatedVariable(VariableNode $node)
+    {
+        return $this->cloneProcessor()
+            ->setIsInterpolationProcessor(true)
+            ->setIsAssignmentProcessor(true)
+            ->setData($this->getActiveData())->reduce($node->interpolationNodes);
     }
 
     /**
@@ -1075,10 +1141,34 @@ class NodeProcessor
     public function guardRuntimeTag($tagCheck)
     {
         if (GlobalRuntimeState::$isEvaluatingUserData) {
+            $allowList = GlobalRuntimeState::$allowedContentTagPaths;
             $guardList = GlobalRuntimeState::$bannedContentTagPaths;
-        } else {
-            $guardList = GlobalRuntimeState::$bannedTagPaths;
+
+            $isAllowed = Str::is($allowList, $tagCheck);
+            $isBlocked = ! empty($guardList) && Str::is($guardList, $tagCheck);
+
+            if (! $isAllowed || $isBlocked) {
+                Log::warning('Runtime Access Violation: '.$tagCheck, [
+                    'tag' => $tagCheck,
+                    'file' => GlobalRuntimeState::$currentExecutionFile,
+                    'trace' => GlobalRuntimeState::$templateFileStack,
+                ]);
+
+                if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                    throw ErrorFactory::makeRuntimeError(
+                        AntlersErrorCodes::RUNTIME_PROTECTED_TAG_ACCESS,
+                        null,
+                        'Protected tag access.'
+                    );
+                }
+
+                return false;
+            }
+
+            return true;
         }
+
+        $guardList = GlobalRuntimeState::$bannedTagPaths;
 
         if (empty($guardList)) {
             return true;
@@ -1110,7 +1200,7 @@ class NodeProcessor
         $namedSlots = [];
 
         foreach ($node->children as $child) {
-            if ($child instanceof AntlersNode && ! $child->isComment && $child->name->name == 'slot') {
+            if ($child instanceof AntlersNode && ! $child->isComment && $child->isPaired() && $child->name->name == 'slot') {
                 $namedSlots[$child->name->methodPart] = $child;
             }
         }
@@ -1218,7 +1308,9 @@ class NodeProcessor
                                 'User content Antlers PHP tag.'
                             );
                         } else {
-                            Log::warning('PHP Node evaluated in user content: '.$node->name->name, [
+                            $logContent = $node->rawStart.$node->innerContent().$node->rawEnd;
+
+                            Log::warning('PHP Node evaluated in user content: '.$logContent, [
                                 'file' => GlobalRuntimeState::$currentExecutionFile,
                                 'trace' => GlobalRuntimeState::$templateFileStack,
                                 'content' => $node->innerContent(),
@@ -1262,6 +1354,17 @@ class NodeProcessor
                         if ($this->isTracingEnabled()) {
                             $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
                         }
+
+                        continue;
+                    }
+
+                    if ($node instanceof DirectiveNode) {
+                        if ($node->hasParsedRuntimeNodes == false) {
+                            $node->parsedRuntimeNodes = $this->languageParser->parse($node->runtimeNodes);
+                            $node->hasParsedRuntimeNodes = true;
+                        }
+
+                        $this->evaluateDirective($node);
 
                         continue;
                     }
@@ -1542,6 +1645,10 @@ class NodeProcessor
                             $this->data = $lockData;
                         }
 
+                        if ($node->name->name == 'include') {
+                            $tagParameters = $this->captureIncludeSlots($node, $tagActiveData, $tagParameters);
+                        }
+
                         if ($node->name->name == 'partial' || $node->name->name == 'scope') {
                             if (array_key_exists('handle_prefix', $tagParameters)) {
                                 $handlePrefixes = $tagParameters['handle_prefix'];
@@ -1582,6 +1689,16 @@ class NodeProcessor
                             'tag_method' => $tagMethod,
                         ]);
 
+                        $suspendedData = null;
+                        $capturedRuntimeState = null;
+
+                        if ($tag::$isolated) {
+                            $tag->setIsolatedContext($tagActiveData);
+                            $suspendedData = $this->getAllData();
+                            $this->data = [];
+                            $capturedRuntimeState = GlobalRuntimeState::captureAndIsolate();
+                        }
+
                         if (in_array(CachesOutput::class, class_implements($tag))) {
                             $isCacheTag = true;
                             GlobalRuntimeState::$isCacheEnabled = true;
@@ -1616,6 +1733,12 @@ class NodeProcessor
                             GlobalRuntimeState::$requiresRuntimeIsolation = $currentIsolationState;
                             GlobalRuntimeState::$evaulatingTagContents = false;
                             $this->stopMeasuringTag();
+
+                            if ($capturedRuntimeState !== null) {
+                                $this->data = $suspendedData;
+
+                                GlobalRuntimeState::restoreState($capturedRuntimeState);
+                            }
                         }
 
                         $afterAssignments = $this->runtimeAssignments;
@@ -1738,7 +1861,9 @@ class NodeProcessor
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
-                            $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            if (! $this->assigningAugmentable($output) && ! $this->evaluatingValue($output)) {
+                                $output = PathDataManager::reduceForAntlers($output, $this->antlersParser, $this->getActiveData(), $node->isClosedBy != null);
+                            }
                         }
 
                         if ($this->isInterpolationProcessor) {
@@ -2014,6 +2139,12 @@ class NodeProcessor
                                     }
 
                                     if ($this->guardRuntime($node, $runtimeResult)) {
+                                        if ($runtimeResult instanceof Slot) {
+                                            $lockData = $this->data;
+                                            $runtimeResult = $runtimeResult->render();
+                                            $this->data = $lockData;
+                                        }
+
                                         $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($runtimeResult));
                                     }
 
@@ -2097,6 +2228,20 @@ class NodeProcessor
                         $val = $val->get()->all();
                     }
 
+                    if ($val instanceof Slot) {
+                        $lockData = $this->data;
+                        $val = $val->render($node->hasParameters ? $this->getSlotOutputProps($node) : []);
+                        $this->data = $lockData;
+
+                        $buffer .= $this->measureBufferAppend($node, $this->modifyBufferAppend($val));
+
+                        if ($this->isTracingEnabled()) {
+                            $this->runtimeConfiguration->traceManager->traceOnExit($node, null);
+                        }
+
+                        continue;
+                    }
+
                     $executedParamModifiers = false;
 
                     if ($tagCallbackResult != null) {
@@ -2164,6 +2309,8 @@ class NodeProcessor
 
                                     if ($val instanceof Value) {
                                         if ($val->shouldParseAntlers()) {
+                                            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingUserData = true;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             GlobalRuntimeState::$userContentEvalState = [
@@ -2171,14 +2318,18 @@ class NodeProcessor
                                                 $node,
                                             ];
 
-                                            $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
-                                            GlobalRuntimeState::$userContentEvalState = null;
-                                            GlobalRuntimeState::$isEvaluatingUserData = false;
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            try {
+                                                $val = $val->antlersValue($this->antlersParser, $this->getActiveData());
+                                            } finally {
+                                                GlobalRuntimeState::$userContentEvalState = null;
+                                                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+                                                GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
+                                            }
                                         } else {
+                                            $prevIsEvaluatingData = GlobalRuntimeState::$isEvaluatingData;
                                             GlobalRuntimeState::$isEvaluatingData = true;
                                             $val = $val->value();
-                                            GlobalRuntimeState::$isEvaluatingData = false;
+                                            GlobalRuntimeState::$isEvaluatingData = $prevIsEvaluatingData;
                                         }
                                     }
 
@@ -2422,6 +2573,18 @@ class NodeProcessor
         return $buffer;
     }
 
+    private function assigningAugmentable($output): bool
+    {
+        return $this->isAssignmentProcessor
+            && $output instanceof Augmentable
+            && $output instanceof Stringable;
+    }
+
+    private function evaluatingValue($output): bool
+    {
+        return $this->isExpressionProcessor && $output instanceof Value;
+    }
+
     /**
      * Executes any PHP within the provided buffer and returns the result.
      *
@@ -2454,51 +2617,99 @@ class NodeProcessor
         return ob_get_clean();
     }
 
+    protected function evaluateDirective(DirectiveNode $directive)
+    {
+        $env = new Environment;
+        $env->setProcessor($this)
+            ->cascade($this->cascade)
+            ->setData($this->getActiveData());
+
+        $args = $env->evaluate($directive->parsedRuntimeNodes);
+
+        unset($env);
+
+        // We can't be sure that we're not already compiling Blade.
+        // Because of this, we need our own Blade compiler to
+        // not accidentally mess with raw PHP blocks, etc.
+        $blade = new BladeCompiler(
+            app('files'),
+            config('view.compiled'),
+            config('view.relative_hash', false) ? base_path() : '',
+            false,
+            'php',
+        );
+
+        foreach (Blade::getCustomDirectives() as $directiveName => $compiler) {
+            $blade->directive($directiveName, $compiler);
+        }
+
+        $buffer = $blade->compileString($directive->directiveName.'($___directiveArgs)');
+
+        $this->evaluatePhpBuffer($buffer, true, [
+            '___directiveArgs' => $args,
+        ]);
+    }
+
     protected function evaluateAntlersPhpNode(PhpExecutionNode $node)
     {
-        if (! GlobalRuntimeState::$allowPhpInContent == false && GlobalRuntimeState::$isEvaluatingUserData) {
+        if (! GlobalRuntimeState::$allowPhpInContent && GlobalRuntimeState::$isEvaluatingUserData) {
             return StringUtilities::sanitizePhp($node->content);
         }
 
-        $phpBuffer = '';
-
-        if ($node->isEchoNode == false) {
-            $phpBuffer = $node->content;
+        if (! $node->isEchoNode) {
+            $buffer = $node->content;
 
             if (! Str::contains($node->content, $this->validPhpOpenTags)) {
-                $phpBuffer = '<?php '.$node->content.' ?>';
+                $buffer = '<?php '.$node->content.' ?>';
             }
         } else {
-            $phpBuffer = '<?php echo '.$node->content.'; ?>';
+            $buffer = '<?php echo '.$node->content.'; ?>';
         }
 
-        $phpRuntimeAssignments = [];
+        return $this->evaluatePhpBuffer(
+            $buffer,
+            ! $node->isEchoNode
+        );
+    }
+
+    private function evaluatePhpBuffer(string $___phpBuffer, bool $___processAssignments = false, array $___extraContext = [])
+    {
+        $___phpRuntimeAssignments = [];
         ob_start();
 
         try {
             extract($this->getActiveData());
+            extract($___extraContext);
             $___antlersVarBefore = get_defined_vars();
-            eval('?>'.$phpBuffer.'<?php ');
+            eval('?>'.$___phpBuffer.'<?php ');
             $___antlersPhpExecutionResult = ob_get_clean();
 
-            if (! $node->isEchoNode) {
+            if ($___processAssignments) {
                 $___antlersVarAfter = get_defined_vars();
 
-                foreach ($___antlersVarAfter as $varKey => $varValue) {
-                    if (! array_key_exists($varKey, $___antlersVarBefore) || array_key_exists($varKey, $this->previousAssignments) || array_key_exists($varKey, $this->runtimeAssignments)) {
-                        $phpRuntimeAssignments[$varKey] = $varValue;
+                foreach ($___antlersVarAfter as $___varKey => $___varValue) {
+                    if (
+                        str_starts_with($___varKey, '___') ||
+                        (array_key_exists($___varKey, $___antlersVarBefore) && $___antlersVarBefore[$___varKey] === $___varValue)
+                    ) {
+                        continue;
                     }
+
+                    $___phpRuntimeAssignments[$___varKey] = $___varValue;
                 }
             }
         } catch (ParseError $e) {
-            throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$phpBuffer}");
+            throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$___phpBuffer}");
         }
 
-        if (! $node->isEchoNode && ! empty($phpRuntimeAssignments)) {
-            unset($phpRuntimeAssignments['___antlersVarBefore']);
-            unset($phpRuntimeAssignments['___antlersPhpExecutionResult']);
+        if ($___processAssignments && ! empty($___phpRuntimeAssignments)) {
+            unset($___phpRuntimeAssignments['___antlersVarBefore']);
+            unset($___phpRuntimeAssignments['___antlersPhpExecutionResult']);
+            unset($___phpRuntimeAssignments['___extraContext']);
+            unset($___phpRuntimeAssignments['___phpBuffer']);
+            unset($___phpRuntimeAssignments['___processAssignments']);
 
-            $this->processAssignments($phpRuntimeAssignments);
+            $this->processAssignments($___phpRuntimeAssignments);
         }
 
         return $___antlersPhpExecutionResult;
@@ -2628,9 +2839,13 @@ class NodeProcessor
             return $data->value();
         }
 
+        $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
-        $value = $data->antlersValue($this->antlersParser, $context);
-        GlobalRuntimeState::$isEvaluatingUserData = false;
+        try {
+            $value = $data->antlersValue($this->antlersParser, $context);
+        } finally {
+            GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();

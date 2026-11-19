@@ -4,6 +4,8 @@ namespace Tests\Feature\Assets;
 
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Actions\Action;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Tests\FakesRoles;
@@ -229,24 +231,90 @@ class BrowserTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(3, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::asset-one.txt')
-            ->assertJsonPath('data.assets.1.id', 'one::nested/asset-two.txt')
-            ->assertJsonPath('data.assets.2.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(3, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-two.txt')
+            ->assertJsonPath('data.2.id', 'one::nested/subdirectory/asset-three.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/asset-two.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-two.txt');
 
         $this
             ->actingAs($this->userWithPermission())
             ->getJson('/cp/assets/browse/search/one/nested/subdirectory?search=asset')
             ->assertSuccessful()
-            ->assertJsonCount(1, 'data.assets')
-            ->assertJsonPath('data.assets.0.id', 'one::nested/subdirectory/asset-three.txt');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/subdirectory/asset-three.txt');
+    }
+
+    #[Test]
+    public function it_filters_assets()
+    {
+        $containerOne = AssetContainer::make('one')->disk('test')->save();
+        $containerTwo = AssetContainer::make('two')->disk('test')->save();
+
+        $containerOne
+            ->makeAsset('asset-one.txt')
+            ->upload(UploadedFile::fake()->create('asset-one.txt'));
+        $containerOne
+            ->makeAsset('asset-two.jpg')
+            ->upload(UploadedFile::fake()->image('asset-two.jpg', 100, 200));
+        $containerOne
+            ->makeAsset('nested/asset-three.jpg')
+            ->upload(UploadedFile::fake()->image('asset-three.jpg', 200, 100));
+        $containerTwo
+            ->makeAsset('asset-four.txt')
+            ->upload(UploadedFile::fake()->create('asset-four.txt'));
+        $containerTwo
+            ->makeAsset('nested/asset-five.jpg')
+            ->upload(UploadedFile::fake()->image('asset-five.jpg', 200, 100))
+            ->set('alt', 'An image')
+            ->save();
+
+        $txtFilter = ['asset_properties' => ['extension' => ['operator' => '=', 'value' => 'txt']]];
+        $imageFilter = ['asset_properties' => ['type' => ['operator' => '=', 'value' => 'image']]];
+        $widthFilter = ['asset_properties' => ['dimensions' => ['dimension' => 'width', 'operator' => '>', 'value' => 100]]];
+        $altFilter = ['fields' => ['alt' => ['operator' => 'like', 'value' => 'image']]];
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($txtFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-one.txt');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', 'one::asset-two.jpg')
+            ->assertJsonPath('data.1.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one?filters='.base64_encode(json_encode($widthFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/one/nested?filters='.base64_encode(json_encode($imageFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'one::nested/asset-three.jpg');
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/search/two?filters='.base64_encode(json_encode($altFilter)))
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', 'two::nested/asset-five.jpg');
     }
 
     #[Test]
@@ -264,7 +332,7 @@ class BrowserTest extends TestCase
             ->actingAs($user)
             ->getJson('/cp/assets/browse/test/one.txt/edit')
             ->assertSuccessful()
-            ->assertViewIs('statamic::assets.browse');
+            ->assertInertia(fn ($page) => $page->component('assets/Browse'));
     }
 
     #[Test]
@@ -298,6 +366,92 @@ class BrowserTest extends TestCase
             ->assertForbidden();
     }
 
+    #[Test]
+    public function it_only_allows_editing_the_blueprint_with_permission()
+    {
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'configure fields']]);
+
+        $this
+            ->actingAs(User::make()->assignRole('test')->save())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', true));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page->where('container.can_edit_blueprint', false));
+    }
+
+    #[Test]
+    public function it_includes_container_actions_in_the_browse_data()
+    {
+        TestContainerAction::register();
+
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithContainerActionPermission())
+            ->get(cp_route('assets.browse.show', 'test'))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->component('assets/Browse')
+                ->where('container.actions_url', 'http://localhost/cp/asset-containers/actions')
+                ->where('container.actions.0.handle', 'test-container-action'));
+    }
+
+    #[Test]
+    public function it_runs_a_container_action()
+    {
+        TestContainerAction::register();
+        TestContainerAction::$ran = [];
+
+        $container = AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithContainerActionPermission())
+            ->post(cp_route('asset-containers.actions.run'), [
+                'action' => 'test-container-action',
+                'selections' => ['test'],
+                'values' => [],
+            ])
+            ->assertSuccessful();
+
+        $this->assertCount(1, TestContainerAction::$ran);
+        $this->assertInstanceOf(AssetContainerContract::class, TestContainerAction::$ran[0]);
+        $this->assertEquals($container->handle(), TestContainerAction::$ran[0]->handle());
+    }
+
+    #[Test]
+    public function it_doesnt_run_a_container_action_without_permission()
+    {
+        TestContainerAction::register();
+        TestContainerAction::$ran = [];
+
+        AssetContainer::make('test')->disk('test')->save();
+
+        $this
+            ->actingAs($this->userWithoutPermission())
+            ->post(cp_route('asset-containers.actions.run'), [
+                'action' => 'test-container-action',
+                'selections' => ['test'],
+                'values' => [],
+            ])
+            ->assertForbidden();
+
+        $this->assertCount(0, TestContainerAction::$ran);
+    }
+
+    private function userWithContainerActionPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets', 'configure asset containers']]);
+
+        return User::make()->assignRole('test')->save();
+    }
+
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test assets', 'view one assets', 'view two assets']]);
@@ -315,17 +469,41 @@ class BrowserTest extends TestCase
     private function jsonStructure()
     {
         return [
-            'meta',
             'links' => ['folder_action', 'asset_action'],
             'data' => [
-                'assets' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
-                ],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions'],
+                ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
+            ],
+            'meta' => [
                 'folder' => [
                     'title', 'path', 'parent_path', 'actions', 'folders',
                 ],
             ],
         ];
+    }
+}
+
+class TestContainerAction extends Action
+{
+    public static $ran = [];
+
+    public static function handle()
+    {
+        return 'test-container-action';
+    }
+
+    public function visibleTo($item)
+    {
+        return $item instanceof AssetContainerContract;
+    }
+
+    public function authorize($user, $item)
+    {
+        return $user->can('configure asset containers');
+    }
+
+    public function run($items, $values)
+    {
+        static::$ran = $items->all();
     }
 }

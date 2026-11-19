@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class TermDeleting extends Event
 {
-    public $term;
-
-    public function __construct($term)
+    public function __construct(public $term)
     {
-        $this->term = $term;
     }
 
     /**

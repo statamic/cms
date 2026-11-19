@@ -14,11 +14,14 @@ use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Pattern;
 use Statamic\Query\Concerns\FakesQueries;
+use Statamic\Query\Concerns\QueriesRelationships;
+use Statamic\Query\Exceptions\MultipleRecordsFoundException;
+use Statamic\Query\Exceptions\RecordsNotFoundException;
 use Statamic\Query\Scopes\AppliesScopes;
 
 abstract class Builder implements Contract
 {
-    use AppliesScopes, FakesQueries;
+    use AppliesScopes, FakesQueries, QueriesRelationships;
 
     protected $columns;
     protected $limit;
@@ -39,6 +42,7 @@ abstract class Builder implements Contract
         '>=' => 'GreaterThanOrEqualTo',
         '<=' => 'LessThanOrEqualTo',
     ];
+    protected $likePatterns = [];
 
     public function __call($method, $args)
     {
@@ -69,7 +73,16 @@ abstract class Builder implements Contract
 
     public function offset($value)
     {
-        $this->offset = max(0, $value);
+        $value = max(0, $value);
+
+        // A large page number can overflow the offset arithmetic in forPage()/chunk() into a
+        // float, which array_slice() rejects. Clamp an out-of-range offset to PHP_INT_MAX so it
+        // yields an empty page instead of throwing.
+        if (is_float($value)) {
+            $value = $value >= PHP_INT_MAX ? PHP_INT_MAX : (int) $value;
+        }
+
+        $this->offset = $value;
 
         return $this;
     }
@@ -186,7 +199,7 @@ abstract class Builder implements Contract
 
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
-        $loweredOperator = strtolower((string) $operator);
+        $loweredOperator = is_string($operator) ? strtolower($operator) : $operator;
 
         if ($useDefault) {
             return [$operator, '='];
@@ -205,7 +218,7 @@ abstract class Builder implements Contract
 
     protected function invalidOperator($operator)
     {
-        if (is_null($operator)) {
+        if (! is_string($operator)) {
             return true;
         }
 
@@ -314,6 +327,48 @@ abstract class Builder implements Contract
         return $this->whereJsonLength($column, $operator, $value, 'or');
     }
 
+    public function whereJsonOverlaps($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonOverlaps',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonOverlaps($column, $values)
+    {
+        return $this->whereJsonOverlaps($column, $values, 'or');
+    }
+
+    public function whereJsonDoesntOverlap($column, $values, $boolean = 'and')
+    {
+        if (! is_array($values)) {
+            $values = [$values];
+        }
+
+        $this->wheres[] = [
+            'type' => 'JsonDoesntOverlap',
+            'column' => $column,
+            'values' => $values,
+            'boolean' => $boolean,
+        ];
+
+        return $this;
+    }
+
+    public function orWhereJsonDoesntOverlap($column, $values)
+    {
+        return $this->whereJsonDoesntOverlap($column, $values, 'or');
+    }
+
     public function whereNull($column, $boolean = 'and', $not = false)
     {
         $this->wheres[] = [
@@ -387,7 +442,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = Carbon::parse($value->format('Y-m-d')); // we only care about the date part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->startOfDay(); // we only care about the date part
 
         $this->wheres[] = [
             'type' => 'Date',
@@ -513,7 +568,7 @@ abstract class Builder implements Contract
             $value = Carbon::parse($value);
         }
 
-        $value = $value->format('H:i:s'); // we only care about the time part
+        $value = Carbon::instance($value)->setTimezone(config('app.timezone'))->format('H:i:s'); // we only care about the time part
 
         $this->wheres[] = [
             'type' => 'Time',
@@ -563,6 +618,52 @@ abstract class Builder implements Contract
     public function first()
     {
         return $this->get()->first();
+    }
+
+    public function firstOrFail($columns = ['*'])
+    {
+        if (! is_null($item = $this->select($columns)->first())) {
+            return $item;
+        }
+
+        throw new RecordsNotFoundException();
+    }
+
+    public function firstOr($columns = ['*'], ?Closure $callback = null)
+    {
+        if ($columns instanceof Closure) {
+            $callback = $columns;
+
+            $columns = ['*'];
+        }
+
+        if (! is_null($model = $this->select($columns)->first())) {
+            return $model;
+        }
+
+        return $callback();
+    }
+
+    public function sole($columns = ['*'])
+    {
+        $result = $this->get($columns);
+
+        $count = $result->count();
+
+        if ($count === 0) {
+            throw new RecordsNotFoundException();
+        }
+
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
+        }
+
+        return $result->first();
+    }
+
+    public function exists()
+    {
+        return $this->count() >= 1;
     }
 
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
@@ -616,6 +717,31 @@ abstract class Builder implements Contract
 
     abstract public function pluck($column, $key = null);
 
+    public function min($column)
+    {
+        return $this->pluck($column)->min();
+    }
+
+    public function max($column)
+    {
+        return $this->pluck($column)->max();
+    }
+
+    public function sum($column)
+    {
+        return $this->pluck($column)->sum();
+    }
+
+    public function avg($column)
+    {
+        return $this->pluck($column)->avg();
+    }
+
+    public function average($column)
+    {
+        return $this->avg($column);
+    }
+
     public function when($value, $callback, $default = null)
     {
         if ($value) {
@@ -649,6 +775,10 @@ abstract class Builder implements Contract
 
     protected function filterTestEquals($item, $value)
     {
+        if ($item instanceof DateTimeInterface && $value instanceof DateTimeInterface) {
+            return $item == $value;
+        }
+
         return strtolower($item ?? '') === strtolower($value ?? '');
     }
 
@@ -687,9 +817,12 @@ abstract class Builder implements Contract
             $item = json_encode($item);
         }
 
-        $pattern = Pattern::sqlLikeToRegex($like);
+        // What's being looked for is the same for every item, so its pattern is only worked out for the first.
+        $pattern = is_string($like)
+            ? $this->likePatterns[$like] ??= Pattern::sqlLikeToRegex($like)
+            : Pattern::sqlLikeToRegex($like);
 
-        return preg_match('/'.$pattern.'/im', (string) $item);
+        return preg_match('/'.$pattern.'/imu', (string) $item);
     }
 
     protected function filterTestNotLike($item, $like)
@@ -699,7 +832,7 @@ abstract class Builder implements Contract
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/im", $item);
+        return preg_match("/{$pattern}/imu", (string) $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)
@@ -722,13 +855,21 @@ abstract class Builder implements Contract
      */
     public function chunk($count, callable $callback)
     {
+        $skip = $this->offset;
+        $remaining = $this->limit;
+
         $page = 1;
 
         do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
+            $offset = (($page - 1) * $count) + intval($skip);
+
+            $limit = is_null($remaining) ? $count : min($count, $remaining);
+
+            if ($limit == 0) {
+                break;
+            }
+
+            $results = $this->offset($offset)->limit($limit)->get();
 
             $countResults = $results->count();
 
@@ -736,9 +877,10 @@ abstract class Builder implements Contract
                 break;
             }
 
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
+            if (! is_null($remaining)) {
+                $remaining = max($remaining - $countResults, 0);
+            }
+
             if ($callback($results, $page) === false) {
                 return false;
             }

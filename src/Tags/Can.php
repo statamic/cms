@@ -11,7 +11,6 @@ class Can extends Tags
      * Maps to {{ can:[permission] }}.
      *
      * @param  string  $method
-     * @param  array  $args
      * @return string|void
      */
     public function wildcard($method)

@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed once($key, callable $callable)
  * @method static mixed|\Spatie\Blink\Blink store($name = 'default')
  *
- * @see Statamic\Support\Blink
+ * @see \Statamic\Support\Blink
  */
 class Blink extends Facade
 {

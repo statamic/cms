@@ -15,7 +15,7 @@ use Statamic\Contracts\Auth\RoleRepository;
  * @method static void delete(\Statamic\Contracts\Auth\Role $role)
  *
  * @see \Statamic\Contracts\Auth\RoleRepository
- * @see \Statamic\Auth\Role
+ * @link \Statamic\Auth\Role
  */
 class Role extends Facade
 {

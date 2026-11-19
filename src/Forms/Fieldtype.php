@@ -7,10 +7,13 @@ use Statamic\Data\DataCollection;
 use Statamic\Facades;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Fieldtypes\Relationship;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\Query\ItemQueryBuilder;
 use Statamic\Query\Scopes\Filter;
+
+use function Statamic\trans as __;
 
 class Fieldtype extends Relationship
 {
@@ -23,38 +26,53 @@ class Fieldtype extends Relationship
     protected function configFieldItems(): array
     {
         return [
-            'placeholder' => [
-                'display' => __('Placeholder'),
-                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
-                'type' => 'text',
-            ],
-            'max_items' => [
-                'type' => 'integer',
-                'display' => __('Max Items'),
-                'default' => 1,
-                'instructions' => __('statamic::fieldtypes.form.config.max_items'),
-                'force_in_config' => true,
-            ],
-            'mode' => [
-                'display' => __('UI Mode'),
-                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
-                'type' => 'radio',
-                'default' => 'default',
-                'options' => [
-                    'default' => __('Stack Selector'),
-                    'select' => __('Select Dropdown'),
-                    'typeahead' => __('Typeahead Field'),
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'placeholder' => [
+                        'display' => __('Placeholder'),
+                        'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                        'type' => 'text',
+                    ],
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                        'type' => 'radio',
+                        'default' => 'default',
+                        'options' => [
+                            'default' => __('Stack Selector'),
+                            'select' => __('Select Dropdown'),
+                            'typeahead' => __('Typeahead Field'),
+                        ],
+                    ],
                 ],
             ],
-            'query_scopes' => [
-                'display' => __('Query Scopes'),
-                'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
-                'type' => 'taggable',
-                'options' => Scope::all()
-                    ->reject(fn ($scope) => $scope instanceof Filter)
-                    ->map->handle()
-                    ->values()
-                    ->all(),
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_items' => [
+                        'type' => 'integer',
+                        'display' => __('Max Items'),
+                        'default' => 1,
+                        'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                        'force_in_config' => true,
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
+                    'query_scopes' => [
+                        'display' => __('Query Scopes'),
+                        'instructions' => __('statamic::fieldtypes.form.config.query_scopes'),
+                        'type' => 'taggable',
+                        'options' => Scope::all()
+                            ->reject(fn ($scope) => $scope instanceof Filter)
+                            ->map->handle()
+                            ->values()
+                            ->all(),
+                    ],
+                ],
             ],
         ];
     }
@@ -72,6 +90,11 @@ class Fieldtype extends Relationship
         ];
     }
 
+    protected function authorizeItemData($id): bool
+    {
+        return $this->authorizeViewable(Facades\Form::find($id));
+    }
+
     protected function toItemArray($id, $site = null)
     {
         if ($form = Facades\Form::find($id)) {
@@ -87,7 +110,9 @@ class Fieldtype extends Relationship
     public function getIndexItems($request)
     {
         $query = (new ItemQueryBuilder())
-            ->withItems(new DataCollection(Facades\Form::all()));
+            ->withItems(new DataCollection(
+                Facades\Form::all()->filter(fn ($form) => User::current()->can('view', $form))
+            ));
 
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');

@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class RevisionSaving extends Event
 {
-    public $revision;
-
-    public function __construct($revision)
+    public function __construct(public $revision)
     {
-        $this->revision = $revision;
     }
 
     /**

@@ -30,6 +30,7 @@ class User extends BaseUser
 
     protected $id;
     protected $email;
+    protected Collection $passkeys;
     protected $password;
     protected $permissions;
 
@@ -37,6 +38,13 @@ class User extends BaseUser
     {
         $this->data = collect();
         $this->supplements = collect();
+        $this->passkeys = collect();
+    }
+
+    public function __clone()
+    {
+        $this->data = clone $this->data;
+        $this->supplements = clone $this->supplements;
     }
 
     public function data($data = null)
@@ -97,6 +105,12 @@ class User extends BaseUser
 
     public function path()
     {
+        $email = (string) $this->email();
+
+        if ($email === '.' || $email === '..' || basename($email) !== $email || preg_match('/[\\\\\0]/', $email)) {
+            throw new \InvalidArgumentException('Invalid email address for a user file path.');
+        }
+
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('users')->directory(), '/'),
             $this->email(),
@@ -116,7 +130,7 @@ class User extends BaseUser
             ? File::disk('users')->lastModified($path)
             : time();
 
-        return Carbon::createFromTimestamp($timestamp);
+        return Carbon::createFromTimestamp($timestamp, config('app.timezone'));
     }
 
     /**
@@ -132,7 +146,7 @@ class User extends BaseUser
     /**
      * Set the token value for the "remember me" session.
      *
-     * @param  string  $value
+     * @param  string  $token
      * @return void
      */
     public function setRememberToken($token)
@@ -298,7 +312,7 @@ class User extends BaseUser
     {
         $last_login = $this->getMeta('last_login');
 
-        return $last_login ? Carbon::createFromTimestamp($last_login) : $last_login;
+        return $last_login ? Carbon::createFromTimestamp($last_login, config('app.timezone')) : $last_login;
     }
 
     public function setLastLogin($carbon)
@@ -352,6 +366,7 @@ class User extends BaseUser
             'id' => (string) $this->id(),
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
+            'passkeys' => $this->passkeys()->map(fn ($key) => $key->fileData())->all(),
         ])->all();
     }
 
@@ -370,5 +385,16 @@ class User extends BaseUser
             'roles' => $this->get('roles', []),
             'super' => $this->get('super', false),
         ], $this->data()->toArray());
+    }
+
+    public function passkeys(): Collection
+    {
+        return $this->passkeys;
+
+    }
+
+    public function setPasskeys(Collection $passkeys)
+    {
+        $this->passkeys = $passkeys->keyBy(fn ($passkey) => $passkey->id());
     }
 }

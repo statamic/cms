@@ -105,4 +105,30 @@ class TermPolicyTest extends PolicyTestCase
         // If no site is specified, it should avoid checking site access.
         $this->assertFalse($user->can('create', [TermContract::class, $taxonomy]));
     }
+
+    #[Test]
+    public function user_with_configure_permission_can_do_it_all()
+    {
+        $userWithPermission = $this->userWithPermissions(['configure taxonomies']);
+        $userWithoutPermission = $this->userWithPermissions([]);
+
+        $taxonomy = tap(Taxonomy::make('tags'))->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data([]))->save()->term();
+
+        $this->assertTrue($userWithPermission->can('view', $term));
+        $this->assertTrue($userWithPermission->can('edit', $term));
+        $this->assertTrue($userWithPermission->can('update', $term));
+        $this->assertTrue($userWithPermission->can('create', [TermContract::class, $taxonomy]));
+        $this->assertTrue($userWithPermission->can('store', [TermContract::class, $taxonomy]));
+        $this->assertTrue($userWithPermission->can('delete', $term));
+        $this->assertTrue($userWithPermission->can('publish', $term));
+
+        $this->assertFalse($userWithoutPermission->can('view', $term));
+        $this->assertFalse($userWithoutPermission->can('edit', $term));
+        $this->assertFalse($userWithoutPermission->can('update', $term));
+        $this->assertFalse($userWithoutPermission->can('create', [TermContract::class, $taxonomy]));
+        $this->assertFalse($userWithoutPermission->can('store', [TermContract::class, $taxonomy]));
+        $this->assertFalse($userWithoutPermission->can('delete', $term));
+        $this->assertFalse($userWithoutPermission->can('publish', $term));
+    }
 }

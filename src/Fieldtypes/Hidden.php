@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
+use function Statamic\trans as __;
+
 class Hidden extends Fieldtype
 {
     protected $categories = ['special'];
@@ -11,10 +13,15 @@ class Hidden extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'default' => [
-                'display' => __('Default Value'),
-                'instructions' => __('statamic::messages.fields_default_instructions'),
-                'type' => 'text',
+            [
+                'display' => __('Data & Format'),
+                'fields' => [
+                    'default' => [
+                        'display' => __('Default Value'),
+                        'instructions' => __('statamic::messages.fields_default_instructions'),
+                        'type' => 'text',
+                    ],
+                ],
             ],
         ];
     }

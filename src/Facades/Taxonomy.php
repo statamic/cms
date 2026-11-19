@@ -16,11 +16,11 @@ use Statamic\Contracts\Taxonomies\TaxonomyRepository;
  * @method static void save(\Statamic\Contracts\Taxonomies\Taxonomy $taxonomy)
  * @method static void delete(\Statamic\Contracts\Taxonomies\Taxonomy $taxonomy)
  * @method static \Statamic\Contracts\Taxonomies\Taxonomy make(?string $handle = null)
- * @method static addPreviewTargets(string $handle, array $targets)
- * @method static additionalPreviewTargets(string $handle)
+ * @method static void addPreviewTargets(string $handle, array $targets)
+ * @method static \Illuminate\Support\Collection additionalPreviewTargets(string $handle)
  *
  * @see \Statamic\Stache\Repositories\TaxonomyRepository
- * @see \Statamic\Taxonomies\Taxonomy
+ * @link \Statamic\Taxonomies\Taxonomy
  */
 class Taxonomy extends Facade
 {

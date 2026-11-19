@@ -24,6 +24,7 @@ use Tests\TestCase;
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use \Tests\FakesRoles;
     use TestsQueryableValueWithMaxItems;
 
     public function setUp(): void
@@ -129,6 +130,45 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_pre_processes_for_index()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(['foo/one.txt', 'bar/two.txt']);
+
+        $this->assertEquals(2, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt', 'test::bar/two.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    #[Test]
+    public function it_pre_processes_for_index_when_max_files_is_one()
+    {
+        $preProcessed = $this->fieldtype(['max_files' => 1])->preProcessIndex('foo/one.txt');
+
+        $this->assertEquals(1, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15469
+     */
+    #[Test]
+    public function it_pre_processes_a_single_value_for_index_when_max_files_is_no_longer_one()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex('foo/one.txt');
+
+        $this->assertEquals(1, $preProcessed['total']);
+        $this->assertEquals(['test::foo/one.txt'], $preProcessed['assets']->map(fn ($asset) => $asset['id'])->all());
+    }
+
+    #[Test]
+    public function it_pre_processes_for_index_when_the_value_is_null()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(null);
+
+        $this->assertEquals(0, $preProcessed['total']);
+        $this->assertEquals([], $preProcessed['assets']->all());
+    }
+
+    #[Test]
     public function it_replaces_dimensions_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -207,6 +247,16 @@ class AssetsTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_rules_that_are_not_strings()
+    {
+        $closure = fn ($attribute, $value, $fail) => null;
+
+        $replaced = $this->fieldtype(['validate' => ['required', $closure]])->fieldRules();
+
+        $this->assertEquals(['required', $closure], $replaced);
+    }
+
+    #[Test]
     public function it_doesnt_replace_non_image_related_rule()
     {
         config()->set('statamic.cp.route', '/');
@@ -216,6 +266,54 @@ class AssetsTest extends TestCase
         $this->assertIsArray($replaced);
         $this->assertCount(1, $replaced);
         $this->assertEquals('file', $replaced[0]);
+    }
+
+    #[Test]
+    public function what_it_preloads_about_a_container_is_worked_out_once_however_many_fields_use_it()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $this->actingAs(tap(\Statamic\Facades\User::make()->assignRole('test'))->save());
+
+        $checks = 0;
+        \Illuminate\Support\Facades\Gate::after(function () use (&$checks) {
+            $checks++;
+        });
+
+        $first = $this->fieldtype(['container' => 'test'])->preload();
+        $checksForOne = $checks;
+        $second = $this->fieldtype(['container' => 'test'])->preload();
+
+        $this->assertGreaterThan(0, $checksForOne);
+        $this->assertSame($checksForOne, $checks);
+        $this->assertSame($first['container'], $second['container']);
+        $this->assertTrue($first['container']['can_view']);
+        $this->assertFalse($first['container']['can_delete']);
+        $this->assertEquals($first['columns']->map->toArray()->all(), $second['columns']->map->toArray()->all());
+    }
+
+    #[Test]
+    public function each_field_gets_columns_of_its_own()
+    {
+        $this->actingAs(tap(\Statamic\Facades\User::make()->makeSuper())->save());
+
+        $first = $this->fieldtype(['container' => 'test'])->preload()['columns'];
+        $first->first()->label('Changed');
+        $second = $this->fieldtype(['container' => 'test'])->preload()['columns'];
+
+        $this->assertNotSame($first->first(), $second->first());
+        $this->assertSame('Alt Text', $second->first()->label());
+    }
+
+    #[Test]
+    public function what_it_preloads_about_a_container_is_each_users_own()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+
+        $this->actingAs(tap(\Statamic\Facades\User::make()->id('one')->assignRole('test'))->save());
+        $this->assertFalse($this->fieldtype(['container' => 'test'])->preload()['container']['can_edit']);
+
+        $this->actingAs(tap(\Statamic\Facades\User::make()->id('two')->makeSuper())->save());
+        $this->assertTrue($this->fieldtype(['container' => 'test'])->preload()['container']['can_edit']);
     }
 
     public function fieldtype($config = [])

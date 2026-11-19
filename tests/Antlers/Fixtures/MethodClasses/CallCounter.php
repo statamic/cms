@@ -13,6 +13,13 @@ class CallCounter
         return $this;
     }
 
+    public function incrementTwice()
+    {
+        $this->count += 2;
+
+        return $this;
+    }
+
     public function __toString(): string
     {
         return 'Count: '.$this->count;

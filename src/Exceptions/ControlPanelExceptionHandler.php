@@ -8,6 +8,8 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Exceptions\ValidationException as StatamicValidationException;
 use Throwable;
 
+use function Statamic\trans as __;
+
 class ControlPanelExceptionHandler extends Handler
 {
     use Concerns\RendersControlPanelExceptions;
@@ -15,6 +17,11 @@ class ControlPanelExceptionHandler extends Handler
     public function render($request, Throwable $e)
     {
         return $this->renderException($request, $e);
+    }
+
+    protected function shouldReturnJson($request, Throwable $e)
+    {
+        return $request->expectsJson();
     }
 
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)

@@ -10,6 +10,7 @@ class AllowedFile implements ValidationRule
 {
     private const EXTENSIONS = [
         '7z',
+        'aac',
         'aiff',
         'asc',
         'asf',
@@ -25,10 +26,12 @@ class AllowedFile implements ValidationRule
         'dotm',
         'dotx',
         'fla',
+        'flac',
         'flv',
         'gif',
         'gz',
         'gzip',
+        'h264',
         'heic',
         'heif',
         'hevc',
@@ -46,6 +49,7 @@ class AllowedFile implements ValidationRule
         'mcc',
         'md',
         'mid',
+        'mkv',
         'mov',
         'mp3',
         'mp4',
@@ -120,8 +124,12 @@ class AllowedFile implements ValidationRule
         }
     }
 
-    private function isAllowedExtension(UploadedFile $file): bool
+    private function isAllowedExtension(mixed $file): bool
     {
+        if (! $file instanceof UploadedFile) {
+            return false;
+        }
+
         $extensions = $this->allowedExtensions ?? array_merge(static::EXTENSIONS, config('statamic.assets.additional_uploadable_extensions', []));
 
         return in_array(trim(strtolower($file->getClientOriginalExtension())), $extensions);

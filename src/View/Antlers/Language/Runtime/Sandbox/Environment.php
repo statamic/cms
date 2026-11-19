@@ -6,6 +6,7 @@ use ArrayAccess;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Query\Builder;
@@ -890,6 +891,27 @@ class Environment
 
                 continue;
             } elseif ($currentNode instanceof MethodInvocationNode) {
+                if (GlobalRuntimeState::$isEvaluatingUserData && ! GlobalRuntimeState::$allowMethodsInContent) {
+                    array_pop($stack);
+
+                    if (GlobalRuntimeState::$throwErrorOnAccessViolation) {
+                        throw ErrorFactory::makeRuntimeError(
+                            AntlersErrorCodes::RUNTIME_METHOD_CALL_USER_CONTENT,
+                            $currentNode,
+                            'Method invocation in user content.'
+                        );
+                    } else {
+                        Log::warning('Method call evaluated in user content.', [
+                            'file' => GlobalRuntimeState::$currentExecutionFile,
+                            'trace' => GlobalRuntimeState::$templateFileStack,
+                        ]);
+                    }
+
+                    $stack[] = null;
+
+                    continue;
+                }
+
                 $leftNode = array_pop($stack);
 
                 if ($leftNode == null) {
@@ -956,7 +978,7 @@ class Environment
             if ($operand instanceof LeftAssignmentOperator) {
                 $varName = $this->nameOf($left);
 
-                $right = $this->checkForFieldValue($this->getValue($rightNode));
+                $right = $this->checkForFieldValue($this->getAssignedValue($rightNode));
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $lastPath = $this->dataRetriever->lastPath();
@@ -1155,6 +1177,15 @@ class Environment
         return $stack;
     }
 
+    private function getAssignedValue($node)
+    {
+        if ($node instanceof VariableNode && $node->isInterpolationReference && ! $node->hasModifiers()) {
+            return $this->nodeProcessor->reduceAssignedInterpolatedVariable($node);
+        }
+
+        return $this->getValue($node);
+    }
+
     /**
      * Evaluates the provided null coalescence group.
      *
@@ -1172,8 +1203,14 @@ class Environment
             $leftVal = $leftVal->value();
         }
 
-        if ($leftVal != null) {
-            return $leftVal;
+        if ($group->strict) {
+            if ($leftVal !== null) {
+                return $leftVal;
+            }
+        } else {
+            if ($leftVal != null) {
+                return $leftVal;
+            }
         }
 
         return $this->getValue($group->right);
@@ -1369,22 +1406,30 @@ class Environment
     private function checkForFieldValue($value, $hasModifiers = false, $modifierChain = null)
     {
         if ($value instanceof Value) {
+            $prevIsEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
             GlobalRuntimeState::$isEvaluatingUserData = true;
-            if ($value->shouldParseAntlers()) {
-                if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
-                    GlobalRuntimeState::$userContentEvalState = [
-                        $value,
-                        $this->nodeProcessor->getActiveNode(),
-                    ];
-                    $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
-                    GlobalRuntimeState::$userContentEvalState = null;
+
+            try {
+                if ($value->shouldParseAntlers()) {
+                    if (! $hasModifiers || ($modifierChain != null && $modifierChain[0]->nameNode->name != 'raw')) {
+                        GlobalRuntimeState::$userContentEvalState = [
+                            $value,
+                            $this->nodeProcessor->getActiveNode(),
+                        ];
+                        try {
+                            $value = $value->antlersValue($this->nodeProcessor->getAntlersParser(), $this->data);
+                        } finally {
+                            GlobalRuntimeState::$userContentEvalState = null;
+                        }
+                    }
+                } else {
+                    if (! $hasModifiers) {
+                        $value = $value->value();
+                    }
                 }
-            } else {
-                if (! $hasModifiers) {
-                    $value = $value->value();
-                }
+            } finally {
+                GlobalRuntimeState::$isEvaluatingUserData = $prevIsEvaluatingUserData;
             }
-            GlobalRuntimeState::$isEvaluatingUserData = false;
         }
 
         return $value;

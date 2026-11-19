@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Str;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Taxonomy;
@@ -228,5 +229,93 @@ Layout 3:
 EXPECTED;
 
         $this->assertSame($expected, $result);
+    }
+
+    public function test_escaped_braces_in_concurrent_requests()
+    {
+        Collection::make('pages')->routes(['en' => '{slug}'])->save();
+        EntryFactory::collection('pages')->id('1')->slug('page-one')->data([
+            'title' => 'Page One',
+            'template' => 'escaped_braces',
+        ])->create();
+        EntryFactory::collection('pages')->id('2')->slug('page-two')->data([
+            'title' => 'Page Two',
+            'template' => 'escaped_braces',
+        ])->create();
+
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+
+        $template = <<<'EOT'
+{{ title }}
+{{ "string @{foo@} bar" }}
+{{ "another @{example@} here" }}
+EOT;
+
+        $this->viewShouldReturnRaw('escaped_braces', $template);
+
+        $expectedOne = <<<'EXPECTED'
+Page One
+string {foo} bar
+another {example} here
+EXPECTED;
+
+        $expectedTwo = <<<'EXPECTED'
+Page Two
+string {foo} bar
+another {example} here
+EXPECTED;
+
+        $responseOne = $this->get('page-one')->assertOk();
+        $contentOne = StringUtilities::normalizeLineEndings(trim($responseOne->content()));
+
+        $responseTwo = $this->get('page-two')->assertOk();
+        $contentTwo = StringUtilities::normalizeLineEndings(trim($responseTwo->content()));
+
+        $this->assertSame($expectedOne, $contentOne);
+        $this->assertSame($expectedTwo, $contentTwo);
+    }
+
+    public function test_php_nodes_dont_overwrite_parent_scope_needlessly()
+    {
+        $this->createBlueprintsAndData();
+        $this->withFakeViews();
+
+        $layout = <<<'EOT'
+{{ template_content }}
+Layout: {{ title }}
+EOT;
+
+        $template = <<<'EOT'
+{{?
+    $loop_data = [
+        [
+            'title' => 'A different title',
+        ],
+    ];
+?}}
+
+Before: {{ title }}
+{{ collection:news }}
+    {{ collection:news }}
+        {{ loop_data }}
+            {{? /* */ ?}}
+        {{ /loop_data }}
+    {{ /collection:news }}
+{{ /collection:news }}
+After: {{ title }}
+EOT;
+
+        $this->viewShouldReturnRaw('layout', $layout);
+        $this->viewShouldReturnRaw('default', $template);
+
+        $result = $this->get('bravo/news-2')
+            ->assertOk()
+            ->content();
+
+        $this->assertSame(
+            'Before: News 2 After: News 2 Layout: News 2',
+            Str::squish($result)
+        );
     }
 }

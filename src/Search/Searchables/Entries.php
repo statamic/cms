@@ -31,7 +31,21 @@ class Entries extends Provider
             $query->where('site', $site);
         }
 
-        return $query->lazy(100)->filter($this->filter())->values();
+        $this->applyQueryScope($query);
+
+        if ($filter = $this->filter()) {
+            return $query
+                ->lazy(config('statamic.search.chunk_size'))
+                ->filter($filter)
+                ->values()
+                ->map->reference();
+        }
+
+        if ($this->index->handle() !== 'cp') {
+            $query->whereStatus('published');
+        }
+
+        return $query->pluck('reference');
     }
 
     public function contains($searchable): bool
@@ -48,16 +62,23 @@ class Entries extends Provider
             return false;
         }
 
-        return $this->filter()($searchable);
+        if (($filter = $this->filter()) && ! $filter($searchable)) {
+            return false;
+        }
+
+        $query = Entry::query()->where('id', $searchable->id());
+
+        if (! $filter && $this->index->handle() !== 'cp') {
+            $query->whereStatus('published');
+        }
+
+        $this->applyQueryScope($query);
+
+        return $query->exists();
     }
 
     public function find(array $ids): Collection
     {
         return Entry::query()->whereIn('id', $ids)->get();
-    }
-
-    protected function defaultFilter()
-    {
-        return fn ($item) => $item->status() === 'published';
     }
 }

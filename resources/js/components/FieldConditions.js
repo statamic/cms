@@ -1,7 +1,13 @@
-export default class FieldConditions {
+import { ref } from 'vue';
 
+const conditions = ref({});
+
+export default class FieldConditions {
     add(name, condition) {
-        Statamic.$store.commit('statamic/condition', {name, condition});
+        conditions.value[name] = condition;
     }
 
+    get(name) {
+        return conditions.value[name];
+    }
 }

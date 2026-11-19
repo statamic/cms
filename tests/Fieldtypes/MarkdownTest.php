@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Markdown;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -14,6 +15,28 @@ use Tests\TestCase;
 class MarkdownTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+
+    #[Test]
+    public function heading_buttons_are_opt_in()
+    {
+        $buttons = (new Markdown)->configFields()->get('buttons');
+
+        $this->assertSame([
+            'bold', 'italic', 'unorderedlist', 'orderedlist', 'quote', 'link', 'image', 'table',
+        ], $buttons->defaultValue());
+        $this->assertTrue($buttons->get('full_width_setting'));
+    }
+
+    #[Test]
+    public function existing_button_selections_and_order_are_preserved()
+    {
+        foreach ([[], ['table', 'bold'], ['h6', 'h1', 'italic']] as $buttons) {
+            $fieldtype = $this->fieldtype(['buttons' => $buttons]);
+
+            $this->assertSame($buttons, $fieldtype->config('buttons'));
+            $this->assertSame($buttons, $fieldtype->config()['buttons']);
+        }
+    }
 
     #[Test]
     public function it_augments_to_html()
@@ -168,6 +191,24 @@ EOT;
 EOT;
 
         $this->assertEquals($expected, $this->fieldtype()->augment($markdown));
+    }
+
+    #[Test]
+    public function it_converts_to_smartypants_after_antlers_is_parsed()
+    {
+        $md = $this->fieldtype(['smartypants' => true, 'antlers' => true]);
+
+        $value = <<<'EOT'
+{{ "this is a string" | replace(" is ", " isnt ") | upper }}
+EOT;
+
+        $value = new Value($value, 'markdown', $md);
+
+        $expected = <<<'EOT'
+<p>THIS ISNT A STRING</p>
+EOT;
+
+        $this->assertEqualsTrimmed($expected, $value->antlersValue(app(\Statamic\Contracts\View\Antlers\Parser::class), []));
     }
 
     private function fieldtype($config = [])

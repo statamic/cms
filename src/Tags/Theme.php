@@ -8,6 +8,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
+/** @deprecated Will be removed in v7. Use the vite or mix tags instead. */
 class Theme extends Tags
 {
     /**
@@ -17,7 +18,6 @@ class Theme extends Tags
      * eg. {{ theme:img }}, {{ theme:svg }}, etc.
      *
      * @param  string  $method  Tag part
-     * @param  array  $arguments  Unused
      * @return string
      */
     public function wildcard($method)
@@ -102,7 +102,7 @@ class Theme extends Tags
         $url = $this->themeUrl($path);
 
         if ($this->params->bool('tag')) {
-            return '<link rel="stylesheet" href="'.$url.'" />';
+            return '<link rel="stylesheet" href="'.$url.'">';
         }
 
         return $url;

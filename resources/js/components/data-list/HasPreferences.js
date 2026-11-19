@@ -1,21 +1,17 @@
 export default {
-
     data() {
         return {
             preferencesPrefix: null,
-        }
+        };
     },
 
     computed: {
-
         hasPreferences() {
             return this.preferencesPrefix !== null;
-        }
-
+        },
     },
 
     methods: {
-
         preferencesKey(type) {
             return `${this.preferencesPrefix}.${type}`;
         },
@@ -28,10 +24,8 @@ export default {
             return this.$preferences.set(this.preferencesKey(type), value);
         },
 
-        removePreference(type, value=null) {
+        removePreference(type, value = null) {
             return this.$preferences.remove(this.preferencesKey(type), value);
-        }
-
-    }
-
-}
+        },
+    },
+};

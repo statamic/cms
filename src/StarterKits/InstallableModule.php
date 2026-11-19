@@ -74,9 +74,26 @@ final class InstallableModule extends Module
     {
         $this->installableFiles()->each(function ($toPath, $fromPath) {
             $this->installFile($fromPath, $toPath, $this->installer->console());
+            $this->loadInstalledConfig($toPath);
         });
 
         return $this;
+    }
+
+    /**
+     * Load installed config file into the running app, so later install steps see it.
+     */
+    private function loadInstalledConfig(string $path): void
+    {
+        $configPath = Path::tidy(config_path()).'/';
+
+        if (! Str::startsWith($path, $configPath) || ! Str::endsWith($path, '.php')) {
+            return;
+        }
+
+        $key = Str::of($path)->after($configPath)->beforeLast('.php')->replace('/', '.')->toString();
+
+        config()->set($key, array_merge(config($key, []), require $path));
     }
 
     /**
@@ -104,18 +121,9 @@ final class InstallableModule extends Module
      */
     protected function installableFiles(): Collection
     {
-        $installableFromExportPaths = $this
+        return $this
             ->exportPaths()
             ->flatMap(fn ($path) => $this->expandExportDirectoriesToFiles($path));
-
-        $installableFromExportAsPaths = $this
-            ->exportAsPaths()
-            ->flip()
-            ->flatMap(fn ($to, $from) => $this->expandExportDirectoriesToFiles($to, $from));
-
-        return collect()
-            ->merge($installableFromExportPaths)
-            ->merge($installableFromExportAsPaths);
     }
 
     /**
@@ -196,7 +204,6 @@ final class InstallableModule extends Module
     {
         $this
             ->exportPaths()
-            ->merge($this->exportAsPaths())
             ->reject(fn ($path) => $this->files->exists($this->installableFilesPath($path)))
             ->each(function ($path) {
                 throw new StarterKitException("Starter kit path [{$path}] does not exist.");

@@ -15,4 +15,6 @@ class NullCoalescenceGroup extends AbstractNode
      * @var AbstractNode|null
      */
     public $right = null;
+
+    public bool $strict = false;
 }

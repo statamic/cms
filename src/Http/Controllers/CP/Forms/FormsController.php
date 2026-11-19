@@ -3,9 +3,12 @@
 namespace Statamic\Http\Controllers\CP\Forms;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use InvalidArgumentException;
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
+use Statamic\CP\PublishForm;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Scope;
@@ -13,6 +16,8 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Rules\Handle;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
@@ -36,28 +41,20 @@ class FormsController extends CpController
                     'submissions' => $form->querySubmissions()->count(),
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
-                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'blueprint_url' => cp_route('blueprints.forms.edit', $form->handle()),
                     'can_edit' => User::current()->can('edit', $form),
                     'can_edit_blueprint' => User::current()->can('configure form fields', $form),
-                    'actions' => Action::for($form),
                 ];
             })
             ->values();
 
-        if ($request->wantsJson()) {
-            return [
-                'meta' => [
-                    'columns' => $columns,
-                    'activeFilterBadges' => [],
-                ],
-                'data' => $forms,
-            ];
-        }
-
-        return view('statamic::forms.index', [
+        return Inertia::render('forms/Index', [
             'forms' => $forms,
             'initialColumns' => $columns,
             'actionUrl' => cp_route('forms.actions.run'),
+            'canCreate' => User::current()->can('create', FormContract::class),
+            'createUrl' => cp_route('forms.create'),
+            'configureEmailUrl' => cp_route('utilities.email'),
         ]);
     }
 
@@ -73,15 +70,34 @@ class FormsController extends CpController
             ->rejectUnlisted()
             ->values();
 
-        $viewData = [
-            'form' => $form,
+        return Inertia::render('forms/Show', [
+            'form' => [
+                'title' => __($form->title()),
+                'handle' => $form->handle(),
+                'editUrl' => $form->editUrl(),
+                'deleteUrl' => $form->deleteUrl(),
+                'blueprintUrl' => cp_route('blueprints.forms.edit', $form->handle()),
+                'canEdit' => User::current()->can('edit', $form),
+                'canDelete' => User::current()->can('delete', $form),
+                'canConfigureFields' => User::current()->can('configure form fields'),
+            ],
             'columns' => $columns,
             'filters' => Scope::filters('form-submissions', [
                 'form' => $form->handle(),
             ]),
-        ];
-
-        return view('statamic::forms.show', $viewData);
+            'actionUrl' => cp_route('forms.submissions.actions.run', $form->handle()),
+            'exporters' => $form->exporters()->map(fn ($exporter) => [
+                'handle' => $exporter->handle(),
+                'title' => $exporter->title(),
+                'downloadUrl' => $exporter->downloadUrl(),
+                'supportsColumnSelection' => $exporter->supportsColumnSelection(),
+            ])->values(),
+            'exportColumns' => $form->fields()
+                ->map(fn ($field) => ['handle' => $field->handle(), 'title' => __($field->display())])
+                ->push(['handle' => 'date', 'title' => __('Date')])
+                ->values(),
+            'redirectUrl' => cp_route('forms.index'),
+        ]);
     }
 
     /**
@@ -120,7 +136,9 @@ class FormsController extends CpController
 
         $this->authorize('create', FormContract::class);
 
-        return view('statamic::forms.create');
+        return Inertia::render('forms/Create', [
+            'submitUrl' => cp_route('forms.store'),
+        ]);
     }
 
     public function store(Request $request)
@@ -159,17 +177,11 @@ class FormsController extends CpController
             'email' => $form->email(),
         ]);
 
-        $fields = ($blueprint = $this->editFormBlueprint($form))
-            ->fields()
-            ->addValues($values)
-            ->preProcess();
-
-        return view('statamic::forms.edit', [
-            'blueprint' => $blueprint->toPublishArray(),
-            'values' => $fields->values(),
-            'meta' => $fields->meta(),
-            'form' => $form,
-        ]);
+        return PublishForm::make($this->editFormBlueprint($form))
+            ->title(__('Configure Form'))
+            ->values($values)
+            ->asConfig()
+            ->submittingTo(cp_route('forms.update', $form->handle()));
     }
 
     public function update($form, Request $request)
@@ -220,12 +232,16 @@ class FormsController extends CpController
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'html',
+                        'display' => __('Blueprint'),
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'html' => ''.
-                            '<div class="text-xs">'.
-                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
-                            '</div>',
+                        'type' => 'blueprints',
+                        'options' => [
+                            [
+                                'handle' => 'default',
+                                'title' => __('Edit Blueprint'),
+                                'edit_url' => cp_route('blueprints.forms.edit', $form->handle()),
+                            ],
+                        ],
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -249,6 +265,7 @@ class FormsController extends CpController
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',
+                        'full_width_setting' => true,
                         'add_row' => __('Add Email'),
                         'instructions' => __('statamic::messages.form_configure_email_instructions'),
                         'fields' => [
@@ -310,6 +327,7 @@ class FormsController extends CpController
                                     'display' => __('HTML view'),
                                     'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -319,6 +337,7 @@ class FormsController extends CpController
                                     'display' => __('Text view'),
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                     'folder' => config('statamic.forms.email_view_folder'),
+                                    'clearable' => true,
                                 ],
                             ],
                             [
@@ -356,20 +375,83 @@ class FormsController extends CpController
 
         ];
 
+        $positions = Form::extraConfigPositionsFor($form->handle());
+
         foreach (Form::extraConfigFor($form->handle()) as $handle => $config) {
+            $before = $positions[$handle]['beforeSection'] ?? null;
+            $after = $positions[$handle]['afterSection'] ?? null;
             $merged = false;
             foreach ($fields as $sectionHandle => $section) {
-                if ($section['display'] == $config['display']) {
+                if ($section['display'] == __($config['display'])) {
+                    if ($before || $after) {
+                        throw new InvalidArgumentException("The [{$config['display']}] section already exists, so beforeSection and afterSection can't be used.");
+                    }
+
                     $fields[$sectionHandle]['fields'] += $config['fields'];
                     $merged = true;
                 }
             }
 
             if (! $merged) {
-                $fields[$handle] = $config;
+                $fields = $this->insertSection($fields, $handle, $config, $before, $after);
             }
         }
 
-        return Blueprint::makeFromTabs($fields);
+        return Blueprint::make()->setContents(collect([
+            'tabs' => [
+                'main' => [
+                    'sections' => collect($fields)->map(function ($section) {
+                        return [
+                            'display' => $section['display'],
+                            'fields' => collect($section['fields'])->map(function ($field, $handle) {
+                                return [
+                                    'handle' => $handle,
+                                    'field' => $field,
+                                ];
+                            })->values()->all(),
+                        ];
+                    })->values()->all(),
+                ],
+            ],
+        ])->all());
+
+    }
+
+    protected function insertSection(array $sections, string $handle, array $section, ?string $before = null, ?string $after = null): array
+    {
+        if (isset($sections[$handle]) && ($before || $after)) {
+            Log::warning("Form config section [{$handle}] replaces an existing section, so its position was ignored.");
+        }
+
+        if (isset($sections[$handle]) || (! $before && ! $after)) {
+            $sections[$handle] = $section;
+
+            return $sections;
+        }
+
+        $result = [];
+        $inserted = false;
+
+        foreach ($sections as $existingHandle => $existing) {
+            if ($before === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+
+            $result[$existingHandle] = $existing;
+
+            if ($after === $existingHandle) {
+                $result[$handle] = $section;
+                $inserted = true;
+            }
+        }
+
+        if (! $inserted) {
+            Log::warning("Form config section [{$handle}] could not be placed relative to [".($before ?? $after).'] because it does not exist. Appending it instead.');
+
+            return $sections + [$handle => $section];
+        }
+
+        return $result;
     }
 }

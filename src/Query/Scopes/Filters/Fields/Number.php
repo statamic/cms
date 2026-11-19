@@ -4,6 +4,8 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 abstract class Number extends FieldtypeFilter
 {
     abstract protected function valueFieldtype();
@@ -21,6 +23,8 @@ abstract class Number extends FieldtypeFilter
                     '>=' => __('Greater than or equals'),
                     '<' => __('Less than'),
                     '<=' => __('Less than or equals'),
+                    'null' => __('Empty'),
+                    'not-null' => __('Not empty'),
                 ],
                 'default' => '=',
             ],
@@ -28,7 +32,7 @@ abstract class Number extends FieldtypeFilter
                 'type' => $this->valueFieldtype(),
                 'placeholder' => __('Value'),
                 'if' => [
-                    'operator' => 'not empty',
+                    'operator' => 'contains_any <>, >, >=, <, <=, =',
                 ],
             ],
         ];
@@ -39,7 +43,11 @@ abstract class Number extends FieldtypeFilter
         $operator = $values['operator'];
         $value = $values['value'];
 
-        $query->where($handle, $operator, $value);
+        match ($operator) {
+            'null' => $query->whereNull($handle),
+            'not-null' => $query->whereNotNull($handle),
+            default => $query->where($handle, $operator, $value),
+        };
     }
 
     public function badge($values)

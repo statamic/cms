@@ -1,23 +1,29 @@
 <template>
-    <div class="range-fieldtype-wrapper bg-gray-200 dark:bg-dark-700 rounded py-2 px-4 border dark:border-dark-900">
-        <div class="flex items-center">
-            <div v-if="config.prepend" v-text="__(config.prepend)" class="rtl:ml-2 ltr:mr-2" />
-            <input
-                type="range"
-                v-model="val"
-                :name="name"
-                :min="config.min"
-                :max="config.max"
-                :step="config.step"
-                :width="config.width"
-                :readonly="isReadOnly"
-                :disabled="isReadOnly"
-                :id="fieldId"
-                class="flex-1 min-w-0"
-            />
-            <div class="rounded border dark:border-dark-900 px-2 py-1 mx-2 bg-gray-100 dark:bg-dark-600 dark:shadow-inner-dark">{{ val }}</div>
-            <div v-if="config.append" v-text="__(config.append)" />
-        </div>
+    <div
+        class="
+            flex items-center gap-2 rounded-lg bg-gray-50 p-2 @lg:px-4 @lg:py-3 dark:bg-gray-800
+            with-contrast:border with-contrast:border-gray-500
+            data-readonly:border data-readonly:border-dashed! data-readonly:border-gray-300 data-readonly:with-contrast:border-gray-100
+            data-readonly:dark:border! data-readonly:dark:border-dashed! data-readonly:dark:border-gray-600!
+            data-readonly:dark:bg-gray-900
+        "
+        :data-readonly="isReadOnly ? true : undefined"
+    >
+        <ui-subheading size="lg" v-if="config.prepend" :text="__(config.prepend)" class="whitespace-nowrap" />
+        <input
+            class="min-w-0 flex-1 w-full disabled:opacity-60"
+            type="range"
+            v-model="val"
+            :disabled="config.disabled || isReadOnly"
+            :id="fieldId"
+            :max="config.max"
+            :min="config.min"
+            :name="name"
+            :step="config.step"
+            :width="config.width"
+        />
+        <ui-badge :text="val"  />
+        <ui-subheading size="lg" v-if="config.append" :text="__(config.append)" />
     </div>
 </template>
 
@@ -25,13 +31,12 @@
 import Fieldtype from './Fieldtype.vue';
 
 export default {
-
     mixins: [Fieldtype],
 
-     data() {
+    data() {
         return {
             val: this.getValue(),
-        }
+        };
     },
 
     methods: {
@@ -50,11 +55,11 @@ export default {
         },
 
         getValue() {
-            if (typeof(this.value) === 'number') {
+            if (typeof this.value === 'number') {
                 return this.value;
             }
 
-            if (typeof(this.config.default) === 'number') {
+            if (typeof this.config.default === 'number') {
                 return this.config.default;
             }
 
@@ -62,15 +67,14 @@ export default {
         },
     },
 
-
     watch: {
         value(value) {
             this.val = value;
         },
         val(value) {
+            if (this.isReadOnly) return;
             this.updateDebounced(value);
-        }
-    }
-
-}
+        },
+    },
+};
 </script>

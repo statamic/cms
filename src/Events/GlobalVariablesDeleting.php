@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class GlobalVariablesDeleting extends Event
 {
-    public $variables;
-
-    public function __construct($variables)
+    public function __construct(public $variables)
     {
-        $this->variables = $variables;
     }
 
     /**

@@ -58,4 +58,75 @@ trait HasSelectOptionsTests
             ],
         ];
     }
+
+    #[Test]
+    #[DataProvider('preProcessIndexProvider')]
+    public function it_preprocesses_index_values($options, $value, $expected)
+    {
+        $field = $this->field(['options' => $options]);
+
+        $this->assertSame($expected, $field->preProcessIndex($value));
+    }
+
+    public static function preProcessIndexProvider()
+    {
+        return [
+            'list' => [
+                ['one', 'two', 'three'],
+                'two',
+                ['two'],
+            ],
+            'associative with labels' => [
+                ['one' => 'One', 'two' => 'Two', 'three' => 'Three'],
+                'two',
+                ['Two'],
+            ],
+            'associative without labels' => [
+                ['one' => null, 'two' => null, 'three' => null],
+                'two',
+                ['two'],
+            ],
+            'multidimensional with labels' => [
+                [
+                    ['key' => 'one', 'value' => 'One'],
+                    ['key' => 'two', 'value' => 'Two'],
+                    ['key' => 'three', 'value' => 'Three'],
+                ],
+                'two',
+                ['Two'],
+            ],
+            'multidimensional without labels' => [
+                [
+                    ['key' => 'one', 'value' => null],
+                    ['key' => 'two', 'value' => null],
+                    ['key' => 'three', 'value' => null],
+                ],
+                'two',
+                ['two'],
+            ],
+            'numeric keys with string value' => [
+                [
+                    ['key' => 926450000, 'value' => 'One'],
+                    ['key' => 926450001, 'value' => 'Two'],
+                ],
+                '926450001',
+                ['Two'],
+            ],
+            'numeric keys with differently formatted string value' => [
+                [
+                    ['key' => 1, 'value' => 'One'],
+                ],
+                '01',
+                ['01'],
+            ],
+            'numeric and string keys with string value' => [
+                [
+                    ['key' => 1, 'value' => 'One'],
+                    ['key' => '1', 'value' => 'String One'],
+                ],
+                '1',
+                ['String One'],
+            ],
+        ];
+    }
 }

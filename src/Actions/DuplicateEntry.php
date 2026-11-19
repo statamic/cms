@@ -8,8 +8,12 @@ use Statamic\Facades\Entry as Entries;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class DuplicateEntry extends Action
 {
+    protected $icon = 'duplicate';
+
     private $newItems;
 
     public static function title()
@@ -66,6 +70,8 @@ class DuplicateEntry extends Action
 
     private function duplicateEntry(Entry $original, ?string $origin = null)
     {
+        $this->suspendPropagation($original);
+
         $originalParent = $this->getEntryParentFromStructure($original);
         [$title, $slug] = $this->generateTitleAndSlug($original);
 
@@ -82,13 +88,14 @@ class DuplicateEntry extends Action
             ->blueprint($original->blueprint()->handle())
             ->published(false)
             ->data($data)
-            ->origin($origin);
+            ->origin($origin)
+            ->updateLastModified(User::current());
 
         if ($original->collection()->requiresSlugs()) {
             $entry->slug($slug);
         }
 
-        if ($original->hasDate()) {
+        if ($original->hasExplicitDate()) {
             $entry->date($original->date());
         }
 
@@ -158,7 +165,7 @@ class DuplicateEntry extends Action
         $slug .= '-'.$attempt;
 
         // If the slug we've just built already exists, we'll try again, recursively.
-        if ($entry->collection()->queryEntries()->where('locale', $entry->locale())->where('slug', $slug)->count()) {
+        if ($entry->collection()->queryEntries()->where('site', $entry->locale())->where('slug', $slug)->count()) {
             [$title, $slug] = $this->generateTitleAndSlug($entry, $attempt + 1);
         }
 
@@ -177,5 +184,10 @@ class DuplicateEntry extends Action
         }
 
         return $this->newItems->first()->editUrl();
+    }
+
+    private function suspendPropagation(Entry $original): void
+    {
+        $original->collection()->propagate(false);
     }
 }

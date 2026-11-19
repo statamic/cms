@@ -5,8 +5,13 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
+
 class Unpublish extends Action
 {
+    protected $icon = 'eye-slash';
+
     public function visibleTo($item)
     {
         return $this->context['view'] === 'list' && $item instanceof Entry && $item->published();

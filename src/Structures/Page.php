@@ -13,6 +13,7 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\BulkAugmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Data\ContainsSupplementalData;
@@ -25,7 +26,7 @@ use Statamic\Facades\URL;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Support\Str;
 
-class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
+class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, ContainsQueryableValues, Entry, JsonSerializable, Protectable, ResolvesValuesContract, Responsable
 {
     use ContainsSupplementalData, ForwardsCalls, HasAugmentedInstance, ResolvesValues, TracksQueriedColumns;
 
@@ -48,6 +49,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     private $routeData;
     private $status;
     private $structure;
+    private $uri;
 
     public function __construct()
     {
@@ -78,12 +80,37 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
 
     public function url()
     {
-        return $this->url ?? optional($this->entry())->url();
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if (! $entry = $this->entry()) {
+            return null;
+        }
+
+        return $this->linksToAnotherSite($entry) ? $entry->absoluteUrl() : $entry->url();
     }
 
     public function urlWithoutRedirect()
     {
-        return $this->url ?? optional($this->entry())->urlWithoutRedirect();
+        if ($this->url) {
+            return $this->url;
+        }
+
+        if (! $entry = $this->entry()) {
+            return null;
+        }
+
+        return $this->linksToAnotherSite($entry) ? $entry->absoluteUrlWithoutRedirect() : $entry->urlWithoutRedirect();
+    }
+
+    private function linksToAnotherSite(Entry $entry)
+    {
+        if (! $this->structure() instanceof Nav || ! $this->structure()->canSelectAcrossSites()) {
+            return false;
+        }
+
+        return $entry->site()->handle() !== $this->tree->site()->handle();
     }
 
     public function isRedirect()
@@ -94,6 +121,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function setDepth($depth)
     {
         $this->depth = $depth;
+        $this->uri = null;
 
         return $this;
     }
@@ -138,10 +166,13 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         if (is_object($reference)) {
             throw_unless($id = $reference->id(), new \Exception('Cannot set an entry without an ID'));
             Blink::store('structure-entries')->put($id, $reference);
+            Blink::store('structure-uris')->forget($id);
             $reference = $id;
         }
 
         $this->reference = $reference;
+        $this->routeData = null;
+        $this->uri = null;
 
         return $this;
     }
@@ -177,6 +208,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function setParent(?self $parent): self
     {
         $this->parent = $parent;
+        $this->uri = null;
 
         return $this;
     }
@@ -184,6 +216,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function setRoute(?string $route): self
     {
         $this->route = $route;
+        $this->uri = null;
 
         return $this;
     }
@@ -196,6 +229,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function slug()
     {
         return optional($this->entry())->slug();
+    }
+
+    public function origin()
+    {
+        return optional($this->entry())->origin();
     }
 
     public function uri()
@@ -214,14 +252,20 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
             return $cached;
         }
 
+        // With the shared cache off, a page still keeps its own URI,
+        // so siblings don't each rebuild their parent's.
+        if (! $this->tree->uriCacheEnabled() && ! is_null($this->uri)) {
+            return $this->uri;
+        }
+
         if (! $this->structure() instanceof CollectionStructure) {
-            return $uris[$this->reference] = $this->entry()->uri();
+            return $this->uri = $uris[$this->reference] = $this->entry()->uri();
         }
 
         $parentUri = $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '';
         $parentUri = Str::replace(['.html', '.htm'], '', $parentUri);
 
-        return $uris[$this->reference] = app(UrlBuilder::class)
+        return $this->uri = $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
                 'parent_uri' => $parentUri,
@@ -266,6 +310,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function setTree($tree)
     {
         $this->tree = $tree;
+        $this->uri = null;
 
         return $this;
     }
@@ -273,6 +318,7 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function setRoot(bool $isRoot)
     {
         $this->isRoot = $isRoot;
+        $this->uri = null;
 
         return $this;
     }
@@ -342,6 +388,11 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         }
 
         return $value;
+    }
+
+    public function hasChildren(): bool
+    {
+        return ! empty($this->children);
     }
 
     public function pages()
@@ -476,6 +527,13 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
         return Collection::findByMount($this);
     }
 
+    public function mountedCollection()
+    {
+        return ($entry = $this->entry())
+            ? Collection::findByMount($entry)
+            : null;
+    }
+
     public function getProtectionScheme()
     {
         return optional($this->entry())->getProtectionScheme();
@@ -484,6 +542,24 @@ class Page implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Entr
     public function __call($method, $args)
     {
         return $this->forwardCallTo($this->entry(), $method, $args);
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return $this->value($field);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'absoluteUrl', 'blueprint', 'collection', 'depth', 'editUrl', 'id', 'isRedirect', 'isRoot',
+            'private', 'published', 'reference', 'route', 'site', 'slug', 'status', 'structure',
+            'title', 'uri', 'url', 'urlWithoutRedirect',
+        ];
     }
 
     #[\ReturnTypeWillChange]

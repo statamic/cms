@@ -312,6 +312,8 @@ class AntlersNode extends AbstractNode
         $instance->rawEnd = $this->rawEnd;
         $instance->startPosition = $this->startPosition;
         $instance->endPosition = $this->endPosition;
+        $instance->interpolationRegions = $this->interpolationRegions;
+        $instance->processedInterpolationRegions = $this->processedInterpolationRegions;
 
         return $instance;
     }

@@ -19,14 +19,13 @@ class ParentTags extends Tags
      * Gets a specified field value from the parent.
      *
      * @param  string  $method
-     * @param  array  $args
      * @return mixed
      */
     public function wildcard($method)
     {
         $var_name = Stringy::removeLeft($this->tag, 'parent:');
 
-        return Arr::get($this->getParent(), $var_name)->value();
+        return Arr::get($this->getParent(), $var_name)?->value();
     }
 
     /**
@@ -60,10 +59,8 @@ class ParentTags extends Tags
 
     /**
      * Get the parent data.
-     *
-     * @return string
      */
-    private function getParent()
+    private function getParent(): ?array
     {
         $segments = explode('/', Str::start(Str::after(URL::getCurrent(), Site::current()->url()), '/'));
         $segment_count = count($segments);

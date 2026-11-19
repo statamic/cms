@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class FieldsetDeleted extends Event implements ProvidesCommitMessage
 {
-    public $fieldset;
-
-    public function __construct($fieldset)
+    public function __construct(public $fieldset)
     {
-        $this->fieldset = $fieldset;
     }
 
     public function commitMessage()

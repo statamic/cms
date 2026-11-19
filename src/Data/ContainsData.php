@@ -25,6 +25,18 @@ trait ContainsData
         return $this;
     }
 
+    public function increment($key, $amount = 1)
+    {
+        $this->data[$key] = ($this->data[$key] ?? 0) + $amount;
+
+        return $this;
+    }
+
+    public function decrement($key, $amount = 1)
+    {
+        return $this->increment($key, -$amount);
+    }
+
     public function remove($key)
     {
         unset($this->data[$key]);

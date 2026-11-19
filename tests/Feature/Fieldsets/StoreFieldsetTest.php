@@ -106,6 +106,28 @@ class StoreFieldsetTest extends TestCase
             ->assertSessionHasErrors('handle');
     }
 
+    #[Test]
+    public function fieldset_gets_created_in_subdirectory()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->actingAs($user)
+            ->submit(['handle' => 'components.test'])
+            ->assertOk()
+            ->assertJson(['redirect' => cp_route('fieldsets.edit', 'components.test')])
+            ->assertSessionHas('success');
+
+        $this->assertCount(1, Facades\Fieldset::all());
+        $fieldset = Facades\Fieldset::find('components.test');
+        $this->assertEquals([
+            'title' => 'Test',
+            'fields' => [],
+        ], $fieldset->contents());
+        $this->assertEquals('components.test', $fieldset->handle());
+    }
+
     private function submit($params = [])
     {
         return $this->post(cp_route('fieldsets.store'), $this->validParams($params));

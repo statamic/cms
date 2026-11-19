@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\Form;
 
+use Illuminate\Support\Facades\Blade;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
@@ -21,7 +22,7 @@ abstract class FormTestCase extends TestCase
             'field' => [
                 'type' => 'text',
                 'display' => 'Full Name',
-                'validate' => 'min:3|alpha_num',
+                'validate' => ['min:3', 'alpha_num'],
             ],
         ],
         [
@@ -30,7 +31,7 @@ abstract class FormTestCase extends TestCase
                 'type' => 'text',
                 'input_type' => 'email',
                 'display' => 'Email Address',
-                'validate' => 'required|email',
+                'validate' => ['required', 'email'],
             ],
         ],
         [
@@ -38,7 +39,7 @@ abstract class FormTestCase extends TestCase
             'field' => [
                 'type' => 'textarea',
                 'display' => 'Message',
-                'validate' => 'sometimes|required',
+                'validate' => ['sometimes', 'required'],
             ],
         ],
     ];
@@ -67,9 +68,14 @@ abstract class FormTestCase extends TestCase
         ], $headers));
     }
 
-    protected function tag($tag, $params = [])
+    protected function tag($string, $context = [])
     {
-        return Parse::template($tag, $params);
+        return Parse::template($string, $context, trusted: true);
+    }
+
+    protected function blade($string, $context = [])
+    {
+        return Blade::render($string, $context);
     }
 
     protected function createForm($blueprintContents = null, $handle = null)
@@ -93,12 +99,10 @@ abstract class FormTestCase extends TestCase
 
     protected function assertFieldRendersHtml($expectedHtmlParts, $fieldConfig, $oldData = [], $extraParams = [])
     {
-        $randomString = str_shuffle('nobodymesseswiththehoff');
-
-        $handle = $fieldConfig['handle'].'_'.$randomString;
+        $handle = str_shuffle('nobodymesseswiththehoff');
 
         $fields = $oldData
-            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => 'required']]], [$fieldConfig])
+            ? array_merge([['handle' => 'failing_field', 'field' => ['type' => 'text', 'validate' => ['required']]]], [$fieldConfig])
             : [$fieldConfig];
 
         $this->createForm(['fields' => $fields], $handle);
@@ -112,7 +116,7 @@ abstract class FormTestCase extends TestCase
         $extraParams = $extraParams ? Html::attributes($extraParams) : '';
 
         $output = $this->normalizeHtml(
-            $this->tag("{{ form:{$handle} {$extraParams}}}{{ fields }}{{ field}}{{ /fields }}{{ /form:{$handle} }}", $oldData)
+            $this->tag("{{ form:{$handle} {$extraParams}}}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}", $oldData)
         );
 
         $expected = collect(Arr::wrap($expectedHtmlParts))

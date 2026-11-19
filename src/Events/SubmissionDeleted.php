@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class SubmissionDeleted extends Event implements ProvidesCommitMessage
 {
-    public $submission;
-
-    public function __construct($submission)
+    public function __construct(public $submission)
     {
-        $this->submission = $submission;
     }
 
     public function commitMessage()

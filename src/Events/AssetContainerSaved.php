@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class AssetContainerSaved extends Event implements ProvidesCommitMessage
 {
-    public $container;
-
-    public function __construct($container)
+    public function __construct(public $container)
     {
-        $this->container = $container;
     }
 
     public function commitMessage()

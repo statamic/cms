@@ -4,9 +4,14 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts;
 
+use function Statamic\trans as __;
+use function Statamic\trans_choice;
+
 class Delete extends Action
 {
     protected $dangerous = true;
+
+    protected $icon = 'trash';
 
     public static function title()
     {
@@ -26,6 +31,8 @@ class Delete extends Action
             case $item instanceof Contracts\Forms\Form:
             case $item instanceof Contracts\Forms\Submission:
             case $item instanceof Contracts\Auth\User:
+            case $item instanceof Contracts\Structures\Nav:
+            case $item instanceof Contracts\Globals\GlobalSet:
                 return true;
             default:
                 return false;
@@ -82,7 +89,15 @@ class Delete extends Action
             }
         }
 
-        return trans_choice('Item deleted|Items deleted', $total);
+        $ids = $items
+            ->map(fn ($item) => method_exists($item, 'id') ? $item->id() : null)
+            ->filter()
+            ->values();
+
+        return [
+            'message' => trans_choice('Item deleted|Items deleted', $total),
+            'callback' => $ids->isNotEmpty() ? ['removeFromSelections', $ids] : null,
+        ];
     }
 
     public function redirect($items, $values)
@@ -102,6 +117,10 @@ class Delete extends Action
                 return cp_route('taxonomies.show', $item->taxonomy()->handle());
             case $item instanceof Contracts\Auth\User:
                 return cp_route('users.index');
+            case $item instanceof Contracts\Structures\Nav:
+                return cp_route('navigation.index');
+            case $item instanceof Contracts\Globals\GlobalSet:
+                return cp_route('globals.index');
         }
     }
 }

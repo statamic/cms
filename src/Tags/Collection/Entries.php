@@ -163,8 +163,12 @@ class Entries
         $previousOfSame = $this->query()
             ->where('date', $currentEntryDate)
             ->orderBy($secondaryOrderBy->sort, $secondaryOrderBy->direction)
-            ->where($secondaryOrderBy->sort, $secondaryOperator, $currentEntry->value($secondaryOrderBy->sort))
             ->get()
+            ->filter(function ($entry) use ($currentEntry, $secondaryOrderBy, $secondaryOperator) {
+                $comparison = Compare::values($entry->value($secondaryOrderBy->sort), $currentEntry->value($secondaryOrderBy->sort));
+
+                return $secondaryOperator === '>' ? $comparison > 0 : $comparison < 0;
+            })
             ->pluck('id')
             ->toArray();
 
@@ -276,7 +280,7 @@ class Entries
             return;
         }
 
-        return $query->where('published', true);
+        return $query->whereStatus('published');
     }
 
     protected function queryPastFuture($query)

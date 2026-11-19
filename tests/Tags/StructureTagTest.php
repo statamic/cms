@@ -3,12 +3,15 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -78,7 +81,7 @@ EOT;
         $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]));
+        ], true));
     }
 
     #[Test]
@@ -143,7 +146,7 @@ EOT;
         $parsed = (string) Antlers::parse($template, [
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
-        ]);
+        ], true);
 
         // This is really what we're interested in testing. The "Two" entry has a foo value
         // of "notbar", but we're only selecting the title, so we shouldn't get the real value.
@@ -217,7 +220,49 @@ EOT;
             'foo' => 'bar', // to test that cascade is inherited.
             'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
             'nav_title' => 'outer nav_title', // to test that the cascade doesn't leak into the iterated scope
-        ]));
+        ], true));
+    }
+
+    #[Test]
+    public function it_renders_a_nav_with_as()
+    {
+        $this->createCollectionAndNav();
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav:test as="navtastic" }}
+    <li>Something before the loop</li>
+    {{ navtastic }}
+    <li>
+        <i>{{ nav_title or title }} {{ foo }}</i>
+    </li>
+    {{ /navtastic }}
+{{ /nav:test }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>Something before the loop</li>
+    <li>
+        <i>Navtitle One bar</i>
+    </li>
+    <li>
+        <i>Two notbar</i>
+    </li>
+    <li>
+        <i>Three bar</i>
+    </li>
+    <li>
+        <i>Title only bar</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'foo' => 'bar', // to test that cascade is inherited.
+        ], true));
     }
 
     #[Test]
@@ -254,6 +299,23 @@ EOT;
     }
 
     #[Test]
+    public function it_limits_and_offsets_the_top_level_items()
+    {
+        $this->createCollectionAndNav();
+
+        $this->assertEquals('[1][1-1][1-2][2]', $this->parseBasicTemplate('test', 'limit="2"'));
+        $this->assertEquals('[3][3-1][3-2][5][5-1]', $this->parseBasicTemplate('test', 'offset="2"'));
+        $this->assertEquals('[2][3][3-1][3-2]', $this->parseBasicTemplate('test', 'offset="1" limit="2"'));
+        $this->assertEquals('[1][1-1][1-2][2]', $this->parseBasicTemplate('test', 'offset="-1" limit="2"'));
+
+        $this->assertEquals('[2][3][3-1][3-2]', $this->parseBasicTemplate('collection:pages', 'offset="1" limit="2"'));
+
+        $this->assertEquals('[2 1 first][3 2 last]', (string) Antlers::parse(
+            '{{ nav:test offset="1" limit="2" }}[{{ entry_id }} {{ count }}{{ if first }} first{{ /if }}{{ if last }} last{{ /if }}]{{ /nav:test }}', [], true
+        ));
+    }
+
+    #[Test]
     public function it_filters_by_published_boolean()
     {
         $this->createCollectionAndNav();
@@ -283,7 +345,9 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $this->makeNav([
-            ['id' => 'home', 'title' => 'Home', 'url' => '/'],
+            ['id' => 'home', 'title' => 'Home', 'url' => '/', 'children' => [
+                ['id' => 'home-1', 'title' => 'home-1', 'url' => '/foo'],
+            ]],
             ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
                 ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
                     ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
@@ -296,32 +360,36 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1=parent][1-1=current][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2=current][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home=current][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/foo');
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home=parent][home-1=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
-        $this->assertEquals('[home=parent][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][home-1][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
 
         // Only the last child has an URL.
         $this->makeNav([
@@ -335,15 +403,15 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         // Only the top parent has an URL.
@@ -358,16 +426,125 @@ EOT;
         ]);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1]', $result);
+    }
+
+    #[Test]
+    public function it_sets_is_current_and_is_parent_for_a_nav_when_home_is_an_entry()
+    {
+        tap(Collection::make('pages')->routes('{slug}')->structureContents(['expects_root' => true]))->save();
+        $home = EntryFactory::collection('pages')->id('home')->data(['title' => 'One'])->create();
+
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => 'home', 'title' => 'Home', 'entry' => $home],
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1', 'children' => [
+                    ['id' => '1-1-1', 'title' => '1.1.1', 'url' => '/1/1/1', 'children' => [
+                        ['id' => '1-1-1-1', 'title' => '1.1.1.1', 'url' => '/1/1/1/1'],
+                    ]],
+                ]],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+            ['id' => '3', 'title' => '3'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/');
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home=current][1][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][1=current][1-1][1-1-1][1-1-1-1][2][3]', $result);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[home][1=parent][1-1=parent][1-1-1=current][1-1-1-1][2][3]', $result);
+    }
+
+    #[Test]
+    public function it_sets_is_external_for_a_nav()
+    {
+        $this->setSiteValue('en', 'url', 'http://localhost/');
+
+        $this->makeNav([
+            ['id' => '1', 'title' => 'Entry', 'url' => '/about'],
+            ['id' => '2', 'title' => 'Homepage anchor', 'url' => '/#anchor'],
+            ['id' => '3', 'title' => 'Bare anchor', 'url' => '#anchor'],
+            ['id' => '4', 'title' => 'Page anchor', 'url' => '/about#anchor'],
+            ['id' => '5', 'title' => 'Query string', 'url' => '/about?query=1'],
+            ['id' => '6', 'title' => 'Own domain', 'url' => 'http://localhost/about'],
+            ['id' => '7', 'title' => 'External', 'url' => 'https://statamic.com'],
+            ['id' => '8', 'title' => 'Protocol relative', 'url' => '//statamic.com'],
+            ['id' => '9', 'title' => 'Email', 'url' => 'mailto:foo@statamic.com'],
+            ['id' => '10', 'title' => 'Phone', 'url' => 'tel:+441234567890'],
+        ]);
+
+        $template = '{{ nav:test }}[{{ id }}{{ if is_external }}=external{{ /if }}]{{ /nav:test }}';
+
+        $this->assertEquals(
+            '[1][2][3][4][5][6][7=external][8=external][9=external][10=external]',
+            (string) Antlers::parse($template, [], true)
+        );
+    }
+
+    #[Test]
+    public function it_uses_the_absolute_url_for_a_nav_entry_link_on_another_site()
+    {
+        $this->makeCrossSiteNav();
+
+        $template = '{{ nav:test }}[{{ id }}={{ url }}]{{ /nav:test }}';
+
+        $this->assertEquals('[link=http://two.example.com/projects][local-link=/projects]', (string) Antlers::parse($template, [], true));
+    }
+
+    #[Test]
+    public function it_only_flags_the_local_nav_entry_link_as_current()
+    {
+        $this->makeCrossSiteNav();
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/projects');
+
+        $template = '{{ nav:test }}[{{ id }}{{ if is_current }}=current{{ /if }}]{{ /nav:test }}';
+
+        $this->assertEquals('[link][local-link=current]', (string) Antlers::parse($template, [], true));
+    }
+
+    private function makeCrossSiteNav()
+    {
+        $this->setSites([
+            'en' => ['url' => 'http://one.example.com/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://two.example.com/', 'locale' => 'fr'],
+        ]);
+
+        Site::setCurrent('en');
+
+        tap(Collection::make('pages')->routes('{slug}'))->sites(['en', 'fr'])->save();
+
+        EntryFactory::collection('pages')->id('projects')->locale('en')->slug('projects')->data(['title' => 'Projects'])->create();
+        EntryFactory::collection('pages')->id('projects-fr')->origin('projects')->locale('fr')->slug('projects')->data(['title' => 'Projects'])->create();
+
+        $nav = Nav::make('test')->canSelectAcrossSites(true);
+        $nav->makeTree('en', [
+            ['id' => 'link', 'title' => 'Projects', 'entry' => 'projects-fr'],
+            ['id' => 'local-link', 'title' => 'Projects (local)', 'entry' => 'projects'],
+        ])->save();
+        $nav->save();
     }
 
     #[Test]
@@ -388,7 +565,7 @@ EOT;
         EntryFactory::collection('rad')->id('3')->slug('3')->data(['title' => 'Three'])->create();
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/2/3');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][2=parent]', $result);
     }
 
@@ -428,32 +605,217 @@ EOT;
         \Statamic\Facades\URL::swap($mock);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/other');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1][1-1][1-1-1][1-1-1-1][2=current]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=current][1-1][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=current][1-1-1][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=current][1-1-1-1][2]', $result);
 
         $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1/1/1');
-        $result = (string) Antlers::parse($template);
+        $result = (string) Antlers::parse($template, [], true);
         $this->assertEquals('[1=parent][1-1=parent][1-1-1=parent][1-1-1-1=current][2]', $result);
+    }
+
+    #[Test]
+    public function it_doesnt_render_anything_when_nav_from_is_invalid()
+    {
+        $this->createCollectionAndNav();
+        Entry::shouldReceive('findByUri')->andReturn(null);
+
+        // The html uses <i> tags (could be any tag, but i is short) to prevent whitespace comparison issues in the assertion.
+        $template = <<<'EOT'
+<ul>
+{{ nav from="something-invalid" }}
+    <li>
+        <i>{{ title }}</i>
+        {{ if children }}
+        <ul>
+            {{ *recursive children* }}
+        </ul>
+        {{ /if }}
+    </li>
+{{ /nav }}
+</ul>
+EOT;
+
+        $expected = <<<'EOT'
+<ul>
+    <li>
+        <i>outer title</i>
+    </li>
+</ul>
+EOT;
+
+        $this->assertXmlStringEqualsXmlString($expected, (string) Antlers::parse($template, [
+            'title' => 'outer title', // to test that cascade the page's data takes precedence over the cascading data.
+        ], true));
+    }
+
+    #[Test]
+    #[DataProvider('repeatedNavProvider')]
+    public function a_nav_output_more_than_once_gives_what_each_tag_gives_on_its_own($first, $second)
+    {
+        $this->createCollectionAndNav();
+
+        $template = fn ($params) => '{{ nav:test '.$params.' }}[{{ id ?? entry_id }} {{ depth }}{{ if first }} first{{ /if }}{{ if last }} last{{ /if }}{{ if children }} > {{ children }}({{ id ?? entry_id }} {{ depth }}{{ if parent }} in {{ parent:id }}{{ /if }}){{ /children }}{{ /if }}]{{ /nav:test }}';
+
+        $alone = [];
+        foreach ([$first, $second] as $params) {
+            Blink::flush();
+            Blink::store('structure-tag-trees')->flush();
+            $alone[] = (string) Antlers::parse($template($params), [], true);
+        }
+
+        Blink::flush();
+        Blink::store('structure-tag-trees')->flush();
+
+        $this->assertNotSame('', $alone[0].$alone[1]);
+        $this->assertSame(
+            $alone[0].'|'.$alone[1].'|'.$alone[0],
+            (string) Antlers::parse($template($first).'|'.$template($second).'|'.$template($first), [], true)
+        );
+    }
+
+    public static function repeatedNavProvider()
+    {
+        return [
+            'the same tag twice' => ['', ''],
+            'whole tree then one level' => ['', 'max_depth="1"'],
+            'one level then whole tree' => ['max_depth="1"', ''],
+            'one level then two' => ['max_depth="1"', 'max_depth="2"'],
+            'two levels then one' => ['max_depth="2"', 'max_depth="1"'],
+            'deeper than the tree, then all of it' => ['max_depth="5"', ''],
+            'limited then offset' => ['limit="2"', 'offset="2"'],
+            'limited then whole tree' => ['limit="2"', ''],
+            'offset then whole tree' => ['offset="2"', ''],
+            'with and without parents' => ['include_parents="false"', ''],
+            'selected fields then all fields' => ['select="title"', ''],
+            'hidden then shown unpublished entries' => ['', 'show_unpublished="true"'],
+            'shown then hidden unpublished entries' => ['show_unpublished="true"', 'max_depth="1"'],
+            'all fields then a selected star' => ['', 'select="*"'],
+            'a selected star then all fields' => ['select="*"', ''],
+            'whole tree then a negative depth' => ['', 'max_depth="-1"'],
+            'a negative depth then whole tree' => ['max_depth="-1"', ''],
+        ];
+    }
+
+    #[Test]
+    public function a_nav_output_more_than_once_is_only_built_as_often_as_it_needs_to_be()
+    {
+        $this->createCollectionAndNav();
+
+        $built = fn () => collect(Blink::store('structure-tag-trees')->all())->flatten(1)->count();
+
+        // The whole tree serves any depth.
+        $this->parseBasicTemplate('test');
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'limit="1" include_parents="false"');
+        $this->assertSame(1, $built());
+
+        // One level of a deeper tree can't serve two levels, but two levels reach the bottom of this one.
+        Blink::store('structure-tag-trees')->flush();
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'max_depth="2"');
+        $this->parseBasicTemplate('test');
+        $this->assertSame(2, $built());
+
+        // Parameters that change which pages are in the tree get a tree of their own.
+        $this->parseBasicTemplate('test', 'show_unpublished="true"');
+        $this->assertSame(3, $built());
+    }
+
+    #[Test]
+    public function a_reused_nav_still_works_out_the_current_page_for_each_tag()
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1'],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
+        $this->assertEquals('[1=parent][1-1=current][2]', (string) Antlers::parse($template, [], true));
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
+        $this->assertEquals('[1][1-1][2=current]', (string) Antlers::parse($template, [], true));
+
+        $this->assertCount(1, collect(Blink::store('structure-tag-trees')->all())->flatten(1));
+    }
+
+    #[Test]
+    public function a_nav_saved_after_it_was_output_is_built_again()
+    {
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1']]);
+        $this->assertEquals('[1]', $this->parseBasicTemplate('test'));
+
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1'], ['id' => '2', 'title' => '2', 'url' => '/2']]);
+        $this->assertEquals('[1][2]', $this->parseBasicTemplate('test'));
+    }
+
+    #[Test]
+    public function a_queue_worker_doesnt_keep_a_tree_from_one_job_to_the_next()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
+        $template = '{{ nav:test }}[{{ title }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        // Changed without saving, the way another process's change would look.
+        $entry->set('title', 'New');
+
+        $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
+        // A job run synchronously during a request leaves what the request has kept alone.
+        event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        $request = request();
+        \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+        event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
+        \Illuminate\Support\Facades\Request::swap($request);
+        $this->assertEquals('[New]', (string) Antlers::parse($template, [], true));
+    }
+
+    #[Test]
+    public function an_entry_saved_after_the_nav_was_output_is_picked_up()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
+        $template = '{{ nav:test }}[{{ title }} {{ url }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
+
+        $entry->set('title', 'New')->slug('two')->save();
+
+        $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
     }
 
     private function makeNav($tree)
@@ -465,9 +827,40 @@ EOT;
         $nav->save();
     }
 
+    #[Test]
+    public function a_subclass_builds_its_own_tree_each_time()
+    {
+        ContextualNavTag::register();
+
+        $this->makeNav([
+            ['id' => 'a', 'title' => 'A', 'url' => '/a'],
+            ['id' => 'b', 'title' => 'B', 'url' => '/b'],
+        ]);
+
+        $template = '{{ contextual_nav:test }}[{{ title }}]{{ /contextual_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, ['wanted' => 'A'], true));
+        $this->assertEquals('[B]', (string) Antlers::parse($template, ['wanted' => 'B'], true));
+        $this->assertCount(0, Blink::store('structure-tag-trees')->all());
+    }
+
+    #[Test]
+    public function a_subclass_that_reuses_trees_keeps_them()
+    {
+        ReusingNavTag::register();
+
+        $this->makeNav([['id' => 'a', 'title' => 'A', 'url' => '/a']]);
+
+        $template = '{{ reusing_nav:test }}[{{ title }}]{{ /reusing_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertCount(1, Blink::store('structure-tag-trees')->all());
+    }
+
     private function parseBasicTemplate($handle, $params = null)
     {
-        return (string) Antlers::parse($this->createBasicTemplate($handle, $params));
+        return (string) Antlers::parse($this->createBasicTemplate($handle, $params), [], true);
     }
 
     private function createBasicTemplate($handle, $params = null)
@@ -531,5 +924,25 @@ EOT;
                 ['id' => '5-1', 'title' => 'URL only', 'url' => 'https://statamic.com'],
             ]],
         ]);
+    }
+}
+
+class ContextualNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'contextual_nav';
+
+    protected function queryForNav($query)
+    {
+        return parent::queryForNav($query)->where('title', $this->context->get('wanted'));
+    }
+}
+
+class ReusingNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'reusing_nav';
+
+    protected function reusesTrees(): bool
+    {
+        return true;
     }
 }

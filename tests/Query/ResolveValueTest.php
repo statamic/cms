@@ -98,6 +98,33 @@ class ResolveValueTest extends TestCase
 
         $this->assertEquals('test', $value);
     }
+
+    #[Test]
+    public function it_does_not_resolve_by_dispatching_to_destructive_methods()
+    {
+        $item = new ContainsDestructiveMethods;
+
+        // "delete" resolves via Str::camel to the denylisted "delete" method,
+        // so it must not be dispatched; it falls through to get() instead.
+        $this->assertEquals('fell through to get', (new ResolveValue)($item, 'delete'));
+        $this->assertFalse($item->deleted);
+    }
+
+    #[Test]
+    public function it_does_not_dispatch_to_destructive_methods_case_insensitively()
+    {
+        $item = new ContainsDestructiveMethods;
+
+        // Str::camel("force-delete") is "forceDelete", and method_exists() is
+        // case-insensitive, so the denylist must match regardless of casing.
+        $this->assertEquals('fell through to get', (new ResolveValue)($item, 'force-delete'));
+        $this->assertFalse($item->forceDeleted);
+
+        // "deletequietly" resolves to a lowercased name that still matches the
+        // denylisted "deleteQuietly" method case-insensitively.
+        $this->assertEquals('fell through to get', (new ResolveValue)($item, 'deletequietly'));
+        $this->assertFalse($item->deletedQuietly);
+    }
 }
 
 class ContainsData
@@ -136,6 +163,33 @@ class ContainsMethod extends ContainsValues
     public function theFooField()
     {
         return 'theFooField method';
+    }
+}
+
+class ContainsDestructiveMethods
+{
+    public $deleted = false;
+    public $forceDeleted = false;
+    public $deletedQuietly = false;
+
+    public function get($field)
+    {
+        return 'fell through to get';
+    }
+
+    public function delete()
+    {
+        $this->deleted = true;
+    }
+
+    public function forceDelete()
+    {
+        $this->forceDeleted = true;
+    }
+
+    public function deleteQuietly()
+    {
+        $this->deletedQuietly = true;
     }
 }
 

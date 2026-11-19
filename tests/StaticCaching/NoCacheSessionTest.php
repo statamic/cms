@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\StaticCache;
+use Statamic\StaticCaching\Cacher;
+use Statamic\StaticCaching\NoCache\RegionNotFound;
 use Statamic\StaticCaching\NoCache\Session;
 use Statamic\StaticCaching\NoCache\StringRegion;
 use Tests\FakesContent;
@@ -46,6 +49,22 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function when_pushing_a_region_it_will_filter_out_private_variables()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            '__env' => 'env value',
+            '__blaze' => fn () => 'a closure',
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+        ], $region->context());
+    }
+
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,
@@ -72,6 +91,26 @@ class NoCacheSessionTest extends TestCase
             'baz' => 'qux',
             'title' => 'local title',
         ], $region->fragmentData());
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15450
+     **/
+    #[Test]
+    public function it_generates_unique_region_ids_across_urls()
+    {
+        $home = new Session('https://example.test/');
+        $error = new Session('https://example.test/1');
+
+        for ($i = 0; $i < 14; $i++) {
+            $home->getRegionId();
+        }
+
+        for ($i = 0; $i < 4; $i++) {
+            $error->getRegionId();
+        }
+
+        $this->assertNotEquals($home->getRegionId(), $error->getRegionId());
     }
 
     #[Test]
@@ -148,6 +187,41 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_serializes_and_unserializes_regions_through_cache()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+        $session->write();
+
+        $cached = StaticCache::cacheStore()->get('nocache::region.'.$region->key());
+        $this->assertIsString($cached, 'Region should be stored as a serialized string, not an object.');
+
+        $retrieved = $session->region($region->key());
+
+        $this->assertInstanceOf(StringRegion::class, $retrieved);
+        $this->assertEquals($region->key(), $retrieved->key());
+        $this->assertEquals(['foo' => 'bar'], $retrieved->context());
+    }
+
+    #[Test]
+    public function it_throws_region_not_found_when_cached_region_is_an_incomplete_class()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+        $session->write();
+
+        // Simulate what happens when serializable_classes enforcement
+        // turns a cached Region object into __PHP_Incomplete_Class.
+        StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), new \__PHP_Incomplete_Class);
+
+        $this->expectException(RegionNotFound::class);
+
+        (new Session('http://localhost/test'))->restore()->region($region->key());
+    }
+
+    #[Test]
     public function a_singleton_is_bound_in_the_container()
     {
         $this->get('/test?foo=bar&bar=baz');
@@ -172,6 +246,23 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function it_normalizes_query_string()
+    {
+        // Mock the Cacher to return a non-normalized URL.
+        // In tests, it always returns the current URL, so we have to mock it.
+        $cacher = Mockery::mock(Cacher::class);
+        $cacher->shouldReceive('getUrl')
+            ->andReturn('http://localhost/test?utm_source=linkedin.com&utm_medium=referral&utm_campaign=foo');
+
+        $this->app->instance(Cacher::class, $cacher);
+
+        $session = $this->app->make(Session::class);
+
+        $this->assertInstanceOf(Session::class, $session);
+        $this->assertEquals('http://localhost/test?utm_campaign=foo&utm_medium=referral&utm_source=linkedin.com', $session->url());
+    }
+
+    #[Test]
     public function it_writes_session_if_a_nocache_tag_is_used()
     {
         $this->withStandardFakeViews();
@@ -186,6 +277,37 @@ class NoCacheSessionTest extends TestCase
             ->assertSee('Test Test');
 
         $this->assertNotNull(Cache::get('nocache::session.'.md5('http://localhost/test')));
+    }
+
+    #[Test]
+    public function it_only_stores_regions_when_the_session_is_written()
+    {
+        $session = new Session('http://localhost/test');
+
+        $region = $session->pushRegion('the contents', [], '.html');
+
+        $this->assertNull(StaticCache::cacheStore()->get('nocache::region.'.$region->key()));
+        $this->assertEquals($region->key(), $session->region($region->key())->key());
+
+        $session->write();
+
+        $this->assertNotNull(StaticCache::cacheStore()->get('nocache::region.'.$region->key()));
+    }
+
+    #[Test]
+    public function it_doesnt_store_regions_for_responses_that_are_not_cached()
+    {
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('errors.404', 'Missing {{ nocache }}{{ response_code }}{{ /nocache }}');
+
+        $this
+            ->get('/missing')
+            ->assertNotFound()
+            ->assertSee('Missing 404');
+
+        $key = sha1('{{ response_code }}').md5('http://localhost/missing|1');
+
+        $this->assertNull(StaticCache::cacheStore()->get('nocache::region.'.$key));
     }
 
     #[Test]

@@ -3,6 +3,7 @@
 namespace Tests\Antlers\Runtime;
 
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Antlers\Fixtures\MethodClasses\ArrayClass;
 use Tests\Antlers\ParserTestCase;
 
 class ArraysTest extends ParserTestCase
@@ -425,5 +426,23 @@ EOT;
     public function test_arrays_as_the_tag_name()
     {
         $this->assertSame('array', $this->renderString('{{ [1, 2, 3, 4] | type_of }}', [], true));
+    }
+
+    public function test_shorthand_arrays_inside_method_calls()
+    {
+        $this->assertSame('one two three', $this->renderString(
+            "{{ instance->join(['one', 'two', 'three']) }}", [
+                'instance' => new ArrayClass,
+            ]));
+
+        $this->assertSame('one two three', $this->renderString(
+            "{{ instance:join(['one', 'two', 'three']) }}", [
+                'instance' => new ArrayClass,
+            ]));
+
+        $this->assertSame('one two three', $this->renderString(
+            "{{ instance.join(['one', 'two', 'three']) }}", [
+                'instance' => new ArrayClass,
+            ]));
     }
 }

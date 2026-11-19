@@ -3,14 +3,16 @@
 namespace Statamic\Http\Controllers\CP\Utilities;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Statamic\Http\Controllers\CP\CpController;
 
 class PhpInfoController extends CpController
 {
     public function __invoke(Request $request)
     {
-        return view('statamic::utilities.phpinfo', [
+        return Inertia::render('utilities/PhpInfo', [
             'phpinfo' => $this->phpinfo(),
+            'version' => PHP_VERSION,
         ]);
     }
 

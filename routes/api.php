@@ -1,28 +1,41 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Statamic\Http\Controllers\API\AssetContainersController;
 use Statamic\Http\Controllers\API\AssetsController;
 use Statamic\Http\Controllers\API\CollectionEntriesController;
+use Statamic\Http\Controllers\API\CollectionsController;
 use Statamic\Http\Controllers\API\CollectionTreeController;
 use Statamic\Http\Controllers\API\FormsController;
 use Statamic\Http\Controllers\API\GlobalsController;
 use Statamic\Http\Controllers\API\NavigationTreeController;
+use Statamic\Http\Controllers\API\NavsController;
 use Statamic\Http\Controllers\API\NotFoundController;
+use Statamic\Http\Controllers\API\PingController;
+use Statamic\Http\Controllers\API\SitesController;
+use Statamic\Http\Controllers\API\TaxonomiesController;
 use Statamic\Http\Controllers\API\TaxonomyTermEntriesController;
 use Statamic\Http\Controllers\API\TaxonomyTermsController;
 use Statamic\Http\Controllers\API\UsersController;
 
+Route::resource('collections', CollectionsController::class)->only('index', 'show');
 Route::resource('collections.entries', CollectionEntriesController::class)->only('index', 'show');
+Route::resource('taxonomies', TaxonomiesController::class)->only('index', 'show');
 Route::resource('taxonomies.terms', TaxonomyTermsController::class)->only('index', 'show');
 Route::resource('taxonomies.terms.entries', TaxonomyTermEntriesController::class)->only('index');
 Route::resource('globals', GlobalsController::class)->only('index', 'show');
 Route::resource('forms', FormsController::class)->only('index', 'show');
 Route::resource('users', UsersController::class)->only('index', 'show');
+Route::resource('sites', SitesController::class)->only('index');
+Route::resource('navs', NavsController::class)->only('index', 'show');
 
+Route::resource('asset-containers', AssetContainersController::class)->only('index', 'show')->parameters(['asset-containers' => 'asset_container']);
 Route::name('assets.index')->get('assets/{asset_container}', [AssetsController::class, 'index']);
 Route::name('assets.show')->get('assets/{asset_container}/{asset}', [AssetsController::class, 'show'])->where('asset', '.*');
 
 Route::get('collections/{collection}/tree', [CollectionTreeController::class, 'show']);
 Route::get('navs/{nav}/tree', [NavigationTreeController::class, 'show']);
+
+Route::get('ping', PingController::class);
 
 Route::get('{path?}', NotFoundController::class)->where('path', '.*');

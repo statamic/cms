@@ -9,8 +9,12 @@ use Statamic\Events\ImpersonationStarted;
 use Statamic\Facades\CP\Toast;
 use Statamic\Facades\User;
 
+use function Statamic\trans as __;
+
 class Impersonate extends Action
 {
+    public $icon = 'mask';
+
     public static function title()
     {
         return __('Start Impersonating');
@@ -18,11 +22,11 @@ class Impersonate extends Action
 
     public function visibleTo($item)
     {
-        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
+        if (! ($item instanceof UserContract && $item->id() != User::current()->id())) {
             return false;
         }
 
-        return $item instanceof UserContract && $item->id() != User::current()->id();
+        return $this->authorize(User::current(), $item);
     }
 
     public function visibleToBulk($items)
@@ -32,7 +36,11 @@ class Impersonate extends Action
 
     public function authorize($authed, $user)
     {
-        return $authed->can('impersonate users');
+        if (! config('statamic.users.impersonate.enabled', true) || session()->get('statamic_impersonated_by')) {
+            return false;
+        }
+
+        return $authed->can('impersonate', $user);
     }
 
     public function run($users, $values)
@@ -51,7 +59,8 @@ class Impersonate extends Action
 
             $guard->login($users->first());
             session()->put('statamic_impersonated_by', $impersonator->getKey());
-            Toast::success(__('You are now impersonating').' '.$impersonated->name());
+            session()->forget('statamic_elevated_session');
+            Toast::success(__('You are now impersonating').' '.($impersonated->name() ?? $impersonated->email()));
 
             ImpersonationStarted::dispatch($impersonator, $impersonated);
         } finally {
@@ -70,6 +79,11 @@ class Impersonate extends Action
         return $users->first()->can('access cp') ? cp_route('index') : '/';
     }
 
+    public function triggersFullPageRefresh(): bool
+    {
+        return true;
+    }
+
     public function confirmationText()
     {
         /** @translation */
@@ -83,6 +97,11 @@ class Impersonate extends Action
     }
 
     public function bypassesDirtyWarning(): bool
+    {
+        return true;
+    }
+
+    public function requiresElevatedSession(): bool
     {
         return true;
     }

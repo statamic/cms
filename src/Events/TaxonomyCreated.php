@@ -4,10 +4,7 @@ namespace Statamic\Events;
 
 class TaxonomyCreated extends Event
 {
-    public $taxonomy;
-
-    public function __construct($taxonomy)
+    public function __construct(public $taxonomy)
     {
-        $this->taxonomy = $taxonomy;
     }
 }

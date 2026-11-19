@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Carbon\Carbon;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -11,6 +12,7 @@ abstract class Builder extends BaseBuilder
 {
     protected $store;
     protected $randomize = false;
+    private static $hasOwnEqualityTest = [];
 
     public function __construct(Store $store)
     {
@@ -90,15 +92,17 @@ abstract class Builder extends BaseBuilder
         $indexes = $this->getOrderKeyValuesByIndex();
 
         // Combine into one multidimensional array, where each item contains the values from each index.
+        // Keys that were already filtered out are left out, and each value is made
+        // sortable here, once, rather than every time it's compared to another.
+        $filtered = $keys->flip()->all();
         $items = [];
         foreach ($indexes as $sort => $values) {
             foreach ($values as $key => $value) {
-                $items[$key] = array_merge($items[$key] ?? [], [$sort => $value]);
+                if (isset($filtered[$key])) {
+                    $items[$key] = array_merge($items[$key] ?? [], [$sort => $this->sortableValue($value)]);
+                }
             }
         }
-
-        // Make sure that any keys that were already filtered out remain filtered out.
-        $items = array_intersect_key($items, $keys->flip()->all());
 
         // Perform the sort.
         $items = DataCollection::make($items)->multisort(
@@ -107,6 +111,18 @@ abstract class Builder extends BaseBuilder
 
         // Finally, we're left with the keys in the correct order.
         return $items->keys();
+    }
+
+    /**
+     * What DataCollection::multisort would turn a value into before comparing it.
+     */
+    private function sortableValue($value)
+    {
+        if (is_array($value)) {
+            return count($value) ? $this->sortableValue(array_values($value)[0]) : null;
+        }
+
+        return $value instanceof Carbon ? $value->timestamp : $value;
     }
 
     public function getWhereColumnKeysFromStore($store, $where)
@@ -143,11 +159,18 @@ abstract class Builder extends BaseBuilder
 
     protected function getItems($keys)
     {
-        return $this->store->getItems($keys);
+        return $this->store->getItems($keys)->filter()->values();
     }
 
     protected function filterWhereBasic($values, $where)
     {
+        if ($this->comparesEqualityAsStrings($where)) {
+            // What's being looked for is the same for every value, so it's lowercased once rather than for each of them.
+            $needle = strtolower($where['value'] ?? '');
+
+            return $values->filter(fn ($value) => strtolower($value ?? '') === $needle);
+        }
+
         return $values->filter(function ($value) use ($where) {
             $method = 'filterTest'.$this->operators[$where['operator']];
 
@@ -155,18 +178,49 @@ abstract class Builder extends BaseBuilder
         });
     }
 
+    private function comparesEqualityAsStrings($where)
+    {
+        if ($where['operator'] !== '=' || ! (is_null($where['value']) || is_scalar($where['value']))) {
+            return false;
+        }
+
+        // A builder with its own idea of what equal means gets to use it.
+        return ! (self::$hasOwnEqualityTest[static::class]
+            ??= (new \ReflectionMethod($this, 'filterTestEquals'))->getDeclaringClass()->getName() !== BaseBuilder::class);
+    }
+
     protected function filterWhereIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return in_array($value, $where['values']);
-        });
+        // Nothing can be in an empty list.
+        if (empty($where['values'])) {
+            return $values->take(0);
+        }
+
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
+
+        return $values->filter(
+            fn ($value) => ! is_array($value) && isset($lookup[$this->normalizeLookupValue($value)])
+        );
     }
 
     protected function filterWhereNotIn($values, $where)
     {
-        return $values->filter(function ($value) use ($where) {
-            return ! in_array($value, $where['values']);
-        });
+        $lookup = array_flip(array_map($this->normalizeLookupValue(...), $where['values']));
+
+        return $values->filter(
+            fn ($value) => is_array($value) || ! isset($lookup[$this->normalizeLookupValue($value)])
+        );
+    }
+
+    private function normalizeLookupValue($value): string|int
+    {
+        return match (true) {
+            is_string($value) => strtolower($value),
+            $value === null => '__NULL__',
+            $value === true => '__TRUE__',
+            $value === false => '__FALSE__',
+            default => $value,
+        };
     }
 
     protected function filterWhereNull($values, $where)
@@ -192,7 +246,9 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return $value->copy()->startOfDay()->$method($where['value']);
+            $value = $value->copy()->setTimezone(config('app.timezone'));
+
+            return $value->startOfDay()->$method($where['value']);
         });
     }
 
@@ -243,6 +299,8 @@ abstract class Builder extends BaseBuilder
             if (is_null($value)) {
                 return false;
             }
+
+            $value = $value->copy()->setTimezone(config('app.timezone'));
 
             $compareValue = $value->copy()->setTimeFromTimeString($where['value']);
 
@@ -301,7 +359,7 @@ abstract class Builder extends BaseBuilder
                 return false;
             }
 
-            return ! empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) == count($where['values']);
         });
     }
 
@@ -312,7 +370,7 @@ abstract class Builder extends BaseBuilder
                 return true;
             }
 
-            return empty(array_intersect($value, $where['values']));
+            return count(array_intersect($value, $where['values'])) != count($where['values']);
         });
     }
 
@@ -326,6 +384,36 @@ abstract class Builder extends BaseBuilder
             }
 
             return $this->{$method}(count($value), $where['value']);
+        });
+    }
+
+    protected function filterWhereJsonOverlaps($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return false;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value === $where['values'];
+            }
+
+            return ! empty(array_intersect(Arr::wrap($value), $where['values']));
+        });
+    }
+
+    protected function filterWhereJsonDoesntOverlap($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            if (is_null($value) || is_null($where['values'])) {
+                return true;
+            }
+
+            if (! is_array($value) && ! is_array($where['values'])) {
+                return $value !== $where['values'];
+            }
+
+            return empty(array_intersect(Arr::wrap($value), $where['values']));
         });
     }
 

@@ -26,7 +26,12 @@ trait PreventsSavingStacheItemsToDisk
     {
         app('files')->deleteDirectory($this->fakeStacheDirectory);
 
-        mkdir($this->fakeStacheDirectory);
+        // The directory can outlive deleteDirectory(), which ignores a failed rmdir(). On Windows
+        // that happens while another process still holds a handle on it, so only recreate it if it's gone.
+        if (! is_dir($this->fakeStacheDirectory)) {
+            mkdir($this->fakeStacheDirectory);
+        }
+
         touch($this->fakeStacheDirectory.'/.gitkeep');
     }
 }

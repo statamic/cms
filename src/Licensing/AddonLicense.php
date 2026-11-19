@@ -5,6 +5,8 @@ namespace Statamic\Licensing;
 use Statamic\Facades\Addon;
 use Statamic\Support\Arr;
 
+use function Statamic\trans;
+
 class AddonLicense extends License
 {
     protected $package;

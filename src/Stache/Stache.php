@@ -3,10 +3,14 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Concurrency;
+use Illuminate\Support\Facades\Log;
 use Statamic\Events\StacheCleared;
 use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
@@ -16,12 +20,17 @@ use Symfony\Component\Lock\LockInterface;
 class Stache
 {
     protected $sites;
+
+    /**
+     * @var Collection<string,Store>
+     */
     protected $stores;
     protected $startTime;
     protected $updateIndexes = true;
     protected $lockFactory;
     protected $locks = [];
     protected $duplicates;
+    protected $exclude = [];
 
     public function __construct()
     {
@@ -60,6 +69,16 @@ class Stache
         return $this;
     }
 
+    public function exclude(string $store)
+    {
+        $this->exclude[] = $store;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<string,Store>
+     */
     public function stores()
     {
         return $this->stores;
@@ -88,11 +107,14 @@ class Stache
 
     public function clear()
     {
-        $this->stores()->reverse()->each->clear();
+        $this->stores()->except($this->exclude)->reverse()->each->clear();
 
         $this->duplicates()->clear();
 
         $this->cacheStore()->forget('stache::timing');
+
+        Blink::forget('collection-structure-tree*');
+        Blink::forget('structure-*');
 
         StacheCleared::dispatch();
 
@@ -110,7 +132,13 @@ class Stache
 
         $this->startTimer();
 
-        $this->stores()->each->warm();
+        $stores = $this->stores()->except($this->exclude);
+
+        if ($this->shouldUseParallelWarming($stores)) {
+            $this->warmInParallel($stores);
+        } else {
+            $stores->each->warm();
+        }
 
         $this->stopTimer();
 
@@ -176,7 +204,7 @@ class Stache
             return null;
         }
 
-        return Carbon::createFromTimestamp($cache['date']);
+        return Carbon::createFromTimestamp($cache['date'], config('app.timezone'));
     }
 
     public function disableUpdatingIndexes()
@@ -223,5 +251,81 @@ class Stache
         return $config === 'auto'
             ? app()->isLocal()
             : (bool) $config;
+    }
+
+    protected function shouldUseParallelWarming($stores): bool
+    {
+        $config = config('statamic.stache.warming', []);
+
+        if (! ($config['parallel_processing'] ?? false)) {
+            return false;
+        }
+
+        if ($stores->count() < ($config['min_stores_for_parallel'] ?? 3)) {
+            return false;
+        }
+
+        if ($this->getCpuCoreCount() < 2) {
+            return false;
+        }
+
+        // Disable parallel processing if using Redis cache (serialization issues)
+        $cacheDriver = config('statamic.stache.cache_store', config('cache.default'));
+        if ($cacheDriver === 'redis') {
+            Log::info('Parallel warming disabled due to Redis cache driver');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function warmInParallel($stores)
+    {
+        try {
+            $config = config('statamic.stache.warming', []);
+            $maxProcesses = $config['max_processes'] ?? 0;
+
+            if ($maxProcesses <= 0) {
+                $maxProcesses = $this->getCpuCoreCount();
+            }
+
+            $maxProcesses = min($maxProcesses, $stores->count());
+
+            $chunkSize = (int) ceil($stores->count() / $maxProcesses);
+            $chunks = $stores->chunk($chunkSize);
+
+            $closures = $chunks->map(function ($chunk) {
+                return function () use ($chunk) {
+                    return $chunk->each->warm()->keys()->all();
+                };
+            })->all();
+
+            $driver = $config['concurrency_driver'] ?? 'process';
+
+            if (empty($closures)) {
+                Log::info('Closures are empty, skipping parallel warming');
+            }
+
+            Concurrency::driver($driver)->run($closures);
+        } catch (\Exception $e) {
+            Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
+            $stores->each->warm();
+        }
+    }
+
+    protected function getCpuCoreCount(): int
+    {
+        if (! function_exists('shell_exec')) {
+            return 1;
+        }
+
+        $command = match (PHP_OS_FAMILY) {
+            'Windows' => 'echo %NUMBER_OF_PROCESSORS%',
+            'Darwin' => 'sysctl -n hw.ncpu 2>/dev/null || echo 1',
+            default => 'nproc 2>/dev/null || echo 1',
+        };
+
+        return max(1, (int) shell_exec($command));
     }
 }

@@ -5,8 +5,12 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\UserGroup;
 
+use function Statamic\trans as __;
+
 class AssignGroups extends Action
 {
+    public $icon = 'add-group';
+
     public static function title()
     {
         return __('Assign Groups');
@@ -20,6 +24,11 @@ class AssignGroups extends Action
     public function authorize($authed, $user)
     {
         return $authed->can('assign user groups');
+    }
+
+    public function requiresElevatedSession(): bool
+    {
+        return true;
     }
 
     public function confirmationText()

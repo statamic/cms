@@ -54,7 +54,7 @@ interface Submission extends Arrayable
     /**
      * Get a value of a field.
      *
-     * @param  string  $key
+     * @param  string  $field
      * @return mixed
      */
     public function get($field);
@@ -71,7 +71,6 @@ interface Submission extends Arrayable
     /**
      * Delete submission.
      *
-     * @param  string  $key
      * @return mixed
      */
     public function delete();

@@ -55,7 +55,9 @@ class StoreBlueprintTest extends TestCase
         $this
             ->actingAs($user)
             ->submit($collection, ['title' => 'My Test Blueprint'])
-            ->assertRedirect('/cp/taxonomies/test/blueprints/my_test_blueprint/edit');
+            ->assertJson([
+                'redirect' => 'http://localhost/cp/fields/blueprints/taxonomies/test/my_test_blueprint/edit',
+            ]);
 
         $this->assertCount(2, Facades\Blueprint::in('taxonomies/test'));
         $blueprint = Facades\Blueprint::in('taxonomies/test')->last();
@@ -86,7 +88,9 @@ class StoreBlueprintTest extends TestCase
         $this
             ->actingAs($user)
             ->submit($collection, ['title' => 'My Test Blueprint'])
-            ->assertRedirect('/cp/taxonomies/test_collection/blueprints/my_test_blueprint/edit');
+            ->assertJson([
+                'redirect' => 'http://localhost/cp/fields/blueprints/taxonomies/test_collection/my_test_blueprint/edit',
+            ]);
 
         $this->assertCount(2, Facades\Blueprint::in('taxonomies/test_collection'));
 
@@ -116,7 +120,7 @@ class StoreBlueprintTest extends TestCase
 
     private function submit($collection, $params = [])
     {
-        return $this->post(cp_route('taxonomies.blueprints.store', $collection), $this->validParams($params));
+        return $this->post(cp_route('blueprints.taxonomies.store', $collection), $this->validParams($params));
     }
 
     private function validParams($overrides = [])

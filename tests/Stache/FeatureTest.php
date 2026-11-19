@@ -7,6 +7,7 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Data;
 use Statamic\Facades\Entry;
+use Statamic\Facades\File;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Nav as NavRepository;
@@ -47,7 +48,7 @@ class FeatureTest extends TestCase
     #[Test]
     public function it_gets_all_collections()
     {
-        $this->assertEquals(4, Collection::all()->count());
+        $this->assertEquals(5, Collection::all()->count());
     }
 
     #[Test]
@@ -92,7 +93,7 @@ class FeatureTest extends TestCase
         $this->assertEquals('Bar', $global->in('en')->get('foo'));
         $this->assertEquals($global, Data::find('global::global'));
         $this->assertEquals($global, Data::find('global'));
-        $this->assertEquals('555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
+        $this->assertEquals('+1 555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
     }
 
     #[Test]
@@ -143,6 +144,62 @@ class FeatureTest extends TestCase
         $this->assertInstanceOf(\Statamic\Structures\Page::class, $entry);
         $this->assertEquals('pages-directors', $entry->id());
         $this->assertEquals('Directors', $entry->title());
+    }
+
+    #[Test]
+    public function the_watcher_updates_entry_uris_when_a_tree_file_changes()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        $path = __DIR__.'/__fixtures__/content/structures/collections/pages.yaml';
+        $original = file_get_contents($path);
+
+        try {
+            $this->assertEquals('/about/board/directors', Entry::find('pages-directors')->uri());
+
+            // Move "directors" from under about/board to the top level, as a git pull or a hand edit would.
+            file_put_contents($path, <<<'YAML'
+tree:
+  -
+    entry: pages-home
+  -
+    entry: pages-about
+    children:
+      -
+        entry: pages-board
+  -
+    entry: pages-directors
+  -
+    entry: pages-blog
+
+YAML);
+            touch($path, time() + 10);
+
+            $this->nextRequest();
+
+            $this->assertEquals('/directors', Entry::find('pages-directors')->uri());
+            $this->assertEquals('pages-directors', Entry::findByUri('/directors')?->id());
+            $this->assertNull(Entry::findByUri('/about/board/directors'));
+        } finally {
+            file_put_contents($path, $original);
+        }
+    }
+
+    /**
+     * What the next request starts with: the cache as it is, nothing memoized in the stores.
+     */
+    private function nextRequest()
+    {
+        \Statamic\Facades\Blink::flush();
+
+        $this->stache->stores()
+            ->flatMap(fn ($store) => $store instanceof \Statamic\Stache\Stores\AggregateStore ? $store->discoverStores() : [$store])
+            ->each(function ($store) {
+                $store->resetMemoizedState();
+                (fn () => $this->fileChangesHandled = false)->call($store);
+            });
+
+        app('stache.indexes')->each->resetMemoizedState();
     }
 
     #[Test]
@@ -256,19 +313,15 @@ class FeatureTest extends TestCase
     #[Test]
     public function saving_a_global_set_writes_it_to_file()
     {
-        $global = GlobalSet::make('new')->title('New Global Set');
-
-        $global->addLocalization(
-            $global->makeLocalization('en')->data(['foo' => 'bar'])
-        );
-
-        $global->save();
+        GlobalSet::make('new')->title('New Global Set')->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
-            "title: 'New Global Set'\ndata:\n  foo: bar\n"
+            "title: 'New Global Set'\n"
         );
+
         @unlink($path);
+        @unlink(__DIR__.'/__fixtures__/content/globals/en/new.yaml');
     }
 
     #[Test]
@@ -286,6 +339,59 @@ class FeatureTest extends TestCase
         $this->assertFileExists(__DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md');
 
         $entry->delete();
+    }
+
+    #[Test]
+    public function it_does_not_restore_a_deleted_entry_when_its_cached_item_is_missing()
+    {
+        config(['statamic.stache.watcher' => false]);
+
+        $entry = tap(Entry::make()
+            ->locale('en')
+            ->id('stale-entry')
+            ->collection(Collection::findByHandle('blog'))
+            ->slug('stale-entry')
+            ->date('2017-07-04')
+            ->data(['title' => 'Stale Entry'])
+        )->save();
+
+        $path = $entry->path();
+
+        Entry::all();
+
+        File::delete($path);
+        $this->stache->cacheStore()->forget('stache::items::entries::blog::'.$entry->id());
+
+        $entries = Entry::all();
+
+        $this->assertCount(14, $entries);
+        $this->assertFileDoesNotExist($path);
+    }
+
+    #[Test]
+    public function it_excludes_deleted_entries_when_building_a_value_index()
+    {
+        config(['statamic.stache.watcher' => false]);
+
+        $entry = tap(Entry::make()
+            ->locale('en')
+            ->id('stale-entry')
+            ->collection(Collection::findByHandle('blog'))
+            ->slug('stale-entry')
+            ->date('2017-07-04')
+            ->data(['title' => 'Stale Entry', 'foo' => 'bar'])
+        )->save();
+
+        $path = $entry->path();
+
+        Entry::all();
+
+        File::delete($path);
+        $this->stache->cacheStore()->forget('stache::items::entries::blog::'.$entry->id());
+
+        $entries = Entry::query()->where('foo', 'bar')->get();
+
+        $this->assertCount(0, $entries);
     }
 
     #[Test]

@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class RoleDeleted extends Event implements ProvidesCommitMessage
 {
-    public $role;
-
-    public function __construct($role)
+    public function __construct(public $role)
     {
-        $this->role = $role;
     }
 
     public function commitMessage()

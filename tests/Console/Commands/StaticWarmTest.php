@@ -3,10 +3,16 @@
 namespace Tests\Console\Commands;
 
 use Facades\Tests\Factories\EntryFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Console\Commands\StaticWarm;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Console\Commands\StaticWarmUncachedJob;
 use Statamic\Facades\Collection;
@@ -185,6 +191,48 @@ class StaticWarmTest extends TestCase
     }
 
     #[Test]
+    public function it_queues_the_requests_using_the_configured_warm_job()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.warm_job' => CustomStaticWarmJob::class,
+            'queue.default' => 'redis',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true])
+            ->expectsOutputToContain('Adding 2 requests')
+            ->assertExitCode(0);
+
+        Queue::assertCount(2);
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/about';
+        });
+        Queue::assertPushed(CustomStaticWarmJob::class, function ($job) {
+            return $job->request->getUri()->getPath() === '/contact';
+        });
+    }
+
+    #[Test]
+    public function it_queues_the_uncached_job_when_the_uncached_option_is_used_with_a_configured_warm_job()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.warm_job' => CustomStaticWarmJob::class,
+            'queue.default' => 'redis',
+        ]);
+
+        Queue::fake();
+
+        $this->artisan('statamic:static:warm', ['--queue' => true, '--uncached' => true])
+            ->assertExitCode(0);
+
+        Queue::assertPushed(StaticWarmUncachedJob::class, 2);
+        Queue::assertNotPushed(CustomStaticWarmJob::class);
+    }
+
+    #[Test]
     public function it_queues_the_request_when_the_uncached_option_is_used()
     {
         config([
@@ -271,6 +319,220 @@ class StaticWarmTest extends TestCase
         ];
     }
 
+    #[Test]
+    public function it_sets_custom_headers_on_requests()
+    {
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $history = [];
+        $this->mockClient([new Response(200), new Response(200)], $history);
+
+        $this->artisan('statamic:static:warm', [
+            '--header' => ['Authorization: Bearer testtoken', 'X-Foo: Bar'],
+        ])->assertExitCode(0);
+
+        $this->assertCount(2, $history);
+
+        foreach ($history as $transaction) {
+            $this->assertEquals('Bearer testtoken', $transaction['request']->getHeaderLine('Authorization'));
+            $this->assertEquals('Bar', $transaction['request']->getHeaderLine('X-Foo'));
+        }
+    }
+
+    #[Test]
+    public function it_sets_custom_headers_on_paginated_requests()
+    {
+        config(['statamic.static_caching.strategy' => 'half']);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm', [
+            '--header' => ['X-Foo: Bar'],
+        ])->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery());
+
+        $this->assertContains('page=2', $queries);
+        $this->assertContains('page=3', $queries);
+
+        foreach ($history as $transaction) {
+            $this->assertEquals('Bar', $transaction['request']->getHeaderLine('X-Foo'));
+        }
+    }
+
+    #[Test]
+    public function it_warms_paginated_pages_after_the_other_urls()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $visited = collect($history)->map(function ($transaction) {
+            $uri = $transaction['request']->getUri();
+
+            return $uri->getPath().($uri->getQuery() ? '?'.$uri->getQuery() : '');
+        })->all();
+
+        $this->assertEquals(['/about', '/contact', '/about?page=1', '/about?page=2', '/about?page=3'], $visited);
+    }
+
+    #[Test]
+    public function it_adds_the_page_to_a_url_that_already_has_a_query_string()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        StaticWarm::hook('additional', fn () => collect(['/zebra?filter=stripes']));
+
+        $history = [];
+        $this->mockClient([
+            new Response(200),
+            new Response(200),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['filter=stripes', 'filter=stripes&page=1', 'filter=stripes&page=2'], $queries);
+    }
+
+    #[Test]
+    public function it_doesnt_paginate_a_url_that_already_has_the_page_parameter()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.strategies.half.warm_concurrency' => 1,
+        ]);
+
+        StaticWarm::hook('additional', fn () => collect(['/zebra?page=3']));
+
+        $history = [];
+        $this->mockClient([
+            new Response(200),
+            new Response(200),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 3,
+                'total' => 4,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['page=3'], $queries);
+    }
+
+    #[Test]
+    public function it_doesnt_warm_paginated_pages_that_are_cached_under_the_same_url()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.ignore_query_strings' => true,
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 3,
+                'name' => 'page',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $this->assertCount(2, $history);
+    }
+
+    #[Test]
+    public function it_only_warms_paginated_pages_whose_query_string_is_part_of_the_cached_url()
+    {
+        config([
+            'statamic.static_caching.strategy' => 'half',
+            'statamic.static_caching.allowed_query_strings' => ['page'],
+        ]);
+
+        $history = [];
+        $this->mockClient([
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'page',
+            ]),
+            (new Response(200))->withHeader('X-Statamic-Pagination', [
+                'current' => 1,
+                'total' => 2,
+                'name' => 'p',
+            ]),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+            new Response(200),
+        ], $history);
+
+        $this->artisan('statamic:static:warm')->assertExitCode(0);
+
+        $queries = collect($history)->map(fn ($transaction) => $transaction['request']->getUri()->getQuery())->filter()->values()->all();
+
+        $this->assertEquals(['page=1', 'page=2'], $queries);
+    }
+
+    private function mockClient(array $responses, array &$history)
+    {
+        $handlerStack = HandlerStack::create(new MockHandler($responses));
+        $handlerStack->push(Middleware::history($history));
+
+        $this->app->bind(Client::class, fn ($app, $parameters) => new Client([
+            ...$parameters['config'],
+            'handler' => $handlerStack,
+        ]));
+    }
+
     private function createPage($slug, $attributes = [])
     {
         $this->makeCollection()->save();
@@ -293,4 +555,8 @@ class StaticWarmTest extends TestCase
             ->routes('{slug}')
             ->template('default');
     }
+}
+
+class CustomStaticWarmJob extends StaticWarmJob
+{
 }

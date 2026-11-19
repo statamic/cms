@@ -26,9 +26,12 @@ class DeleteNavigationTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->delete(cp_route('navigation.destroy', $nav->handle()))
-            ->assertRedirect('/original')
-            ->assertSessionHas('error', 'You are not authorized to delete navs.');
+            ->postJson(cp_route('navigation.actions.run'), [
+                'selections' => [$nav->handle()],
+                'action' => 'delete',
+                'values' => [],
+            ])
+            ->assertForbidden();
 
         $this->assertCount(1, Nav::all());
     }
@@ -44,7 +47,11 @@ class DeleteNavigationTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->delete(cp_route('navigation.destroy', $nav->handle()))
+            ->postJson(cp_route('navigation.actions.run'), [
+                'selections' => [$nav->handle()],
+                'action' => 'delete',
+                'values' => [],
+            ])
             ->assertOk();
 
         $this->assertCount(0, Nav::all());

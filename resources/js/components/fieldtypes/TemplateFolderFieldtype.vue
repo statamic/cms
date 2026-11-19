@@ -11,21 +11,20 @@
 </template>
 
 <script>
-export default {
+import Fieldtype from './Fieldtype.vue';
 
+export default {
     mixins: [Fieldtype],
 
-    inject: ['storeName'],
-
     computed: {
-
         relationshipMeta() {
-            return {...this.meta, ...{
-                getBaseSelectionsUrlParameters: { }
-            }};
-        }
-
-    }
-
+            return {
+                ...this.meta,
+                ...{
+                    getBaseSelectionsUrlParameters: {},
+                },
+            };
+        },
+    },
 };
 </script>

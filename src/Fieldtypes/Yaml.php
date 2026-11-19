@@ -6,6 +6,8 @@ use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Yaml\ParseException;
 
+use function Statamic\trans as __;
+
 class Yaml extends Fieldtype
 {
     protected $categories = ['special'];

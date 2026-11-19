@@ -7,12 +7,14 @@ use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Exceptions\MethodNotFoundException;
 use Statamic\Facades\Compare;
+use Statamic\Query\ResolveValue;
 use Statamic\Search\PlainResult;
 use Statamic\Search\Result;
-use Statamic\Support\Str;
 
 /**
  * An abstract collection of data types.
+ *
+ * @phpstan-consistent-constructor
  */
 class DataCollection extends IlluminateCollection
 {
@@ -96,17 +98,11 @@ class DataCollection extends IlluminateCollection
             return $this->normalizeSortableValue($item[$sort] ?? null);
         }
 
-        $method = Str::camel($sort);
-
         if ($item instanceof Result && ! $item instanceof PlainResult) {
             $item = $item->getSearchable() ?? $item;
         }
 
-        $value = (method_exists($item, $method))
-            ? call_user_func([$item, $method])
-            : $item->get($sort);
-
-        return $this->normalizeSortableValue($value);
+        return $this->normalizeSortableValue((new ResolveValue)($item, $sort));
     }
 
     /**

@@ -2,12 +2,15 @@
 
 namespace Statamic\Stache;
 
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Query\SubmissionQueryBuilder;
+use Statamic\Statamic;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
@@ -45,6 +48,10 @@ class ServiceProvider extends LaravelServiceProvider
         $stache->sites(Site::all()->keys()->all());
 
         $this->registerStores($stache);
+
+        $this->resetMemoizedStateBetweenJobs($stache);
+
+        $this->resetMemoizedStateBetweenOctaneRequests($stache);
     }
 
     private function registerStores($stache)
@@ -68,6 +75,35 @@ class ServiceProvider extends LaravelServiceProvider
         });
 
         $stache->registerStores($stores->all());
+    }
+
+    private function resetMemoizedStateBetweenJobs($stache)
+    {
+        Event::listen(JobProcessing::class, function () use ($stache) {
+            if (! Statamic::isWorker()) {
+                return;
+            }
+
+            $stache->stores()->each->resetMemoizedState();
+
+            $this->app->make('stache.indexes')->each->resetMemoizedState();
+        });
+    }
+
+    /**
+     * The stores are made when the app boots, so under Octane a worker uses the same ones
+     * for every request it handles. What they remember (their paths, for one) has to be
+     * read again for each request, or the worker never sees what another process saves.
+     */
+    private function resetMemoizedStateBetweenOctaneRequests($stache)
+    {
+        // Listened for by name, since Octane isn't necessarily installed.
+        Event::listen('Laravel\Octane\Events\RequestReceived', function () use ($stache) {
+            $stache->stores()->each->resetMemoizedState();
+
+            // Octane handles each request in its own copy of the container.
+            app('stache.indexes')->each->resetMemoizedState();
+        });
     }
 
     private function locks()

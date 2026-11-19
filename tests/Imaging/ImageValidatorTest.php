@@ -8,16 +8,19 @@ use Tests\TestCase;
 
 class ImageValidatorTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        (function () {
+            static::$extensionSupport = [];
+        })->call(new \Statamic\Imaging\ImageValidator(\Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class)));
+
+        parent::tearDown();
+    }
+
     #[Test]
     public function it_checks_if_image_has_valid_extension_and_mimetype()
     {
-        config(['statamic.assets.image_manipulation.driver' => 'imagick']);
-
-        config(['statamic.assets.image_manipulation.additional_extensions' => [
-            'svg',
-            'pdf',
-            'eps',
-        ]]);
+        config(['statamic.assets.image_manipulation.driver' => 'gd']);
 
         // We'll test `isValidExtension()` functionality separately below, and just mock here...
         ImageValidator::shouldReceive('isValidExtension')->andReturnTrue()->times(24);
@@ -52,76 +55,71 @@ class ImageValidatorTest extends TestCase
     }
 
     #[Test]
-    public function it_checks_if_image_extension_is_allowed_for_manipulation_with_gd_driver()
+    public function it_checks_if_image_extension_is_allowed_for_manipulation()
     {
         config(['statamic.assets.image_manipulation.driver' => 'gd']);
 
-        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
-        $this->assertTrue(ImageValidator::isValidExtension('png'));
-        $this->assertTrue(ImageValidator::isValidExtension('gif'));
-        $this->assertTrue(ImageValidator::isValidExtension('webp'));
+        $mock = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $mock->shouldReceive('supports')->with('one')->andReturnTrue();
+        $mock->shouldReceive('supports')->with('two')->andReturnFalse();
 
-        // Supported by imagick only...
-        $this->assertFalse(ImageValidator::isValidExtension('tif'));
-        $this->assertFalse(ImageValidator::isValidExtension('bmp'));
-        $this->assertFalse(ImageValidator::isValidExtension('psd'));
+        $imageValidator = new \Statamic\Imaging\ImageValidator($mock);
 
-        // Supported by imagick only, but requires `additional_extensions` configuration...
-        $this->assertFalse(ImageValidator::isValidExtension('svg'));
-        $this->assertFalse(ImageValidator::isValidExtension('pdf'));
-        $this->assertFalse(ImageValidator::isValidExtension('eps'));
+        $this->assertTrue($imageValidator->isValidExtension('one'));
+        $this->assertFalse($imageValidator->isValidExtension('two'));
     }
 
     #[Test]
-    public function it_checks_if_image_extension_is_allowed_for_manipulation_with_imagick_driver()
+    public function it_does_not_ask_the_driver_about_universally_supported_formats()
     {
-        config(['statamic.assets.image_manipulation.driver' => 'imagick']);
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
 
-        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
-        $this->assertTrue(ImageValidator::isValidExtension('png'));
-        $this->assertTrue(ImageValidator::isValidExtension('gif'));
-        $this->assertTrue(ImageValidator::isValidExtension('webp'));
-        $this->assertTrue(ImageValidator::isValidExtension('tif'));
-        $this->assertTrue(ImageValidator::isValidExtension('bmp'));
-        $this->assertTrue(ImageValidator::isValidExtension('psd'));
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
 
-        // Supported by imagick, but requires `additional_extensions` configuration...
-        $this->assertFalse(ImageValidator::isValidExtension('svg'));
-        $this->assertFalse(ImageValidator::isValidExtension('pdf'));
-        $this->assertFalse(ImageValidator::isValidExtension('eps'));
-        $this->assertFalse(ImageValidator::isValidExtension('avif'));
+        $this->assertTrue($validator->isValidExtension('jpg'));
+        $this->assertTrue($validator->isValidExtension('JPG'));
+        $this->assertTrue($validator->isValidExtension('jpeg'));
+        $this->assertTrue($validator->isValidExtension('png'));
+        $this->assertTrue($validator->isValidExtension('gif'));
     }
 
     #[Test]
-    public function it_checks_if_custom_image_extension_is_allowed_for_manipulation_with_proper_config()
+    public function it_rejects_an_empty_extension_without_asking_the_driver()
     {
-        config(['statamic.assets.image_manipulation.driver' => 'imagick']);
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
 
-        config(['statamic.assets.image_manipulation.additional_extensions' => [
-            'svg',
-            'pdf',
-            'eps',
-            'avif',
-        ]]);
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
 
-        $this->assertTrue(ImageValidator::isValidExtension('jpeg'));
-        $this->assertTrue(ImageValidator::isValidExtension('jpg'));
-        $this->assertTrue(ImageValidator::isValidExtension('png'));
-        $this->assertTrue(ImageValidator::isValidExtension('gif'));
-        $this->assertTrue(ImageValidator::isValidExtension('webp'));
-        $this->assertTrue(ImageValidator::isValidExtension('tif'));
-        $this->assertTrue(ImageValidator::isValidExtension('bmp'));
-        $this->assertTrue(ImageValidator::isValidExtension('psd'));
+        $this->assertFalse($validator->isValidExtension(''));
+        $this->assertFalse($validator->isValidExtension(null));
+    }
 
-        // Should now be supported due to `additional_extensions` config...
-        $this->assertTrue(ImageValidator::isValidExtension('svg'));
-        $this->assertTrue(ImageValidator::isValidExtension('pdf'));
-        $this->assertTrue(ImageValidator::isValidExtension('eps'));
-        $this->assertTrue(ImageValidator::isValidExtension('avif'));
+    #[Test]
+    public function it_still_checks_the_mimetype_of_universally_supported_formats()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldNotReceive('supports');
 
-        // Not configured, should still be false...
-        $this->assertFalse(ImageValidator::isValidExtension('exe'));
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertTrue($validator->isValidImage('jpg', 'image/jpeg'));
+        $this->assertFalse($validator->isValidImage('jpg', 'application/x-msdownload'));
+        $this->assertFalse($validator->isValidImage('png', 'image/jpeg'));
+    }
+
+    #[Test]
+    public function it_only_asks_the_driver_about_an_extension_once()
+    {
+        $driver = \Mockery::mock(\Intervention\Image\Interfaces\DriverInterface::class);
+        $driver->shouldReceive('supports')->with('avif')->once()->andReturnTrue();
+
+        $validator = new \Statamic\Imaging\ImageValidator($driver);
+
+        $this->assertTrue($validator->isValidExtension('avif'));
+        $this->assertTrue($validator->isValidExtension('avif'));
+        $this->assertTrue($validator->isValidExtension('AVIF'));
+        $this->assertTrue((new \Statamic\Imaging\ImageValidator($driver))->isValidExtension('avif'));
     }
 }

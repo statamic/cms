@@ -130,6 +130,11 @@ class Result implements ContainsQueryableValues, Contract
         return $this->searchable->getCpSearchResultBadge();
     }
 
+    public function getCpIcon(): string
+    {
+        return $this->searchable->getCpSearchResultIcon();
+    }
+
     public function get($key, $fallback = null)
     {
         if ($key === 'date' && method_exists($this->searchable, 'date')) {
@@ -142,5 +147,10 @@ class Result implements ContainsQueryableValues, Contract
     public function setSupplement($key, $value)
     {
         $this->searchable->setSupplement($key, $value);
+    }
+
+    public function __call($method, $args)
+    {
+        return $this->searchable->$method(...$args);
     }
 }

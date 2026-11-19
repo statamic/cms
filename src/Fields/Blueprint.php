@@ -7,7 +7,10 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Statamic\CommandPalette\Category;
+use Statamic\CommandPalette\Link;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\ContainsQueryableValues;
 use Statamic\Contracts\Query\QueryableValue;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
@@ -25,10 +28,13 @@ use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
+use function Statamic\trans as __;
+
+class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryableValues, QueryableValue
 {
     use ExistsAsFile, HasAugmentedData;
 
@@ -71,7 +77,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->namespace;
     }
 
-    public function fullyQualifiedHandle(): string
+    public function renderableNamespace(): string
+    {
+        return str_replace('.', ' ', Str::humanize($this->namespace));
+    }
+
+    public function fullyQualifiedHandle(): ?string
     {
         $handle = $this->handle();
 
@@ -136,9 +147,8 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             $namespace = 'vendor/'.$namespace;
         }
 
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            Facades\Blueprint::directory(),
-            $namespace,
+        return Path::tidy(vsprintf('%s/%s.yaml', [
+            Facades\Blueprint::namespaceDirectory($namespace),
             $this->handle(),
         ]));
     }
@@ -149,6 +159,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
 
         return $this
             ->normalizeTabs()
+            ->resetBlueprintCache()
             ->resetFieldsCache();
     }
 
@@ -257,7 +268,9 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 // override array, but only keys that don't already exist in the actual partial field's config.
                 $referencedField = FieldRepository::find($existingField['field']);
                 $referencedFieldConfig = $referencedField->config();
-                $config = array_merge($config, $referencedFieldConfig);
+                $fieldOverrides = $existingField['config'] ?? [];
+
+                $config = array_merge($config, $referencedFieldConfig, $fieldOverrides);
                 $config = Arr::except($config, array_keys($referencedFieldConfig));
                 $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
             } else {
@@ -268,8 +281,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             }
         }
 
-        $targetSectionIndex = $existingField['section']
-            ?? ($prepend ? 0 : count($contents['tabs'][$tab]['sections'] ?? []) - 1);
+        $targetSectionIndex = $existingField['section'] ?? 0;
 
         $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'] ?? [])->keyBy(function ($field) {
             return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
@@ -280,6 +292,7 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
                 $importKey = 'import:'.$importedField['partial'];
                 $field = $allFields->get($importKey);
                 $tab = $field['tab'];
+                $targetSectionIndex = $field['section'];
                 $fields = collect($tabs[$tab]['sections'][$targetSectionIndex]['fields'])->keyBy(function ($field) {
                     return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
                 });
@@ -321,7 +334,15 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     {
         $this->parent = $parent;
 
-        $this->resetBlueprintCache()->resetFieldsCache();
+        $this->resetFieldsCache();
+
+        // The cache survives when the new parent uses the same blueprint. Give the new
+        // parent copies of the fields, so fields handed out earlier keep their parent.
+        if ($this->fieldsCache) {
+            $this->fieldsCache = $this->fieldsCache->newInstance()
+                ->setFields($this->fieldsCache->all()->map(fn ($field) => clone $field))
+                ->setParent($parent);
+        }
 
         return $this;
     }
@@ -441,6 +462,11 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             'handle' => $this->handle(),
             'tabs' => $this->tabs()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
+            'fqh' => $this->fullyQualifiedHandle(),
+            'token' => encrypt([
+                'fqh' => $this->fullyQualifiedHandle(),
+                'user_id' => User::current()?->id(),
+            ]),
         ];
     }
 
@@ -614,6 +640,12 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return $this;
         }
 
+        // A field from an imported fieldset can't be removed on its
+        // own, since it would take the rest of the fieldset with it.
+        if (isset($fields[$handle]['import'])) {
+            return $this;
+        }
+
         $fieldKey = $fields[$handle]['fieldIndex'];
         $sectionIndex = $fields[$handle]['sectionIndex'];
 
@@ -626,10 +658,18 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
     private function getTabFields($tab)
     {
         return collect($this->contents['tabs'][$tab]['sections'])->flatMap(function ($section, $sectionIndex) {
-            return collect($section['fields'])->map(function ($field, $fieldIndex) use ($sectionIndex) {
-                return $field + ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
+            return collect($section['fields'] ?? [])->flatMap(function ($field, $fieldIndex) use ($sectionIndex) {
+                $indexes = ['fieldIndex' => $fieldIndex, 'sectionIndex' => $sectionIndex];
+
+                // An imported fieldset is a single entry in the contents, but may
+                // contain any number of fields, each pointing back at the import.
+                if (isset($field['import'])) {
+                    return (new Fields([$field]))->all()->map(fn () => $field + $indexes)->all();
+                }
+
+                return [$field['handle'] => $field + $indexes];
             });
-        })->keyBy('handle');
+        });
     }
 
     protected function ensureFieldInTabHasConfig($handle, $tab, $config)
@@ -641,20 +681,42 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
             return $this;
         }
 
+        // If field is deferred as an ensured field, we'll need to update it instead
+        if (! isset($fields[$handle]) && isset($this->ensuredFields[$handle])) {
+            return $this->ensureEnsuredFieldHasConfig($handle, $config);
+        }
+
         $fieldKey = $fields[$handle]['fieldIndex'];
         $sectionKey = $fields[$handle]['sectionIndex'];
 
         $field = $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey];
 
-        $isImportedField = Arr::has($field, 'config');
-
-        if ($isImportedField) {
+        if (isset($field['import'])) {
+            // An import keeps its overrides in a `config` array keyed by the
+            // field handles within the fieldset, before any prefix is applied.
+            $importedHandle = Str::after($handle, $field['prefix'] ?? '');
+            $existingConfig = Arr::get($field, "config.{$importedHandle}", []);
+            $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['config'][$importedHandle] = array_merge($existingConfig, $config);
+        } elseif (is_string(Arr::get($field, 'field'))) {
             $existingConfig = Arr::get($field, 'config', []);
             $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['config'] = array_merge($existingConfig, $config);
         } else {
             $existingConfig = Arr::get($field, 'field', []);
             $this->contents['tabs'][$tab]['sections'][$sectionKey]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
         }
+
+        return $this->resetBlueprintCache()->resetFieldsCache();
+    }
+
+    private function ensureEnsuredFieldHasConfig($handle, $config)
+    {
+        if (! isset($this->ensuredFields[$handle])) {
+            return $this;
+        }
+
+        $existingConfig = Arr::get($this->ensuredFields[$handle], 'config', []);
+
+        $this->ensuredFields[$handle]['config'] = array_merge($existingConfig, $config);
 
         return $this->resetBlueprintCache()->resetFieldsCache();
     }
@@ -760,13 +822,46 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, QueryableValue
         return $this->handle();
     }
 
-    public function resetUrl()
+    public function editAdditionalBlueprintUrl()
     {
-        return cp_route('blueprints.reset', [$this->namespace(), $this->handle()]);
+        return cp_route('blueprints.additional.edit', [$this->namespace(), $this->handle()]);
+    }
+
+    public function resetAdditionalBlueprintUrl()
+    {
+        return cp_route('blueprints.additional.reset', [$this->namespace(), $this->handle()]);
     }
 
     public function writeFile($path = null)
     {
         File::put($path ?? $this->buildPath(), $this->fileContents());
+    }
+
+    public function commandPaletteLink(string|array $type, string $url): Link
+    {
+        $type = is_array($type) ? $type : [__($type)];
+
+        $text = [__('Blueprints'), ...$type, __($this->title())];
+
+        return (new Link($text, Category::Fields))
+            ->url($url)
+            ->icon('blueprints');
+    }
+
+    public function getQueryableValue(string $field)
+    {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
+            return $this->{$method}();
+        }
+
+        return null;
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'columns', 'fields', 'handle', 'hidden', 'isEmpty', 'isDeletable', 'isResettable',
+            'namespace', 'order', 'path', 'tabs', 'title',
+        ];
     }
 }

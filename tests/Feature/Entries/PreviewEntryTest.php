@@ -181,6 +181,33 @@ class PreviewEntryTest extends TestCase
         );
     }
 
+    #[Test]
+    public function it_doesnt_create_a_token_without_edit_permission()
+    {
+        Collection::make('blog')->routes('/blog/{slug}')->save();
+
+        EntryFactory::id('the-entry')
+            ->collection('blog')
+            ->slug('the-existing-entry')
+            ->data(['title' => 'The Existing Entry'])
+            ->create();
+
+        LivePreview::shouldReceive('tokenize')->never();
+
+        $this->setTestRoles(['viewer' => ['access cp', 'view blog entries']]);
+        $user = User::make()->assignRole('viewer')->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson('/cp/collections/blog/entries/the-entry/preview', [
+                'preview' => [
+                    'title' => 'Edited title',
+                    'slug' => 'edited-slug',
+                ],
+            ])
+            ->assertForbidden();
+    }
+
     private function user()
     {
         $this->setTestRoles(['test' => ['access cp', 'create blog entries', 'edit blog entries']]);

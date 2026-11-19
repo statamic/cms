@@ -5,9 +5,13 @@ namespace Statamic\Actions;
 use Statamic\Actions\Concerns\MakesZips;
 use Statamic\Contracts\Assets\Asset;
 
+use function Statamic\trans as __;
+
 class DownloadAsset extends Action
 {
     use MakesZips;
+
+    protected $icon = 'download';
 
     protected $confirm = false;
 

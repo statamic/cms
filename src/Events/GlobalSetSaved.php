@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class GlobalSetSaved extends Event implements ProvidesCommitMessage
 {
-    public $globals;
-
-    public function __construct($globals)
+    public function __construct(public $globals)
     {
-        $this->globals = $globals;
     }
 
     public function commitMessage()

@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Statamic\Statamic;
 
+use function Statamic\trans as __;
+
 class MaxRule extends SizeBasedRule
 {
     /**

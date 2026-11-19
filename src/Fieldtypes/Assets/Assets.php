@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Actions\RenameAssetFolder;
 use Statamic\Assets\OrderedQueryBuilder;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\CP\Column;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
@@ -15,14 +16,19 @@ use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\UpdatesReferences;
 use Statamic\GraphQL\Types\AssetInterface;
-use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Http\Resources\CP\Assets\AssetsFieldtypeAsset as AssetResource;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
 class Assets extends Fieldtype
 {
+    use UpdatesReferences;
     protected $categories = ['media', 'relationship'];
     protected $keywords = ['file', 'files', 'image', 'images', 'video', 'videos', 'audio', 'upload'];
     protected $selectableInForms = true;
@@ -31,30 +37,8 @@ class Assets extends Fieldtype
     {
         return [
             [
-                'display' => __('Appearance & Behavior'),
+                'display' => __('Input Behavior'),
                 'fields' => [
-                    'max_files' => [
-                        'display' => __('Max Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'min_files' => [
-                        'display' => __('Min Files'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
-                        'min' => 1,
-                        'type' => 'integer',
-                    ],
-                    'mode' => [
-                        'display' => __('UI Mode'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
-                        'type' => 'select',
-                        'default' => 'list',
-                        'options' => [
-                            'grid' => __('Grid'),
-                            'list' => __('List'),
-                        ],
-                    ],
                     'container' => [
                         'display' => __('Container'),
                         'instructions' => __('statamic::fieldtypes.assets.config.container'),
@@ -64,15 +48,25 @@ class Assets extends Fieldtype
                         'required' => true,
                         'default' => AssetContainer::all()->count() == 1 ? AssetContainer::all()->first()->handle() : null,
                         'force_in_config' => true,
+                        'width' => '50',
+                    ],
+                    'allow_uploads' => [
+                        'display' => __('Allow Uploads'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                        'type' => 'toggle',
+                        'default' => true,
+                        'width' => '50',
                     ],
                     'folder' => [
                         'display' => __('Folder'),
                         'instructions' => __('statamic::fieldtypes.assets.config.folder'),
                         'type' => 'asset_folder',
                         'max_items' => 1,
+                        'mode' => 'select',
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
                     ],
                     'dynamic' => [
                         'display' => __('Dynamic Folder'),
@@ -88,6 +82,7 @@ class Assets extends Fieldtype
                         'if' => [
                             'container' => 'not empty',
                         ],
+                        'width' => '50',
                     ],
                     'restrict' => [
                         'display' => __('Restrict to Folder'),
@@ -95,27 +90,78 @@ class Assets extends Fieldtype
                         'type' => 'toggle',
                         'if' => [
                             'container' => 'not empty',
-                            'dynamic' => 'not true',
+                            'dynamic' => 'empty',
                         ],
+                        'width' => '50',
                     ],
-                    'allow_uploads' => [
-                        'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
-                        'type' => 'toggle',
-                        'default' => true,
+                ],
+            ],
+            [
+                'display' => __('Appearance'),
+                'fields' => [
+                    'mode' => [
+                        'display' => __('UI Mode'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.mode'),
+                        'type' => 'button_group',
+                        'default' => 'list',
+                        'options' => [
+                            'grid' => __('Grid'),
+                            'list' => __('List'),
+                            'compact' => __('Compact'),
+                            'full' => __('Full'),
+                        ],
+                        'width' => '50',
+                    ],
+                    'aspect_ratio' => [
+                        'display' => __('Preview Aspect Ratio'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.aspect_ratio'),
+                        'type' => 'select',
+                        'label_html' => true,
+                        'searchable' => false,
+                        'default' => '8/3',
+                        'options' => $this->aspectRatioOptions(),
+                        'if' => ['mode' => 'equals full'],
+                        'width' => '50',
                     ],
                     'show_filename' => [
                         'display' => __('Show Filename'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_filename'),
                         'type' => 'toggle',
                         'default' => true,
+                        'unless' => ['mode' => 'equals full'],
+                        'width' => '50',
                     ],
                     'show_set_alt' => [
                         'display' => __('Show Set Alt'),
                         'instructions' => __('statamic::fieldtypes.assets.config.show_set_alt'),
                         'type' => 'toggle',
                         'default' => true,
+                        'width' => '50',
                     ],
+                ],
+            ],
+            [
+                'display' => __('Boundaries & Limits'),
+                'fields' => [
+                    'max_files' => [
+                        'display' => __('Max Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                    'min_files' => [
+                        'display' => __('Min Files'),
+                        'instructions' => __('statamic::fieldtypes.assets.config.min_files'),
+                        'min' => 1,
+                        'type' => 'integer',
+                        'width' => '50',
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Advanced'),
+                'fields' => [
                     'query_scopes' => [
                         'display' => __('Query Scopes'),
                         'instructions' => __('statamic::fieldtypes.assets.config.query_scopes'),
@@ -129,6 +175,25 @@ class Assets extends Fieldtype
                 ],
             ],
         ];
+    }
+
+    protected function aspectRatioOptions(): array
+    {
+        return collect(['8/3', '2/1', '16/9', '3/2', '4/3', '1/1', '3/4', '2/3', '9/16'])
+            ->mapWithKeys(function (string $ratio) {
+                $label = str_replace('/', ':', $ratio);
+                $svg = Statamic::svg('aspect-ratios/'.str_replace('/', '-', $ratio), 'h-5 w-7 shrink-0');
+
+                return [
+                    $ratio => <<<HTML
+                        <span class="flex items-center gap-2" title="{$label}">
+                            {$svg}
+                            <span>{$label}</span>
+                        </span>
+                        HTML,
+                ];
+            })
+            ->all();
     }
 
     public function canHaveDefault()
@@ -161,7 +226,7 @@ class Assets extends Fieldtype
         $max_files = (int) $this->config('max_files');
 
         $values = collect($data)->map(function ($id) {
-            return Asset::find($id)->path();
+            return Asset::findOrFail($id)->path();
         });
 
         return $this->config('max_files') === 1 ? $values->first() : $values->all();
@@ -169,12 +234,98 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        $container = $this->container();
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
-            'container' => $container = $this->container()->handle(),
+            'container' => $this->containerForPreload($container),
             'dynamicFolder' => $dynamicFolder = $this->dynamicFolder(),
             'rename_folder' => $this->renameFolderAction($dynamicFolder),
+            'columns' => $this->getColumns(),
         ];
+    }
+
+    private function containerForPreload($container)
+    {
+        // It's the same for every assets field that uses the container, and a page can have a lot of them.
+        return Blink::once('assets-fieldtype-container-'.$container->handle().'-'.User::current()?->id(), fn () => [
+            'id' => $container->id(),
+            'title' => $container->title(),
+            'edit_url' => $container->editUrl(),
+            'delete_url' => $container->deleteUrl(),
+            'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
+            'can_view' => User::current()->can('view', $container),
+            'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
+            'can_edit' => User::current()->can('edit', $container),
+            'can_delete' => User::current()->can('delete', $container),
+            'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
+            'sort_field' => $container->sortField(),
+            'sort_direction' => $container->sortDirection(),
+        ]);
+    }
+
+    protected function getColumns()
+    {
+        return Blink::once('assets-fieldtype-columns-'.$this->container()->handle().'-'.User::current()?->id(), fn () => $this->makeColumns())
+            ->map(fn ($column) => clone $column);
+    }
+
+    private function makeColumns()
+    {
+        $columns = $this->container()->blueprint()->columns()->map(fn ($column) => clone $column);
+
+        $basename = Column::make('basename')
+            ->label(__('File'))
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true)
+            ->required(true);
+
+        $size = Column::make('size')
+            ->label(__('Size'))
+            ->value('size_formatted')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $lastModified = Column::make('last_modified')
+            ->label(__('Last Modified'))
+            ->value('last_modified_relative')
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->sortable(true);
+
+        $width = Column::make('width')
+            ->label(__('Width'))
+            ->value('width')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $height = Column::make('height')
+            ->label(__('Height'))
+            ->value('height')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $duration = Column::make('duration')
+            ->label(__('Duration'))
+            ->value('duration_formatted')
+            ->visible(true)
+            ->defaultVisibility(false)
+            ->sortable(true);
+
+        $columns->put('basename', $basename);
+        $columns->put('size', $size);
+        $columns->put('last_modified', $lastModified);
+        $columns->put('width', $width);
+        $columns->put('height', $height);
+        $columns->put('duration', $duration);
+
+        $columns->setPreferred("assets.{$this->container()->handle()}.columns");
+
+        return $columns->rejectUnlisted()->values();
     }
 
     private function dynamicFolder()
@@ -240,11 +391,17 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        return collect($items)->map(function ($url) {
-            return ($asset = Asset::find($url))
-                ? (new AssetResource($asset))->resolve()['data']
-                : null;
-        })->filter()->values();
+        $user = User::current();
+
+        return collect($items)->map(function ($url) use ($user) {
+            $asset = Asset::find($url);
+
+            if (! $asset || ! $user->can('view', $asset)) {
+                return ['id' => $url, 'url' => $url, 'invalid' => true];
+            }
+
+            return (new AssetResource($asset))->resolve()['data'];
+        })->values();
     }
 
     public function augment($values)
@@ -331,6 +488,10 @@ class Assets extends Fieldtype
         ];
 
         return collect(parent::fieldRules())->map(function ($rule) use ($classes) {
+            if (! is_string($rule)) {
+                return $rule;
+            }
+
             $name = Str::before($rule, ':');
 
             if ($class = Arr::get($classes, $name)) {
@@ -345,9 +506,18 @@ class Assets extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        return $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
+        $data = Arr::wrap($data);
+        $total = count($data);
+
+        // Since we only want to display a handful of thumbnails, we'll slice it up here so we don't perform more
+        // augmentation overhead than necessary. e.g. 5 thumbs then +remainder. If the remainder is 1, we may
+        // as well show all 6 since the +1 would almost take up the same amount of space.
+        $data = collect($data)->take(6)->all();
+
+        $assets = $this->getItemsForPreProcessIndex($data)->map(function ($asset) {
             $arr = [
                 'id' => $asset->id(),
+                'basename' => $asset->basename(),
                 'is_image' => $isImage = $asset->isImage(),
                 'is_svg' => $asset->isSvg(),
                 'extension' => $asset->extension(),
@@ -363,6 +533,8 @@ class Assets extends Fieldtype
 
             return $arr;
         });
+
+        return compact('total', 'assets');
     }
 
     protected function getItemsForPreProcessIndex($values): Collection
@@ -394,5 +566,29 @@ class Assets extends Fieldtype
         return $this->config('max_files') === 1
             ? collect($value)->first()
             : collect($value)->filter()->all();
+    }
+
+    public function replaceAssetReferences($data, ?string $newValue, string $oldValue, string $container)
+    {
+        if ($this->configuredContainerHandle() !== $container) {
+            return $data;
+        }
+
+        return is_string($data)
+            ? $this->replaceValue($data, $newValue, $oldValue)
+            : $this->replaceValuesInArray($data, $newValue, $oldValue);
+    }
+
+    protected function configuredContainerHandle(): ?string
+    {
+        if ($container = $this->config('container')) {
+            return $container;
+        }
+
+        $containers = AssetContainer::all();
+
+        return $containers->count() === 1
+            ? $containers->first()->handle()
+            : null;
     }
 }

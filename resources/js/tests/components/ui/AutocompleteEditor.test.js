@@ -1,0 +1,228 @@
+import { mount } from '@vue/test-utils';
+import { expect, test, vi } from 'vitest';
+import AutocompleteEditor from '@/components/ui/AutocompleteEditor/AutocompleteEditor.vue';
+
+window.__ = (key) => key;
+
+const sampleOptions = [
+    { value: 'jason', label: 'Jason Varga' },
+    { value: 'jesse', label: 'Jesse Leite' },
+];
+
+async function mountEditor(props = {}) {
+    const wrapper = mount(AutocompleteEditor, {
+        props: { modelValue: [], options: sampleOptions, ...props },
+    });
+
+    // useEditor() initializes the tiptap instance asynchronously, so the
+    // ProseMirror DOM isn't guaranteed to exist after a single tick.
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    return wrapper;
+}
+
+function pressEnter(dom) {
+    dom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+}
+
+test('renders a toolbar button for each configured button', async () => {
+    const wrapper = await mountEditor({ buttons: ['bold', 'h2'] });
+
+    const labels = wrapper.findAll('button').map((button) => button.attributes('aria-label'));
+
+    expect(labels).toEqual(['Bold', 'Heading 2']);
+});
+
+test('unknown button keys are ignored', async () => {
+    const wrapper = await mountEditor({ buttons: ['bold', 'not-a-real-button'] });
+
+    const labels = wrapper.findAll('button').map((button) => button.attributes('aria-label'));
+
+    expect(labels).toEqual(['Bold']);
+});
+
+test('inline mode hides the toolbar', async () => {
+    const wrapper = await mountEditor({ inline: true, buttons: ['bold', 'italic'] });
+
+    expect(wrapper.findAll('button')).toHaveLength(0);
+});
+
+test('enableLineBreaks false blocks Enter in inline mode', async () => {
+    const wrapper = await mountEditor({ inline: true, enableLineBreaks: false });
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('hello');
+    editor.commands.focus('end');
+    pressEnter(wrapper.find('.ProseMirror').element);
+    await wrapper.vm.$nextTick();
+
+    expect(editor.getJSON().content).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+    ]);
+});
+
+test('enableLineBreaks true inserts a hard break in inline mode', async () => {
+    const wrapper = await mountEditor({ inline: true, enableLineBreaks: true });
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('hello');
+    editor.commands.focus('end');
+    pressEnter(wrapper.find('.ProseMirror').element);
+    await wrapper.vm.$nextTick();
+
+    expect(editor.getJSON().content).toEqual([
+        {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'hello' }, { type: 'hardBreak' }],
+        },
+    ]);
+});
+
+test('enableLineBreaks false still splits into a new paragraph in block mode', async () => {
+    const wrapper = await mountEditor({ inline: false, enableLineBreaks: false });
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('hello');
+    editor.commands.focus('end');
+    pressEnter(wrapper.find('.ProseMirror').element);
+    await wrapper.vm.$nextTick();
+
+    expect(editor.getJSON().content).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+        { type: 'paragraph' },
+    ]);
+});
+
+test('enableLineBreaks true splits into a new paragraph in block mode', async () => {
+    const wrapper = await mountEditor({ inline: false, enableLineBreaks: true });
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('hello');
+    editor.commands.focus('end');
+    pressEnter(wrapper.find('.ProseMirror').element);
+    await wrapper.vm.$nextTick();
+
+    expect(editor.getJSON().content).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+        { type: 'paragraph' },
+    ]);
+});
+
+test('inserting a mention produces a node with value and label attrs', async () => {
+    const wrapper = await mountEditor();
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent({ type: 'mention', attrs: { value: 'jesse', label: 'Jesse Leite' } });
+
+    expect(editor.getJSON().content).toEqual([
+        {
+            type: 'paragraph',
+            content: [{ type: 'mention', attrs: { value: 'jesse', label: 'Jesse Leite' } }],
+        },
+    ]);
+});
+
+function mentionBadge(wrapper) {
+    return wrapper.find('[data-ui-badge]');
+}
+
+test('a mention matching an option renders as a normal chip', async () => {
+    const wrapper = await mountEditor({
+        modelValue: [
+            { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'jesse', label: 'Jesse Leite' } }] },
+        ],
+    });
+
+    const badge = mentionBadge(wrapper);
+
+    expect(badge.text()).toBe('Jesse Leite');
+    expect(badge.classes()).not.toContain('line-through');
+    expect(badge.attributes('title')).toBeUndefined();
+});
+
+test('a mention with no matching option renders as a missing chip', async () => {
+    const wrapper = await mountEditor({
+        modelValue: [
+            { type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'deleted' } }] },
+        ],
+    });
+
+    const badge = mentionBadge(wrapper);
+
+    expect(badge.text()).toBe('deleted');
+    expect(badge.classes()).toContain('line-through');
+    expect(badge.attributes('title')).toBe('This item no longer exists');
+});
+
+test('nothing is considered missing when options are loaded on demand', async () => {
+    const wrapper = await mountEditor({
+        options: [],
+        loadOptions: () => [],
+        modelValue: [{ type: 'paragraph', content: [{ type: 'mention', attrs: { value: 'deleted' } }] }],
+    });
+
+    expect(mentionBadge(wrapper).classes()).not.toContain('line-through');
+});
+
+test('update:modelValue emits the ProseMirror content array', async () => {
+    const wrapper = await mountEditor();
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('hello');
+    await wrapper.vm.$nextTick();
+
+    const emitted = wrapper.emitted('update:modelValue');
+
+    expect(emitted).toBeTruthy();
+    expect(emitted.at(-1)[0]).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: 'hello' }] },
+    ]);
+});
+
+test('suggestion items are filtered by query against the option label', async () => {
+    const wrapper = await mountEditor();
+    const { editor } = wrapper.vm;
+
+    const mention = editor.extensionManager.extensions.find((extension) => extension.name === 'mention');
+
+    expect(mention.options.suggestion.items({ query: 'jes' })).toEqual([
+        { value: 'jesse', label: 'Jesse Leite' },
+    ]);
+    expect(mention.options.suggestion.items({ query: '' })).toEqual(sampleOptions);
+    expect(mention.options.suggestion.items({ query: 'zzz' })).toEqual([]);
+});
+
+test('options with values outside the token grammar are dropped from loaded suggestions', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const loadOptions = async () => [
+        { value: 'ok', label: 'Ok' },
+        { value: 'a b', label: 'Space' },
+        { value: 'a]]b', label: 'Brackets' },
+    ];
+    const wrapper = await mountEditor({ options: [], loadOptions });
+    const items = wrapper.vm.editor.extensionManager.extensions
+        .find((extension) => extension.name === 'mention')
+        .options.suggestion.items;
+
+    expect(await items({ query: '' })).toEqual([{ value: 'ok', label: 'Ok' }]);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('[a b]'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('[a]]b]'));
+
+    warn.mockRestore();
+});
+
+test('suggestion list never inserts a value outside the token grammar', async () => {
+    const SuggestionList = (await import('@/components/ui/AutocompleteEditor/SuggestionList.vue')).default;
+    const command = vi.fn();
+    const list = mount(SuggestionList, {
+        props: { command, items: [{ value: 'a b', label: 'Bad' }, { value: 'ok', label: 'Ok' }] },
+    });
+
+    const [bad, ok] = list.findAll('button');
+    await bad.trigger('click');
+    expect(command).not.toHaveBeenCalled();
+
+    await ok.trigger('click');
+    expect(command).toHaveBeenCalledWith({ value: 'ok', label: 'Ok' });
+});

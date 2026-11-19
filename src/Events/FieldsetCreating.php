@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class FieldsetCreating extends Event
 {
-    public $fieldset;
-
-    public function __construct($fieldset)
+    public function __construct(public $fieldset)
     {
-        $this->fieldset = $fieldset;
     }
 
     /**

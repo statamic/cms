@@ -25,6 +25,7 @@ class AugmentedUser extends AbstractAugmented
             ->merge($this->roleHandles())
             ->merge($this->groupHandles())
             ->merge($this->blueprintFields()->keys())
+            ->diff(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'])
             ->unique()->sort()->values()->all();
     }
 
@@ -53,6 +54,10 @@ class AugmentedUser extends AbstractAugmented
 
         if ($handle === 'is_super') {
             return new Value($this->data->isSuper(), 'is_super', null, $this->data);
+        }
+
+        if ($handle === 'two_factor_recovery_codes') {
+            return new Value($this->data->get('two_factor_recovery_codes'), 'two_factor_recovery_codes', null, $this->data);
         }
 
         if (Str::startsWith($handle, 'is_')) {

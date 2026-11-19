@@ -128,6 +128,34 @@ class BardTextTest extends TestCase
         $this->assertEquals($expected, $this->modify($data));
     }
 
+    #[Test]
+    public function it_preserves_text_without_adding_spaces_between_marks()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'The "stat" in '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'Stat'],
+                    ['type' => 'text', 'text' => 'amic stands for "static".'],
+                ],
+            ],
+            [
+                // no type
+            ],
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
+        ];
+
+        $expected = 'The "stat" in Statamic stands for "static". Another paragraph.';
+
+        $this->assertEquals($expected, $this->modify($data));
+    }
+
     public function modify($arr, ...$args)
     {
         return Modify::value($arr)->bard_text($args)->fetch();

@@ -4,7 +4,6 @@ namespace Statamic\Imaging;
 
 use Exception;
 use League\Glide\Urls\UrlBuilderFactory;
-use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 
@@ -25,7 +24,6 @@ class GlideUrlBuilder extends ImageUrlBuilder
      *
      * @param  \Statamic\Contracts\Assets\Asset|string  $item
      * @param  array  $params
-     * @param  string|null  $filename
      * @return string
      *
      * @throws \Exception
@@ -59,11 +57,10 @@ class GlideUrlBuilder extends ImageUrlBuilder
             $path .= Str::ensureLeft(URL::encode($filename), '/');
         }
 
-        if (isset($params['mark']) && $params['mark'] instanceof Asset) {
-            $asset = $params['mark'];
-            $params['mark'] = 'asset::'.Str::toBase64Url($asset->containerId().'/'.$asset->path());
-        }
+        $params = $this->withEncodedWatermark($params);
 
-        return URL::prependSiteRoot($builder->getUrl($path, $params));
+        return URL::makeRelative(
+            URL::prependSiteUrl($builder->getUrl($path, $params))
+        );
     }
 }

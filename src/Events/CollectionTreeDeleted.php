@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class CollectionTreeDeleted extends Event implements ProvidesCommitMessage
 {
-    public $tree;
-
-    public function __construct($tree)
+    public function __construct(public $tree)
     {
-        $this->tree = $tree;
     }
 
     public function commitMessage()

@@ -1,35 +1,48 @@
-import Vue from 'vue'
 import Portal from './Portal';
+import { reactive, ref } from 'vue';
 
-class Portals {
+export default class Portals {
+    #disabled = reactive(new Set());
 
-    constructor(instance) {
-        this.portals = instance.$root.portals;
+    constructor() {
+        this.portals = ref([]);
     }
 
     all() {
-        return this.portals;
+        return this.portals.value;
+    }
+
+    // The topmost portal that's actually rendering into its target. Disabled portals
+    // (e.g. fullscreen fieldtypes not in fullscreen) render inline, so they don't count.
+    top() {
+        return this.all().filter((portal) => !this.isDisabled(portal.id)).at(-1);
     }
 
     create(name, data = {}) {
         let portal = new Portal(this, name, data);
 
-        this.portals.push(portal);
+        this.portals.value.push(portal);
 
         return portal;
     }
 
-    destroy(id) {
-        const i = _.findIndex(this.portals, (portal) => portal.id === id);
+    isDisabled(id) {
+        return this.#disabled.has(id);
+    }
 
-        this.portals.splice(i, 1);
+    setDisabled(id, disabled) {
+        disabled ? this.#disabled.add(id) : this.#disabled.delete(id);
+    }
+
+    destroy(id) {
+        const i = this.portals.value.findIndex((portal) => portal.id === id);
+
+        if (i !== -1) this.portals.value.splice(i, 1);
+
+        this.#disabled.delete(id);
+    }
+
+    stacks() {
+        return this.portals.value.filter((portal) => portal.data?.type === 'stack');
     }
 }
-
-Object.defineProperties(Vue.prototype, {
-    $portals: {
-        get() {
-            return new Portals(this);
-        }
-    }
-});

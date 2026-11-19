@@ -3,6 +3,12 @@
 namespace Statamic\Auth;
 
 use ArrayAccess;
+use BaconQrCode\Renderer\Color\Rgb;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\Fill;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -13,7 +19,9 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\TwoFactor\RecoveryCode;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Contracts\Auth\TwoFactor\TwoFactorAuthenticationProvider;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -25,6 +33,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasDirtyState;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Data\TracksQueriedRelations;
+use Statamic\Events\TwoFactorRecoveryCodeReplaced;
 use Statamic\Events\UserCreated;
 use Statamic\Events\UserCreating;
 use Statamic\Events\UserDeleted;
@@ -32,12 +41,15 @@ use Statamic\Events\UserDeleting;
 use Statamic\Events\UserSaved;
 use Statamic\Events\UserSaving;
 use Statamic\Facades;
+use Statamic\Facades\TwoFactor;
 use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Search\Searchable;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+
+use function Statamic\trans as __;
 
 abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticatable, AuthorizableContract, CanResetPasswordContract, ContainsQueryableValues, HasLocalePreference, ResolvesValuesContract, SearchableContract, UserContract
 {
@@ -77,13 +89,13 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function initials()
     {
+        if (! $name = $this->name()) {
+            return '?';
+        }
+
         $surname = '';
-        if ($name = $this->get('name')) {
-            if (Str::contains($name, ' ')) {
-                [$name, $surname] = explode(' ', $name);
-            }
-        } else {
-            $name = (string) $this->email();
+        if (Str::contains($name, ' ')) {
+            [$name, $surname] = explode(' ', $name, 2);
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
@@ -320,7 +332,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
             return $name;
         }
 
-        return $this->email();
+        return null;
     }
 
     public function defaultAugmentedArrayKeys()
@@ -348,14 +360,115 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         return $this->setPreference('locale', $locale);
     }
 
-    public function preferredTheme()
+    public function preferredColorMode()
     {
-        return $this->getPreference('theme') ?? 'auto';
+        $mode = $this->getPreference('color_mode') ?? 'auto';
+
+        return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
+    }
+
+    public function isTwoFactorAuthenticationRequired(): bool
+    {
+        if (! TwoFactor::enabled()) {
+            return false;
+        }
+
+        $enforcedRoles = config('statamic.users.two_factor_enforced_roles', []);
+
+        if (in_array('*', $enforcedRoles)) {
+            return true;
+        }
+
+        return $this->roles()
+            ->map->handle()
+            ->when($this->isSuper(), fn ($roles) => $roles->push('super_users'))
+            ->intersect($enforcedRoles)
+            ->isNotEmpty();
+    }
+
+    /**
+     * Determine if two-factor authentication has been enabled.
+     */
+    public function hasEnabledTwoFactorAuthentication(): bool
+    {
+        return ! is_null($this->two_factor_secret) &&
+            ! is_null($this->two_factor_confirmed_at);
+    }
+
+    /**
+     * Get the user's two factor authentication secret key.
+     */
+    public function twoFactorSecretKey(): string
+    {
+        return decrypt($this->two_factor_secret);
+    }
+
+    /**
+     * Get the user's two factor authentication recovery codes.
+     */
+    public function twoFactorRecoveryCodes(): array
+    {
+        return json_decode(decrypt($this->two_factor_recovery_codes), true);
+    }
+
+    /**
+     * Replace the given recovery code with a new one in the user's stored codes.
+     */
+    public function replaceTwoFactorRecoveryCode(string $code): void
+    {
+        $this->set('two_factor_recovery_codes', encrypt(str_replace(
+            $code,
+            RecoveryCode::generate(),
+            decrypt($this->two_factor_recovery_codes)
+        )))->save();
+
+        TwoFactorRecoveryCodeReplaced::dispatch($this, $code);
+    }
+
+    /**
+     * Get the QR code SVG of the user's two factor authentication QR code URL.
+     */
+    public function twoFactorQrCodeSvg(): string
+    {
+        $svg = (new Writer(
+            new ImageRenderer(
+                new RendererStyle(size: 192, fill: Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
+                new SvgImageBackEnd
+            )
+        ))->writeString($this->twoFactorQrCodeUrl());
+
+        return trim(substr($svg, strpos($svg, "\n") + 1));
+    }
+
+    /**
+     * Get the two factor authentication QR code URL.
+     */
+    public function twoFactorQrCodeUrl(): string
+    {
+        return app(TwoFactorAuthenticationProvider::class)->qrCodeUrl(
+            config('app.name'),
+            $this->email(),
+            decrypt($this->two_factor_secret)
+        );
     }
 
     public function getCpSearchResultBadge(): string
     {
         return __('User');
+    }
+
+    public function getCpSearchResultIcon(): string
+    {
+        return 'users';
+    }
+
+    public function getElevatedSessionMethod(): string
+    {
+        if (! config('statamic.webauthn.allow_password_login_with_passkey', true) && $this->passkeys()->isNotEmpty()) {
+            return 'passkey';
+        }
+
+        return $this->password() ? 'password_confirmation' : 'verification_code';
     }
 
     protected function getComputedCallbacks()
@@ -365,7 +478,7 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
 
     public function getQueryableValue(string $field)
     {
-        if (method_exists($this, $method = Str::camel($field))) {
+        if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }
 
@@ -376,5 +489,14 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         }
 
         return $field->fieldtype()->toQueryableValue($value);
+    }
+
+    private function queryableMethods(): array
+    {
+        return [
+            'apiUrl', 'avatar', 'blueprint', 'editUrl', 'email', 'gravatarUrl', 'groups', 'hasAvatarField',
+            'id', 'initials', 'isSuper', 'isTaxonomizable', 'lastLogin', 'name', 'path', 'preferredLocale',
+            'preferredTheme', 'reference', 'roles', 'title',
+        ];
     }
 }

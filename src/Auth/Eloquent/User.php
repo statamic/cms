@@ -2,11 +2,14 @@
 
 namespace Statamic\Auth\Eloquent;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
@@ -43,14 +46,14 @@ class User extends BaseUser
     {
         if (func_num_args() === 0) {
             $data = array_merge($this->model()->attributesToArray(), [
-                'roles' => $this->roles()->map->handle()->values()->all(),
+                'roles' => $this->explicitRoles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
 
             return collect(Arr::except($data, ['id', 'email']));
         }
 
-        foreach ($data as $key => $value) {
+        foreach (Arr::except($data, ['roles', 'groups']) as $key => $value) {
             $this->set($key, $value);
         }
 
@@ -110,7 +113,7 @@ class User extends BaseUser
 
     protected function saveRoles()
     {
-        $roles = $this->roles()->map->id();
+        $roles = $this->explicitRoles()->map->id();
 
         (new Roles($this))->sync($roles);
     }
@@ -218,6 +221,12 @@ class User extends BaseUser
 
     public function permissions()
     {
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id())) {
+            return $cached;
+        }
+
         $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
@@ -225,6 +234,10 @@ class User extends BaseUser
         if ($this->get('super', false)) {
             $permissions[] = 'super';
         }
+
+        $permissions = $permissions->unique()->values();
+
+        $cache->put($this->id(), $permissions);
 
         return $permissions;
     }
@@ -282,6 +295,20 @@ class User extends BaseUser
             $value = Hash::make($value);
         }
 
+        if ($value === null) {
+            // Only keep a null when the key is a real database column (i.e. it
+            // was loaded from the database). This lets an existing value be
+            // cleared out, while preventing non-column fields from being added
+            // as attributes, which would error when the model is saved.
+            if ($this->model()->exists && array_key_exists($key, $this->model()->getRawOriginal())) {
+                $this->model()->$key = null;
+            } else {
+                unset($this->model()->$key);
+            }
+
+            return $this;
+        }
+
         $this->model()->$key = $value;
 
         return $this;
@@ -296,7 +323,11 @@ class User extends BaseUser
 
     public function merge($data)
     {
-        $this->data($this->data()->merge($data));
+        $merged = $this->data()
+            ->except(['roles', 'groups'])
+            ->merge($data);
+
+        $this->data($merged->all());
 
         return $this;
     }
@@ -316,13 +347,31 @@ class User extends BaseUser
         return $this->model()->getRememberTokenName();
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        if (method_exists($this->model(), 'sendPasswordResetNotification')) {
+            return $this->model()->sendPasswordResetNotification($token);
+        }
+
+        parent::sendPasswordResetNotification($token);
+    }
+
+    public function sendActivateAccountNotification($token)
+    {
+        if (method_exists($this->model(), 'sendActivateAccountNotification')) {
+            return $this->model()->sendActivateAccountNotification($token);
+        }
+
+        parent::sendActivateAccountNotification($token);
+    }
+
     public function lastLogin()
     {
         if (! $date = $this->model()->last_login) {
             return null;
         }
 
-        return $date instanceof Carbon ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
+        return $date instanceof CarbonInterface ? $date : Carbon::createFromFormat($this->model()->getDateFormat(), $date);
     }
 
     public function setLastLogin($time)
@@ -377,5 +426,13 @@ class User extends BaseUser
         return array_merge([
             'email' => $this->email(),
         ], $this->model()->attributesToArray());
+    }
+
+    public function passkeys(): Collection
+    {
+        return app(config('statamic.webauthn.model'))::where('user_id', $this->id())
+            ->get()
+            ->map(fn ($model) => app(Passkey::class)->setModel($model))
+            ->keyBy(fn ($passkey) => $passkey->id());
     }
 }

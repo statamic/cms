@@ -89,6 +89,9 @@ class Git extends Process
             'remote: Resolving deltas',
             'Permanently added the ECDSA host key for IP address',
             'remote: Processed',
+            'Auto packing the repository',
+            'remote: GitHub found',
+            'remote: Bypassed rule violations',
         ];
 
         if (Str::contains($buffer, $ignore)) {

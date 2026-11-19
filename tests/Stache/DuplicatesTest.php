@@ -175,6 +175,30 @@ class DuplicatesTest extends TestCase
     }
 
     #[Test]
+    public function a_duplicate_found_again_after_clearing_is_saved_again()
+    {
+        // As `stache:refresh` does: clear, then warm, in one process.
+        Cache::forever('stache::duplicates', ['test-store' => ['123' => ['path/to/duplicate.md']]]);
+
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+
+        $duplicates = (new Duplicates($stache))->load();
+
+        $duplicates->clear();
+
+        $this->assertSame([], $duplicates->getItems());
+
+        $duplicates->track($store, '123', 'path/to/duplicate.md');
+        $duplicates->cache();
+
+        $this->assertEquals(['test-store' => ['123' => ['path/to/duplicate.md']]], Cache::get('stache::duplicates'));
+    }
+
+    #[Test]
     public function it_finds_all_the_duplicates()
     {
         $store1 = $this->mock(Store::class);
@@ -192,8 +216,13 @@ class DuplicatesTest extends TestCase
         $store3 = $this->mock(AggregateStore::class);
         $store3->shouldReceive('discoverStores')->once()->andReturn([$childStore]);
 
+        $lock = $this->mock(\Symfony\Component\Lock\LockInterface::class);
+        $lock->shouldReceive('acquire')->with(true)->once()->andReturnTrue();
+        $lock->shouldReceive('release')->once();
+
         $stache = $this->mock(Stache::class);
         $stache->shouldReceive('stores')->andReturn(collect([$store1, $store2, $store3]));
+        $stache->shouldReceive('lock')->with('stache-warming')->once()->andReturn($lock);
 
         $duplicates = (new Duplicates($stache));
 

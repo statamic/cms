@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class TaxonomyDeleting extends Event
 {
-    public $taxonomy;
-
-    public function __construct($taxonomy)
+    public function __construct(public $taxonomy)
     {
-        $this->taxonomy = $taxonomy;
     }
 
     /**

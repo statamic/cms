@@ -4,13 +4,12 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
+use function Statamic\trans as __;
+
 class NavSaved extends Event implements ProvidesCommitMessage
 {
-    public $nav;
-
-    public function __construct($nav)
+    public function __construct(public $nav)
     {
-        $this->nav = $nav;
     }
 
     public function commitMessage()

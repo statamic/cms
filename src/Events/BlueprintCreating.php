@@ -2,13 +2,13 @@
 
 namespace Statamic\Events;
 
+/**
+ * @phpstan-consistent-constructor
+ */
 class BlueprintCreating extends Event
 {
-    public $blueprint;
-
-    public function __construct($blueprint)
+    public function __construct(public $blueprint)
     {
-        $this->blueprint = $blueprint;
     }
 
     /**

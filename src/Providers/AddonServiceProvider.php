@@ -6,18 +6,20 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions\Action;
+use Statamic\Addons\Manifest;
 use Statamic\Dictionaries\Dictionary;
 use Statamic\Exceptions\NotBootedException;
-use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Path;
+use Statamic\Facades\YAML;
 use Statamic\Fields\Fieldtype;
 use Statamic\Forms\JsDrivers\JsDriver;
 use Statamic\Modifiers\Modifier;
@@ -114,7 +116,9 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
 
     /**
-     * @var list<string> - URLs of Vite entry points
+     * Vite entry point(s). A string or list is shorthand for the `input` key.
+     *
+     * @var string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}|null
      */
     protected $vite = null;
 
@@ -220,6 +224,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootBlueprints()
                 ->bootFieldsets()
                 ->bootPublishAfterInstall()
+                ->bootSettingsBlueprint()
                 ->bootAddon();
 
             $this->bootedAddons()->push($this->getAddon()->id());
@@ -308,6 +313,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $scopes = collect($this->scopes)
             ->merge($this->autoloadFilesFromFolder('Scopes', Scope::class))
+            ->merge($this->autoloadFilesFromFolder('Query/Scopes', Scope::class))
+            ->merge($this->autoloadFilesFromFolder('Query/Scopes/Filters', Scope::class))
             ->unique();
 
         foreach ($scopes as $class) {
@@ -662,6 +669,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::script($name, "{$filename}.js?v=".md5($version));
     }
 
+    /**
+     * @param  string|list<string>|array{input: string|list<string>, publicDirectory?: string, buildDirectory?: string, hotFile?: string}  $config
+     */
     public function registerVite($config)
     {
         $name = $this->getAddon()->packageName();
@@ -710,6 +720,17 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerExternalStylesheet(string $url)
     {
         Statamic::externalStyle($url);
+    }
+
+    protected function registerSerializableClasses(array $classes)
+    {
+        $existing = $this->app['config']->get('cache.serializable_classes');
+
+        if ($existing === null || $existing === true) {
+            return;
+        }
+
+        $this->app['config']->set('cache.serializable_classes', array_merge(is_array($existing) ? $existing : [], $classes));
     }
 
     protected function schedule(Schedule $schedule)
@@ -799,6 +820,29 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function registerSettingsBlueprint(array|Closure $blueprint): self
+    {
+        $this->app->scoped(
+            "statamic.addons.{$this->getAddon()->slug()}.settings_blueprint",
+            fn () => $blueprint instanceof Closure ? $blueprint() : $blueprint
+        );
+
+        return $this;
+    }
+
+    protected function bootSettingsBlueprint()
+    {
+        if (! $this->shouldBootRootItems()) {
+            return $this;
+        }
+
+        if (file_exists($path = "{$this->getAddon()->directory()}resources/blueprints/settings.yaml")) {
+            $this->registerSettingsBlueprint(fn () => YAML::file($path)->parse());
+        }
+
+        return $this;
+    }
+
     protected function autoloadFilesFromFolder($folder, $requiredClass = null)
     {
         try {
@@ -861,8 +905,8 @@ abstract class AddonServiceProvider extends ServiceProvider
         // i.e. It's the "root" provider. If it's in a subdirectory maybe the developer
         // is organizing their providers. Things like tags etc. can be autoloaded but
         // root level things like routes, views, config, blueprints, etc. will not.
-        $thisDir = Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName()));
-        $autoloadDir = $addon->directory().$addon->autoload();
+        $thisDir = Str::ensureRight(Path::tidy(dirname((new \ReflectionClass(static::class))->getFileName())), '/');
+        $autoloadDir = Str::ensureRight($addon->directory().$addon->autoload(), '/');
 
         return $thisDir === $autoloadDir;
     }

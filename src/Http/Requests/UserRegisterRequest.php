@@ -4,13 +4,19 @@ namespace Statamic\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\URL as LaravelURL;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Rules\EmailWithoutPathCharacters;
 use Statamic\Rules\UniqueUserValue;
+use Statamic\Statamic;
+
+use function Statamic\trans as __;
 
 class UserRegisterRequest extends FormRequest
 {
@@ -21,13 +27,15 @@ class UserRegisterRequest extends FormRequest
 
     public function authorize(): bool
     {
+        throw_unless(Statamic::pro(), new NotFoundHttpException);
+
         return true;
     }
 
     protected function failedValidation(Validator $validator)
     {
         if ($this->isPrecognitive() || $this->wantsJson()) {
-            return parent::failedValidation($validator);
+            parent::failedValidation($validator);
         }
 
         if ($this->ajax()) {
@@ -43,7 +51,8 @@ class UserRegisterRequest extends FormRequest
             throw (new ValidationException($validator, $response));
         }
 
-        $errorResponse = $this->has('_error_redirect') ? redirect($this->input('_error_redirect')) : back();
+        $errorRedirect = $this->input('_error_redirect');
+        $errorResponse = $errorRedirect && ! URL::isExternalToApplication($errorRedirect) ? redirect($errorRedirect) : back();
 
         throw (new ValidationException($validator, $errorResponse->withInput()->withErrors($validator->errors(), 'user.register')));
     }
@@ -68,7 +77,7 @@ class UserRegisterRequest extends FormRequest
         return $this->blueprintFields
             ->validator()
             ->withRules([
-                'email' => ['required', 'email', new UniqueUserValue],
+                'email' => ['required', 'email', new EmailWithoutPathCharacters, new UniqueUserValue],
                 'password' => ['required', 'confirmed', Password::default()],
             ])
             ->validator();
@@ -76,9 +85,9 @@ class UserRegisterRequest extends FormRequest
 
     public function validateResolved()
     {
-        $site = Site::findByUrl(URL::previous()) ?? Site::default();
+        $site = Site::findByUrl(LaravelURL::previous()) ?? Site::default();
 
-        return $this->withLocale($site->lang(), fn () => parent::validateResolved());
+        $this->withLocale($site->lang(), fn () => parent::validateResolved());
     }
 
     private function valuesWithoutAssetFields($fields)

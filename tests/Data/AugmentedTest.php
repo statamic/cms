@@ -10,6 +10,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Statamic\Support\Str;
 use Tests\TestCase;
 
 class AugmentedTest extends TestCase
@@ -332,6 +333,36 @@ class AugmentedTest extends TestCase
         $this->assertEqualsValue('selected', $augmented->get('select'));
         $this->assertEqualsValue('excepted', $augmented->get('except'));
     }
+
+    #[Test]
+    public function it_ignores_non_public_methods_on_the_thing()
+    {
+        $thing = new ThingWithNonPublicMethods([
+            'protected_method' => 'protected data value',
+            'private_method' => 'private data value',
+            'public_method' => 'public data value',
+        ]);
+
+        $augmented = new BaseAugmentedThing($thing);
+
+        $this->assertEqualsValue('protected data value', $augmented->get('protected_method'));
+        $this->assertEqualsValue('private data value', $augmented->get('private_method'));
+        $this->assertEqualsValue('from the public method', $augmented->get('public_method'));
+    }
+
+    #[Test]
+    public function it_uses_protected_methods_on_the_augmented_thing()
+    {
+        $augmented = new class($this->thing) extends BaseAugmentedThing
+        {
+            protected function foo()
+            {
+                return 'from the protected method';
+            }
+        };
+
+        $this->assertEqualsValue('from the protected method', $augmented->get('foo'));
+    }
 }
 
 class Thing
@@ -359,6 +390,34 @@ class Thing
     public function cantCallMe()
     {
         return 'nope';
+    }
+}
+
+class ThingWithNonPublicMethods extends Thing
+{
+    public function __call($method, $args)
+    {
+        return $this->augmentedValue(Str::snake($method));
+    }
+
+    public function augmentedValue($key)
+    {
+        return (new BaseAugmentedThing($this))->get($key);
+    }
+
+    public function publicMethod()
+    {
+        return 'from the public method';
+    }
+
+    protected function protectedMethod()
+    {
+        return 'from the protected method';
+    }
+
+    private function privateMethod()
+    {
+        return 'from the private method';
     }
 }
 

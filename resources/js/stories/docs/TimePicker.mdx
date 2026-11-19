@@ -1,0 +1,15 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as TimePickerStories from '../TimePicker.stories';
+
+<Meta of={TimePickerStories} />
+
+# TimePicker
+A time picker component for selecting hours and minutes, with optional seconds. Includes convenient "set to now" and clear buttons.
+<Canvas of={TimePickerStories._DocsIntro} sourceState={'shown'} />
+
+## With Seconds
+Set the `granularity` prop to `second` to include seconds in the time selection.
+<Canvas of={TimePickerStories._WithSeconds} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={TimePickerStories} />

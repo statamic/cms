@@ -8,11 +8,18 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
 use Statamic\Rules\Handle;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
+use function Statamic\trans as __;
+
+/**
+ * @phpstan-consistent-constructor
+ */
 class Field implements Arrayable
 {
     protected $handle;
@@ -133,6 +140,11 @@ class Field implements Arrayable
         return Arr::get($this->config, 'always_save', false);
     }
 
+    public function reserveSpaceWhenHidden()
+    {
+        return Arr::get($this->config, 'reserve_space_when_hidden', false);
+    }
+
     public function rules()
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
@@ -173,6 +185,11 @@ class Field implements Arrayable
     public function isRequired()
     {
         return collect($this->rules()[$this->handle])->contains('required');
+    }
+
+    public function hasSometimesRule()
+    {
+        return collect($this->rules()[$this->handle])->contains('sometimes');
     }
 
     public function setValidationContext($context)
@@ -259,7 +276,7 @@ class Field implements Arrayable
 
     public function toPublishArray()
     {
-        return array_merge($this->preProcessedConfig(), [
+        $array = array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
             'prefix' => $this->prefix,
             'type' => $this->type(),
@@ -269,7 +286,12 @@ class Field implements Arrayable
             'visibility' => $this->visibility(),
             'read_only' => $this->visibility() === 'read_only', // Deprecated: Addon fieldtypes should now reference new `visibility` state.
             'always_save' => $this->alwaysSave(),
+            'reserve_space_when_hidden' => $this->reserveSpaceWhenHidden(),
         ]);
+
+        unset($array['validate']);
+
+        return $array;
     }
 
     public function setValue($value)
@@ -286,7 +308,24 @@ class Field implements Arrayable
 
     public function defaultValue()
     {
+        if ($this->hasComputedDefault()) {
+            return FieldFacade::resolveComputedDefault(Str::chopStart($this->config['default'], 'computed:'));
+        }
+
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
+    }
+
+    public function hasComputedDefault(): bool
+    {
+        if (! isset($this->config['default'])) {
+            return false;
+        }
+
+        if (! is_string($this->config['default'])) {
+            return false;
+        }
+
+        return Str::startsWith($this->config['default'], 'computed:');
     }
 
     public function validationValue()
@@ -406,10 +445,14 @@ class Field implements Arrayable
     {
         $fieldtype = $this->fieldtype();
 
-        $fields = $fieldtype->configFields()->addValues($this->config);
+        $fields = $fieldtype->configFields()->addValues($fieldtype->config());
+
+        $defaults = Blink::once('common-field-option-defaults', function () {
+            return self::commonFieldOptions()->all()->map->defaultValue()->all();
+        });
 
         return array_merge(
-            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            $defaults,
             $this->config,
             $fields->preProcess()->values()->all(),
             [
@@ -435,7 +478,7 @@ class Field implements Arrayable
             $type = ['type' => $type];
         }
 
-        if ($this->isRequired()) {
+        if ($this->isRequired() && ! $this->hasSometimesRule() && $this->type() !== 'assets') {
             $type['type'] = GraphQL::nonNull($type['type']);
         }
 
@@ -480,6 +523,7 @@ class Field implements Arrayable
                 'display' => __('Display Label'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
                 'type' => 'field_display',
+                'width' => 50,
             ],
             'hide_display' => [
                 'type' => 'toggle',
@@ -498,16 +542,19 @@ class Field implements Arrayable
                     'not_in:'.implode(',', $reserved),
                 ],
                 'show_regenerate' => true,
+                'width' => 50,
             ],
             'instructions' => [
                 'display' => __('Instructions'),
                 'instructions' => __('statamic::messages.fields_instructions_instructions'),
                 'type' => 'textarea',
+                'width' => 75,
             ],
             'instructions_position' => [
                 'display' => __('Instructions Position'),
                 'instructions' => __('statamic::messages.fields_instructions_position_instructions'),
-                'type' => 'select',
+                'type' => 'radio',
+                'width' => 25,
                 'options' => [
                     'above' => __('Above'),
                     'below' => __('Below'),
@@ -531,15 +578,7 @@ class Field implements Arrayable
                 'unless' => [
                     'type' => 'section',
                 ],
-            ],
-            'sortable' => [
-                'display' => __('Sortable'),
-                'instructions' => __('statamic::messages.fields_sortable_instructions'),
-                'type' => 'toggle',
-                'default' => true,
-                'unless' => [
-                    'visibility' => 'equals computed',
-                ],
+                'width' => 50,
             ],
             'visibility' => [
                 'display' => __('Visibility'),
@@ -552,6 +591,17 @@ class Field implements Arrayable
                 ],
                 'default' => 'visible',
                 'type' => 'select',
+                'width' => 50,
+            ],
+            'sortable' => [
+                'display' => __('Sortable'),
+                'instructions' => __('statamic::messages.fields_sortable_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'unless' => [
+                    'visibility' => 'equals computed',
+                ],
+                'width' => 50,
             ],
             'replicator_preview' => [
                 'display' => __('Preview'),
@@ -559,6 +609,7 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
+                'width' => 50,
             ],
             'duplicate' => [
                 'display' => __('Duplicate'),
@@ -566,6 +617,16 @@ class Field implements Arrayable
                 'type' => 'toggle',
                 'validate' => 'boolean',
                 'default' => true,
+                'width' => 50,
+
+            ],
+            'actions' => [
+                'display' => __('Show Actions'),
+                'instructions' => __('statamic::messages.fields_actions_instructions'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+
             ],
         ])->map(fn ($field, $handle) => compact('handle', 'field'))->values()->all();
 

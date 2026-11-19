@@ -1,0 +1,88 @@
+import type {Meta, StoryObj} from '@storybook/vue3';
+import {Button, Heading, Popover, Textarea} from '@statamic/cms/ui';
+
+const meta = {
+    title: 'Overlays/Popover',
+    component: Popover,
+    argTypes: {
+        align: {
+            control: 'select',
+            options: ['start', 'center', 'end'],
+        },
+        side: {
+            control: 'select',
+            options: ['top', 'bottom', 'left', 'right'],
+        },
+        'update:open': {
+            description: 'Event handler called when the open state of the popover changes.',
+            table: {
+                category: 'events',
+                type: { summary: '(value: string) => void' }
+            }
+        }
+    },
+} satisfies Meta<typeof Popover>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const _DocsIntro: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Popover, Button, Heading, Textarea },
+        template: `
+            <Popover>
+                <template #trigger>
+                    <Button text="Open Popover" />
+                </template>
+                <div class="flex flex-col gap-2.5">
+                    <Heading text="Provide Feedback" />
+                    <Textarea placeholder="How we can make this component better?" elastic />
+                    <div class="flex flex-col sm:flex-row sm:justify-end">
+                        <Button variant="primary" size="sm" text="Submit" />
+                    </div>
+                </div>
+            </Popover>
+        `,
+    }),
+};
+
+export const _Width: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Popover, Button, Heading },
+        template: `
+            <Popover class="w-[420px]!">
+                <template #trigger>
+                    <Button text="Open Popover" />
+                </template>
+                <Heading text="I'm 420 pixels wide" />
+                <img src="https://images.unsplash.com/photo-1611946258523-9c2bfabb94e3?q=80&w=2571&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="420" class="mt-2">
+            </Popover>
+        `,
+    }),
+};
+
+export const _Direction: Story = {
+    tags: ['!dev'],
+    render: () => ({
+        components: { Popover, Button },
+        template: `
+            <div class="flex space-x-3 justify-center">
+                <Popover side="left">
+                    <template #trigger>
+                        <Button text="← To the left" />
+                    </template>
+                    <p>Popped to the left</p>
+                </Popover>
+
+                <Popover side="right">
+                    <template #trigger>
+                        <Button text="To the right →" />
+                    </template>
+                    <p>Popped to the right</p>
+                </Popover>
+            </div>
+        `,
+    }),
+};

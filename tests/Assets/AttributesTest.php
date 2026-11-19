@@ -6,6 +6,7 @@ use Facades\Statamic\Assets\ExtractInfo;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\Attributes;
@@ -78,23 +79,37 @@ class AttributesTest extends TestCase
     }
 
     #[Test]
-    public function it_gets_the_attributes_of_video_file()
+    #[DataProvider('videoProvider')]
+    public function it_gets_the_attributes_of_video_file($playtimeSeconds, $resolutionX, $resolutionY, $rotate, $expected)
     {
         $asset = (new Asset)
             ->container(AssetContainer::make('test-container')->disk('test'))
             ->path('path/to/asset.mp4');
 
         ExtractInfo::shouldReceive('fromAsset')->with($asset)->andReturn([
-            'playtime_seconds' => 13,
+            'playtime_seconds' => $playtimeSeconds,
             'video' => [
-                'resolution_x' => 1920,
-                'resolution_y' => 1080,
+                'resolution_x' => $resolutionX,
+                'resolution_y' => $resolutionY,
+                'rotate' => $rotate,
             ],
         ]);
 
         $attributes = $this->attributes->asset($asset);
 
-        $this->assertEquals(['duration' => 13, 'width' => 1920, 'height' => 1080], $attributes->get());
+        $this->assertEquals($expected, $attributes->get());
+    }
+
+    public static function videoProvider()
+    {
+        return [
+            'not rotated' => [13, 1920, 1080, null, ['duration' => 13, 'width' => 1920, 'height' => 1080]],
+            'rotated 90' => [13, 1920, 1080, 90, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated -90' => [13, 1920, 1080, -90, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated 270' => [13, 1920, 1080, 270, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated -270' => [13, 1920, 1080, -270, ['duration' => 13, 'width' => 1080, 'height' => 1920]],
+            'rotated 180' => [13, 1920, 1080, 180, ['duration' => 13, 'width' => 1920, 'height' => 1080]],
+        ];
     }
 
     #[Test]
@@ -135,6 +150,61 @@ class AttributesTest extends TestCase
         $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg></svg>'))->get());
         $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg width="100"></svg>'))->get());
         $this->assertEquals(['width' => 300, 'height' => 150], $this->attributes->asset($this->svgAsset('<svg height="100"></svg>'))->get());
+    }
+
+    #[Test]
+    #[DataProvider('exifOrientationProvider')]
+    public function it_respects_exif_orientation_when_getting_image_dimensions($orientation, $expectedWidth, $expectedHeight)
+    {
+        $asset = (new Asset)
+            ->container(AssetContainer::make('test-container')->disk('test'))
+            ->path('path/to/asset.jpg');
+
+        $jpeg = $this->createJpegWithOrientation(4032, 3024, $orientation);
+        Storage::disk('test')->put('path/to/asset.jpg', $jpeg);
+
+        $attributes = $this->attributes->asset($asset)->get();
+
+        $this->assertEquals($expectedWidth, $attributes['width']);
+        $this->assertEquals($expectedHeight, $attributes['height']);
+    }
+
+    public static function exifOrientationProvider()
+    {
+        return [
+            'orientation 1 (normal)' => [1, 4032, 3024],
+            'orientation 2 (flip horizontal)' => [2, 4032, 3024],
+            'orientation 3 (rotate 180)' => [3, 4032, 3024],
+            'orientation 4 (flip vertical)' => [4, 4032, 3024],
+            'orientation 5 (transpose)' => [5, 3024, 4032],
+            'orientation 6 (rotate 90 CW)' => [6, 3024, 4032],
+            'orientation 7 (transverse)' => [7, 3024, 4032],
+            'orientation 8 (rotate 90 CCW)' => [8, 3024, 4032],
+        ];
+    }
+
+    private function createJpegWithOrientation(int $width, int $height, int $orientation): string
+    {
+        $img = imagecreatetruecolor($width, $height);
+        ob_start();
+        imagejpeg($img);
+        $jpeg = ob_get_clean();
+        imagedestroy($img);
+
+        $tiff = pack('A2', 'II')
+            .pack('v', 42)
+            .pack('V', 8)
+            .pack('v', 1)
+            .pack('v', 0x0112)
+            .pack('v', 3)
+            .pack('V', 1)
+            .pack('v', $orientation)."\x00\x00"
+            .pack('V', 0);
+
+        $app1 = "Exif\x00\x00".$tiff;
+        $app1Segment = "\xFF\xE1".pack('n', strlen($app1) + 2).$app1;
+
+        return substr($jpeg, 0, 2).$app1Segment.substr($jpeg, 2);
     }
 
     private function svgAsset($svg)

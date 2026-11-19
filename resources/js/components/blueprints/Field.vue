@@ -1,20 +1,18 @@
 <script>
 export default {
-
     props: {
         field: {
             type: Object,
-            required: true
+            required: true,
         },
         isRoot: {
             type: Boolean,
-            default: true
+            default: true,
         },
         fields: {
             type: Array,
         },
-        isEditing: Boolean
-    }
-
-}
+        isEditing: Boolean,
+    },
+};
 </script>

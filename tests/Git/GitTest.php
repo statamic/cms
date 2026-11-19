@@ -3,6 +3,7 @@
 namespace Tests\Git;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Processes\Git as GitProcess;
@@ -19,7 +20,7 @@ class GitTest extends TestCase
 
     private $files;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +61,7 @@ class GitTest extends TestCase
     {
         Config::set('statamic.git.enabled', false);
 
-        $this->expectExceptionMessage('Statamic Git integration is currently disabled.');
+        $this->expectExceptionMessage('Statamic Git integration is disabled.');
 
         Git::anything();
     }
@@ -252,18 +253,72 @@ EOT;
 
         Git::commit('Message"; echo "deleting all your files now"; #');
 
-        $expectedUser = 'Jimmy\; echo deleting all your files now\; \# <jimmy@haxor.org\; echo deleting all your files now\; \#>';
-        $expectedMessage = 'Message\; echo deleting all your files now\; \#';
-
-        if (static::isRunningWindows()) {
-            $expectedUser = str_replace('\\', '^', $expectedUser);
-            $expectedMessage = str_replace('\\', '^', $expectedMessage);
-        }
+        $expectedUser = 'Jimmy; echo deleting all your files now; # <jimmy@haxor.org; echo deleting all your files now; #>';
+        $expectedMessage = 'Message; echo deleting all your files now; #';
 
         $lastCommit = $this->showLastCommit(base_path('content'));
 
         $this->assertStringContainsString($expectedUser, $lastCommit);
         $this->assertStringContainsString($expectedMessage, $lastCommit);
+    }
+
+    #[Test]
+    public function it_commits_with_spaces_in_paths()
+    {
+        $this->files->put(base_path('content/collections/file with spaces.yaml'), 'title: File with spaces in path!');
+        $this->files->makeDirectory(base_path('content/collections/folder with spaces'));
+        $this->files->put(base_path('content/collections/folder with spaces/file.yaml'), 'title: Folder with spaces in path!');
+
+        $expectedContentStatus = <<<'EOT'
+?? "collections/file with spaces.yaml"
+?? "collections/folder with spaces/"
+EOT;
+
+        $this->assertEquals($expectedContentStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit();
+
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Spock <spock@example.com>', $commit);
+        $this->assertStringContainsString('collections/file with spaces.yaml', $commit);
+        $this->assertStringContainsString('title: File with spaces in path!', $commit);
+        $this->assertStringContainsString('collections/folder with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: Folder with spaces in path!', $commit);
+    }
+
+    #[Test]
+    public function it_commits_with_spaces_in_explicitly_configured_paths()
+    {
+        Config::set('statamic.git.paths', [
+            'content/path with spaces',
+        ]);
+
+        $this->files->makeDirectory(base_path('content/path with spaces'));
+        $this->files->put(base_path('content/path with spaces/file.yaml'), 'title: File with spaces in path!');
+        $this->files->put(base_path('content/path with spaces/nested file with spaces.yaml'), 'title: Nested file with spaces in path!');
+        $this->files->makeDirectory(base_path('content/path with spaces/nested folder with spaces'));
+        $this->files->put(base_path('content/path with spaces/nested folder with spaces/file.yaml'), 'title: Nested folder with spaces in path!');
+
+        $expectedStatus = <<<'EOT'
+?? "path with spaces/"
+EOT;
+
+        $this->assertEquals($expectedStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+
+        $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
+
+        Git::commit();
+
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Spock <spock@example.com>', $commit);
+        $this->assertStringContainsString('path with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: File with spaces in path!', $commit);
+        $this->assertStringContainsString('path with spaces/nested file with spaces.yaml', $commit);
+        $this->assertStringContainsString('title: Nested file with spaces in path!', $commit);
+        $this->assertStringContainsString('path with spaces/nested folder with spaces/file.yaml', $commit);
+        $this->assertStringContainsString('title: Nested folder with spaces in path!', $commit);
     }
 
     #[Test]
@@ -339,6 +394,115 @@ EOT;
         Git::dispatchCommit();
 
         Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
+    }
+
+    #[Test]
+    public function it_only_dispatches_one_commit_job_at_a_time()
+    {
+        // ShouldBeUnique acquires its cache lock in Bus\Dispatcher before the job
+        // reaches the queue driver, so Queue::fake() still enforces uniqueness here.
+        Queue::fake();
+
+        Git::dispatchCommit();
+        Git::dispatchCommit();
+        Git::dispatchCommit();
+
+        Queue::assertPushed(\Statamic\Git\CommitJob::class, 1);
+    }
+
+    #[Test]
+    public function it_attributes_coalesced_commits_to_the_configured_user()
+    {
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Bob', 'email' => 'bob@example.com'],
+        ]);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with(null)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->withArgs(function ($message) {
+            return str_contains($message, 'Entry saved')
+                && str_contains($message, 'Co-Authored-By: Alice <alice@example.com>')
+                && str_contains($message, 'Co-Authored-By: Bob <bob@example.com>');
+        })->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
+    }
+
+    #[Test]
+    public function it_attributes_non_coalesced_commits_to_the_authenticated_user()
+    {
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+        ]);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with($user)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->with('Entry saved')->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
+    }
+
+    #[Test]
+    public function it_adds_co_authored_by_trailers_for_coalesced_saves()
+    {
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $message = "Content saved\n\nCo-Authored-By: Alice <alice@example.com>\nCo-Authored-By: Bob <bob@example.com>";
+
+        Git::commit($message);
+
+        $commit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString('Co-Authored-By: Alice <alice@example.com>', $commit);
+        $this->assertStringContainsString('Co-Authored-By: Bob <bob@example.com>', $commit);
+    }
+
+    #[Test]
+    public function it_deduplicates_co_authors_for_repeated_saves_by_the_same_user()
+    {
+        Cache::put('statamic-git-pending-saves', [
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Alice', 'email' => 'alice@example.com'],
+            ['name' => 'Bob', 'email' => 'bob@example.com'],
+        ]);
+
+        $user = User::make()->email('alice@example.com');
+
+        Git::shouldReceive('as')->with(null)->andReturnSelf()->once();
+        Git::shouldReceive('commit')->withArgs(function ($message) {
+            return substr_count($message, 'Co-Authored-By:') === 2
+                && str_contains($message, 'Co-Authored-By: Alice <alice@example.com>')
+                && str_contains($message, 'Co-Authored-By: Bob <bob@example.com>');
+        })->once();
+
+        (new \Statamic\Git\CommitJob('Entry saved', $user))->handle();
+    }
+
+    #[Test]
+    public function it_wires_dispatch_to_co_authored_by_trailers_end_to_end()
+    {
+        Queue::fake();
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
+
+        $alice = User::make()->email('alice@example.com')->data(['name' => 'Alice'])->makeSuper();
+        $bob = User::make()->email('bob@example.com')->data(['name' => 'Bob'])->makeSuper();
+
+        $this->actingAs($alice);
+        Git::dispatchCommit();
+
+        $this->actingAs($bob);
+        Git::dispatchCommit(); // dropped by ShouldBeUnique, but Bob's save is still recorded in cache
+
+        (new \Statamic\Git\CommitJob(null, $alice))->handle();
+
+        $commit = $this->showLastCommit(base_path('content'));
+
+        $this->assertStringContainsString('Co-Authored-By: Alice <alice@example.com>', $commit);
+        $this->assertStringContainsString('Co-Authored-By: Bob <bob@example.com>', $commit);
     }
 
     #[Test]

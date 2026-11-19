@@ -7,6 +7,8 @@ use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
 
+use function Statamic\trans as __;
+
 class Site extends Filter
 {
     protected $pinned = true;
@@ -18,11 +20,13 @@ class Site extends Filter
 
     public function fieldItems()
     {
+        $options = $this->options()->all();
+
         return [
             'site' => [
                 'display' => __('Site'),
-                'type' => 'radio',
-                'options' => $this->options()->all(),
+                'type' => count($options) > 5 ? 'select' : 'radio',
+                'options' => $options,
             ],
         ];
     }

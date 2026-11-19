@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\DirectoryListing;
 use Statamic\Facades\Stache;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 
 class AssetContainerContents
@@ -31,11 +30,11 @@ class AssetContainerContents
      */
     public function all()
     {
-        if ($this->files && ! Statamic::isWorker()) {
+        if ($this->files) {
             return $this->files;
         }
 
-        return $this->files = Cache::remember($this->key(), $this->ttl(), function () {
+        return $this->files = $this->cacheStore()->remember($this->key(), $this->ttl(), function () {
             return collect($this->getRawFlysystemDirectoryListing())
                 ->keyBy('path')
                 ->map(fn ($file) => $this->normalizeFlysystemAttributes($file))
@@ -164,7 +163,7 @@ class AssetContainerContents
 
     public function cached()
     {
-        return Cache::get($this->key());
+        return $this->cacheStore()->get($this->key());
     }
 
     public function files()
@@ -209,7 +208,7 @@ class AssetContainerContents
 
     public function filteredFilesIn($folder, $recursive)
     {
-        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
+        if (isset($this->filteredFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
             return $this->filteredFiles[$key];
         }
 
@@ -239,7 +238,7 @@ class AssetContainerContents
 
     public function filteredDirectoriesIn($folder, $recursive)
     {
-        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')]) && ! Statamic::isWorker()) {
+        if (isset($this->filteredDirectories[$key = $folder.($recursive ? '-recursive' : '')])) {
             return $this->filteredDirectories[$key];
         }
 
@@ -271,7 +270,7 @@ class AssetContainerContents
 
     public function save()
     {
-        Cache::put($this->key(), $this->all(), $this->ttl());
+        $this->cacheStore()->put($this->key(), $this->all(), $this->ttl());
     }
 
     public function forget($path)
@@ -297,10 +296,6 @@ class AssetContainerContents
 
         $files = $this->all()->put($path, $metadata);
 
-        if (Statamic::isWorker()) {
-            Cache::put($this->key(), $files, $this->ttl());
-        }
-
         $this->filteredFiles = null;
         $this->filteredDirectories = null;
 
@@ -315,5 +310,15 @@ class AssetContainerContents
     private function ttl()
     {
         return Stache::isWatcherEnabled() ? 0 : null;
+    }
+
+    public function cacheStore()
+    {
+        return Cache::store($this->hasCustomStore() ? 'asset_container_contents' : null);
+    }
+
+    private function hasCustomStore(): bool
+    {
+        return config()->has('cache.stores.asset_container_contents');
     }
 }
