@@ -16,6 +16,7 @@ use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Form;
+use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Support\Arr;
@@ -272,6 +273,32 @@ class FormTest extends TestCase
         $this->assertFalse($return);
         Form::shouldNotHaveReceived('delete');
         Event::assertNotDispatched(FormDeleted::class);
+    }
+
+    #[Test]
+    public function submissions_only_include_finalized_submissions()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        FormSubmission::make()->form($form)->data(['ref' => 'finalized'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'partial', '_partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'spam', '_marked_spam_at' => 1700000000])->save();
+
+        $this->assertEquals(['finalized'], $form->submissions()->map->get('ref')->all());
+    }
+
+    #[Test]
+    public function deleting_a_form_deletes_partial_and_spam_submissions()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        FormSubmission::make()->form($form)->data(['ref' => 'finalized'])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'partial', '_partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['ref' => 'spam', '_marked_spam_at' => 1700000000])->save();
+
+        $form->delete();
+
+        $this->assertCount(0, FormSubmission::query()->where('form', 'contact_us')->get());
     }
 
     #[Test]

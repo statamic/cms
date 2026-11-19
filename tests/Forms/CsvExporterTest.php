@@ -31,6 +31,26 @@ class CsvExporterTest extends TestCase
     }
 
     #[Test]
+    public function it_only_exports_finalized_submissions_by_default()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        FormSubmission::make()->form($form)->data(['name' => 'Finalized'])->save();
+        FormSubmission::make()->form($form)->data(['name' => 'Partial', '_partial' => true])->save();
+        FormSubmission::make()->form($form)->data(['name' => 'Spam', '_marked_spam_at' => 1700000000])->save();
+
+        $csv = (new CsvExporter)->setForm($form)->setConfig([])->export();
+
+        $this->assertStringContainsString('Finalized', $csv);
+        $this->assertStringNotContainsString('Partial', $csv);
+        $this->assertStringNotContainsString('Spam', $csv);
+    }
+
+    #[Test]
     public function it_exports_all_columns_by_default()
     {
         $form = $this->makeFormWithSubmission();

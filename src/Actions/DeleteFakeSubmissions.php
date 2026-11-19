@@ -40,7 +40,7 @@ class DeleteFakeSubmissions extends Action
             throw new Exception(__('statamic::messages.form_fake_submissions_form_not_found'));
         }
 
-        $fakeSubmissions = $form->submissions()->filter(fn ($submission) => (bool) $submission->get('_fake'));
+        $fakeSubmissions = $form->querySubmissions()->get()->filter(fn ($submission) => (bool) $submission->get('_fake'));
         $currentUser = request()->user() ? User::fromUser(request()->user()) : null;
 
         // The UI always posts the `_all_fake_submissions_` sentinel, which resolves to an
