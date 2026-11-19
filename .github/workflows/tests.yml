@@ -92,10 +92,6 @@ jobs:
           ini-values: short_open_tag=on
           coverage: none
 
-      - name: Require Laravel's PHP 8.6 branch
-        if: steps.should-run-tests.outputs.result == 'true' && matrix.php == '8.6'
-        run: composer require "laravel/framework:dev-13/php86-experiment as 13.40.0" --no-interaction --no-update
-
       - name: Install dependencies
         uses: nick-invision/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4.0.0
         if: steps.should-run-tests.outputs.result == 'true'
