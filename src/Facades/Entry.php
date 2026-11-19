@@ -2,8 +2,6 @@
 
 namespace Statamic\Facades;
 
-// Temporary change to trigger the Pint lint step in CI. Revert before merging.
-
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\EntryRepository;
 
