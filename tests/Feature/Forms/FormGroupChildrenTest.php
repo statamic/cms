@@ -181,6 +181,35 @@ class FormGroupChildrenTest extends TestCase
     }
 
     #[Test]
+    public function group_children_can_use_handles_that_are_only_reserved_at_the_top_level_of_a_form()
+    {
+        $form = $this->makeForm();
+
+        foreach (['message', 'messages', 'date'] as $handle) {
+            $this
+                ->actingAs($this->formEditor())
+                ->postJson(cp_route('forms.builder.fields.update', $form->handle()), [
+                    'type' => 'long_answer',
+                    'id' => 'one',
+                    'values' => ['display' => 'Message', 'handle' => $handle],
+                    'fields' => [['_id' => 'one', 'type' => 'inline', 'handle' => $handle, 'config' => ['type' => 'long_answer']]],
+                ])
+                ->assertOk();
+        }
+
+        $this
+            ->actingAs($this->formEditor())
+            ->postJson(cp_route('forms.builder.fields.update', $form->handle()), [
+                'type' => 'short_answer',
+                'id' => 'one',
+                'values' => ['display' => 'Status', 'handle' => 'status'],
+                'fields' => [],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['handle']);
+    }
+
+    #[Test]
     public function it_doesnt_validate_handles_when_updating_a_top_level_field_preview()
     {
         $form = $this->makeForm();

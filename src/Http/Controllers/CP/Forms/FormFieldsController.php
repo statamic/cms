@@ -73,7 +73,7 @@ class FormFieldsController extends CpController
 
         $fieldtype = FormFieldtypeRepository::find($request->type);
 
-        $blueprint = $this->blueprint($fieldtype->configBlueprint());
+        $blueprint = $this->blueprint($fieldtype->configBlueprint(), nested: $request->has('fields'));
 
         $fields = $blueprint->fields()->addValues($request->values);
 
@@ -143,14 +143,22 @@ class FormFieldsController extends CpController
         }
     }
 
-    private function blueprint($blueprint)
+    private function blueprint($blueprint, bool $nested = false)
     {
+        $commonFields = collect(FormField::commonFieldOptions()->items());
+
+        if ($nested) {
+            $commonFields = $commonFields->map(fn (array $item) => $item['handle'] === 'handle'
+                ? $this->withoutFormOnlyReservedHandles($item)
+                : $item);
+        }
+
         return Blueprint::make()->setContents([
             'tabs' => [
                 'main' => [
                     'sections' => [
                         [
-                            'fields' => collect(FormField::commonFieldOptions()->items())
+                            'fields' => $commonFields
                                 ->merge($blueprint->contents()['tabs']['main']['sections'][0]['fields'])
                                 ->reverse()->unique('handle')->reverse() // Prioritize the duplicate from the fieldtype
                                 ->values()
@@ -160,5 +168,16 @@ class FormFieldsController extends CpController
                 ],
             ],
         ]);
+    }
+
+    private function withoutFormOnlyReservedHandles(array $item): array
+    {
+        $item['field']['validate'] = collect($item['field']['validate'])
+            ->map(fn ($rule) => is_string($rule) && str_starts_with($rule, 'not_in:')
+                ? 'not_in:'.implode(',', Field::reservedHandles())
+                : $rule)
+            ->all();
+
+        return $item;
     }
 }
