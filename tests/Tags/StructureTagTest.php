@@ -3,9 +3,11 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
@@ -666,6 +668,156 @@ EOT;
         ], true));
     }
 
+    #[Test]
+    #[DataProvider('repeatedNavProvider')]
+    public function a_nav_output_more_than_once_gives_what_each_tag_gives_on_its_own($first, $second)
+    {
+        $this->createCollectionAndNav();
+
+        $template = fn ($params) => '{{ nav:test '.$params.' }}[{{ id ?? entry_id }} {{ depth }}{{ if first }} first{{ /if }}{{ if last }} last{{ /if }}{{ if children }} > {{ children }}({{ id ?? entry_id }} {{ depth }}{{ if parent }} in {{ parent:id }}{{ /if }}){{ /children }}{{ /if }}]{{ /nav:test }}';
+
+        $alone = [];
+        foreach ([$first, $second] as $params) {
+            Blink::flush();
+            Blink::store('structure-tag-trees')->flush();
+            $alone[] = (string) Antlers::parse($template($params), [], true);
+        }
+
+        Blink::flush();
+        Blink::store('structure-tag-trees')->flush();
+
+        $this->assertNotSame('', $alone[0].$alone[1]);
+        $this->assertSame(
+            $alone[0].'|'.$alone[1].'|'.$alone[0],
+            (string) Antlers::parse($template($first).'|'.$template($second).'|'.$template($first), [], true)
+        );
+    }
+
+    public static function repeatedNavProvider()
+    {
+        return [
+            'the same tag twice' => ['', ''],
+            'whole tree then one level' => ['', 'max_depth="1"'],
+            'one level then whole tree' => ['max_depth="1"', ''],
+            'one level then two' => ['max_depth="1"', 'max_depth="2"'],
+            'two levels then one' => ['max_depth="2"', 'max_depth="1"'],
+            'deeper than the tree, then all of it' => ['max_depth="5"', ''],
+            'limited then offset' => ['limit="2"', 'offset="2"'],
+            'limited then whole tree' => ['limit="2"', ''],
+            'offset then whole tree' => ['offset="2"', ''],
+            'with and without parents' => ['include_parents="false"', ''],
+            'selected fields then all fields' => ['select="title"', ''],
+            'hidden then shown unpublished entries' => ['', 'show_unpublished="true"'],
+            'shown then hidden unpublished entries' => ['show_unpublished="true"', 'max_depth="1"'],
+            'all fields then a selected star' => ['', 'select="*"'],
+            'a selected star then all fields' => ['select="*"', ''],
+            'whole tree then a negative depth' => ['', 'max_depth="-1"'],
+            'a negative depth then whole tree' => ['max_depth="-1"', ''],
+        ];
+    }
+
+    #[Test]
+    public function a_nav_output_more_than_once_is_only_built_as_often_as_it_needs_to_be()
+    {
+        $this->createCollectionAndNav();
+
+        $built = fn () => collect(Blink::store('structure-tag-trees')->all())->flatten(1)->count();
+
+        // The whole tree serves any depth.
+        $this->parseBasicTemplate('test');
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'limit="1" include_parents="false"');
+        $this->assertSame(1, $built());
+
+        // One level of a deeper tree can't serve two levels, but two levels reach the bottom of this one.
+        Blink::store('structure-tag-trees')->flush();
+        $this->parseBasicTemplate('test', 'max_depth="1"');
+        $this->parseBasicTemplate('test', 'max_depth="2"');
+        $this->parseBasicTemplate('test');
+        $this->assertSame(2, $built());
+
+        // Parameters that change which pages are in the tree get a tree of their own.
+        $this->parseBasicTemplate('test', 'show_unpublished="true"');
+        $this->assertSame(3, $built());
+    }
+
+    #[Test]
+    public function a_reused_nav_still_works_out_the_current_page_for_each_tag()
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ if children }}{{ *recursive children* }}{{ /if }}{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => '1', 'title' => '1', 'url' => '/1', 'children' => [
+                ['id' => '1-1', 'title' => '1.1', 'url' => '/1/1'],
+            ]],
+            ['id' => '2', 'title' => '2', 'url' => '/2'],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/1/1');
+        $this->assertEquals('[1=parent][1-1=current][2]', (string) Antlers::parse($template, [], true));
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/2');
+        $this->assertEquals('[1][1-1][2=current]', (string) Antlers::parse($template, [], true));
+
+        $this->assertCount(1, collect(Blink::store('structure-tag-trees')->all())->flatten(1));
+    }
+
+    #[Test]
+    public function a_nav_saved_after_it_was_output_is_built_again()
+    {
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1']]);
+        $this->assertEquals('[1]', $this->parseBasicTemplate('test'));
+
+        $this->makeNav([['id' => '1', 'title' => '1', 'url' => '/1'], ['id' => '2', 'title' => '2', 'url' => '/2']]);
+        $this->assertEquals('[1][2]', $this->parseBasicTemplate('test'));
+    }
+
+    #[Test]
+    public function a_queue_worker_doesnt_keep_a_tree_from_one_job_to_the_next()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
+        $template = '{{ nav:test }}[{{ title }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        // Changed without saving, the way another process's change would look.
+        $entry->set('title', 'New');
+
+        $job = \Mockery::mock(\Illuminate\Contracts\Queue\Job::class);
+        $job->shouldReceive('payload')->andReturn([]);
+        // A job run synchronously during a request leaves what the request has kept alone.
+        event(new \Illuminate\Queue\Events\JobProcessing('sync', $job));
+        $this->assertEquals('[Old]', (string) Antlers::parse($template, [], true));
+
+        $request = request();
+        \Illuminate\Support\Facades\Request::swap(new \Tests\Fakes\FakeArtisanRequest('queue:work'));
+        event(new \Illuminate\Queue\Events\JobProcessing('redis', $job));
+        \Illuminate\Support\Facades\Request::swap($request);
+        $this->assertEquals('[New]', (string) Antlers::parse($template, [], true));
+    }
+
+    #[Test]
+    public function an_entry_saved_after_the_nav_was_output_is_picked_up()
+    {
+        tap(Collection::make('pages')->routes('{slug}'))->save();
+        $entry = EntryFactory::collection('pages')->id('one')->slug('one')->data(['title' => 'Old'])->create();
+        $this->makeNav([['id' => 'a', 'entry' => 'one']]);
+
+        $template = '{{ nav:test }}[{{ title }} {{ url }}]{{ /nav:test }}';
+
+        $this->assertEquals('[Old /one]', (string) Antlers::parse($template, [], true));
+
+        $entry->set('title', 'New')->slug('two')->save();
+
+        $this->assertEquals('[New /two]', (string) Antlers::parse($template, [], true));
+    }
+
     private function makeNav($tree)
     {
         $nav = Nav::make('test');
@@ -673,6 +825,37 @@ EOT;
         $nav->makeTree('en', $tree)->save();
 
         $nav->save();
+    }
+
+    #[Test]
+    public function a_subclass_builds_its_own_tree_each_time()
+    {
+        ContextualNavTag::register();
+
+        $this->makeNav([
+            ['id' => 'a', 'title' => 'A', 'url' => '/a'],
+            ['id' => 'b', 'title' => 'B', 'url' => '/b'],
+        ]);
+
+        $template = '{{ contextual_nav:test }}[{{ title }}]{{ /contextual_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, ['wanted' => 'A'], true));
+        $this->assertEquals('[B]', (string) Antlers::parse($template, ['wanted' => 'B'], true));
+        $this->assertCount(0, Blink::store('structure-tag-trees')->all());
+    }
+
+    #[Test]
+    public function a_subclass_that_reuses_trees_keeps_them()
+    {
+        ReusingNavTag::register();
+
+        $this->makeNav([['id' => 'a', 'title' => 'A', 'url' => '/a']]);
+
+        $template = '{{ reusing_nav:test }}[{{ title }}]{{ /reusing_nav:test }}';
+
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertEquals('[A]', (string) Antlers::parse($template, [], true));
+        $this->assertCount(1, Blink::store('structure-tag-trees')->all());
     }
 
     private function parseBasicTemplate($handle, $params = null)
@@ -741,5 +924,25 @@ EOT;
                 ['id' => '5-1', 'title' => 'URL only', 'url' => 'https://statamic.com'],
             ]],
         ]);
+    }
+}
+
+class ContextualNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'contextual_nav';
+
+    protected function queryForNav($query)
+    {
+        return parent::queryForNav($query)->where('title', $this->context->get('wanted'));
+    }
+}
+
+class ReusingNavTag extends \Statamic\Tags\Nav
+{
+    protected static $handle = 'reusing_nav';
+
+    protected function reusesTrees(): bool
+    {
+        return true;
     }
 }

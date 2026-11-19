@@ -1741,6 +1741,45 @@ class BlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_throw_for_duplicate_handles_between_imported_fieldsets()
+    {
+        $emailLink = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+                ['handle' => 'address', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        $phoneLink = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+                ['handle' => 'number', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')->with('email_link')->andReturn($emailLink);
+        Facades\Fieldset::shouldReceive('find')->with('phone_link')->andReturn($phoneLink);
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents([
+            'title' => 'Test',
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['import' => 'email_link'],
+                                ['import' => 'phone_link'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['label', 'address', 'number'], $blueprint->fields()->all()->keys()->all());
+    }
+
+    #[Test]
     public function it_can_import_the_same_fieldset_twice_with_different_prefixes()
     {
         $fieldset = (new Fieldset)->setContents([

@@ -78,7 +78,7 @@ trait RestoresTestbenchSkeleton
             ->flatMap(fn ($path) => str_contains($path, '*') ? $files->glob($path) : [$path]);
 
         foreach ($expand($purge['files']) as $file) {
-            $files->delete($file);
+            $this->removePath($file);
         }
 
         foreach ($expand($purge['directories']) as $directory) {
@@ -104,7 +104,7 @@ trait RestoresTestbenchSkeleton
             // directory or a link, because a junction gives contradictory answers. unlink()
             // takes files and file links, rmdir() takes empty directories, directory links
             // and junctions without following them.
-            @unlink($absolute) || @rmdir($absolute);
+            $this->removePath($absolute);
         }
     }
 

@@ -59,7 +59,7 @@ export default {
 
     methods: {
         setInitialValue() {
-            this.currentOption = this.$preferences.get(this.preferencesKey) || 'listing';
+            this.currentOption = this.$preferences.get(this.preferencesKey) || this.$config.get('afterSave');
         },
 
         setPreference(value) {

@@ -165,6 +165,7 @@ return [
     'parent_exceeds_max_depth' => 'Dies würde die maximale Tiefe überschreiten.',
     'reserved' => 'Dies ist ein reserviertes Wort.',
     'reserved_field_handle' => '„:handle“ ist ein reserviertes Wort und kann nicht als Handle verwendet werden.',
+    'link_cannot_reference_itself' => 'Ein Eintrag darf nicht auf sich selbst verlinken.',
     'unique_entry_value' => 'Dieser Wert ist bereits vergeben.',
     'unique_form_handle' => 'Dieser Wert ist bereits vergeben.',
     'unique_term_value' => 'Dieser Wert ist bereits vergeben.',

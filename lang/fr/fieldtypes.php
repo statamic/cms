@@ -11,6 +11,7 @@ return [
     'array.title' => 'Array',
     'asset_folders.config.container' => 'Choisir le conteneur de ressources à utiliser pour ce champ.',
     'assets.config.allow_uploads' => 'Autorisez le téléversement de nouveaux fichiers.',
+    'assets.config.aspect_ratio' => 'Le ratio de prévisualisation dans le panneau de contrôle. N’affecte ni la ressource d’origine ni votre interface utilisateur.',
     'assets.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'assets.config.dynamic' => 'Les ressources seront placées dans un sous-dossier qui prend en compte la valeur de ce champ.',
     'assets.config.folder' => 'Le dossier à partir duquel commencer la navigation.',

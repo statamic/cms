@@ -142,7 +142,7 @@ class GlideManager
         return Cache::store('glide');
     }
 
-    public function clearAsset($asset)
+    public function clearAsset($asset, bool $preserveHybridMappings = false)
     {
         $pathPrefix = ImageGenerator::assetCachePathPrefix($asset);
         $manifestKey = ImageGenerator::assetCacheManifestKey($asset);
@@ -156,13 +156,22 @@ class GlideManager
             $server->setCachePathCallable($customCallable);
         });
 
-        // Use manifest to clear each manipulation key from cache store.
-        collect($this->cacheStore()->get($manifestKey, []))->each(function ($manipulationKey) {
-            $this->cacheStore()->forget($manipulationKey);
-        });
+        $remainingKeys = collect($this->cacheStore()->get($manifestKey, []))
+            ->filter(function ($key) use ($preserveHybridMappings) {
+                if ($preserveHybridMappings && Str::startsWith($key, 'hybrid::')) {
+                    return true;
+                }
 
-        // Clear manifest itself from cache store.
-        $this->cacheStore()->forget($manifestKey);
+                $this->cacheStore()->forget($key);
+
+                return false;
+            })->values()->all();
+
+        if ($remainingKeys) {
+            $this->cacheStore()->forever($manifestKey, $remainingKeys);
+        } else {
+            $this->cacheStore()->forget($manifestKey);
+        }
 
         GlideAssetCacheCleared::dispatch($asset);
     }
@@ -185,9 +194,15 @@ class GlideManager
             'watermark' => 'mark',
         ];
 
-        return collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
+        $params = collect($params)->mapWithKeys(function ($value, $param) use ($legend) {
             return [$legend[$param] ?? $param => $value];
         })->all();
+
+        if (isset($params['fm']) && strtolower($params['fm']) === 'jpeg') {
+            $params['fm'] = 'jpg';
+        }
+
+        return $params;
     }
 
     private function getCachePathCallable()

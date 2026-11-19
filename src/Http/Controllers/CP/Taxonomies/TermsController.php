@@ -197,7 +197,13 @@ class TermsController extends CpController
             $term->merge($values);
         }
 
-        $term->slug($request->slug);
+        $slugIsLocalized = $term->hasOrigin()
+            && $term->blueprint()->field('slug')->isLocalizable()
+            && in_array('slug', $request->input('_localized'));
+
+        if (! $term->hasOrigin() || $slugIsLocalized) {
+            $term->slug($request->slug);
+        }
 
         $term->published($request->published);
 
@@ -310,14 +316,14 @@ class TermsController extends CpController
             $term
                 ->in($defaultSite)
                 ->published($published)
-                ->data($values)
-                ->slug($slug);
+                ->data($values);
         }
 
         $term
             ->published($published)
-            ->data($values)
-            ->slug($slug);
+            ->data($values);
+
+        $term->term()->slug($slug);
 
         $saved = $term->updateLastModified(User::current())->save();
 

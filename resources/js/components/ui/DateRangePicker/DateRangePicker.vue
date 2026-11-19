@@ -194,6 +194,7 @@ const hoverCardDate = computed(() => {
                         v-if="timeZoneLabel && hoverCardDate"
                         :date="hoverCardDate"
                         :additional-timezones="additionalTimezones"
+                        :show-seconds="granularity === 'second'"
                         side="top"
                     >
                         <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />

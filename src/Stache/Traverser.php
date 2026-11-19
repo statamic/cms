@@ -21,7 +21,7 @@ class Traverser
             return collect();
         }
 
-        $files = Finder::create()->files()->ignoreDotFiles(true)->in($dir)->sortByName();
+        $files = Finder::create()->files()->ignoreDotFiles(true)->in($dir);
 
         $paths = [];
         foreach ($files as $file) {
@@ -29,10 +29,29 @@ class Traverser
                 continue;
             }
 
-            $paths[Path::tidy($file->getPathname())] = $file->getMTime();
+            try {
+                $mtime = $file->getMTime();
+            } catch (\RuntimeException $e) {
+                // Skip the file only when a fresh listing shows it was removed after it was listed
+                $listing = @scandir($file->getPath());
+
+                if ($listing === false || in_array($file->getFilename(), $listing, true)) {
+                    throw $e;
+                }
+
+                continue;
+            }
+
+            $paths[Path::tidy($file->getPathname())] = $mtime;
         }
 
-        return collect($paths)->sort();
+        // Sort by path, then (stably) by timestamp, so files with the same timestamp are
+        // ordered by path. This is much faster than Finder's sortByName(), which calls
+        // realpath() on both files for every comparison.
+        ksort($paths, SORT_STRING);
+        asort($paths);
+
+        return collect($paths);
     }
 
     public function filter($filter)

@@ -50,6 +50,8 @@ class ServiceProvider extends LaravelServiceProvider
         $this->registerStores($stache);
 
         $this->resetMemoizedStateBetweenJobs($stache);
+
+        $this->resetMemoizedStateBetweenOctaneRequests($stache);
     }
 
     private function registerStores($stache)
@@ -85,6 +87,22 @@ class ServiceProvider extends LaravelServiceProvider
             $stache->stores()->each->resetMemoizedState();
 
             $this->app->make('stache.indexes')->each->resetMemoizedState();
+        });
+    }
+
+    /**
+     * The stores are made when the app boots, so under Octane a worker uses the same ones
+     * for every request it handles. What they remember (their paths, for one) has to be
+     * read again for each request, or the worker never sees what another process saves.
+     */
+    private function resetMemoizedStateBetweenOctaneRequests($stache)
+    {
+        // Listened for by name, since Octane isn't necessarily installed.
+        Event::listen('Laravel\Octane\Events\RequestReceived', function () use ($stache) {
+            $stache->stores()->each->resetMemoizedState();
+
+            // Octane handles each request in its own copy of the container.
+            app('stache.indexes')->each->resetMemoizedState();
         });
     }
 

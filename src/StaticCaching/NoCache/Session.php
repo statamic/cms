@@ -20,6 +20,10 @@ class Session
 
     protected $url;
 
+    protected $paginationUrl;
+
+    protected $pendingRegions = [];
+
     private $regionCount = 0;
 
     public function __construct($url)
@@ -40,6 +44,13 @@ class Session
         return $this;
     }
 
+    public function setPaginationUrl(string $url)
+    {
+        $this->paginationUrl = $url;
+
+        return $this;
+    }
+
     /**
      * @return Collection<Region>
      */
@@ -50,6 +61,10 @@ class Session
 
     public function region(string $key): Region
     {
+        if ($region = $this->pendingRegion($key)) {
+            return $region;
+        }
+
         if ($this->regions->contains($key) && ($region = StaticCache::cacheStore()->get('nocache::region.'.$key))) {
             if ($region instanceof Region) {
                 return $region;
@@ -74,7 +89,7 @@ class Session
     {
         $region = new StringRegion($this, trim($contents), $context, $extension);
 
-        $this->cacheRegion($region);
+        $this->pendingRegions[$region->key()] = $region;
 
         $this->regions[] = $region->key();
 
@@ -85,7 +100,7 @@ class Session
     {
         $region = new ViewRegion($this, $view, $context);
 
-        $this->cacheRegion($region);
+        $this->pendingRegions[$region->key()] = $region;
 
         $this->regions[] = $region->key();
 
@@ -108,6 +123,7 @@ class Session
     {
         $this->regions = new Collection;
         $this->cascade = [];
+        $this->pendingRegions = [];
     }
 
     public function write()
@@ -115,6 +131,8 @@ class Session
         if ($this->regions->isEmpty()) {
             return;
         }
+
+        $this->storePendingRegions();
 
         $store = StaticCache::cacheStore();
 
@@ -150,12 +168,28 @@ class Session
         AbstractPaginator::currentPathResolver(fn () => Str::before($this->url, '?'));
 
         AbstractPaginator::currentPageResolver(function () {
-            return Str::of($this->url)->after('page=')->before('&')->__toString();
+            return Str::of($this->paginationUrl ?? $this->url)->after('page=')->before('&')->__toString();
         });
     }
 
     protected function cacheRegion(Region $region)
     {
         StaticCache::cacheStore()->forever('nocache::region.'.$region->key(), serialize($region));
+    }
+
+    protected function pendingRegion(string $key): ?Region
+    {
+        if (! $region = $this->pendingRegions[$key] ?? null) {
+            return null;
+        }
+
+        // Hand back a copy that has been through serialization, exactly like one read
+        // back from the store, so rendering behaves the same before and after write().
+        return unserialize(serialize($region), ['allowed_classes' => true]);
+    }
+
+    protected function storePendingRegions(): void
+    {
+        collect($this->pendingRegions)->each(fn (Region $region) => $this->cacheRegion($region));
     }
 }

@@ -1,6 +1,7 @@
 import characterWidths from './TruncateTextCharacterMap.js';
 
 const BASE_FONT_SIZE = 16;
+const FALLBACK_FONT_FAMILY = 'inter';
 
 /**
  * Observes the parent element for resize events and truncates the text
@@ -29,7 +30,7 @@ export default function truncateOnResize(element, text, { ellipsis = '...' } = {
 function middleTruncate(element, text, ellipsis) {
     const style = window.getComputedStyle(element);
     const fontSize = Number.parseFloat(style.fontSize);
-    const fontFamily = normalizeFontFamily(style.fontFamily.split(',')[0]);
+    const fontFamily = resolveFontFamily(style.fontFamily);
 
     const availableWidth = measureAvailableWidth(element);
 
@@ -62,6 +63,7 @@ function middleTruncate(element, text, ellipsis) {
 // Uses a precomputed character width map (at 16px base size) to estimate
 // text width without triggering DOM layout. Unmapped characters fall back
 // to 'W' width (the widest common character) for a safe overestimate.
+// Fonts without a map (e.g. system fonts) are estimated using the fallback map.
 
 function measureCharWidth(char, fontFamily, fontSize) {
     const widths = characterWidths[fontFamily] ?? {};
@@ -71,6 +73,15 @@ function measureCharWidth(char, fontFamily, fontSize) {
 
 function normalizeFontFamily(fontFamily) {
     return fontFamily.replaceAll('"', '').replaceAll("'", '').trim().toLowerCase();
+}
+
+function resolveFontFamily(fontFamilies) {
+    const mapped = fontFamilies
+        .split(',')
+        .map(normalizeFontFamily)
+        .find((fontFamily) => characterWidths[fontFamily]);
+
+    return mapped ?? FALLBACK_FONT_FAMILY;
 }
 
 function measureTextWidth(text, fontFamily, fontSize) {

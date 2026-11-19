@@ -3,6 +3,7 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -135,11 +136,73 @@ class EntriesTest extends TestCase
     }
 
     #[Test]
+    public function it_returns_an_empty_collection_when_preprocessing_index_and_nothing_is_selected()
+    {
+        foreach ([null, []] as $value) {
+            $preProcessed = $this->fieldtype()->preProcessIndex($value);
+
+            $this->assertInstanceOf(Collection::class, $preProcessed);
+            $this->assertCount(0, $preProcessed);
+        }
+    }
+
+    #[Test]
     public function it_includes_drafts_when_pre_processing_for_index()
     {
         $preProcessed = $this->fieldtype()->preProcessIndex([456, 'invalid', '123', 'draft', 'scheduled', 'expired']);
 
         $this->assertEquals([456, '123', 'draft', 'scheduled', 'expired'], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    #[Test]
+    public function it_looks_the_entries_up_once_when_pre_processing_for_index()
+    {
+        config(['statamic.system.fake_sql_queries' => true]);
+
+        $queries = 0;
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Database\Events\QueryExecuted::class, function () use (&$queries) {
+            $queries++;
+        });
+
+        $this->fieldtype()->preProcessIndex([456, '123', 'draft']);
+
+        $this->assertSame(1, $queries);
+    }
+
+    #[Test]
+    public function it_lists_an_entry_once_when_pre_processing_for_index()
+    {
+        $preProcessed = $this->fieldtype()->preProcessIndex(['123', 456, '123']);
+
+        $this->assertEquals(['123', 456], $preProcessed->map(fn ($entry) => $entry['id'])->all());
+    }
+
+    #[Test]
+    public function it_localizes_and_includes_drafts_when_pre_processing_for_index()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->date('2021-01-02')->create();
+        EntryFactory::id('789-fr')->origin('789')->locale('fr')->collection('blog')->slug('three-fr')->data(['title' => 'Le Three'])->date('2021-01-02')->published(false)->create();
+
+        $preProcessed = $this->fieldtype([], $parent)->preProcessIndex(['789', 'invalid', 456, '123', '123-fr']);
+
+        $this->assertEquals(['789-fr', '123-fr'], $preProcessed->map(fn ($entry) => $entry['id'])->all()); // 456 isn't localized.
+        $this->assertEquals(['Le Three', 'Le One'], $preProcessed->map(fn ($entry) => $entry['title'])->all());
+    }
+
+    #[Test]
+    public function it_uses_a_substituted_entry_when_pre_processing_for_index()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        EntryFactory::id('123-fr')->origin('123')->locale('fr')->collection('blog')->slug('one-fr')->data(['title' => 'Le One'])->date('2021-01-02')->create();
+
+        Facades\Entry::substitute((clone Facades\Entry::find('456'))->set('title', 'Two, being previewed'));
+        Facades\Entry::substitute((clone Facades\Entry::find('123-fr'))->set('title', 'Le One, being previewed'));
+
+        $this->assertEquals(['Two, being previewed'], $this->fieldtype()->preProcessIndex([456])->map(fn ($entry) => $entry['title'])->all());
+        $this->assertEquals(['Le One, being previewed'], $this->fieldtype([], $parent)->preProcessIndex(['123'])->map(fn ($entry) => $entry['title'])->all());
     }
 
     #[Test]
@@ -415,6 +478,37 @@ class EntriesTest extends TestCase
 
         $second = $field->fieldtype();
         $this->assertTrue($second->getItemData(['123'])->first()['invalid']);
+    }
+
+    #[Test]
+    #[DataProvider('sortProvider')]
+    public function it_sorts_by_the_collection_sort_when_the_configured_collections_share_it($collections, $params, $expectedColumn, $expectedDirection)
+    {
+        Facades\Collection::make('pages')->save();
+        Facades\Collection::make('menu')->structureContents(['root' => false])->save();
+        Facades\Collection::make('footer')->structureContents(['root' => false])->save();
+        Facades\Collection::make('concerts')->sortField('dates->start')->sortDirection('asc')->save();
+        Facades\Collection::make('festivals')->sortField('dates->start')->sortDirection('asc')->save();
+
+        $fieldtype = $this->fieldtype(['collections' => $collections]);
+        $request = new Request($params);
+
+        $this->assertEquals($expectedColumn, $fieldtype->getSortColumn($request));
+        $this->assertEquals($expectedDirection, $fieldtype->getSortDirection($request));
+    }
+
+    public static function sortProvider()
+    {
+        return [
+            'single collection' => [['blog'], [], 'date', 'desc'],
+            'collections sharing a sort' => [['blog', 'events'], [], 'date', 'desc'],
+            'collections sharing a json sort' => [['concerts', 'festivals'], [], 'dates->start', 'asc'],
+            'collections with different sorts' => [['blog', 'pages'], [], 'title', 'asc'],
+            'collections with a missing one' => [['blog', 'events', 'missing'], [], 'title', 'asc'],
+            'structured collections' => [['menu', 'footer'], [], 'title', 'asc'],
+            'explicit sort' => [['blog', 'events'], ['sort' => 'title', 'order' => 'desc'], 'title', 'desc'],
+            'search' => [['blog', 'events'], ['search' => 'foo'], 'title', 'asc'],
+        ];
     }
 
     public function fieldtype($config = [], $parent = null)

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -149,6 +150,11 @@ abstract class AbstractCacher implements Cacher
         return collect($this->cache->get($key, []));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        return null;
+    }
+
     /**
      * Flush all the cached URLs.
      *
@@ -161,6 +167,17 @@ abstract class AbstractCacher implements Cacher
         });
 
         $this->cache->forget($this->normalizeKey('domains'));
+    }
+
+    protected function flushDedicatedStore(): void
+    {
+        if (! config()->has('cache.stores.static_cache')) {
+            return;
+        }
+
+        if ($this->cache === Cache::store('static_cache')) {
+            $this->cache->flush();
+        }
     }
 
     /**
@@ -193,14 +210,30 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $this->withUrlsLock(function () use ($key, $domain) {
-            $urls = $this->getUrls($domain)->forget($key);
+        $this->forgetUrls([$key], $domain);
+    }
+
+    /**
+     * Forget / remove multiple URLs from the cache by their keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function forgetUrls($keys, $domain = null)
+    {
+        if (empty($keys)) {
+            return;
+        }
+
+        $this->withUrlsLock(function () use ($keys, $domain) {
+            $urls = $this->getUrls($domain)->except($keys);
 
             $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
         });
     }
 
-    private function withUrlsLock(callable $callback)
+    protected function withUrlsLock(callable $callback)
     {
         if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
             return $callback();
@@ -292,7 +325,9 @@ abstract class AbstractCacher implements Cacher
 
             $request = new GuzzleRequest('GET', $url);
 
-            StaticWarmJob::dispatch($request, [])
+            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
+
+            $job::dispatch($request, [])
                 ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
                 ->onQueue(config('statamic.static_caching.warm_queue'));
         });

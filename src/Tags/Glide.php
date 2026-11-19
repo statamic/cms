@@ -292,9 +292,10 @@ class Glide extends Tags
             $item = Str::after($item, config('app.url'));
         }
 
-        // External URLs are already fine as-is.
+        // Absolute URLs may belong to an asset container on an external disk, like S3.
+        // Otherwise, they're external URLs and are already fine as-is.
         if (URL::isAbsolute($item)) {
-            return $item;
+            return Asset::find($item) ?? $item;
         }
 
         // Double colons indicate an asset ID.

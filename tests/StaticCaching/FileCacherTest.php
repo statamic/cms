@@ -4,6 +4,7 @@ namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -165,6 +166,19 @@ class FileCacherTest extends TestCase
 
         $writer->shouldHaveReceived('flush')->with('test/path');
         $writer->shouldHaveReceived('flush')->with('fr/test/path');
+    }
+
+    #[Test]
+    public function flushing_wipes_the_dedicated_static_cache_store()
+    {
+        config(['cache.stores.static_cache' => ['driver' => 'array']]);
+        $cache = Cache::store('static_cache');
+        $cache->forever('untracked', 'value');
+        $cacher = $this->fileCacher(['path' => 'test/path'], \Mockery::spy(Writer::class), $cache);
+
+        $cacher->flush();
+
+        $this->assertNull($cache->get('untracked'));
     }
 
     #[Test]

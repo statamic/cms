@@ -6,7 +6,7 @@ class DatabaseSession extends Session
 {
     public function write()
     {
-        // Nothing to write. Session gets compiled by querying regions.
+        $this->storePendingRegions();
     }
 
     public function restore()
@@ -24,6 +24,10 @@ class DatabaseSession extends Session
 
     public function region(string $key): Region
     {
+        if ($region = $this->pendingRegion($key)) {
+            return $region;
+        }
+
         $region = DatabaseRegion::where('key', $key)->first();
 
         if (! $region) {

@@ -17,6 +17,7 @@ import {
 import { parseAbsolute } from '@internationalized/date';
 import Icon from '../Icon/Icon.vue';
 import CalendarToday from './CalendarToday.vue';
+import CalendarMonthYearPicker from './CalendarMonthYearPicker.vue';
 
 defineOptions({ name: 'Calendar' });
 
@@ -105,7 +106,9 @@ const calendarGridClass = computed(() =>
         @update:model-value="emit('update:modelValue', $event)"
     >
         <Component :is="components.CalendarHeader" :class="calendarHeaderClass">
-            <Component :is="components.CalendarHeading" class="text-sm font-medium text-gray-925 dark:text-white" />
+            <CalendarMonthYearPicker>
+                <Component :is="components.CalendarHeading" class="text-sm font-medium text-gray-925 dark:text-white" />
+            </CalendarMonthYearPicker>
             <div class="inline-flex items-center">
                 <Component
                     :is="components.CalendarPrev"

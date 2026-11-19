@@ -78,6 +78,61 @@ class EntryQueryBuilderTest extends TestCase
     }
 
     #[Test]
+    public function nothing_is_found_in_an_empty_list()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $this->assertSame([], Entry::query()->whereIn('id', [])->get()->map->id()->all());
+        $this->assertSame([], Entry::query()->whereIn('title', [])->get()->map->id()->all());
+        $this->assertSame(['id-1'], Entry::query()->where('title', 'Post 1')->orWhereIn('id', [])->get()->map->id()->all());
+        $this->assertSame(['id-1', 'id-2', 'id-3'], Entry::query()->whereNotIn('id', [])->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function entries_are_ordered_the_way_a_data_collection_sorts_their_values()
+    {
+        $values = [
+            'a' => ['rank' => 3, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => ['b', 'z']],
+            'b' => ['rank' => null, 'published_on' => Carbon::parse('2024-01-01'), 'tags' => []],
+            'c' => ['rank' => 1, 'published_on' => null, 'tags' => ['a']],
+            'd' => ['rank' => 3, 'published_on' => Carbon::parse('2024-02-01'), 'tags' => 'c'],
+            'e' => ['rank' => 2, 'published_on' => Carbon::parse('2024-03-01'), 'tags' => null],
+            'left-out' => ['rank' => 0, 'published_on' => Carbon::parse('2025-01-01'), 'tags' => ['a']],
+        ];
+
+        foreach ($values as $id => $data) {
+            EntryFactory::id($id)->slug($id)->collection('posts')->data($data + ['title' => $id, 'listed' => $id !== 'left-out'])->create();
+        }
+
+        $listed = collect($values)->except('left-out');
+
+        foreach (['rank', 'rank:desc', 'published_on', 'published_on:desc', 'tags', 'tags:desc', 'rank:desc|published_on', 'published_on:desc|rank'] as $sort) {
+            $query = Entry::query()->where('listed', true);
+
+            foreach (explode('|', $sort) as $orderBy) {
+                $query->orderBy(...explode(':', $orderBy.':asc'));
+            }
+
+            $this->assertSame(
+                \Statamic\Data\DataCollection::make($listed->all())->multisort($sort)->keys()->all(),
+                $query->get()->map->id()->all(),
+                $sort
+            );
+        }
+    }
+
+    #[Test]
+    public function ordering_by_a_field_whose_handle_is_a_number_leaves_entries_as_they_were()
+    {
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['title' => 'a', '1' => 3])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['title' => 'b', '1' => 1])->create();
+        EntryFactory::id('c')->slug('c')->collection('posts')->data(['title' => 'c', '1' => 2])->create();
+
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1')->get()->map->id()->all());
+        $this->assertSame(['a', 'b', 'c'], Entry::query()->orderBy('1', 'desc')->get()->map->id()->all());
+    }
+
+    #[Test]
     public function where_in_and_where_not_in_are_case_insensitive()
     {
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post One'])->create();
@@ -160,6 +215,27 @@ class EntryQueryBuilderTest extends TestCase
 
         $this->assertCount(2, $entries);
         $this->assertEquals(['Post 1', 'Post 4'], $entries->map->title->all());
+    }
+
+    #[Test]
+    public function entries_are_found_using_where_with_dates_regardless_of_display_format()
+    {
+        $this->createWhereDateTestEntries();
+
+        Carbon::setToStringFormat('F jS, Y');
+        $this->beforeApplicationDestroyed(fn () => Carbon::resetToStringFormat());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T23:31:00+03:00'))
+            ->get();
+
+        $this->assertEquals(['1'], $entries->map->id()->all());
+
+        $entries = Entry::query()
+            ->where('test_date', Carbon::parse('2021-11-15T20:31:01Z'))
+            ->get();
+
+        $this->assertCount(0, $entries);
     }
 
     #[Test]
@@ -1678,6 +1754,93 @@ class EntryQueryBuilderTest extends TestCase
         Entry::query()->orderBy('delete', 'asc')->get();
 
         $this->assertCount($count, Entry::all());
+    }
+
+    #[Test]
+    #[DataProvider('equalsProvider')]
+    public function entries_are_found_by_what_a_value_equals($value, $expected)
+    {
+        Collection::make('posts')->save();
+        collect([
+            'a' => 'Red', 'b' => 'red', 'c' => 'RED ', 'd' => null, 'e' => '', 'f' => true, 'g' => false,
+            'h' => 1, 'i' => '1', 'j' => 0, 'k' => 1.5, 'l' => '1.5', 'm' => 'Ünï',
+        ])->each(fn ($thing, $id) => EntryFactory::id($id)->slug($id)->collection('posts')->data(['thing' => $thing])->create());
+
+        $this->assertEquals($expected, Entry::query()->where('thing', $value)->get()->map->id()->all());
+        $this->assertEquals($expected, Entry::query()->where('thing', '=', $value)->get()->map->id()->all());
+    }
+
+    public static function equalsProvider()
+    {
+        return [
+            'string' => ['red', ['a', 'b']],
+            'string in another case' => ['RED', ['a', 'b']],
+            'string with a space' => ['red ', ['c']],
+            'empty string' => ['', ['d', 'e', 'g']],
+            'null' => [null, ['d', 'e', 'g']],
+            'true' => [true, ['f', 'h', 'i']],
+            'false' => [false, ['d', 'e', 'g']],
+            'one' => [1, ['f', 'h', 'i']],
+            'one as a string' => ['1', ['f', 'h', 'i']],
+            'zero' => [0, ['j']],
+            'float' => [1.5, ['k', 'l']],
+            'accented' => ['Ünï', ['m']],
+        ];
+    }
+
+    #[Test]
+    public function a_date_is_found_by_the_date_it_equals()
+    {
+        Collection::make('posts')->dated(true)->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->date('2021-11-15')->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->date('2021-11-14')->create();
+
+        $this->assertEquals(['a'], Entry::query()->where('date', \Illuminate\Support\Carbon::parse('2021-11-15'))->get()->map->id()->all());
+        $this->assertEquals(['a'], Entry::query()->where('date', '2021-11-15 00:00:00')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function a_query_builder_with_its_own_idea_of_equal_gets_to_use_it()
+    {
+        Collection::make('posts')->save();
+        EntryFactory::id('a')->slug('a')->collection('posts')->data(['thing' => 'Red'])->create();
+        EntryFactory::id('b')->slug('b')->collection('posts')->data(['thing' => 'red'])->create();
+
+        $query = new CaseSensitiveEntryQueryBuilder(app(\Statamic\Stache\Stache::class)->store('entries'));
+
+        $this->assertEquals(['b'], $query->where('thing', 'red')->get()->map->id()->all());
+    }
+
+    #[Test]
+    public function the_pattern_for_a_like_is_worked_out_once_for_all_the_entries_it_is_tested_against()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        \Statamic\Facades\Pattern::partialMock()->shouldReceive('sqlLikeToRegex')->with('%post 1%')->once()->passthru();
+
+        $this->assertEquals(['Post 1'], Entry::query()->where('title', 'like', '%post 1%')->get()->map->title->all());
+    }
+
+    #[Test]
+    public function each_like_in_a_query_looks_for_its_own_thing()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $entries = Entry::query()
+            ->where('title', 'like', 'post%')
+            ->where('title', 'not like', '%2')
+            ->where(fn ($query) => $query->where('title', 'like', '%1')->orWhere('title', 'like', '%3'))
+            ->get();
+
+        $this->assertEquals(['Post 1', 'Post 3'], $entries->map->title->all());
+    }
+}
+
+class CaseSensitiveEntryQueryBuilder extends \Statamic\Stache\Query\EntryQueryBuilder
+{
+    protected function filterTestEquals($item, $value)
+    {
+        return $item === $value;
     }
 }
 

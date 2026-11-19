@@ -22,7 +22,7 @@
                 <StatusIndicator v-if="status" :status="status" />
                 <div v-if="create" class="truncate grow">{{ __('Add ":value"', { value: title }) }}</div>
                 <div v-else v-text="title" class="truncate grow" />
-                <ui-badge v-if="hint" size="sm" v-text="hint" />
+                <ui-badge v-if="hint" size="sm" :text="hint" />
             </div>
         </template>
         <template #no-options>
@@ -187,7 +187,7 @@ export default {
                 let option = this.options.find((option) => option.id === id);
                 let existing = this.items.find((item) => item.id === id);
 
-                return existing || option || { id: id, title: id };
+                return existing || option || { id: id, title: id, editable: false };
             });
 
             this.$emit('input', items);

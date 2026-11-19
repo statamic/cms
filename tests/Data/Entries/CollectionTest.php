@@ -553,6 +553,36 @@ class CollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_only_queries_entries_in_the_sites_it_was_saved_with()
+    {
+        // Like a real cache, hand out copies. The plain array store would hand back
+        // the collection being saved itself, and fetching it resets its dirty state.
+        config([
+            'cache.stores.stache-serializing' => ['driver' => 'array', 'serialize' => true],
+            'statamic.stache.cache_store' => 'stache-serializing',
+        ]);
+
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+
+        $collection = tap(Facades\Collection::make('test')->sites(['en', 'fr']))->save();
+        Facades\Entry::make()->collection('test')->locale('en')->id('en-entry')->slug('en-entry')->save();
+        Facades\Entry::make()->collection('test')->locale('fr')->id('fr-entry')->slug('fr-entry')->save();
+
+        $queried = [];
+        Event::listen(CollectionSaved::class, function ($event) use (&$queried) {
+            $queried[] = $event->collection->queryEntries()->get()->map->id()->sort()->values()->all();
+        });
+
+        $collection->sites(['en'])->save();
+        $collection->sites(['en', 'fr'])->save();
+
+        $this->assertEquals([['en-entry'], ['en-entry', 'fr-entry']], $queried);
+    }
+
+    #[Test]
     public function it_dispatches_collection_saved()
     {
         Event::fake();

@@ -732,10 +732,37 @@ class QueryBuilderTest extends TestCase
         $this->assertCount(1, $results);
         $this->assertEquals(['b'], $results->map->reference->all());
     }
+
+    #[Test]
+    public function paginating_works_the_results_out_once()
+    {
+        $items = collect(range(1, 25))->map(fn ($i) => ['reference' => 'item'.$i, 'status' => $i % 5 ? 'published' : 'draft', 'site' => $i % 2 ? 'en' : 'fr']);
+
+        $query = (new FakeQueryBuilder($items))->withoutData()->where('status', 'published')->where('site', 'en');
+
+        $paginator = $query->paginate(4, ['*'], 'page', 2);
+
+        $this->assertSame(1, $query->searches);
+        $this->assertSame(10, $paginator->total());
+        $this->assertEquals(['item11', 'item13', 'item17', 'item19'], collect($paginator->items())->map->reference->all());
+    }
+
+    #[Test]
+    public function a_query_can_be_used_again_after_paginating()
+    {
+        $items = collect(range(1, 6))->map(fn ($i) => ['reference' => 'item'.$i, 'site' => $i % 2 ? 'en' : 'fr']);
+
+        $query = (new FakeQueryBuilder($items))->withoutData()->where('site', 'en');
+
+        $this->assertSame(3, $query->paginate(2)->total());
+        $this->assertEquals(['item3'], $query->where('reference', 'item3')->get()->map->reference->all());
+        $this->assertSame(1, $query->paginate(2)->total());
+    }
 }
 
 class FakeQueryBuilder extends QueryBuilder
 {
+    public $searches = 0;
     protected $results;
 
     public function __construct($results)
@@ -746,6 +773,8 @@ class FakeQueryBuilder extends QueryBuilder
 
     public function getSearchResults($query)
     {
+        $this->searches++;
+
         return $this->results;
     }
 }
