@@ -13,12 +13,8 @@ let closeOpenCard = null;
 // in its place, so it reads as the same card showing another field, not something new arriving.
 export const cardEntrance = (switched) => (switched ? '' : 'animate-in fade-in-0 zoom-in-95 duration-100');
 
-
 // Whether a click landed on a suggest button, which opens its own card (and so closes this one) itself
 export const onSuggestButton = (event) => !!event.target.closest?.('[data-ai-suggest-button]');
-
-// The publish form hands down its sidebar column (see Tabs.vue). Without one (a narrow window, a blueprint with no sidebar, or a form
-// that isn't in one), or without a scrolling area the card can be placed in, place stays null and the card opens under the field instead.
 
 // The nearest scrolling area above the column: the page's, or a stack's. The card is placed in it, so it needs to be positioned.
 function scrollerOf(element) {
@@ -55,6 +51,9 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
     let resizes = null;
     let settle = null;
     let faded = [];
+
+    // The card itself, whether the ref is to an element or a component
+    const cardElement = () => card?.value?.$el ?? card?.value ?? null;
 
     function onScroll() {
         clearTimeout(settle);
@@ -124,6 +123,8 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
         start();
     });
 
+    // The publish form hands down its sidebar column (see Tabs.vue). Without one (a narrow window, a blueprint with no sidebar, or a form
+    // that isn't in one), or without a scrolling area the card can be placed in, place stays null and the card opens under the field instead.
     function start() {
         aside = sidebar?.value ?? null;
         scroller.value = scrollerOf(aside);
@@ -137,26 +138,22 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
         resizes.observe(aside);
         resizes.observe(scroller.value.firstElementChild ?? scroller.value);
         // The card grows as its suggestions come in
-        nextTick(() => {
-            const cardEl = card?.value?.$el ?? card?.value;
-            if (cardEl && resizes) resizes.observe(cardEl);
-        });
+        nextTick(() => cardElement() && resizes?.observe(cardElement()));
     }
 
     function restore(panel) {
-        panel.style.opacity = '';
+        panel.style.opacity = panel.style.transition = '';
     }
 
     // Fades the sidebar's panels near the card, and brings back any it's moved away from
     function fadeNearby() {
-        const cardEl = card?.value?.$el ?? card?.value;
-        if (!aside || !cardEl?.getBoundingClientRect) return;
-        const near = cardEl.closest('.rounded-xl')?.getBoundingClientRect() ?? cardEl.getBoundingClientRect();
+        const cardEl = cardElement();
+        if (!aside || !cardEl) return;
+        const near = (cardEl.closest('.rounded-xl') ?? cardEl).getBoundingClientRect();
         const panels = [...aside.querySelectorAll('[class*="@container/panel"]')];
         const boxes = (panels.length ? panels : [...aside.children]).map((panel) => ({ panel, box: panel.getBoundingClientRect() }));
         const within = (a, b, gap) => a.bottom > b.top - gap && a.top < b.bottom + gap;
-        // The ones near the card, then any near those, and so on
-        // with how many steps along the chain each is from the card
+        // The ones near the card, then any near those, and so on, with how many steps along the chain each is from the card
         const chained = boxes.filter(({ box }) => within(box, near, NEAR)).map((entry) => ({ ...entry, step: 0 }));
         for (let i = 0; i < chained.length; i++) {
             boxes.forEach(
@@ -166,16 +163,14 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
                     chained.push({ ...other, step: chained[i].step + 1 }),
             );
         }
-        const close = chained.map(({ panel }) => panel);
-        faded.filter((panel) => !close.includes(panel)).forEach(restore);
-        const steps = new Map(chained.map(({ panel, step }) => [panel, step]));
-        close.forEach((panel) => {
+        const fading = chained.map(({ panel }) => panel);
+        faded.filter((panel) => !fading.includes(panel)).forEach(restore);
+        chained.forEach(({ panel, step }) => {
             panel.style.transition = 'opacity 150ms ease-out';
-            panel.style.opacity = String(FADES[Math.min(steps.get(panel) ?? 0, 2)]);
+            panel.style.opacity = String(FADES[Math.min(step, FADES.length - 1)]);
         });
-        faded = close;
+        faded = fading;
     }
-
 
     // The sidebar comes and goes as the window crosses 920px wide, so an open card moves over it, or under the field, to match
     watch(
