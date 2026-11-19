@@ -334,7 +334,7 @@ class EmailTest extends TestCase
     }
 
     #[Test]
-    public function it_excludes_informational_and_structural_fields_from_the_fields_data()
+    public function it_excludes_spacers_and_display_only_form_fieldtypes_from_the_fields_data()
     {
         $form = tap(Form::make('test')->formFields([
             'fields' => [
@@ -342,6 +342,10 @@ class EmailTest extends TestCase
                 ['handle' => 'intro', 'field' => ['type' => 'heading']],
                 ['handle' => 'gap', 'field' => ['type' => 'spacer']],
                 ['handle' => 'blurb', 'field' => ['type' => 'paragraph']],
+                ['handle' => 'notice', 'field' => ['type' => 'banner', 'display' => 'Notice']],
+                ['handle' => 'details', 'field' => ['type' => 'section', 'display' => 'Details']],
+                ['handle' => 'markup', 'field' => ['type' => 'html', 'html' => '<p>Hi</p>']],
+                ['handle' => 'tip', 'field' => ['type' => 'info']],
             ],
         ]))->save();
 
@@ -349,7 +353,29 @@ class EmailTest extends TestCase
 
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 
-        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals(
+            ['name', 'details', 'markup', 'tip'],
+            collect($email->viewData['fields'])->pluck('handle')->all()
+        );
+    }
+
+    #[Test]
+    public function it_includes_group_fields_in_the_fields_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'address', 'field' => ['type' => 'group', 'fields' => [
+                    ['handle' => 'street', 'field' => ['type' => 'text']],
+                ]]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'address' => ['street' => '1 Main St']]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name', 'address'], collect($email->viewData['fields'])->pluck('handle')->all());
     }
 
     #[Test]

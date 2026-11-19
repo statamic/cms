@@ -134,7 +134,7 @@ class FakeSubmissionGeneratorTest extends TestCase
         $this->assertIsString($values['short']);
         $this->assertIsString($values['long']);
         $this->assertIsInt($values['number']);
-        $this->assertIsInt($values['currency']);
+        $this->assertIsFloat($values['currency']);
         $this->assertIsBool($values['toggle']);
         $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}$/', $values['date']);
         $this->assertMatchesRegularExpression('/^\d{2}:\d{2}$/', $values['time']);

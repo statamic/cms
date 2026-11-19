@@ -53,18 +53,20 @@ const updateResponse = (payload) => ({ data: { values: { ...payload.values } } }
 let updatePayloads = [];
 const updateCalls = () => updatePayloads.map((payload) => ['/update', payload]);
 
-function setup({ field, fields = [], originValues = {}, edit = respondToEdit, update = (payload) => Promise.resolve(updateResponse(payload)) }) {
+const defaultFieldtypes = [
+    { handle: 'radio', categories: ['choice'], collects_value: true },
+    { handle: 'text', categories: ['text'], collects_value: true },
+    { handle: 'heading', categories: ['information'], collects_value: false },
+];
+
+function setup({ field, fields = [], fieldtypes = defaultFieldtypes, originValues = {}, edit = respondToEdit, update = (payload) => Promise.resolve(updateResponse(payload)) }) {
     const beforeSave = [];
     const inspecting = ref(field);
 
     Object.assign(context, {
         dirty: vi.fn(),
         errors: ref({}),
-        fieldtypes: [
-            { handle: 'radio', categories: ['choice'] },
-            { handle: 'text', categories: ['text'] },
-            { handle: 'heading', categories: ['information'] },
-        ],
+        fieldtypes,
         form: { handle: 'contact' },
         inspecting,
         onBeforeSave: (callback) => {
@@ -427,4 +429,35 @@ test('hiding and showing a linked field on the canvas keeps its conditions as ov
     expect(field.config).toMatchObject({ unless: { method: 'equals phone' } });
     expect(field.config_overrides).toContain('unless');
     expect(field.config_overrides).not.toContain('hidden');
+});
+
+test('fields are offered as conditions and get a validation tab based on whether their fieldtype collects a value', async () => {
+    const field = textField({ handle: 'email', config: { type: 'text', display: 'Email' } });
+
+    const { inspecting } = setup({
+        field,
+        fields: [
+            { _id: 'address-id', handle: 'address', fieldtype: 'group', icon: 'group', config: { type: 'group', display: 'Address' } },
+            { _id: 'gap-id', handle: 'gap', fieldtype: 'spacer', icon: 'spacer', config: { type: 'spacer', display: 'Gap' } },
+            { _id: 'intro-id', handle: 'intro', fieldtype: 'heading', icon: 'heading', config: { type: 'heading', display: 'Intro' } },
+        ],
+        fieldtypes: [
+            { handle: 'text', categories: ['text'], collects_value: true },
+            { handle: 'group', categories: ['structure'], collects_value: true },
+            { handle: 'spacer', categories: ['structure'], collects_value: false },
+            { handle: 'heading', categories: ['information'], collects_value: false },
+        ],
+    });
+    await flushPromises();
+
+    expect(wrapper.vm.suggestableConditionFields.map((f) => f.handle)).toEqual(['address']);
+    expect(wrapper.vm.shouldShowValidationTab).toBe(true);
+
+    inspecting.value = context.pages.value[0].sections[0].fields[0];
+    await flushPromises();
+    expect(wrapper.vm.shouldShowValidationTab).toBe(true);
+
+    inspecting.value = context.pages.value[0].sections[0].fields[1];
+    await flushPromises();
+    expect(wrapper.vm.shouldShowValidationTab).toBe(false);
 });

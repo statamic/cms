@@ -2,6 +2,7 @@
 
 namespace Tests\Forms\Fieldtypes;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Charts\VerticalBar;
 use Statamic\Forms\Fields\FormField;
@@ -23,9 +24,10 @@ class CurrencyTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'integer',
+            'type' => 'float',
             'prepend' => '$',
             'currency_symbol' => '$',
+            'step' => 0.01,
         ], $fieldtype->toFieldArray());
     }
 
@@ -39,11 +41,83 @@ class CurrencyTest extends TestCase
         ]));
 
         $this->assertEquals([
-            'type' => 'integer',
+            'type' => 'float',
             'prepend' => '€',
             'currency_symbol' => '€',
+            'step' => 0.01,
             'default' => 100,
         ], $fieldtype->toFieldArray());
+    }
+
+    #[Test]
+    #[DataProvider('stepProvider')]
+    public function it_sets_the_step_from_the_currency_decimals($currency, $step)
+    {
+        $fieldtype = (new Currency)->setField(new FormField('price', [
+            'type' => 'currency',
+            'currency' => $currency,
+        ]));
+
+        $this->assertSame($step, $fieldtype->toFieldArray()['step']);
+    }
+
+    public static function stepProvider()
+    {
+        return [
+            'two decimals' => ['USD', 0.01],
+            'no decimals' => ['JPY', 1],
+            'three decimals' => ['BHD', 0.001],
+        ];
+    }
+
+    #[Test]
+    public function a_configured_step_takes_precedence()
+    {
+        $fieldtype = (new Currency)->setField(new FormField('price', [
+            'type' => 'currency',
+            'currency' => 'USD',
+            'step' => 5,
+        ]));
+
+        $this->assertSame(5, $fieldtype->toFieldArray()['step']);
+    }
+
+    #[Test]
+    #[DataProvider('missingCurrencyProvider')]
+    public function it_handles_a_missing_or_unknown_currency($currency)
+    {
+        $fieldtype = (new Currency)->setField(new FormField('price', [
+            'type' => 'currency',
+            'currency' => $currency,
+        ]));
+
+        $this->assertEquals([
+            'type' => 'float',
+            'prepend' => null,
+            'currency_symbol' => null,
+            'step' => 0.01,
+        ], $fieldtype->toFieldArray());
+    }
+
+    public static function missingCurrencyProvider()
+    {
+        return [
+            'null' => [null],
+            'unknown' => ['NOPE'],
+        ];
+    }
+
+    #[Test]
+    public function it_accepts_and_stores_decimal_amounts()
+    {
+        $field = (new Currency)->setField(new FormField('price', [
+            'type' => 'currency',
+            'currency' => 'USD',
+        ]))->toField();
+
+        $this->assertSame(12.5, $field->setValue('12.50')->process()->value());
+        $this->assertContains('numeric', $field->rules()[$field->handle()]);
+        $this->assertNotContains('integer', $field->rules()[$field->handle()]);
     }
 
     #[Test]

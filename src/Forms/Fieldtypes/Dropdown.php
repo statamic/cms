@@ -3,10 +3,10 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Illuminate\Support\Collection;
-use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\HorizontalBar;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Fieldtypes\Concerns\HasHideableOptions;
 use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
@@ -14,6 +14,8 @@ use function Statamic\trans as __;
 
 class Dropdown extends FormFieldtype
 {
+    use HasHideableOptions;
+
     protected static $fieldtype = 'select';
     protected $description = 'A dropdown list where respondents pick from your options.';
     protected $icon = 'fieldtype-select';
@@ -64,22 +66,12 @@ class Dropdown extends FormFieldtype
     {
         return [
             'type' => 'select',
-            'options' => $this->enabledOptions(),
+            'options' => $this->options(),
             'placeholder' => $this->config('placeholder'),
             'multiple' => $this->config('multiple'),
             'max_items' => $this->config('max_selections', $this->config('max_items')),
             ...Arr::except($this->config(), ['type', 'options', 'placeholder', 'multiple', 'max_items', 'max_selections']),
         ];
-    }
-
-    private function enabledOptions(): array
-    {
-        return collect($this->config('options'))
-            ->reject(fn ($option): bool => is_array($option) && ($option['hidden'] ?? false) === true)
-            ->mapWithKeys(fn ($option, $key): array => [
-                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
-            ])
-            ->all();
     }
 
     public function valueType(): ?FormValueType
@@ -94,9 +86,7 @@ class Dropdown extends FormFieldtype
 
     public function chartOptions(FieldResponses $responses): ?Collection
     {
-        return collect($this->enabledOptions())
-            ->map(fn ($label, $key) => new ChartOption($key, $label))
-            ->values();
+        return $this->hideableChartOptions($responses);
     }
 
     public function example(): ?array

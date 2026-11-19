@@ -13,7 +13,7 @@ export const categories = {
     other: { get title() { return __('Other'); }, color: 'gray' },
 };
 
-export const collectsValue = (category) => !['information', 'structure'].includes(category);
+export const collectsValue = (fieldtype) => fieldtype?.collects_value ?? true;
 
 export const categoryColorClasses = {
     purple: { dot: 'bg-purple-500', icon: 'text-purple-600 dark:text-purple-400' },
