@@ -766,23 +766,26 @@ function stopFollowing() {
                     v-for="saved in promptPills"
                     :key="saved.command"
                     type="button"
-                    class="max-w-36 cursor-pointer truncate rounded-full bg-white px-2.5 py-1 text-xs text-gray-700 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800"
+                    class="flex max-w-36 cursor-pointer rounded-full bg-white px-2.5 py-[8.5px] text-xs text-gray-700 shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800"
                     v-tooltip="{ content: '/' + saved.command, hoverOnly: true }"
                     @mousedown.prevent
                     @click="runPrompt(saved)"
                 >
-                    {{ saved.name }}
+                    <!-- Trimmed like a Badge's text, so it sits in the middle of the pill, with 8.5px above and below, so the pill is as tall as
+                         it was untrimmed. A long name still ends in "…", but it's clipped only side to side: truncate's overflow: hidden would cut
+                         the trimmed text's ascenders and descenders off. -->
+                    <span class="min-w-0 overflow-x-clip text-ellipsis whitespace-nowrap st-text-trim-optical-cap">{{ saved.name }}</span>
                 </button>
                 <!-- The rest of the saved prompts, as "+ 2", with "2 more" in its tooltip. It opens them all. -->
                 <button
                     v-if="morePrompts"
                     type="button"
-                    class="shrink-0 cursor-pointer rounded-full bg-white px-2 py-1 text-xs text-gray-700 tabular-nums shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800 dark:hover:text-white"
+                    class="flex shrink-0 cursor-pointer rounded-full bg-white px-2 py-[8.5px] text-xs text-gray-700 tabular-nums shadow-ui-sm ring ring-gray-200 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-850 dark:text-gray-300 dark:ring-gray-700/80 dark:hover:bg-gray-800 dark:hover:text-white"
                     v-tooltip="{ content: __(':count more', { count: morePrompts }), hoverOnly: true }"
                     @mousedown.prevent
                     @click="showHelp = true"
                 >
-                    + {{ morePrompts }}
+                    <span class="st-text-trim-optical-cap">+ {{ morePrompts }}</span>
                 </button>
             </div>
             <!-- A hint about the / key sits next to the send button while the chat is focused and nothing has been typed, until the chat starts. Clicking it opens the help too. It's left out of the Tab order (/ does the same from the keyboard), and mousedown.prevent keeps focus in the input. -->
