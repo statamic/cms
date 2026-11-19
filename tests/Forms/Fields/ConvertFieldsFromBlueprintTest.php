@@ -206,6 +206,55 @@ class ConvertFieldsFromBlueprintTest extends TestCase
     }
 
     #[Test]
+    public function it_converts_the_children_of_groups()
+    {
+        $this->makeBlueprint([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'details', 'field' => [
+                                    'type' => 'group',
+                                    'display' => 'Details',
+                                    'fields' => [
+                                        ['handle' => 'name', 'field' => ['type' => 'text', 'display' => 'Name']],
+                                        ['handle' => 'phone', 'field' => ['type' => 'text', 'input_type' => 'tel']],
+                                        ['handle' => 'color', 'field' => ['type' => 'select', 'options' => ['red' => 'Red']]],
+                                        ['handle' => 'resume', 'field' => ['type' => 'files', 'max_files' => 1]],
+                                        ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'assets']],
+                                        ['import' => 'address'],
+                                        ['handle' => 'city', 'field' => 'address.city'],
+                                    ],
+                                ]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $form = Form::make('contact_us');
+
+        $this->assertEquals([
+            'handle' => 'details',
+            'field' => [
+                'type' => 'group',
+                'display' => 'Details',
+                'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                    ['handle' => 'phone', 'field' => ['type' => 'phone']],
+                    ['handle' => 'color', 'field' => ['type' => 'dropdown', 'options' => ['red' => 'Red']]],
+                    ['handle' => 'resume', 'field' => ['type' => 'files', 'max_files' => 1]],
+                    ['handle' => 'photo', 'field' => ['type' => 'assets', 'container' => 'assets']],
+                    ['import' => 'address'],
+                    ['handle' => 'city', 'field' => 'address.city'],
+                ],
+            ],
+        ], $form->formFields()->items()->first());
+    }
+
+    #[Test]
     public function it_flattens_tabs_into_sections()
     {
         $this->makeBlueprint([
