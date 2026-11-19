@@ -4,6 +4,7 @@ import { DocsCallout, Header, Button, CommandPaletteItem } from '@ui';
 import Head from '@/pages/layout/Head.vue';
 
 defineProps({
+    columns: Array,
     filters: Object,
     sortColumn: String,
     sortDirection: String,
@@ -44,6 +45,7 @@ defineProps({
     </Header>
 
     <Listing
+        :columns="columns"
         :initial-sort-column="sortColumn"
         :initial-sort-direction="sortDirection"
         :filters="filters"

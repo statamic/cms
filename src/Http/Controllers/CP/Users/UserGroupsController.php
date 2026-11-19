@@ -9,6 +9,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\RequireStatamicPro;
+use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Support\Str;
 
 use function Statamic\trans as __;
@@ -74,6 +75,10 @@ class UserGroupsController extends CpController
             'listingConfig' => [
                 'listingKey' => 'usergroup-users',
                 'groupId' => $group->id(),
+                'columns' => (new Users(collect()))
+                    ->blueprint(User::blueprint())
+                    ->columnPreferenceKey('users.columns')
+                    ->columns(),
                 'actionUrl' => cp_route('users.actions.run'),
                 'allowFilterPresets' => false,
             ],

@@ -34,6 +34,11 @@ class Users extends ResourceCollection
         return $this;
     }
 
+    public function columns()
+    {
+        return $this->setColumns()->columns;
+    }
+
     private function setColumns()
     {
         $columns = $this->blueprint->columns();
