@@ -89,6 +89,7 @@ class FastParserTest extends TestCase
             'multi-line flow collection' => "a: [one,\n  two]\nb: 1\n",
             'document end marker' => "a: 1\n...\n",
             'windows line endings' => "a: 1\r\nb: 2\r\n",
+            'trailing form feed' => "a: foo\f\nb: 1\n",
 
             'deep nesting' => self::nested(70),
             'nesting beyond symfony\'s limit' => self::nested(130),
