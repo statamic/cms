@@ -43,13 +43,14 @@
 }
 
 /* A see-through card, as the image's prompt card is (see AiImage.vue): 70% of its colour, with what's behind blurred (the blur is on the card).
-   It has no edge, at rest or focused: the photo behind gives it its shape. The purple glow still comes in while it's focused or working. */
+   It has no edge or glow, at rest or focused: the photo behind gives it its shape. */
 .ai-chat-card[data-glass],
 .ai-chat-card[data-glass]:focus-within,
 .ai-chat-card[data-glass][data-working] {
     background: color-mix(in oklab, var(--ai-card-bg) 70%, transparent);
     border-color: transparent;
     outline: none;
+    box-shadow: none;
 }
 
 /* Once a chat has started, hovering the floating card brings in a softer version of the glow, at about half its strength. Before then it's just an input,
