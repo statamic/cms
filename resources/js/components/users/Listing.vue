@@ -2,6 +2,7 @@
     <div>
         <Listing
             :url="requestUrl"
+            :columns="columns"
             :action-url="actionUrl"
             :action-context="actionContext"
             :preferences-prefix="preferencesPrefix"
@@ -63,6 +64,7 @@ export default {
 
     props: {
         group: String,
+        columns: { type: Array, default: null },
         allowFilterPresets: {
             default: true,
         },

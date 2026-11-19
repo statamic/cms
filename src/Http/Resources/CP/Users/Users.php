@@ -4,6 +4,7 @@ namespace Statamic\Http\Resources\CP\Users;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 use Statamic\Statamic;
@@ -32,6 +33,15 @@ class Users extends ResourceCollection
         $this->columnPreferenceKey = $key;
 
         return $this;
+    }
+
+    public static function listingColumns()
+    {
+        return (new self(collect()))
+            ->blueprint(User::blueprint())
+            ->columnPreferenceKey('users.columns')
+            ->setColumns()
+            ->columns;
     }
 
     private function setColumns()

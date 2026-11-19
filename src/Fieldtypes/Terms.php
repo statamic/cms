@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use Closure;
+use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Localization;
@@ -158,7 +160,11 @@ class Terms extends Relationship
             ? $parent->locale()
             : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
-        if ($single && Blink::has($key = 'terms-augment-'.$site.'-'.json_encode($values))) {
+        // Use the taxonomy-qualified IDs in the cache key, since a value stored by a field
+        // limited to a single taxonomy will not contain the taxonomy handle on its own.
+        $key = 'terms-augment-'.$site.'-'.json_encode($this->convertAugmentationValuesToIds($values));
+
+        if ($single && Blink::has($key)) {
             return Blink::get($key);
         }
 
@@ -219,7 +225,7 @@ class Terms extends Relationship
                 return "{$taxonomy}::{$value}";
             } else {
                 if (! Str::contains($value, '::')) {
-                    throw new \Exception("Ambigious taxonomy term value [$value]. Field [{$this->field->handle()}] is configured with multiple taxonomies.");
+                    throw new Exception("Ambigious taxonomy term value [$value]. Field [{$this->field->handle()}] is configured with multiple taxonomies.");
                 }
 
                 return $value;
@@ -599,7 +605,7 @@ class Terms extends Relationship
             ->when($taxonomies, fn ($query) => $query->whereIn('taxonomy', $taxonomies));
     }
 
-    public function relationshipQueryIdMapFn(): ?\Closure
+    public function relationshipQueryIdMapFn(): ?Closure
     {
         return $this->usingSingleTaxonomy()
             ? fn ($term) => Str::after($term->id(), '::')
