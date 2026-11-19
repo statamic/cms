@@ -46,6 +46,8 @@
                                     :text="__('Transparency')"
                                     @click="cycleCheckerboard"
                                 />
+                                <!-- Prototype: ask the AI to do things with the image (see AiImage.vue) -->
+                                <ui-button inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-spark" variant="ghost" :class="aiOpen ? '[&_svg]:text-ai-light!' : '[&_svg]:!opacity-45'" :text="__('Ask AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
                                 <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
@@ -76,9 +78,12 @@
                             class="flex flex-1 flex-col justify-center items-center p-8 h-full min-h-0"
                         >
                             <!-- Image -->
-                            <div v-if="asset.isImage" class="max-w-full max-h-full" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-md`]: asset.can_be_transparent && showCheckerboard }">
-                                <img :src="asset.preview" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
-                            </div>
+                            <!-- Prototype: wrapped so the AI can show what it makes in the image's place (see AiImage.vue) -->
+                            <AiImage v-if="asset.isImage" :asset="asset" v-model:open="aiOpen" v-slot="{ src, style }">
+                                <div class="max-w-full max-h-full overflow-hidden" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-md`]: asset.can_be_transparent && showCheckerboard }">
+                                    <img :src="src" :style="style" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
+                                </div>
+                            </AiImage>
 
                             <!-- SVG -->
                             <div v-else-if="asset.isSvg" class="flex h-full w-full flex-col shadow-ui-xl dark:bg-gray-800">
@@ -211,6 +216,8 @@ import {
 import ItemActions from '@/components/actions/ItemActions.vue';
 import shortcutLabel from '@/util/shortcutLabel.js';
 import useCheckerboard from '@/composables/checkerboard.js';
+import { permissions } from '@api';
+import AiImage from '@/components/ai-image/AiImage.vue';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'created', 'action-started', 'action-completed'],
@@ -224,6 +231,7 @@ export default {
         FocalPointEditor,
         CropEditor,
         PdfViewer,
+        AiImage,
         PublishContainer,
         PublishTabs,
         Icon,
@@ -271,6 +279,7 @@ export default {
             errors: {},
             actions: [],
             closingWithChanges: false,
+            aiOpen: false,
         };
     },
 
@@ -281,6 +290,11 @@ export default {
 
         saveAndCloseTooltip() {
             return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
+        // Prototype: whether the AI can be asked about the image (see AiImage.vue)
+        canUseAi() {
+            return this.isImage && permissions.has('use ai');
         },
 
         isImage() {
