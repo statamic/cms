@@ -62,7 +62,7 @@ class Attributes
             return ['width' => 0, 'height' => 0];
         }
 
-        return $this->orient($size[0], $size[1], $path);
+        return $this->orient($size[0], $size[1], $this->orientation($path));
     }
 
     /**
@@ -90,11 +90,15 @@ class Attributes
             while (true) {
                 $header .= (string) stream_get_contents($stream, $window - strlen($header));
 
-                if ($header !== '' && ($size = @getimagesizefromstring($header))) {
-                    return $this->orient($size[0], $size[1], $header, true);
+                $size = $header !== '' ? @getimagesizefromstring($header) : false;
+                $orientation = $size ? $this->headerOrientation($header, $size[2]) : null;
+
+                // The dimensions can be readable before the orientation is, so keep going until both are.
+                if ($size && (! is_null($orientation) || feof($stream))) {
+                    return $this->orient($size[0], $size[1], $orientation ?? 1);
                 }
 
-                if (feof($stream)) {
+                if (! $size && feof($stream)) {
                     // The whole file has been read, so a copy has nothing more to offer.
                     return ['width' => 0, 'height' => 0];
                 }
@@ -127,35 +131,47 @@ class Attributes
         return $source->readStream($path);
     }
 
-    private function orient(int $width, int $height, string $image, bool $isContents = false): array
+    private function orient(int $width, int $height, int $orientation): array
     {
-        if (in_array($this->orientation($image, $isContents), [5, 6, 7, 8])) {
+        if (in_array($orientation, [5, 6, 7, 8])) {
             [$width, $height] = [$height, $width];
         }
 
         return compact('width', 'height');
     }
 
-    private function orientation(string $image, bool $isContents): int
+    private function orientation(string $path): int
     {
         if (! function_exists('exif_read_data')) {
             return 1;
         }
 
-        if (! $isContents) {
-            $exif = @exif_read_data($image);
+        $exif = @exif_read_data($path);
 
-            return $exif['Orientation'] ?? 1;
+        return $exif['Orientation'] ?? 1;
+    }
+
+    /**
+     * Returns null when the header stops short of the EXIF data being readable.
+     */
+    private function headerOrientation(string $header, int $type): ?int
+    {
+        if (! function_exists('exif_read_data')) {
+            return 1;
         }
 
         $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $image);
+        fwrite($stream, $header);
         rewind($stream);
 
         try {
             $exif = @exif_read_data($stream);
         } finally {
             fclose($stream);
+        }
+
+        if ($exif === false && in_array($type, [IMAGETYPE_JPEG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM])) {
+            return null;
         }
 
         return $exif['Orientation'] ?? 1;

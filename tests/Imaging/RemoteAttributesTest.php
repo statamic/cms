@@ -67,6 +67,26 @@ class RemoteAttributesTest extends TestCase
     }
 
     #[Test]
+    public function it_reads_further_when_the_orientation_cannot_be_read_yet()
+    {
+        $probe = ImageFixtures::jpeg(30, 60, self::SIZE, orientation: 6);
+        $dimensions = strpos($probe, "\xFF\xC0");
+        $scan = strpos($probe, "\xFF\xDA");
+
+        // End the first window between the dimensions and the start of the scan,
+        // which is where the EXIF data stops being readable.
+        $padding = 64 * 1024 - intdiv($dimensions + $scan, 2) - 8;
+
+        $this->adapter->seed('image.jpg', ImageFixtures::jpeg(30, 60, self::SIZE, orientation: 6, headerPadding: $padding));
+
+        $attributes = (new Attributes)->from($this->disk, 'image.jpg');
+
+        $this->assertSame(['width' => 60, 'height' => 30], $attributes);
+        $this->assertSame(1, $this->adapter->objectReads);
+        $this->assertLessThan(200 * 1024, $this->adapter->objectBytes);
+    }
+
+    #[Test]
     public function it_falls_back_to_copying_the_file_when_the_dimensions_are_too_far_in()
     {
         $size = 4 * 1024 * 1024;
