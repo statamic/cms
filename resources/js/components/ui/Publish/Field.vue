@@ -343,11 +343,11 @@ const fieldtypeComponentEvents = computed(() => ({
                     </template>
                     <!-- Prototype: the AI chat changed this field. The badge takes the theme's AI colour, with ways to see what changed and undo it (see AiChangeControls.vue). -->
                     <AiChangeControls v-if="aiChange" :container="containerName" :path="fullPath" part="label" />
-                    <!-- Prototype: while the field previews a suggestion, a purple badge like "Changed by AI" says which one -->
+                    <!-- Prototype: while the field previews a suggestion, a purple badge like "Changed by AI" says which one. Its negative margins keep it from making the label taller. -->
                     <Badge
                         v-if="previewingSuggestion !== null"
                         size="sm"
-                        class="ms-2 align-middle bg-ai/5 border-ai/40 text-ai dark:bg-ai/20 dark:text-ai-light"
+                        class="ms-2 -my-1 align-middle bg-ai/5 border-ai/40 text-ai dark:bg-ai/20 dark:text-ai-light"
                         :text="previewingSuggestion ? __('Previewing :name', { name: previewingSuggestion }) : __('Previewing')"
                     />
                     <ui-button size="sm" class="[&_svg]:translate-y-0.5" inset icon="synced" variant="ghost" v-tooltip="__('messages.field_synced_with_origin')" v-if="!isReadOnly && isSyncable" v-show="isSynced" @click="desync" />

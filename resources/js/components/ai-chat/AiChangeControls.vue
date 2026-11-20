@@ -140,8 +140,8 @@ const partClass = (type) => ({
 
 <template>
     <template v-if="change">
-        <!-- Next to the label. Undo is set like the Read Only note (small grey text after an icon), with a hover background as it's a button. -->
-        <span v-if="part === 'label'" class="ms-2 inline-flex items-center gap-1.5 align-middle text-2xs font-normal text-gray-500 dark:text-gray-400">
+        <!-- Next to the label. Undo is set like the Read Only note (small grey text after an icon), with a hover background as it's a button. It sits at the top of the label's line, which it fills exactly (20px), so it doesn't make the label taller, as aligning it to the middle did. -->
+        <span v-if="part === 'label'" class="ms-2 inline-flex items-center gap-1.5 align-top text-2xs font-normal text-gray-500 dark:text-gray-400">
             <!-- On a field that was empty, there's nothing to compare, so the badge is just a label, with no chevron -->
             <Badge v-if="hadNothing" size="sm" icon="plus" :class="addedBadge" :text="__('Added by AI')" />
             <!-- Otherwise it opens and closes the changes, with a chevron that turns over while they're open -->
