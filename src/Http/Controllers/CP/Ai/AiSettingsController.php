@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Statamic\CP\PublishForm;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Role;
 use Statamic\Facades\Site;
@@ -38,6 +39,7 @@ class AiSettingsController extends CpController
         $values['page_prompts'] = $prompts->where('use_on', '!=', 'fields')->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->values()->all();
         $values['field_prompts'] = $prompts->where('use_on', 'fields')->map(fn ($prompt) => ['name' => $prompt['name'] ?? null, 'instructions' => $prompt['instructions'] ?? null])->values()->all();
         unset($values['prompts']);
+        $values['image_prompts'] = self::savedImagePrompts();
 
         return PublishForm::make($this->blueprint())
             ->asConfig()
@@ -90,6 +92,85 @@ class AiSettingsController extends CpController
         Cache::forever(self::CACHE_KEY, [...Cache::get(self::CACHE_KEY, []), 'prompts' => $prompts]);
 
         return ['prompts' => self::prompts(), 'command' => Str::slug($request->name)];
+    }
+
+    /**
+     * Adds an image skill from the image's AI card in the asset editor ("Save as skill"), without going to Settings → AI. Like a new chat
+     * skill, it's offered everywhere, to everyone, and Settings → AI is where to say what it should look like, and where it's offered.
+     * Returns the image skills the card can now run.
+     */
+    public function storeImagePrompt(Request $request)
+    {
+        $this->onlySuperUsers();
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'instructions' => ['required', 'string'],
+            'starts_from' => ['required', 'string'],
+        ]);
+
+        $prompts = self::savedImagePrompts();
+        $command = Str::slug($request->name);
+
+        // Its command is its name as a slug, so two with the same slug couldn't both be run
+        if (collect($prompts)->contains(fn ($prompt) => Str::slug($prompt['name'] ?? '') === $command)) {
+            throw ValidationException::withMessages(['name' => __('There\'s already a skill run with /:command.', ['command' => $command])]);
+        }
+
+        $prompts[] = ['type' => 'prompt', 'name' => $request->name, 'starts_from' => $request->starts_from, 'instructions' => $request->instructions, 'makes' => 2, 'shape' => 'original', 'containers' => [], 'roles' => []];
+
+        Cache::forever(self::CACHE_KEY, [...Cache::get(self::CACHE_KEY, []), 'image_prompts' => $prompts]);
+
+        return ['imagePrompts' => self::imagePrompts(), 'command' => $command];
+    }
+
+    /**
+     * The image skills, shared with every CP page (see HandleInertiaRequests), for the image's AI card in the asset editor (see AiImage.vue).
+     * They're kept like page skills: a list the site can change, switch off or add to. Each starts from one of the things the image model
+     * can do (or a plain edit), with its own instructions, how many images it makes and what shape, and pictures of the look it's after.
+     * The ones it comes with each start from that thing, as it is.
+     */
+    public static function imagePrompts(): array
+    {
+        $user = User::current();
+
+        if (! $user || (! $user->isSuper() && ! $user->hasPermission('use ai'))) {
+            return [];
+        }
+
+        return collect(self::savedImagePrompts())
+            ->filter(fn ($prompt) => filled($prompt['name'] ?? null) && ($prompt['enabled'] ?? true))
+            ->filter(fn ($prompt) => empty($prompt['roles']) || $user->isSuper() || collect($prompt['roles'])->contains(fn ($role) => $user->hasRole($role)))
+            ->map(fn ($prompt) => [
+                'name' => $prompt['name'],
+                'command' => Str::slug($prompt['name']),
+                'instructions' => $prompt['instructions'] ?? '',
+                'starts_from' => $prompt['starts_from'] ?? 'edit',
+                'makes' => (int) ($prompt['makes'] ?? 2),
+                'shape' => $prompt['shape'] ?? 'original',
+                'containers' => $prompt['containers'] ?? [],
+            ])
+            ->values()
+            ->all();
+    }
+
+    // What the image model can do, which each image skill starts from, by its handle. They run in AiImage.vue.
+    private static function imageActions(): array
+    {
+        return [
+            'edit' => __('An edit, as described'),
+            'variations' => __('Make variations'),
+            'remove-background' => __('Remove background'),
+            'extend' => __('Extend'),
+            'upscale' => __('Upscale'),
+            'erase' => __('Erase something'),
+        ];
+    }
+
+    // Prototype: the site's image skills, or the ones it comes with if none have been saved
+    private static function savedImagePrompts(): array
+    {
+        return Cache::get(self::CACHE_KEY, [])['image_prompts'] ?? app(static::class)->defaults()['image_prompts'];
     }
 
     /**
@@ -206,6 +287,24 @@ class AiSettingsController extends CpController
                     'instructions' => "Look over the whole site and list what needs attention: broken links, pages that haven't been updated in a year, images without alt text, drafts nobody has touched in a month, and meta descriptions that are missing or too long. Say which page each one is on. Don't change anything.",
                 ],
             ],
+            // The image skills it comes with: one for each thing the image model can do, plus one to show what a site's own are for
+            'image_prompts' => [
+                ['type' => 'prompt', 'name' => 'Make variations', 'starts_from' => 'variations', 'instructions' => 'Make new images with the same subject and style as this one.', 'makes' => 4, 'shape' => 'original', 'containers' => [], 'roles' => []],
+                ['type' => 'prompt', 'name' => 'Remove background', 'starts_from' => 'remove-background', 'instructions' => 'Cut out the subject, on a see-through background.', 'makes' => 2, 'shape' => 'original', 'containers' => [], 'roles' => []],
+                ['type' => 'prompt', 'name' => 'Extend', 'starts_from' => 'extend', 'instructions' => 'Widen or heighten the image to common shapes, filling in the new edges.', 'makes' => 3, 'shape' => 'original', 'containers' => [], 'roles' => []],
+                ['type' => 'prompt', 'name' => 'Upscale', 'starts_from' => 'upscale', 'instructions' => 'Make it bigger and sharper, for large spaces.', 'makes' => 2, 'shape' => 'original', 'containers' => [], 'roles' => []],
+                ['type' => 'prompt', 'name' => 'Erase something', 'starts_from' => 'erase', 'instructions' => 'Take out what I paint over, and fill in the gap so it looks like it was never there.', 'makes' => 2, 'shape' => 'original', 'containers' => [], 'roles' => []],
+                [
+                    'type' => 'prompt',
+                    'name' => 'Brand hero',
+                    'starts_from' => 'extend',
+                    'instructions' => 'Warm, soft evening light. Keep the subject on the right third, with room on the left for a heading.',
+                    'makes' => 2,
+                    'shape' => '16:9',
+                    'containers' => [],
+                    'roles' => [],
+                ],
+            ],
             // A few to show what they're for. Page prompts get a /command in the AI chat, and field prompts show in the suggestions menu on fields.
             'prompts' => [
                 [
@@ -298,6 +397,37 @@ class AiSettingsController extends CpController
                 ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'width' => 33]],
                 ['handle' => 'instructions', 'field' => ['type' => 'text', 'display' => __('Instructions'), 'placeholder' => __('Make it shorter, keeping what it says.')]],
             ],
+        ]];
+    }
+
+    // Image skills, like page skills: collapsed, a row shows its name in the badge, then the start of its instructions. Each starts from one
+    // of the things the image model can do (or a plain edit), and says how many images it makes, what shape, and what they should look like.
+    private function imagePromptsField(): array
+    {
+        return ['handle' => 'image_prompts', 'field' => [
+            'type' => 'replicator',
+            'display' => __('Image Skills'),
+            'hide_display' => true,
+            'full_width_setting' => true,
+            'collapse' => true,
+            'previews' => true,
+            'button_label' => __('Add Skill'),
+            'insert_between' => false,
+            'actions' => false,
+            'header_actions' => 'image-prompts-actions',
+            'sets' => ['main' => ['display' => __('Skills'), 'sets' => [
+                'prompt' => ['display' => __('Image Skill'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Brand hero'), 'replicator_preview' => false, 'width' => 50]],
+                    ['handle' => 'starts_from', 'field' => ['type' => 'select', 'display' => __('Starts From'), 'options' => self::imageActions(), 'default' => 'edit', 'replicator_preview' => false, 'width' => 50]],
+                    ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('What to change, and how it should look.')]],
+                    ['handle' => 'look_like', 'field' => ['type' => 'assets', 'display' => __('Look Like'), 'instructions' => __('Up to three images in the style you\'re after.'), 'container' => AssetContainer::all()->first()?->handle(), 'max_files' => 3, 'mode' => 'grid', 'replicator_preview' => false]],
+                    ['handle' => 'makes', 'field' => ['type' => 'select', 'display' => __('Makes'), 'options' => ['1' => __('1 image'), '2' => __('2 images'), '3' => __('3 images'), '4' => __('4 images')], 'default' => '2', 'replicator_preview' => false, 'width' => 33]],
+                    ['handle' => 'shape', 'field' => ['type' => 'select', 'display' => __('Shape'), 'options' => ['original' => __('Same as the image'), '16:9' => __('Wide, 16:9'), '1:1' => __('Square'), '4:5' => __('Portrait, 4:5')], 'default' => 'original', 'replicator_preview' => false, 'width' => 33]],
+                    ['handle' => 'format', 'field' => ['type' => 'select', 'display' => __('Saved As'), 'options' => ['original' => __('Same as the image'), 'jpg' => 'JPG', 'png' => 'PNG', 'webp' => 'WebP'], 'default' => 'original', 'replicator_preview' => false, 'width' => 33]],
+                    ['handle' => 'containers', 'field' => ['type' => 'select', 'display' => __('Asset Containers'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everywhere'), 'replicator_preview' => false, 'options' => AssetContainer::all()->mapWithKeys(fn ($container) => [$container->handle() => $container->title()])->all(), 'width' => 50]],
+                    ['handle' => 'roles', 'field' => ['type' => 'select', 'display' => __('Roles'), 'multiple' => true, 'clearable' => true, 'placeholder' => __('Everyone'), 'replicator_preview' => false, 'options' => Role::all()->mapWithKeys(fn ($role) => [$role->handle() => $role->title()])->all(), 'width' => 50]],
+                ]],
+            ]]],
         ]];
     }
 
@@ -505,13 +635,19 @@ class AiSettingsController extends CpController
                             'display' => __('Page Skills'),
                             // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
                             'header_actions' => 'page-prompts-actions',
-                            'instructions' => __('Jobs your team does often on a whole page, run in the AI chat by typing / and their name, like `/legal-check`. Leave *Collections* and *Roles* empty to offer one everywhere, to everyone who can use AI.'),
+                            'instructions' => __('Whole-page jobs, run from the AI chat.'),
                             'fields' => [$this->pagePromptsField()],
                         ],
                         [
                             'display' => __('Field Skills'),
                             'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
                             'fields' => [$this->fieldPromptsField()],
+                        ],
+                        [
+                            'display' => __('Image Skills'),
+                            'header_actions' => 'image-prompts-actions',
+                            'instructions' => __('Image edits, offered under *Ask AI* in the asset editor.'),
+                            'fields' => [$this->imagePromptsField()],
                         ],
                         [
                             'display' => __('Scheduled Prompts'),

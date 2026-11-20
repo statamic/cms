@@ -42,6 +42,8 @@ class HandleInertiaRequests extends Middleware
                 'isCpRoute' => Statamic::isCpRoute(),
                 // Prototype: the AI chat's saved prompts (see AiSettingsController)
                 'aiPrompts' => AiSettingsController::prompts(),
+                // Prototype: the image skills, for the image's AI card in the asset editor (see AiSettingsController)
+                'aiImagePrompts' => AiSettingsController::imagePrompts(),
             ],
             '_toasts' => $this->toasts($request),
         ]);
