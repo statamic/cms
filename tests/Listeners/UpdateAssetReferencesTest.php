@@ -4,12 +4,14 @@ namespace Tests\Listeners;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\AssetFolder;
 use Statamic\Events\AssetReferencesUpdated;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Arr;
@@ -386,6 +388,35 @@ class UpdateAssetReferencesTest extends TestCase
 
         $this->assertEquals(2, $scans());
         $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg', 'destination/other.jpg'], $entry->fresh()->get('gallery'));
+    }
+
+    #[Test]
+    public function an_item_that_fails_to_update_does_not_stop_the_rest_of_the_batch()
+    {
+        Exceptions::fake();
+
+        $failing = $this->createEntryWithGallery(['hoff.jpg', 'norris.jpg']);
+        $entry = tap(Facades\Entry::make()->collection('articles')->data(['gallery' => ['hoff.jpg', 'norris.jpg']]))->save();
+
+        Event::listen(EntrySaving::class, function ($event) use ($failing) {
+            if ($event->entry->id() === $failing->id()) {
+                throw new \Exception('Something went wrong');
+            }
+        });
+
+        UpdateAssetReferences::$batchChunkSize = 1;
+
+        try {
+            UpdateAssetReferences::batch(fn () => collect([$this->assetHoff, $this->assetNorris])->each->move('destination'));
+        } finally {
+            UpdateAssetReferences::$batchChunkSize = 500;
+        }
+
+        $this->assertEquals(['hoff.jpg', 'norris.jpg'], $failing->fresh()->get('gallery'));
+        $this->assertEquals(['destination/hoff.jpg', 'destination/norris.jpg'], $entry->fresh()->get('gallery'));
+
+        Exceptions::assertReportedCount(2);
+        Exceptions::assertReported(fn (\Exception $e) => $e->getMessage() === 'Something went wrong');
     }
 
     #[Test]

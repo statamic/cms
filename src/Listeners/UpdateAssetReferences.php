@@ -224,25 +224,40 @@ class UpdateAssetReferences extends Subscriber implements ShouldQueue
         $this
             ->getItemsContainingData()
             ->each(function ($item) use ($container, $moves, &$updatedMoves) {
-                if ($this->updateItemReferences($item, $container, $moves, $updatedMoves)) {
-                    GitSubscriber::withoutListeners(fn () => $item->save());
-                }
-
-                if (method_exists($item, 'hasWorkingCopy') && $item->hasWorkingCopy()) {
-                    $workingCopyEntry = $item->makeFromRevision($item->workingCopy());
-
-                    // Only updates to saved items count towards the AssetReferencesUpdated events.
-                    $workingCopyUpdatedMoves = [];
-
-                    if ($this->updateItemReferences($workingCopyEntry, $container, $moves, $workingCopyUpdatedMoves)) {
-                        $workingCopyEntry->saveToWorkingCopy();
-                    }
+                // One failing item shouldn't stop the rest of the content (or later chained chunks) being updated.
+                try {
+                    $this->replaceItemReferences($item, $container, $moves, $updatedMoves);
+                } catch (\Throwable $e) {
+                    report($e);
                 }
             });
 
         ksort($updatedMoves);
 
         return array_values($updatedMoves);
+    }
+
+    private function replaceItemReferences($item, string $container, array $moves, array &$updatedMoves): void
+    {
+        $itemUpdatedMoves = [];
+
+        if ($this->updateItemReferences($item, $container, $moves, $itemUpdatedMoves)) {
+            GitSubscriber::withoutListeners(fn () => $item->save());
+
+            // Only counted once the item has saved, so a failed save doesn't dispatch AssetReferencesUpdated.
+            $updatedMoves += $itemUpdatedMoves;
+        }
+
+        if (method_exists($item, 'hasWorkingCopy') && $item->hasWorkingCopy()) {
+            $workingCopyEntry = $item->makeFromRevision($item->workingCopy());
+
+            // Only updates to saved items count towards the AssetReferencesUpdated events.
+            $workingCopyUpdatedMoves = [];
+
+            if ($this->updateItemReferences($workingCopyEntry, $container, $moves, $workingCopyUpdatedMoves)) {
+                $workingCopyEntry->saveToWorkingCopy();
+            }
+        }
     }
 
     /**
