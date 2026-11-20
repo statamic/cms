@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use PHPUnit\Framework\Attributes\Test;
 use RuntimeException;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Search;
@@ -67,6 +68,16 @@ class InsertMultipleJobAssetsTest extends TestCase
     public function it_does_not_download_whole_assets_to_index_them()
     {
         $this->runJob();
+
+        $this->assertIndexed(self::PATHS);
+        $this->assertSame(4, $this->adapter->objectReads);
+        $this->assertLessThan(self::SIZE / 2, $this->adapter->objectBytes);
+    }
+
+    #[Test]
+    public function it_does_not_download_whole_assets_when_a_save_rebuilds_a_missing_index()
+    {
+        Asset::find('remote::one.jpg')->save();
 
         $this->assertIndexed(self::PATHS);
         $this->assertSame(4, $this->adapter->objectReads);
