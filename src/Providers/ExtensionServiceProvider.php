@@ -191,7 +191,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'include' => Tags\IncludeTag::class,
         'increment' => Tags\Increment::class,
         'installed' => Tags\Installed::class,
-        'is' => Tags\Is::class,
+        'is' => Tags\IsTag::class,
         'iterate' => Tags\Iterate::class,
         'foreach' => Tags\Iterate::class,
         'link' => Tags\Link::class,

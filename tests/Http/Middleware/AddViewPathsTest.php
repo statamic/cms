@@ -80,7 +80,7 @@ class AddViewPathsTest extends TestCase
         $handled = false;
 
         (new AddViewPaths())->handle($request, function () use ($expectedPaths, &$handled) {
-            $this->assertEquals($expectedPaths, Arr::get(view()->getFinder()->getHints(), 'foo'));
+            $this->assertPathsEquals($expectedPaths, Arr::get(view()->getFinder()->getHints(), 'foo'));
             $handled = true;
 
             return new Response;
@@ -88,6 +88,13 @@ class AddViewPathsTest extends TestCase
 
         $this->assertTrue($handled);
         $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
+    }
+
+    private function assertPathsEquals(array $expected, array $actual)
+    {
+        $normalize = fn ($paths) => array_map(fn ($path) => str_replace('\\', '/', $path), $paths);
+
+        $this->assertEquals($normalize($expected), $normalize($actual));
     }
 
     #[Test]
@@ -105,7 +112,7 @@ class AddViewPathsTest extends TestCase
 
         (new AddViewPaths())->handle($request, function () use ($originalPaths, $originalHints, &$handled) {
             $this->assertEquals($originalPaths, view()->getFinder()->getPaths());
-            $this->assertEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
+            $this->assertPathsEquals($originalHints, Arr::get(view()->getFinder()->getHints(), 'foo'));
             $handled = true;
 
             return new Response;
