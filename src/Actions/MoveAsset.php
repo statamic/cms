@@ -5,6 +5,7 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blink;
+use Statamic\Listeners\UpdateAssetReferences;
 
 use function Statamic\trans as __;
 
@@ -43,7 +44,8 @@ class MoveAsset extends Action
     {
         $oldIds = $assets->map->id()->all();
 
-        $newIds = $assets->each->move($values['folder'])->map->id()->all();
+        // Update the references to all the moved assets together, rather than one at a time.
+        $newIds = UpdateAssetReferences::batch(fn () => $assets->each->move($values['folder']))->map->id()->all();
 
         return [
             'ids' => $newIds,

@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts;
+use Statamic\Listeners\UpdateAssetReferences;
 
 use function Statamic\trans as __;
 use function Statamic\trans_choice;
@@ -75,7 +76,8 @@ class Delete extends Action
 
     public function run($items, $values)
     {
-        $failures = $items->reject(fn ($entry) => $entry->delete());
+        // Assets (and asset folders) have their references updated together, rather than one at a time.
+        $failures = UpdateAssetReferences::batch(fn () => $items->reject(fn ($entry) => $entry->delete()));
         $total = $items->count();
 
         if ($failures->isNotEmpty()) {
