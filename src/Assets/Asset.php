@@ -273,12 +273,10 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     private function metaValue($key)
     {
-        $meta = $this->meta();
+        $value = Arr::get($this->meta(), $key);
 
-        // A null value is a legitimate result, e.g. the duration of an image.
-        // Only meta that is missing the key entirely needs to be regenerated.
-        if (Arr::has($meta, $key)) {
-            return Arr::get($meta, $key);
+        if (! is_null($value)) {
+            return $value;
         }
 
         $this->cacheStore()->forget($this->metaCacheKey());
