@@ -294,3 +294,10 @@
 [data-ai-moving] #nprogress {
     display: none;
 }
+
+/* GROUP AI / DEMOS
+=================================================== */
+/* Prototype: the nav's scrollbar is hidden while a demo scrolls the nav back to the top, so it doesn't flash in and out (see AiChatDemos.vue) */
+.nav-main.ai-demos-scrolling {
+    scrollbar-width: none;
+}

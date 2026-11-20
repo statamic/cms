@@ -18,7 +18,8 @@ let starting = null;
 // The demo played last, marked with a purple dot in the nav so you can see where you are in the list
 const lastPlayed = ref(null);
 
-// Scrolling back up shows the nav's scrollbar, which flashes in and out. So it's hidden for the length of the scroll, and back to normal after.
+// Scrolling back up shows the nav's scrollbar, which flashes in and out. So it's hidden for the length of the scroll, and back to normal after
+// (.ai-demos-scrolling in components/ai.css).
 function hideScrollbarWhileScrolling(nav) {
     const done = () => nav.classList.remove('ai-demos-scrolling');
     nav.classList.add('ai-demos-scrolling');
@@ -215,12 +216,3 @@ const sections = [...groups, { title: 'Coming later', demos: phaseTwoDemos }];
         </ul>
     </div>
 </template>
-
-<style>
-.nav-main.ai-demos-scrolling {
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        display: none;
-    }
-}
-</style>
