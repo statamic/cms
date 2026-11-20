@@ -35,7 +35,8 @@ const NEAR = 24;
 const CHAIN = 40;
 
 // The panels fade more the nearer they are to the card: the nearest to 30%, the next along the chain to 40%, and any further to 50%
-const FADES = [0.3, 0.4, 0.5];
+const FADES = ['opacity-30', 'opacity-40', 'opacity-50'];
+const FADE_CLASSES = ['transition-opacity', 'duration-150', 'ease-out', ...FADES];
 
 // showing: whether the card is open. anchor: an element in the field, to find the field from. close: closes this card. card: an element in
 // the card, to see which of the sidebar's panels it's near.
@@ -142,7 +143,7 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
     }
 
     function restore(panel) {
-        panel.style.opacity = panel.style.transition = '';
+        panel.classList.remove(...FADE_CLASSES);
     }
 
     // Fades the sidebar's panels near the card, and brings back any it's moved away from
@@ -166,8 +167,8 @@ export default function useSidebarCard(showing, anchor, close, card = null) {
         const fading = chained.map(({ panel }) => panel);
         faded.filter((panel) => !fading.includes(panel)).forEach(restore);
         chained.forEach(({ panel, step }) => {
-            panel.style.transition = 'opacity 150ms ease-out';
-            panel.style.opacity = String(FADES[Math.min(step, FADES.length - 1)]);
+            panel.classList.remove(...FADES);
+            panel.classList.add('transition-opacity', 'duration-150', 'ease-out', FADES[Math.min(step, FADES.length - 1)]);
         });
         faded = fading;
     }
