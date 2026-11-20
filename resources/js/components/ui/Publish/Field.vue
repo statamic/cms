@@ -14,7 +14,9 @@ import FieldActions from '@/components/field-actions/FieldActions.vue';
 import ShowField from '@/components/field-conditions/ShowField.js';
 import AiSuggest from '@/components/ai-suggest/AiSuggest.vue';
 import AiSuggestLarge from '@/components/ai-suggest/AiSuggestLarge.vue';
-import AiAltWrite from '@/components/ai-image/AiAltWrite.vue';
+import AiWrite from '@/components/ai-image/AiWrite.vue';
+import { altFor } from '@/components/ai-image/mock-alt-text.js';
+import { filenameFor } from '@/components/ai-image/mock-image-edits.js';
 import { suggestableTypes } from '@/components/ai-suggest/use-ai-suggest.js';
 import useAiChanges from '@/composables/use-ai-changes.js';
 import AiChangeControls from '@/components/ai-chat/AiChangeControls.vue';
@@ -229,13 +231,21 @@ const canSuggest = computed(() => props.config.ai_suggestions && suggestableType
 // A single-line field gives the button a backing in the field's colour instead, so long text slips behind it.
 const isSuggestMultiline = computed(() => ['textarea', 'markdown'].includes(props.config.type));
 
-// Prototype: in the asset editor, an image's Alt Text field has a button that writes its alt text (see AiAltWrite.vue)
+// Prototype: in the asset editor, the AI can fill in two fields from the image, with a button at the field's end (see AiWrite.vue): its Alt
+// Text, and its new name when you rename it (Rename's Filename field)
 const aiAltAsset = inject('aiAltAsset', null);
-const altAsset = computed(() =>
-    aiAltAsset?.() && props.config.handle === 'alt' && ['text', 'textarea'].includes(props.config.type) && !props.config.ai_suggestions && !isReadOnly.value && permissions.has('use ai')
-        ? aiAltAsset()
-        : null,
-);
+const aiWrite = computed(() => {
+    const asset = aiAltAsset?.();
+    const textField = ['text', 'textarea'].includes(props.config.type);
+    if (!asset || !textField || props.config.ai_suggestions || isReadOnly.value || !permissions.has('use ai')) return null;
+    if (props.config.handle === 'alt') {
+        return { text: () => altFor(asset), label: __('Write alt text'), writingStatus: __('Writing alt text…'), doneStatus: __('Alt text added') };
+    }
+    if (props.config.handle === 'filename') {
+        return { text: () => filenameFor(asset), label: __('Suggest a filename'), writingStatus: __('Thinking of a filename…'), doneStatus: __('Filename suggested') };
+    }
+    return null;
+});
 
 const isReadOnly = computed(() => {
     if (containerReadOnly.value) return true;
@@ -374,7 +384,7 @@ const fieldtypeComponentEvents = computed(() => ({
             <div class="text-xs text-red-600" v-if="!fieldtypeComponentExists && fieldtypeComponent !== 'spacer-fieldtype'">
                 Component <code v-text="fieldtypeComponent"></code> does not exist.
             </div>
-            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest || aiChange || altAsset, '[&_textarea]:pe-9!': canSuggest && isSuggestMultiline }">
+            <div v-if="fieldtypeComponentExists" @focusin="focused" @focusout="blurred" :class="{ 'pointer-events-none select-none': isLocked, relative: canSuggest || aiChange || aiWrite, '[&_textarea]:pe-9!': canSuggest && isSuggestMultiline }">
                 <Component
                     ref="fieldtype"
                     :is="fieldtypeComponent"
@@ -401,10 +411,10 @@ const fieldtypeComponentEvents = computed(() => ({
                     @apply="suggestionApplied"
                     @preview="previewingSuggestion = $event"
                 />
-                <AiAltWrite
-                    v-if="altAsset"
+                <AiWrite
+                    v-if="aiWrite"
                     :button-class="['absolute! end-1.5 top-[7px] z-[calc(var(--z-index-above)+1)]', !isSuggestMultiline && 'bg-white! shadow-[-4px_0_4px_white]! rtl:shadow-[4px_0_4px_white]! dark:bg-gray-900! dark:shadow-[-4px_0_4px_var(--color-gray-900)]! rtl:dark:shadow-[4px_0_4px_var(--color-gray-900)]!']"
-                    :asset="altAsset"
+                    v-bind="aiWrite"
                     @apply="suggestionApplied"
                 />
                 <!-- Prototype: what the AI chat changed, laid over the field, once you open it from the badge (see placeOptions in AiChangeControls.vue) -->
