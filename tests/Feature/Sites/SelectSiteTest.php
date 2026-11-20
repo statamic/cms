@@ -50,6 +50,22 @@ class SelectSiteTest extends TestCase
         $this->assertEquals('fr', Site::selected()->handle());
     }
 
+    /** @see https://github.com/statamic/cms/issues/11557 */
+    #[Test]
+    public function site_filter_in_the_previous_url_is_switched_to_the_selected_site()
+    {
+        $filters = base64_encode(json_encode(['site' => ['site' => 'en'], 'status' => ['status' => 'published']]));
+        $expectedFilters = base64_encode(json_encode(['site' => ['site' => 'fr'], 'status' => ['status' => 'published']]));
+
+        $this
+            ->actingAs(tap(User::make()->assignRole('can_access_fr'))->save())
+            ->from('/original?page=2&filters='.urlencode($filters))
+            ->get('cp/select-site/fr')
+            ->assertRedirect('/original?page=2&filters='.urlencode($expectedFilters));
+
+        $this->assertEquals('fr', Site::selected()->handle());
+    }
+
     #[Test]
     public function invalid_site_cannot_be_selected()
     {

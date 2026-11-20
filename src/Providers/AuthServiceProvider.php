@@ -148,7 +148,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::after(function ($user, $ability) {
             // If the ability isn't a Statamic permission, we don't want to get involved. 🙈
-            if (! Permission::boot()->flattened()->map->value()->contains($ability)) {
+            if (! Permission::boot()->contains($ability)) {
                 return null;
             }
 
@@ -197,6 +197,10 @@ class AuthServiceProvider extends ServiceProvider
 
         RateLimiter::for('statamic.cp.passkeys', function (Request $request) {
             return RateLimiter::limiter('statamic.passkeys')($request);
+        });
+
+        RateLimiter::for('statamic.protect.password', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
         });
 
         RateLimiter::for('statamic.forms', function (Request $request) {

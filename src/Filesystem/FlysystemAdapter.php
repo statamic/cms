@@ -56,6 +56,14 @@ class FlysystemAdapter extends AbstractAdapter
         return parent::exists($path);
     }
 
+    public function put($path, $contents)
+    {
+        // Flysystem creates any missing parent directories as part of the write. Making
+        // the directory first is another request per write on a remote disk, and on
+        // object stores it leaves an empty "directory" object behind each time.
+        return $this->filesystem->put($this->normalizePath($path), $contents);
+    }
+
     public function getFiles($path, $recursive = false)
     {
         return $this->collection(

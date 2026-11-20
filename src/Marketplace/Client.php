@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Statamic;
 
 class Client
 {
@@ -71,6 +72,8 @@ class Client
             return $this->cache()->rememberWithExpiration($key, function () use ($method, $endpoint, $params) {
                 $response = Guzzle::request($method, $endpoint, [
                     'verify' => $this->verifySsl,
+                    'timeout' => 5,
+                    'headers' => ['user-agent' => 'Statamic/'.Statamic::version()],
                     ($method === 'GET' ? 'query' : 'json') => $params,
                 ]);
 

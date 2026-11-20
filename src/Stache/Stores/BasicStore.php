@@ -31,7 +31,23 @@ abstract class BasicStore extends Store
             return $item;
         }
 
-        $item = $this->makeItemFromFile($path, File::get($path));
+        if (! File::exists($path)) {
+            return null;
+        }
+
+        $contents = File::get($path);
+
+        // A file a fresh listing shows was removed after its path was recorded is
+        // treated as gone, rather than rebuilt from no contents as a new, empty item
+        if ($contents === null) {
+            $listing = @scandir(dirname($path));
+
+            if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                return null;
+            }
+        }
+
+        $item = $this->makeItemFromFile($path, $contents);
 
         $this->cacheItem($item);
 

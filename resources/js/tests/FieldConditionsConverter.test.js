@@ -38,6 +38,21 @@ test('it converts from blueprint format and applies prefixes', () => {
     expect(converted).toEqual(expected);
 });
 
+test('it converts from blueprint format when a field has multiple conditions', () => {
+    let converted = FieldConditionsConverter.fromBlueprint({
+        status: ['published', 'archived'],
+        audience: 'members',
+    });
+
+    let expected = [
+        { field: 'status', operator: 'equals', value: 'published' },
+        { field: 'status', operator: 'equals', value: 'archived' },
+        { field: 'audience', operator: 'equals', value: 'members' },
+    ];
+
+    expect(converted).toEqual(expected);
+});
+
 test('it converts from blueprint format and does not apply prefix to field conditions with root syntax', () => {
     let converted = FieldConditionsConverter.fromBlueprint(
         {
@@ -98,6 +113,21 @@ test('it converts to blueprint format', () => {
     let expected = {
         name: 'isnt joe',
         age: '== 13',
+    };
+
+    expect(converted).toEqual(expected);
+});
+
+test('it converts to blueprint format when a field has multiple conditions', () => {
+    let converted = FieldConditionsConverter.toBlueprint([
+        { field: 'status', operator: 'is', value: 'published' },
+        { field: 'status', operator: 'is', value: 'archived' },
+        { field: 'audience', operator: 'is', value: 'members' },
+    ]);
+
+    let expected = {
+        status: ['is published', 'is archived'],
+        audience: 'is members',
     };
 
     expect(converted).toEqual(expected);

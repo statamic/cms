@@ -68,4 +68,23 @@ describe('DictionaryFieldtype options', () => {
 
         expect(fieldtype.vm.normalizedOptions).toEqual([{ value: 'ca', label: 'Canada' }]);
     });
+
+    test('selected options carry their icon when present', async () => {
+        const fieldtype = mountFieldtype({
+            value: ['de', 'fr'],
+            maxItems: null,
+            selectedOptions: [
+                { value: 'de', label: 'Germany', icon: 'globe', invalid: false },
+                { value: 'fr', label: 'France', invalid: false },
+            ],
+            fetchedOptions: [],
+            shallow: true,
+        });
+        await flushPromises();
+
+        expect(fieldtype.vm.selectedOptions).toEqual([
+            { value: 'de', label: 'Germany', icon: 'globe', invalid: false },
+            { value: 'fr', label: 'France', invalid: false },
+        ]);
+    });
 });

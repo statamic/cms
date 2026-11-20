@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Calendar, Card} from '@ui';
+import {Calendar, Card} from '@statamic/cms/ui';
 
 const meta = {
     title: 'Forms/Calendar',
@@ -29,7 +29,7 @@ export const _DocsIntro: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${defaultCode}</Card>`,
+        template: `<Card><Calendar /></Card>`,
     }),
 };
 
@@ -44,7 +44,7 @@ export const _MultipleMonths: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${multipleMonthsCode}</Card>`,
+        template: `<Card><Calendar :number-of-months="2" /></Card>`,
     }),
 };
 
@@ -59,6 +59,6 @@ export const _WeekStartsOn: Story = {
     },
     render: () => ({
         components: { Calendar, Card },
-        template: `<Card>${weekStartsOnCode}</Card>`,
+        template: `<Card><Calendar week-starts-on="1" /></Card>`,
     }),
 };

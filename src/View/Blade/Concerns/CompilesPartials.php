@@ -3,6 +3,8 @@
 namespace Statamic\View\Blade\Concerns;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Statamic\Tags\IncludeTag;
 use Stillat\BladeParser\Nodes\Components\ComponentNode;
 use Stillat\BladeParser\Nodes\Components\ParameterNode;
 use Stillat\BladeParser\Nodes\Components\ParameterType;
@@ -15,6 +17,26 @@ trait CompilesPartials
         $tagName = mb_strtolower($tagName);
 
         return $tagName === 'slot' || str($tagName)->startsWith(['slot.', 'slot:']);
+    }
+
+    protected function compileSlotOutput(ComponentNode $component): string
+    {
+        if (! $this->isValidSlotName($name = $this->rawSlotName($component))) {
+            return $this->compileComponent($component);
+        }
+
+        $slot = $name === 'slot'
+            ? '($slot ?? null)'
+            : '($'.IncludeTag::SLOTS_KEY.'['.var_export($name, true).'] ?? null)';
+
+        $context = '$'.IncludeTag::CONTEXT_KEY.' ?? false';
+        $output = '\Statamic\View\Slot::output('.$slot.', '.$this->compileParameters($component->parameters).')';
+
+        $fallback = $this->isPairedComponent($component)
+            ? $this->compile($component->innerDocumentContent)
+            : '';
+
+        return '<?php if ('.$context.') { if ('.$slot.' !== null) { echo '.$output.'; } else { ?>'.$fallback.'<?php } } else { ?>'.$this->compileComponent($component).'<?php } ?>';
     }
 
     protected function isComponentSlot(ComponentNode $parent, ComponentNode $child): bool
@@ -52,47 +74,108 @@ trait CompilesPartials
         return [$name, $compiled];
     }
 
+    protected function compileIncludeSlot(ComponentNode $node): array
+    {
+        $name = $this->rawSlotName($node);
+
+        if (! $this->isValidSlotName($name)) {
+            throw new InvalidArgumentException("Invalid slot name [{$name}].");
+        }
+
+        return [$name, $this->compile($node->innerDocumentContent)];
+    }
+
+    protected function rawSlotName(ComponentNode $component): string
+    {
+        $name = (string) str($component->name)->substr(5);
+
+        return $name === '' ? 'slot' : $name;
+    }
+
+    protected function isValidSlotName(string $name): bool
+    {
+        return (bool) preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $name);
+    }
+
     protected function compilePartial(ComponentNode $component): string
+    {
+        return $this->compileViewTag($component, isInclude: false);
+    }
+
+    protected function compileInclude(ComponentNode $component): string
+    {
+        return $this->compileViewTag($component, isInclude: true);
+    }
+
+    protected function compileViewTag(ComponentNode $component, bool $isInclude): string
     {
         [$slots, $newContent] = $this->extractSlots($component);
         $params = $component->getParameters()->keyBy(fn (ParameterNode $param) => $param->materializedName);
         $forwardMethods = ['exists', 'if_exists'];
 
-        if (str($component->tagName)->startsWith('partial:')) {
-            $partialName = (string) str($component->tagName)->substr(8);
+        [$baseName, $method, $originalMethod] = $this->extractMethodNames($component);
+        $baseName = Str::lower($baseName);
 
-            if (! in_array($partialName, $forwardMethods)) {
-                $srcParam = new ParameterNode();
-                $srcParam->type = ParameterType::Parameter;
-                $srcParam->setName('src');
-                $srcParam->setValue($partialName);
-                $params['src'] = $srcParam;
-            }
+        if (str_contains($component->tagName, ':') && ! in_array($originalMethod, $forwardMethods)) {
+            $srcParam = new ParameterNode();
+            $srcParam->type = ParameterType::Parameter;
+            $srcParam->setName('src');
+            $srcParam->setValue($originalMethod);
+            $params['src'] = $srcParam;
         }
 
         $hoistedSet = '';
         $hoistedUnset = '';
+        $compiledSlots = array_map(
+            fn ($slot) => $isInclude ? $this->compileIncludeSlot($slot) : $this->compileSlot($slot),
+            $slots
+        );
 
+        if ($isInclude && Str::snake($method) !== 'exists') {
+            if (trim($newContent) !== '') {
+                $compiledSlots[] = ['slot', $this->compile($newContent)];
+            }
+
+            $newContent = '';
+        }
+
+        if ($isInclude) {
+            $seen = [];
+
+            foreach ($compiledSlots as [$name]) {
+                if (isset($seen[$name])) {
+                    throw new InvalidArgumentException("The include tag cannot define the [{$name}] slot more than once.");
+                }
+
+                $seen[$name] = true;
+            }
+        }
+
+        // The label is randomized so slot content containing the terminator cannot break out of the nowdoc.
         $set = <<<'SET'
-$$varName = <<<'COMPILED'
+$$varName = <<<'$label'
 #compiled#
-COMPILED;
+$label;
 SET;
         $unset = <<<'UNSET'
 unset($$varName);
 UNSET;
 
-        foreach ($slots as $slot) {
+        foreach ($compiledSlots as [$name, $compiled]) {
             $hoistedVarName = '__partialSlot'.Str::random(32);
-            [$name, $compiled] = $this->compileSlot($slot);
+            $hoistedLabel = 'COMPILED'.Str::random(32);
             $injectedParam = new ParameterNode();
-            $injectedParam->setName($name);
+            $paramName = $isInclude ? IncludeTag::SLOT_PARAM_PREFIX.$name : $name;
+            $injectedParam->setName($paramName);
             $injectedParam->type = ParameterType::DynamicVariable;
 
-            $injectedParam->value = 'new \Illuminate\Support\HtmlString(\Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', get_defined_vars()))';
+            $injectedParam->value = $isInclude
+                ? '\Statamic\View\Slot::forBlade($'.$hoistedVarName.', get_defined_vars())'
+                : 'new \Illuminate\Support\HtmlString(\Illuminate\Support\Facades\Blade::render($'.$hoistedVarName.', get_defined_vars()))';
 
             $hoistedSet .= Str::swap([
                 '$varName' => $hoistedVarName,
+                '$label' => $hoistedLabel,
                 '#compiled#' => $compiled,
             ], $set);
 
@@ -100,7 +183,7 @@ UNSET;
                 '$varName' => $hoistedVarName,
             ], $unset);
 
-            $params[$name] = $injectedParam;
+            $params[$paramName] = $injectedParam;
         }
 
         $compiledNode = <<<'PHP'
@@ -134,8 +217,6 @@ unset(
 ?>
 PHP;
 
-        [$name, $method, $originalMethod] = $this->extractMethodNames($component);
-
         if (! in_array(Str::snake($method), $forwardMethods)) {
             $method = $originalMethod = 'index';
         }
@@ -149,7 +230,7 @@ PHP;
                 '#set#' => $hoistedSet,
                 '#unset#' => $hoistedUnset,
                 '$tagMethod' => "'".$method."'",
-                '$tagName' => 'partial',
+                '$tagName' => $baseName,
                 '$originalMethod' => "'".$originalMethod."'",
             ]
         );

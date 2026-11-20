@@ -23,7 +23,7 @@ class Svg
         $svg = static::sanitizeStyleTags($svg);
 
         return $sanitizer->sanitize($svg, [
-            'remove-xml-tags' => ! Str::startsWith($svg, '<?xml'),
+            'remove-xml-tags' => true,
         ]);
     }
 

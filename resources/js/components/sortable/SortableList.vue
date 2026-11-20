@@ -1,15 +1,6 @@
 <script>
 import { Sortable, Plugins, Draggable } from '@shopify/draggable';
-
-function move(items, oldIndex, newIndex) {
-    const itemRemovedArray = [...items.slice(0, oldIndex), ...items.slice(oldIndex + 1, items.length)];
-
-    return [
-        ...itemRemovedArray.slice(0, newIndex),
-        items[oldIndex],
-        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length),
-    ];
-}
+import arrayMove from './arrayMove.js';
 
 export default {
     emits: ['dragstart', 'dragend', 'update:model-value'],
@@ -129,11 +120,21 @@ export default {
         setupSortableList() {
             this.sortable = new Sortable(this.$el, this.computedOptions);
 
-            this.sortable.on('drag:start', () => this.$emit('dragstart'));
+            this.sortable.on('drag:start', (event) => {
+                // Tell DragHandle a real drag began so click-to-move won't also fire.
+                const source = event.originalSource;
+                source?.querySelectorAll?.('[data-drag-handle]').forEach((handle) => {
+                    handle.dispatchEvent(new CustomEvent('statamic-drag-start'));
+                });
+                if (source?.matches?.('[data-drag-handle]')) {
+                    source.dispatchEvent(new CustomEvent('statamic-drag-start'));
+                }
+                this.$emit('dragstart');
+            });
             this.sortable.on('drag:stop', () => this.$emit('dragend'));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
-                this.$emit('update:model-value', move(this.modelValue, oldIndex, newIndex));
+                this.$emit('update:model-value', arrayMove(this.modelValue, oldIndex, newIndex));
             });
 
             if (this.mirror === false) {

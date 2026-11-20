@@ -38,6 +38,7 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $jsonVariablesSnapshot = null;
     protected static $bootedCallbacks = [];
     protected static $afterInstalledCallbacks = [];
     public static bool $isRenderingCpException = false;
@@ -246,6 +247,21 @@ class Statamic
         return new static;
     }
 
+    public static function snapshotJsonVariables()
+    {
+        // Once per process: the first request's starting state is the boot-time
+        // state, and keeping it pristine means a request that fails mid-cycle
+        // can never bake its own variables into the baseline.
+        static::$jsonVariablesSnapshot ??= static::$jsonVariables;
+    }
+
+    public static function restoreJsonVariablesSnapshot()
+    {
+        if (static::$jsonVariablesSnapshot !== null) {
+            static::$jsonVariables = static::$jsonVariablesSnapshot;
+        }
+    }
+
     public static function svg($name, $attrs = null, $fallback = null)
     {
         $dir = statamic_path('resources/svg');
@@ -365,6 +381,13 @@ class Statamic
         }
 
         static::$bootedCallbacks = [];
+
+        app()->instance('statamic.booted', true);
+    }
+
+    public static function hasBooted(): bool
+    {
+        return app()->bound('statamic.booted');
     }
 
     public static function afterInstalled(Closure $callback)
@@ -496,13 +519,22 @@ class Statamic
 
     public static function nonInertiaPageData()
     {
-        $props = Inertia::getShared();
-
         return [
             'url' => '/'.request()->path(),
             'component' => 'NonInertiaPage',
             'version' => inertia()->getVersion(),
-            'props' => $props,
+            'props' => static::resolveProps(Inertia::getShared()),
         ];
+    }
+
+    private static function resolveProps(array $props)
+    {
+        return collect($props)->map(function ($value) {
+            if (is_object($value) && is_callable($value)) {
+                $value = App::call($value);
+            }
+
+            return is_array($value) ? static::resolveProps($value) : $value;
+        })->all();
     }
 }

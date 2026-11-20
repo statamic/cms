@@ -3,7 +3,7 @@
 namespace Statamic\Marketplace;
 
 use Facades\Statamic\Marketplace\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon;
 use Statamic\Marketplace\Addon as AddonProduct;
@@ -20,10 +20,12 @@ class Marketplace
 
         return static::$packagesCache[$hash] ??= Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $packages) {
             try {
-                $response = Client::post($uri, ['packages' => $packages]);
+                if (! $response = Client::post($uri, ['packages' => $packages])) {
+                    return [0 => collect()];
+                }
 
                 return [60 => collect($response['data'])];
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
                 return [5 => collect()];
             }
         });
@@ -35,19 +37,19 @@ class Marketplace
         $hash = md5(json_encode($params));
 
         return Cache::rememberWithExpiration("marketplace-$uri-$hash", function () use ($uri, $params) {
-            $fallback = [5 => ['data' => collect(), 'meta' => null]];
+            $fallback = ['data' => collect(), 'meta' => null];
 
             try {
                 if (! $response = Client::get($uri, $params)) {
-                    return $fallback;
+                    return [0 => $fallback];
                 }
 
                 return [60 => [
                     'data' => collect($response['data']),
                     'meta' => $response['meta'] ?? null,
                 ]];
-            } catch (RequestException $e) {
-                return $fallback;
+            } catch (TransferException $e) {
+                return [5 => $fallback];
             }
         });
     }
@@ -78,10 +80,12 @@ class Marketplace
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
             try {
-                $response = Client::get($uri);
+                if (! $response = Client::get($uri)) {
+                    return [0 => collect()];
+                }
 
                 return [60 => collect($response['data'])];
-            } catch (RequestException $e) {
+            } catch (TransferException $e) {
 
                 return [5 => collect()];
             }

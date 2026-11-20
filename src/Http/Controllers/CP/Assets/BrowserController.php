@@ -10,6 +10,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\CP\Column;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -85,10 +86,13 @@ class BrowserController extends CpController
                 'blueprint_url' => cp_route('blueprints.asset-containers.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
+                'can_edit_blueprint' => User::current()->can('configure fields'),
                 'can_upload' => User::current()->can('store', [\Statamic\Contracts\Assets\Asset::class, $container]),
                 'can_create_folders' => User::current()->can('create', [\Statamic\Contracts\Assets\AssetFolder::class, $container]),
                 'sort_field' => $container->sortField(),
                 'sort_direction' => $container->sortDirection(),
+                'actions' => Action::for($container, ['view' => 'form']),
+                'actions_url' => cp_route('asset-containers.actions.run'),
             ],
             'folder' => $path,
             'columns' => $this->columns,

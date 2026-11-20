@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -26,6 +27,10 @@ class CollectionTreeController extends CpController
             'include_home' => true,
             'site' => $site,
         ]);
+
+        if ($collection->structure()->expectsRoot() && ! empty($pages)) {
+            $pages[0]['actions'] = Action::for(Entry::find($pages[0]['entry']), ['view' => 'tree']);
+        }
 
         if (User::current()->cant('view-other-authors-entries', [EntryContract::class, $collection])) {
             $entriesFromOtherAuthors = collect($pages)
@@ -84,21 +89,22 @@ class CollectionTreeController extends CpController
             return;
         }
 
+        $siblingUris = [];
+
         foreach ($tree->diff()->moved() as $id) {
             $page = $tree->find($id);
             $parent = $page->parent();
+            $isTopLevel = ! $parent || $parent->isRoot();
+            $key = $isTopLevel ? '' : $parent->id();
 
-            $siblings = (! $parent || $parent->isRoot())
-                ? $tree->pages()->all()->slice(1)
-                : $page->parent()->pages()->all();
+            // Moved pages under the same parent share siblings, so build that list once.
+            $siblingUris[$key] ??= ($isTopLevel ? $tree->pages()->all()->slice(1) : $parent->pages()->all())
+                ->mapWithKeys(fn ($sibling) => [$sibling->reference() => $sibling->uri()]);
 
-            $siblings = $siblings->reject(function ($sibling) use ($id) {
-                return $sibling->reference() === $id;
-            });
+            // The root is sliced off the top-level siblings, so it won't be in the list.
+            $uri = $siblingUris[$key][$id] ?? $page->uri();
 
-            $uris = $siblings->map->uri();
-
-            if ($uris->contains($uri = $page->uri())) {
+            if ($siblingUris[$key]->except($id)->contains($uri)) {
                 throw ValidationException::withMessages(['uri' => trans('statamic::validation.duplicate_uri', ['value' => $uri])]);
             }
         }

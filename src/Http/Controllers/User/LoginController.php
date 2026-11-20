@@ -23,9 +23,9 @@ class LoginController extends Controller
     {
         $this->handleTooManyLoginAttempts($request);
 
-        $this->checkPasskeyEnforcement($request);
-
         $user = User::fromUser($this->validateCredentials($request));
+
+        $this->checkPasskeyEnforcement($request, $user);
 
         if (TwoFactor::enabled() && $user->hasEnabledTwoFactorAuthentication()) {
             return $this->twoFactorChallengeResponse($request, $user);
@@ -47,13 +47,9 @@ class LoginController extends Controller
         return redirect()->intended(route('statamic.site'))->withSuccess(__('Login successful.'));
     }
 
-    private function checkPasskeyEnforcement(Request $request)
+    private function checkPasskeyEnforcement(Request $request, $user)
     {
         if (config('statamic.webauthn.allow_password_login_with_passkey', true)) {
-            return;
-        }
-
-        if (! $user = User::findByEmail($request->get($this->username()))) {
             return;
         }
 

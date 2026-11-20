@@ -191,19 +191,61 @@ class EntriesTest extends TestCase
         $this->assertTrue($provider->contains($e));
     }
 
-    private function makeProvider($locale, $config)
+    /**
+     * @see https://github.com/statamic/cms/issues/15542
+     */
+    #[Test]
+    public function it_can_use_a_query_scope_and_a_custom_filter()
     {
-        $index = $this->makeIndex($locale, $config);
+        CustomEntriesScope::register();
+
+        Collection::make('blog')->save();
+        $a = EntryFactory::collection('blog')->id('a')->create();
+        $b = EntryFactory::collection('blog')->id('b')->published(false)->create();
+        $c = EntryFactory::collection('blog')->id('c')->data(['is_searchable' => false])->create();
+
+        $provider = $this->makeProvider(null, [
+            'searchables' => 'content',
+            'query_scope' => 'custom_entries_scope',
+            'filter' => fn ($entry) => $entry->published(),
+        ]);
+
+        $this->assertEquals(['entry::a'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a));
+        $this->assertFalse($provider->contains($b));
+        $this->assertFalse($provider->contains($c));
+    }
+
+    #[Test]
+    public function it_includes_unpublished_entries_in_the_cp_index()
+    {
+        Collection::make('blog')->save();
+        $a = EntryFactory::collection('blog')->id('a')->create();
+        $b = EntryFactory::collection('blog')->id('b')->published(false)->create();
+
+        $provider = $this->makeProvider(null, ['searchables' => 'content'], 'cp');
+
+        $this->assertEquals(['entry::a', 'entry::b'], $provider->provide()->all());
+
+        $this->assertTrue($provider->contains($a));
+        $this->assertTrue($provider->contains($b));
+    }
+
+    private function makeProvider($locale, $config, $handle = 'default')
+    {
+        $index = $this->makeIndex($locale, $config, $handle);
 
         $keys = $this->normalizeSearchableKeys($config['searchables'] ?? null);
 
         return (new Entries)->setIndex($index)->setKeys($keys);
     }
 
-    private function makeIndex($locale, $config)
+    private function makeIndex($locale, $config, $handle)
     {
         $index = $this->mock(\Statamic\Search\Index::class);
 
+        $index->shouldReceive('handle')->andReturn($handle);
         $index->shouldReceive('config')->andReturn($config);
         $index->shouldReceive('locale')->andReturn($locale);
 

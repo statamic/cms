@@ -2,8 +2,11 @@
 
 namespace Tests\Stache;
 
+use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
@@ -71,10 +74,89 @@ class BasicStoreTest extends TestCase
     {
         $this->markTestIncomplete();
     }
+
+    #[Test]
+    public function clearing_forgets_cached_items()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        $this->store->getItem('foo');
+        $this->assertTrue(Cache::has('stache::items::test::foo'));
+
+        $this->store->clear();
+
+        $this->assertFalse(Cache::has('stache::items::test::foo'));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/10295
+     */
+    #[Test]
+    public function clearing_a_cold_store_does_not_read_any_files()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+
+        $this->store->clear();
+
+        $this->assertEquals(0, $this->store->madeItemCount);
+    }
+
+    #[Test]
+    public function it_does_not_rebuild_an_item_whose_file_was_removed_after_its_path_was_recorded()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        $this->store->paths();
+
+        // The path is recorded, but the item has not been built.
+        $this->store->forgetItem('foo');
+        $store = $this->store;
+
+        unlink($this->tempDir.'/foo.yaml');
+
+        // A file removed between the existence check and the read.
+        File::partialMock()->shouldReceive('exists')->with($this->tempDir.'/foo.yaml')->andReturnTrue();
+
+        $this->assertNull($store->getItem('foo'));
+    }
+
+    #[Test]
+    public function paths_skip_a_file_removed_after_the_traversal_stat()
+    {
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        file_put_contents($this->tempDir.'/bar.yaml', '');
+
+        Traverser::shouldReceive('filter')->andReturnSelf();
+        Traverser::shouldReceive('traverse')->andReturn(collect([
+            $this->tempDir.'/bar.yaml' => 1234567890,
+            $this->tempDir.'/gone.yaml' => 1234567891,
+            $this->tempDir.'/foo.yaml' => 1234567892,
+        ]));
+
+        $this->assertEqualsCanonicalizing(['foo', 'bar'], $this->store->paths()->keys()->all());
+    }
+
+    #[Test]
+    public function rebuilding_paths_caches_file_timestamps_for_the_watcher()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+        touch($this->tempDir.'/foo.yaml', 1234567890);
+
+        $this->store->paths();
+        $this->store->clear();
+        $this->assertFalse(Cache::has('stache::timestamps::test'));
+
+        $this->store->paths();
+
+        $this->assertEquals([$this->tempDir.'/foo.yaml' => 1234567890], Cache::get('stache::timestamps::test'));
+    }
 }
 
 class TestBasicStore extends BasicStore
 {
+    public $madeItemCount = 0;
+
     public function key()
     {
         return 'test';
@@ -82,6 +164,8 @@ class TestBasicStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
+        $this->madeItemCount++;
+
         $data = YAML::parse($contents);
         $id = Str::after($path, Path::tidy(__DIR__.'/tmp/'));
         $id = Str::before($id, '.yaml');

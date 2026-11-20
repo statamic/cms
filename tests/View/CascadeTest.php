@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\Sites\Site as SiteInstance;
@@ -28,6 +29,14 @@ class CascadeTest extends TestCase
     {
         parent::setUp();
         $this->fakeSiteConfig();
+    }
+
+    public function tearDown(): void
+    {
+        URL::enforceTrailingSlashes(false);
+        URL::clearUrlCache();
+
+        parent::tearDown();
     }
 
     private function cascade()
@@ -218,6 +227,30 @@ class CascadeTest extends TestCase
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    #[Test]
+    public function it_hydrates_request_is_homepage_when_request_is_homepage_with_enforced_trailing_slashes()
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->get('http://test.com/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertTrue($cascade['is_homepage']);
+        });
+    }
+
+    #[Test]
+    public function it_hydrates_request_is_homepage_when_request_is_not_homepage_with_enforced_trailing_slashes()
+    {
+        URL::enforceTrailingSlashes();
+
+        $this->get('http://test.com/test/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $this->assertFalse($cascade['is_homepage']);
         });
     }
 
@@ -522,6 +555,60 @@ class CascadeTest extends TestCase
             // a var that would normally be there to show the callbacks are run at the end
             $this->assertEquals('not the xml header', $cascade['xml_header']);
         });
+    }
+
+    #[Test]
+    public function a_hydrated_once_callback_only_runs_on_the_next_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $cascade->hydratedOnce(function ($cascade) {
+            $cascade->set('response_code', 404);
+        });
+
+        // The callback runs during this hydration...
+        $this->assertEquals(404, $cascade->hydrate()->toArray()['response_code']);
+
+        // ...but not on subsequent ones, so the value falls back to its default.
+        $this->assertEquals(200, $cascade->hydrate()->toArray()['response_code']);
+    }
+
+    #[Test]
+    public function hydrated_once_callbacks_do_not_accumulate_across_hydrations()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $register = function () use ($cascade, &$runs) {
+            $cascade->hydratedOnce(function () use (&$runs) {
+                $runs++;
+            });
+        };
+
+        // Simulate two error renders on the same long-lived process.
+        $register();
+        $cascade->hydrate();
+        $register();
+        $cascade->hydrate();
+
+        // Two registrations, two runs — not three (which is what accumulation would cause).
+        $this->assertEquals(2, $runs);
+    }
+
+    #[Test]
+    public function persistent_hydrated_callbacks_still_run_every_hydration()
+    {
+        $cascade = $this->cascade();
+
+        $runs = 0;
+        $cascade->hydrated(function () use (&$runs) {
+            $runs++;
+        });
+
+        $cascade->hydrate();
+        $cascade->hydrate();
+
+        $this->assertEquals(2, $runs);
     }
 
     #[Test]

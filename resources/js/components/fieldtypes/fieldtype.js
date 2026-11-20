@@ -21,6 +21,7 @@ const use = function(emit, props) {
             props.readOnly ||
             props.config.visibility === 'read_only' ||
             props.config.visibility === 'computed' ||
+            props.config.read_only === true ||
             false
         );
     });

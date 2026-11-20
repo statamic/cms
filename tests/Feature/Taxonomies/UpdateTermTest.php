@@ -2,7 +2,12 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\TermSaving;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -75,6 +80,220 @@ class UpdateTermTest extends TestCase
 
         $term = $term->fresh();
         $this->assertEquals('Updated alfa', $term->title);
+    }
+
+    #[Test]
+    public function it_replaces_placeholders_in_blueprint_validation_rules()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'alfa']))->save();
+
+        $blueprint = Blueprint::makeFromFields([
+            'slug' => ['type' => 'slug', 'validate' => 'new \\Statamic\\Rules\\UniqueTermValue({taxonomy}, {id}, {site})'],
+        ]);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect([$blueprint]));
+
+        $this
+            ->actingAs($user)
+            ->update($term, ['title' => 'Updated alfa', 'slug' => 'alfa'])
+            ->assertOk();
+
+        $term = $term->fresh();
+        $this->assertEquals('Updated alfa', $term->title);
+    }
+
+    #[Test]
+    public function default_values_are_returned_for_fields_saved_empty()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->save();
+        $this->seedBlueprintFields('tags', [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'alfa']))->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($term, ['title' => 'Updated alfa'])
+            ->assertOk();
+
+        $this->assertEquals(['Sugar', 'Salt'], collect($response->json('data.values.nutrition_table'))->pluck('name')->all());
+    }
+
+    #[Test]
+    public function localized_fields_saved_empty_stay_empty()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->save();
+        $this->seedBlueprintFields('tags', [
+            'nutrition_table' => [
+                'type' => 'grid',
+                'default' => [['name' => 'Sugar'], ['name' => 'Salt']],
+                'fields' => [['handle' => 'name', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa', 'nutrition_table' => [['name' => 'Fat']]])
+            ->dataForLocale('fr', ['title' => 'le alfa'])
+        )->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'le alfa',
+                'nutrition_table' => [],
+                '_localized' => ['title', 'nutrition_table'],
+            ])
+            ->assertOk();
+
+        $this->assertSame([], $response->json('data.values.nutrition_table'));
+    }
+
+    /**
+     * @see https://github.com/statamic/cms/issues/15951
+     */
+    #[Test]
+    #[DataProvider('unlocalizedSlugProvider')]
+    public function slug_isnt_saved_on_localization_when_it_isnt_localized($slugField, $localizationData, $localizedFields)
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields('tags', ['slug' => $slugField]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa'])
+            ->dataForLocale('fr', $localizationData)
+        )->save();
+
+        $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'Updated le alfa',
+                'slug' => 'alfa',
+                '_localized' => $localizedFields,
+            ])
+            ->assertOk();
+
+        $term = Term::find('tags::alfa');
+        $this->assertArrayNotHasKey('slug', $term->in('fr')->data()->all());
+
+        $term->in('en')->slug('bravo')->save();
+
+        $this->assertEquals('bravo', Term::find('tags::bravo')->in('fr')->slug());
+    }
+
+    public static function unlocalizedSlugProvider()
+    {
+        return [
+            'slug not localizable' => [
+                ['type' => 'slug'],
+                ['title' => 'le alfa'],
+                ['title'],
+            ],
+            'slug not localizable but previously saved on localization' => [
+                ['type' => 'slug'],
+                ['title' => 'le alfa', 'slug' => 'alfa'],
+                ['title', 'slug'],
+            ],
+            'slug localizable but not localized' => [
+                ['type' => 'slug', 'localizable' => true],
+                ['title' => 'le alfa'],
+                ['title'],
+            ],
+        ];
+    }
+
+    #[Test]
+    public function slug_is_saved_on_localization_when_it_is_localized()
+    {
+        $this->setSites([
+            'en' => ['locale' => 'en', 'url' => '/'],
+            'fr' => ['locale' => 'fr', 'url' => '/fr'],
+        ]);
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'access fr site']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+        $this->seedBlueprintFields('tags', [
+            'slug' => ['type' => 'slug', 'localizable' => true],
+        ]);
+        $term = tap(Term::make()->taxonomy('tags')->slug('alfa')
+            ->dataForLocale('en', ['title' => 'alfa'])
+            ->dataForLocale('fr', ['title' => 'le alfa'])
+        )->save();
+
+        $this
+            ->actingAs($user)
+            ->update($term->in('fr'), [
+                'title' => 'le alfa',
+                'slug' => 'le-alfa',
+                '_localized' => ['title', 'slug'],
+            ])
+            ->assertOk();
+
+        $term = Term::find('tags::alfa');
+        $this->assertEquals('alfa', $term->in('en')->slug());
+        $this->assertEquals('le-alfa', $term->in('fr')->slug());
+    }
+
+    #[Test]
+    public function meta_reflects_values_changed_while_saving()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit tags terms', 'view topics terms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('topics')->save();
+        $this->seedBlueprintFields('tags', [
+            'topics' => ['type' => 'terms', 'taxonomies' => ['topics']],
+        ]);
+        $this->seedBlueprintFields('topics', []);
+        Term::make()->taxonomy('topics')->inDefaultLocale()->slug('bravo')->data(['title' => 'Bravo'])->save();
+        $term = tap(Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alfa')->data(['title' => 'alfa']))->save();
+
+        Event::listen(TermSaving::class, function (TermSaving $event) {
+            $event->term->set('topics', ['bravo']);
+        });
+
+        $response = $this
+            ->actingAs($user)
+            ->update($term, ['title' => 'Updated alfa'])
+            ->assertOk();
+
+        $this->assertEquals(['topics::bravo'], $response->json('data.values.topics'));
+        $this->assertEquals('Bravo', $response->json('data.meta.topics.data.0.title'));
+    }
+
+    private function seedBlueprintFields($taxonomy, $fields)
+    {
+        $blueprint = Blueprint::makeFromFields($fields);
+
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('in')
+            ->with('taxonomies/'.$taxonomy)
+            ->andReturn(collect([$blueprint]));
     }
 
     private function update($term, $attrs = [])

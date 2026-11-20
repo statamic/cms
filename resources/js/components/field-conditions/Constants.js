@@ -9,7 +9,20 @@ export const KEYS = [
     'hide_when_any',
 ];
 
-export const OPERATORS = ['equals', 'not', 'contains', 'contains_any', '===', '!==', '>', '>=', '<', '<=', 'custom'];
+export const OPERATORS = [
+    'equals',
+    'not',
+    'contains',
+    'contains_any',
+    'includes_any',
+    '===',
+    '!==',
+    '>',
+    '>=',
+    '<',
+    '<=',
+    'custom',
+];
 
 export const ALIASES = {
     is: 'equals',
@@ -17,5 +30,4 @@ export const ALIASES = {
     isnt: 'not',
     '!=': 'not',
     includes: 'contains',
-    includes_any: 'contains_any',
 };

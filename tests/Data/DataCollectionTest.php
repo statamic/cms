@@ -23,6 +23,19 @@ class DataCollectionTest extends TestCase
     }
 
     #[Test]
+    public function it_sorts_naturally()
+    {
+        $collection = new DataCollection([
+            ['foo' => 'Heading 10'],
+            ['foo' => 'Heading 2'],
+            ['foo' => 'Heading 1'],
+        ]);
+
+        $this->assertEquals(['Heading 1', 'Heading 2', 'Heading 10'], $collection->multisort('foo')->pluck('foo')->all());
+        $this->assertEquals(['Heading 10', 'Heading 2', 'Heading 1'], $collection->multisort('foo:desc')->pluck('foo')->all());
+    }
+
+    #[Test]
     public function it_sorts_by_first_item_in_arrays()
     {
         $collection = new DataCollection([

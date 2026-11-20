@@ -3,10 +3,13 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Console\Commands\StaticWarmJob;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -147,6 +150,11 @@ abstract class AbstractCacher implements Cacher
         return collect($this->cache->get($key, []));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        return null;
+    }
+
     /**
      * Flush all the cached URLs.
      *
@@ -161,6 +169,17 @@ abstract class AbstractCacher implements Cacher
         $this->cache->forget($this->normalizeKey('domains'));
     }
 
+    protected function flushDedicatedStore(): void
+    {
+        if (! config()->has('cache.stores.static_cache')) {
+            return;
+        }
+
+        if ($this->cache === Cache::store('static_cache')) {
+            $this->cache->flush();
+        }
+    }
+
     /**
      * Save a URL to the cache.
      *
@@ -172,15 +191,15 @@ abstract class AbstractCacher implements Cacher
     {
         $domain = $domain ?? $this->getBaseUrl();
 
-        $this->cacheDomain($domain);
-
-        $urls = $this->getUrls($domain);
-
         $url = Str::removeLeft($url, $domain);
 
-        $urls->put($key, $url);
+        $this->withUrlsLock(function () use ($key, $url, $domain) {
+            $this->cacheDomain($domain);
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+            $urls = $this->getUrls($domain)->put($key, $url);
+
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
     }
 
     /**
@@ -191,11 +210,40 @@ abstract class AbstractCacher implements Cacher
      */
     public function forgetUrl($key, $domain = null)
     {
-        $urls = $this->getUrls($domain);
+        $this->forgetUrls([$key], $domain);
+    }
 
-        $urls->forget($key);
+    /**
+     * Forget / remove multiple URLs from the cache by their keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $domain
+     * @return void
+     */
+    public function forgetUrls($keys, $domain = null)
+    {
+        if (empty($keys)) {
+            return;
+        }
 
-        $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        $this->withUrlsLock(function () use ($keys, $domain) {
+            $urls = $this->getUrls($domain)->except($keys);
+
+            $this->cache->forever($this->getUrlsCacheKey($domain), $urls->all());
+        });
+    }
+
+    protected function withUrlsLock(callable $callback)
+    {
+        if (! ($store = $this->cache->getStore()) instanceof LockProvider) {
+            return $callback();
+        }
+
+        try {
+            return $store->lock($this->normalizeKey('urls'), 10)->block(10, $callback);
+        } catch (LockTimeoutException $e) {
+            return $callback();
+        }
     }
 
     /**
@@ -262,17 +310,38 @@ abstract class AbstractCacher implements Cacher
     {
         $this->getUrls($domain)->filter(function ($value) use ($url) {
             return $value === $url || Str::startsWith($value, $url.'?');
-        })->each(function ($url) use ($domain) {
+        })->each(function ($url, $key) use ($domain) {
+            // Warming an error response would just fail with the same error,
+            // so invalidate it and let the next request cache a fresh copy.
+            if ($this->hasCachedErrorResponse($key)) {
+                $this->invalidateUrl($url, $domain);
+
+                return;
+            }
+
             $url = ($domain ?: $this->getBaseUrl()).$url;
 
             $url = RecacheToken::addToUrl($url);
 
             $request = new GuzzleRequest('GET', $url);
 
-            StaticWarmJob::dispatch($request, [])
+            $job = config('statamic.static_caching.warm_job') ?? StaticWarmJob::class;
+
+            $job::dispatch($request, [])
                 ->onConnection(config('statamic.static_caching.warm_queue_connection') ?? config('queue.default'))
                 ->onQueue(config('statamic.static_caching.warm_queue'));
         });
+    }
+
+    /**
+     * Check if the cached response for a URL key is an error response.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function hasCachedErrorResponse($key)
+    {
+        return false;
     }
 
     /**

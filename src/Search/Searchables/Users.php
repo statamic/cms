@@ -42,8 +42,8 @@ class Users extends Provider
             return false;
         }
 
-        if ($filter = $this->filter()) {
-            return $filter($searchable);
+        if (($filter = $this->filter()) && ! $filter($searchable)) {
+            return false;
         }
 
         $query = User::query()->where('id', $searchable->id());

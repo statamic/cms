@@ -9,7 +9,7 @@ import {
     PublishSections,
     PublishTabs,
     TabProvider,
-} from '@ui';
+} from '@statamic/cms/ui';
 
 const meta = {
     title: 'Components/PublishContainer',

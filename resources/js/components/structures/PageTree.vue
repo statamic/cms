@@ -71,6 +71,10 @@
                             <template #branch-options="props">
                                 <slot name="branch-options" v-bind="{ ...props, stat }" />
                             </template>
+
+                            <template #branch-options-dropdown="props">
+                                <slot name="branch-options-dropdown" v-bind="{ ...props, stat }" />
+                            </template>
                         </tree-branch>
                     </template>
                 </Draggable>
@@ -214,6 +218,12 @@ export default {
             });
         },
 
+        refresh() {
+            return this.getPages().then(() => {
+                this.initialPages = clone(this.pages);
+            });
+        },
+
         treeUpdated() {
             this.pages = this.$refs.tree.getData();
             this.$emit('changed', this.pages);
@@ -345,6 +355,10 @@ export default {
         pageUpdated() {
             this.pages = this.$refs.tree.getData();
             this.$emit('changed', this.pages);
+        },
+
+        depthOf(page) {
+            return this.$refs.tree.getStat(page).level;
         },
 
         expandAll() {

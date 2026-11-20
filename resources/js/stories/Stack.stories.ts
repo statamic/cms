@@ -1,5 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/vue3';
-import {Button, Stack, StackClose, StackHeader, StackContent, StackFooter, Modal, ModalClose} from '@ui';
+import {Button, Stack, StackClose, StackHeader, StackContent, StackFooter, Modal, ModalClose} from '@statamic/cms/ui';
+import {ref} from 'vue';
 
 const meta = {
     title: 'Overlays/Stack',
@@ -31,26 +32,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const defaultCode = `
-<Stack>
-    <template #trigger>
-        <Button text="How neat is that?" />
-    </template>
-
-    That's pretty neat.
-</Stack>
-`;
-
 export const _DocsIntro: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: defaultCode }
-        }
-    },
     render: () => ({
         components: { Stack, Button },
-        template: defaultCode,
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="How neat is that?" />
+                </template>
+
+                That's pretty neat.
+            </Stack>
+        `,
     }),
 };
 
@@ -121,31 +115,25 @@ export const _CloseViaSlotProp: Story = {
     }),
 };
 
-const iconCode = `
-<Stack
-    v-model:open="isOpen"
-    title="That's Pretty Neat"
-    icon="fire-flame-burn-hot"
->
-    <template #trigger>
-        <Button text="How neat is that?" />
-    </template>
-</Stack>
-`;
-
 export const _WithIcon: Story = {
     tags: ['!dev'],
-    parameters: {
-        docs: {
-            source: { code: iconCode }
-        }
-    },
     render: () => ({
         components: { Stack, Button },
-        data: () => {
-            return { isOpen: false };
+        setup() {
+            const isOpen = ref(false);
+            return { isOpen };
         },
-        template: iconCode,
+        template: `
+            <Stack
+                v-model:open="isOpen"
+                title="That's Pretty Neat"
+                icon="fire-flame-burn-hot"
+            >
+                <template #trigger>
+                    <Button text="How neat is that?" />
+                </template>
+            </Stack>
+        `,
     }),
 };
 
@@ -193,26 +181,18 @@ export const BeforeClose: Story = {
 };
 
 
-const viaTriggerCode = `
-    <Stack>
-        <template #trigger>
-            <Button text="Open" />
-        </template>
-
-        I'm a stack.
-    </Stack>
-`;
 export const ViaTrigger: Story = {
-    parameters: {
-        docs: {
-            source: {
-                code: viaTriggerCode
-            }
-        }
-    },
     render: () => ({
         components: { Stack, Button },
-        template: viaTriggerCode
+        template: `
+            <Stack>
+                <template #trigger>
+                    <Button text="Open" />
+                </template>
+
+                I'm a stack.
+            </Stack>
+        `
     }),
 };
 
@@ -241,8 +221,17 @@ export const ViaProp: Story = {
     },
     render: () => ({
         components: { Stack, Button },
-        data: () => ({ isOpen: false }),
-        template: viaPropTemplate
+        setup() {
+            const isOpen = ref(false);
+            return { isOpen };
+        },
+        template: `
+            <Button text="Open" @click="isOpen = true" />
+
+            <Stack v-model:open="isOpen">
+                I'm a stack.
+            </Stack>
+        `
     }),
 };
 

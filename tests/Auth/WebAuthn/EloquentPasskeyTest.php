@@ -3,8 +3,10 @@
 namespace Tests\Auth\WebAuthn;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Date;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -155,6 +157,26 @@ class EloquentPasskeyTest extends TestCase
             'id' => Base64UrlSafe::encodeUnpadded('test-credential-id-123'),
             'name' => 'Updated Passkey Name',
         ]);
+    }
+
+    #[Test]
+    public function it_saves_a_passkey_with_a_last_login_when_the_app_uses_immutable_dates()
+    {
+        Date::use(CarbonImmutable::class);
+
+        $this->beforeApplicationDestroyed(fn () => Date::useDefault());
+
+        $user = User::make()->email('test@example.com')->set('name', 'Test User');
+        $user->save();
+
+        $passkey = (new Passkey)
+            ->setName('My Passkey')
+            ->setUser($user)
+            ->setCredential($this->createTestCredential())
+            ->setLastLogin(now());
+
+        $this->assertTrue($passkey->save());
+        $this->assertEquals('2019-11-21 23:39:29', $passkey->lastLogin()->format('Y-m-d H:i:s'));
     }
 
     #[Test]

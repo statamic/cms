@@ -3,14 +3,22 @@
 namespace Statamic\Assets;
 
 use Facades\Statamic\Imaging\ImageValidator;
+use League\Flysystem\UnableToWriteFile;
 use Statamic\Facades\Glide;
 use Statamic\Support\Svg;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class Uploader
 {
+    /**
+     * Whether the uploaded file was run through the source preset.
+     */
+    protected bool $processedSourceFile = false;
+
     public function upload(UploadedFile $file)
     {
+        $this->processedSourceFile = false;
+
         $source = $this->processSourceFile($file);
 
         $this->write($source, $path = $this->uploadPath($file));
@@ -47,10 +55,14 @@ abstract class Uploader
         ]);
 
         try {
-            return $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
+            $path = $cache.'/'.$server->makeImage($file->getFilename(), ['p' => $preset]);
         } catch (\Exception $exception) {
             return $file->getRealPath();
         }
+
+        $this->processedSourceFile = true;
+
+        return $path;
     }
 
     private function write($sourcePath, $destinationPath)
@@ -61,10 +73,15 @@ abstract class Uploader
             $stream = Svg::sanitize(stream_get_contents($stream));
         }
 
-        $this->disk()->put($this->uploadPathPrefix().$destinationPath, $stream);
+        $path = $this->uploadPathPrefix().$destinationPath;
+        $written = $this->disk()->put($path, $stream);
 
         if (is_resource($stream)) {
             fclose($stream);
+        }
+
+        if (! $written) {
+            throw UnableToWriteFile::atLocation($path, 'Make sure the directory is writable.');
         }
     }
 

@@ -1,6 +1,8 @@
 export default function cleanCodeSnippet(code) {
     // Extract template content from render functions or template tags
-    let cleaned = code;
+    // Drop the <script setup> import block Storybook adds to generated snippets.
+    // The imports are still included in the component manifests for AI agents.
+    let cleaned = code.replace(/<script\b[^>]*>[\s\S]*?<\/script>/, '');
 
     // Handle render function format
     const renderMatch = code.match(/template:\s*`([\s\S]*?)`/);
@@ -8,7 +10,7 @@ export default function cleanCodeSnippet(code) {
         cleaned = renderMatch[1];
     } else {
         // Handle simple template format
-        cleaned = code.replace(/<template>([\s\S]*?)<\/template>/, '$1');
+        cleaned = cleaned.replace(/<template>([\s\S]*?)<\/template>/, '$1');
     }
 
     // Split into lines and remove common leading whitespace

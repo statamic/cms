@@ -236,6 +236,15 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function an_entry_redirecting_to_itself_is_not_found()
+    {
+        $this->withStandardFakeErrorViews();
+        $this->createPage('about', ['with' => ['redirect' => 'entry::about']]);
+
+        $this->get('/about')->assertStatus(404);
+    }
+
+    #[Test]
     public function drafts_are_visible_if_using_live_preview()
     {
         $this->withStandardBlueprints();
@@ -696,6 +705,23 @@ class FrontendTest extends TestCase
         $this->assertEquals(404, Cascade::get('response_code'));
 
         // todo: test cascade vars are in the debugbar
+    }
+
+    #[Test]
+    public function a_404_does_not_leak_its_response_code_into_later_requests()
+    {
+        // In a long-lived process the Cascade is reused between requests. A 404 render
+        // must not poison the response_code seen by subsequent successful requests.
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', 'Page {{ response_code }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }}');
+
+        $this->createPage('about', ['with' => ['template' => 'some_template']]);
+
+        $this->get('unknown')->assertNotFound()->assertSee('Not found 404');
+
+        $this->get('/about')->assertOk()->assertSee('Page 200');
     }
 
     #[Test]

@@ -7,6 +7,8 @@ use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Field as FieldFacade;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
@@ -313,6 +315,229 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_appends_config_sections_to_linear_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_multiple_config_sections()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'max_items' => ['type' => 'integer'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    'extra_html_class' => ['type' => 'textarea'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+            [
+                'display' => 'New extra section',
+                'fields' => [
+                    ['handle' => 'extra_html_class', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals([
+            'foo' => 'textarea',
+            'max_items' => 'integer',
+            'more_options' => 'array',
+            'extra_html_class' => 'textarea',
+        ], $fieldtype->configFields()->all()->map(fn ($field) => $field->type())->all());
+    }
+
+    #[Test]
+    public function it_appends_config_sections_to_sectioned_fieldtypes()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                [
+                    'display' => 'Main',
+                    'fields' => [
+                        'foo' => ['type' => 'textarea'],
+                    ],
+                ],
+                [
+                    'display' => 'More',
+                    'fields' => [
+                        'max_items' => ['type' => 'integer'],
+                    ],
+                ],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'display' => 'Main',
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+            [
+                'display' => 'More',
+                'fields' => [
+                    ['handle' => 'max_items', 'field' => ['type' => 'integer']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function it_appends_fields_and_sections_together()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'group' => ['type' => 'text'],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    'more_options' => ['type' => 'array'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'group', 'field' => ['type' => 'text']],
+                ],
+            ],
+            [
+                'display' => 'Extra section',
+                'fields' => [
+                    ['handle' => 'more_options', 'field' => ['type' => 'array']],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+    }
+
+    #[Test]
+    public function appending_a_grid_config_field_is_not_treated_as_a_section()
+    {
+        $grid = [
+            'type' => 'grid',
+            'display' => 'Columns',
+            'fields' => [
+                ['handle' => 'label', 'field' => ['type' => 'text']],
+            ],
+        ];
+
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigFields([
+            'columns' => $grid,
+        ]);
+
+        $this->assertEquals([
+            [
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'columns', 'field' => $grid],
+                ],
+            ],
+        ], $fieldtype->configBlueprint()->contents()['tabs']['main']['sections']);
+
+        $this->assertEquals('grid', $fieldtype->configFields()->get('columns')->type());
+        $this->assertNull($fieldtype->configFields()->get('label'));
+    }
+
+    #[Test]
     public function it_wont_override_previously_appended_config_fields()
     {
         TestAppendConfigFields::appendConfigFields([
@@ -545,6 +770,69 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_only_computes_default_values_for_config_fields_missing_from_the_raw_config()
+    {
+        FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed = 0;
+
+        (new FieldtypeWithCountedDefaultValue)::register();
+
+        $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', [
+            'alfa' => 'explicitly set',
+        ]));
+
+        $this->assertEquals([
+            'alfa' => 'explicitly set',
+        ], $fieldtype->config());
+
+        $this->assertSame(0, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+
+        $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []));
+
+        $this->assertEquals([
+            'alfa' => 'default!',
+        ], $fieldtype->config());
+
+        $this->assertSame(1, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+    }
+
+    #[Test]
+    public function config_field_default_values_are_only_computed_once_per_request()
+    {
+        FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed = 0;
+
+        (new FieldtypeWithCountedDefaultValue)::register();
+
+        foreach (range(1, 3) as $i) {
+            $fieldtype = (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []));
+
+            $this->assertEquals('default!', $fieldtype->config('alfa'));
+            $this->assertEquals(['alfa' => 'default!'], $fieldtype->config());
+        }
+
+        $this->assertSame(1, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+
+        Blink::flush();
+
+        $this->assertEquals('default!', (new TestFieldtypeWithCountedConfigField)->setField(new Field('test', []))->config('alfa'));
+        $this->assertSame(2, FieldtypeWithCountedDefaultValue::$timesDefaultValueWasComputed);
+    }
+
+    #[Test]
+    public function computed_config_field_defaults_are_resolved_on_every_read()
+    {
+        $count = 0;
+        FieldFacade::computedDefault('counted', function () use (&$count) {
+            return 'computed '.++$count;
+        });
+
+        $fieldtype = (new TestFieldtypeWithComputedConfigField)->setField(new Field('test', []));
+
+        $this->assertEquals('computed 1', $fieldtype->config('alfa'));
+        $this->assertEquals('computed 2', $fieldtype->config('alfa'));
+        $this->assertEquals(['alfa' => 'computed 3'], $fieldtype->config());
+    }
+
+    #[Test]
     #[Group('graphql')]
     public function it_gets_the_graphql_type_of_string_by_default()
     {
@@ -742,6 +1030,39 @@ class TestFieldtypeWithConfigFields extends Fieldtype
             'default' => ['hotel!'],
         ],
     ];
+}
+
+class TestFieldtypeWithCountedConfigField extends Fieldtype
+{
+    protected $configFields = [
+        'alfa' => [
+            'type' => 'counted_default',
+        ],
+    ];
+}
+
+class TestFieldtypeWithComputedConfigField extends Fieldtype
+{
+    protected $configFields = [
+        'alfa' => [
+            'type' => 'text',
+            'default' => 'computed:counted',
+        ],
+    ];
+}
+
+class FieldtypeWithCountedDefaultValue extends Fieldtype
+{
+    protected static $handle = 'counted_default';
+
+    public static $timesDefaultValueWasComputed = 0;
+
+    public function defaultValue()
+    {
+        static::$timesDefaultValueWasComputed++;
+
+        return 'default!';
+    }
 }
 
 class TestMultiWordFieldtype extends Fieldtype

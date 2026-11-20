@@ -2,15 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
+use Statamic\Support\Arr;
+
 trait ExtractsFromTermFields
 {
     protected function extractFromFields($term, $blueprint)
     {
         // The values should only be data merged with the origin data.
         // We don't want injected taxonomy values, which $term->values() would have given us.
-        $values = $term->inDefaultLocale()->data()->merge(
-            $term->data()
-        );
+        $values = collect(Arr::removeNullValues($term->inDefaultLocale()->data()->all()));
+
+        if (! $term->isRoot()) {
+            $values = $values->merge($term->data());
+        }
 
         $fields = $blueprint
             ->fields()

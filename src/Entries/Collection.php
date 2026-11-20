@@ -511,6 +511,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
 
         Blink::forget('collection-handles');
         Blink::forget('mounted-collections');
+        Blink::forget("collection-structure-collection-{$this->id()}");
         Blink::flushStartingWith("collection-{$this->id()}");
 
         if ($withEvents) {
@@ -822,6 +823,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
         }
 
         Blink::forget('mounted-collections');
+        Blink::forget("collection-structure-collection-{$this->id()}");
 
         return true;
     }

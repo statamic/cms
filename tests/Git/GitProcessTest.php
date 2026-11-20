@@ -177,6 +177,14 @@ EOT;
         $this->simulateLoggableErrorOutput("remote: GitHub found 45 vulnerabilities on user/repo's default branch (1 critical, 17 high, 24 moderate, 3 low). To find out more, visit:\nremote: https://github.com/user/repo/security/dependabot");
     }
 
+    #[Test]
+    public function it_doesnt_log_github_bypassed_rule_violations_as_error_output()
+    {
+        Log::shouldReceive('error')->never();
+
+        $this->simulateLoggableErrorOutput("remote: Bypassed rule violations for refs/heads/main:\nremote:\nremote: - Changes must be made through a pull request.\nremote:\nremote: - Required status check \"test\" is expected.\nremote:");
+    }
+
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');

@@ -2,10 +2,7 @@
 
 namespace Tests\Auth\Protect;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Request as RequestFacade;
 use PHPUnit\Framework\Attributes\Test;
-use Statamic\Auth\Protect\ProtectorManager;
 
 class IpProtectorTest extends PageProtectionTestCase
 {
@@ -49,15 +46,14 @@ class IpProtectorTest extends PageProtectionTestCase
     }
 
     #[Test]
-    public function allows_when_client_ip_in_forwarded_chain()
+    public function allows_client_ip_from_behind_a_trusted_proxy()
     {
         config(['statamic.protect.schemes.ip_address' => [
             'driver' => 'ip_address',
             'allowed' => ['123.4.5.6'],
         ]]);
-        config(['trustedproxy.proxies' => '*']);
+        config(['trustedproxy.proxies' => ['10.0.0.1']]);
 
-        // Simulate request behind a load balancer (e.g. Google Cloud Platform): REMOTE_ADDR is proxy, client IP in X-Forwarded-For.
         $this
             ->withHeader('X-Forwarded-For', '123.4.5.6')
             ->requestPageProtectedBy('ip_address', ['REMOTE_ADDR' => '10.0.0.1'])
@@ -65,13 +61,13 @@ class IpProtectorTest extends PageProtectionTestCase
     }
 
     #[Test]
-    public function denies_when_no_ip_in_forwarded_chain_matches()
+    public function denies_client_ip_from_behind_a_trusted_proxy()
     {
         config(['statamic.protect.schemes.ip_address' => [
             'driver' => 'ip_address',
             'allowed' => ['123.4.5.6'],
         ]]);
-        config(['trustedproxy.proxies' => '*']);
+        config(['trustedproxy.proxies' => ['10.0.0.1']]);
 
         $this
             ->withHeader('X-Forwarded-For', '10.0.0.2')
@@ -79,32 +75,51 @@ class IpProtectorTest extends PageProtectionTestCase
             ->assertStatus(403);
     }
 
-    /**
-     * Regression test: when ip() returns the proxy and ips() contains the client (e.g. Google Cloud Platform),
-     * only the ips()-based protector allows access.
-     */
     #[Test]
-    public function allows_when_only_ips_chain_contains_allowed_ip_not_ip()
+    public function denies_an_allowed_ip_spoofed_earlier_in_the_forwarded_chain()
     {
         config(['statamic.protect.schemes.ip_address' => [
             'driver' => 'ip_address',
             'allowed' => ['123.4.5.6'],
         ]]);
+        config(['trustedproxy.proxies' => ['10.0.0.1']]);
 
-        $original = RequestFacade::getFacadeRoot();
-        $request = Request::create('/test');
-        $request = \Mockery::mock($request)->makePartial();
-        $request->shouldReceive('ip')->andReturn('10.0.0.1');
-        $request->shouldReceive('ips')->andReturn(['10.0.0.1', '123.4.5.6']);
+        // Only the entry nearest the trusted proxy is the resolved client. Anything before it
+        // was written by the client, so an allowed address placed there must not be honored.
+        $this
+            ->withHeader('X-Forwarded-For', '123.4.5.6, 203.0.113.9')
+            ->requestPageProtectedBy('ip_address', ['REMOTE_ADDR' => '10.0.0.1'])
+            ->assertStatus(403);
+    }
 
-        RequestFacade::swap($request);
+    #[Test]
+    public function allows_client_ip_when_a_load_balancer_appends_its_own_trusted_address()
+    {
+        config(['statamic.protect.schemes.ip_address' => [
+            'driver' => 'ip_address',
+            'allowed' => ['123.4.5.6'],
+        ]]);
+        config(['trustedproxy.proxies' => ['130.211.0.0/22', '34.120.0.1']]);
 
-        try {
-            $protector = $this->app->make(ProtectorManager::class)->driver('ip_address');
-            $protector->protect();
-            $this->addToAssertionCount(1);
-        } finally {
-            RequestFacade::swap($original);
-        }
+        // Google Cloud's load balancer appends its forwarding rule address to the chain.
+        $this
+            ->withHeader('X-Forwarded-For', '123.4.5.6, 34.120.0.1')
+            ->requestPageProtectedBy('ip_address', ['REMOTE_ADDR' => '130.211.0.5'])
+            ->assertOk();
+    }
+
+    #[Test]
+    public function denies_a_spoofed_chain_when_a_load_balancer_appends_its_own_trusted_address()
+    {
+        config(['statamic.protect.schemes.ip_address' => [
+            'driver' => 'ip_address',
+            'allowed' => ['123.4.5.6'],
+        ]]);
+        config(['trustedproxy.proxies' => ['130.211.0.0/22', '34.120.0.1']]);
+
+        $this
+            ->withHeader('X-Forwarded-For', '123.4.5.6, 203.0.113.9, 34.120.0.1')
+            ->requestPageProtectedBy('ip_address', ['REMOTE_ADDR' => '130.211.0.5'])
+            ->assertStatus(403);
     }
 }

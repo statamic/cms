@@ -132,6 +132,22 @@ class CollectionTreeTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_fire_a_saving_event_when_saving_quietly()
+    {
+        Event::fake();
+
+        $collection = Collection::make('test')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en');
+        $tree->saveQuietly();
+
+        Event::assertNotDispatched(CollectionTreeSaving::class);
+
+        $this->assertFileExists($tree->path());
+    }
+
+    #[Test]
     public function returning_false_in_collection_tree_saving_stops_saving()
     {
         Event::listen(CollectionTreeSaving::class, function (CollectionTreeSaving $event) {

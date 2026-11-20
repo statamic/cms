@@ -24,7 +24,7 @@ trait DeletesDirectories
             // each other. unlink() removes files and file symlinks, rmdir() removes
             // empty directories, directory symlinks and junctions without touching
             // what they point at, and anything surviving both has contents in it.
-            if (@unlink($path) || @rmdir($path)) {
+            if ($this->removePath($path)) {
                 continue;
             }
 
@@ -32,5 +32,18 @@ trait DeletesDirectories
         }
 
         @rmdir($directory);
+    }
+
+    // The failed attempt is expected, so its warning is swallowed by a handler rather than
+    // `@`. Pest reports warnings that `@` silenced, which would flood every run.
+    protected function removePath(string $path): bool
+    {
+        set_error_handler(fn () => true);
+
+        try {
+            return unlink($path) || rmdir($path);
+        } finally {
+            restore_error_handler();
+        }
     }
 }

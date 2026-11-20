@@ -41,7 +41,9 @@ function actionCompleted(successful = null, response = {}) {
 }
 
 function actionSuccess(response) {
-    if (response.message !== false) {
+    if (response.success === false) {
+        Statamic.$toast.error(response.message || __('Action failed'));
+    } else if (response.message !== false) {
         Statamic.$toast.success(response.message || __('Action completed'));
     }
     refresh();

@@ -41,7 +41,9 @@ class Entries extends Provider
                 ->map->reference();
         }
 
-        $query->whereStatus('published');
+        if ($this->index->handle() !== 'cp') {
+            $query->whereStatus('published');
+        }
 
         return $query->pluck('reference');
     }
@@ -60,13 +62,15 @@ class Entries extends Provider
             return false;
         }
 
-        if ($filter = $this->filter()) {
-            return $filter($searchable);
+        if (($filter = $this->filter()) && ! $filter($searchable)) {
+            return false;
         }
 
-        $query = Entry::query()
-            ->whereStatus('published')
-            ->where('id', $searchable->id());
+        $query = Entry::query()->where('id', $searchable->id());
+
+        if (! $filter && $this->index->handle() !== 'cp') {
+            $query->whereStatus('published');
+        }
 
         $this->applyQueryScope($query);
 

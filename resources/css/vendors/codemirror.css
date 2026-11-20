@@ -105,6 +105,10 @@
         @apply text-gray-900 dark:text-gray-300;
     }
 
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-500;
+    }
+
     .CodeMirror-gutters {
         @apply border-r-gray-300;
     }
@@ -512,6 +516,10 @@ span.CodeMirror-selectedtext {
         color: #eeffff;
     }
 
+    &.CodeMirror pre.CodeMirror-placeholder {
+        @apply text-gray-400/85;
+    }
+
     .CodeMirror-gutters {
         background: #263238;
         @apply dark:bg-gray-900;
@@ -636,4 +644,10 @@ span.CodeMirror-selectedtext {
         text-decoration: underline;
         color: white !important;
     }
+}
+
+/* Fields configured as read only: let the editor's grey surface show through.
+   Kept last so it beats the theme backgrounds above. */
+[data-ui-field-read-only] .CodeMirror {
+    background: transparent;
 }

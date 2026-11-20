@@ -17,9 +17,9 @@ class SvgController extends Controller
     {
         $asset = $this->asset($asset);
 
-        abort_if(! $contents = $asset->disk()->get($asset->path()), 500);
-
         $this->authorize('view', $asset);
+
+        abort_if(! $contents = $asset->disk()->get($asset->path()), 500);
 
         return response($contents)
             ->header('Content-Type', 'image/svg+xml')

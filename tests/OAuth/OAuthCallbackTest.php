@@ -328,6 +328,49 @@ class OAuthCallbackTest extends TestCase
         return $user;
     }
 
+    #[Test]
+    public function a_new_user_is_not_created_when_pro_is_disabled()
+    {
+        config(['statamic.editions.pro' => false]);
+
+        $this->fakeProvider('test', [], 'sub-1', 'new@example.com');
+
+        $this->hitCallback('test');
+
+        $this->assertGuest();
+        $this->assertCount(0, UserFacade::all());
+        $this->assertNull($this->provider('test')->getUserId('sub-1'));
+    }
+
+    #[Test]
+    public function an_existing_user_can_still_log_in_when_pro_is_disabled()
+    {
+        $user = UserFacade::make()->id('user-1')->email('existing@example.com')->save();
+        $this->provider('test')->setUserProviderId($user, 'sub-1');
+
+        config(['statamic.editions.pro' => false]);
+
+        $this->fakeProvider('test', [], 'sub-1', 'existing@example.com');
+
+        $this->hitCallback('test');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertCount(1, UserFacade::all());
+    }
+
+    #[Test]
+    public function a_new_user_is_created_when_pro_is_enabled()
+    {
+        config(['statamic.editions.pro' => true]);
+
+        $this->fakeProvider('test', [], 'sub-1', 'new@example.com');
+
+        $this->hitCallback('test');
+
+        $this->assertCount(1, UserFacade::all());
+        $this->assertAuthenticatedAs(UserFacade::findByEmail('new@example.com'));
+    }
+
     private function hitCallback(string $provider)
     {
         return $this

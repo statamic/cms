@@ -2,9 +2,13 @@
 
 namespace Tests\Feature\Users;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
+use Tests\Auth\UnsafeEmailPayloads;
 use Tests\ElevatesSessions;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -16,6 +20,7 @@ class UpdateUserTest extends TestCase
     use ElevatesSessions;
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+    use UnsafeEmailPayloads;
 
     #[Test]
     public function it_saves_a_user()
@@ -37,6 +42,34 @@ class UpdateUserTest extends TestCase
     }
 
     #[Test]
+    public function meta_matches_the_values_returned_after_saving()
+    {
+        $blueprint = Blueprint::makeFromFields([
+            'sources' => [
+                'type' => 'grid',
+                'min_rows' => 1,
+                'fields' => [['handle' => 'label', 'field' => ['type' => 'text']]],
+            ],
+        ]);
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+
+        $response = $this
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), ['email' => 'test@domain.com'])
+            ->assertOk();
+
+        $this->assertEquals(
+            collect($response->json('data.values.sources'))->pluck('_id')->all(),
+            array_keys($response->json('data.meta.sources.existing'))
+        );
+    }
+
+    #[Test]
     public function it_requires_an_elevated_session()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit users']]);
@@ -53,6 +86,24 @@ class UpdateUserTest extends TestCase
 
         $this->assertEquals('test@domain.com', User::find($user->id())->email());
         $this->assertEquals('Johh Smith', User::find($user->id())->name);
+    }
+
+    #[Test]
+    #[DataProvider('unsafeEmailProvider')]
+    public function it_rejects_emails_that_are_unsafe_as_file_paths($email)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit users']]);
+        $user = tap(User::make()->email('test@domain.com'))->save();
+        $me = tap(User::make()->email('admin@domain.com')->assignRole('test'))->save();
+        $before = $this->filesystemSnapshot();
+
+        $this
+            ->actingAsWithElevatedSession($me)
+            ->patchJson($user->updateUrl(), ['email' => $email])
+            ->assertJsonValidationErrors('email');
+
+        $this->assertSame($before, $this->filesystemSnapshot());
+        $this->assertEquals('test@domain.com', User::find($user->id())->email());
     }
 
     #[Test]

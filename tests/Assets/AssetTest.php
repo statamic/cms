@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToWriteFile;
+use League\Glide\Server;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -611,7 +613,7 @@ class AssetTest extends TestCase
     #[Test]
     public function it_checks_if_its_a_video_file()
     {
-        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm'];
+        $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm', 'mov', 'mpeg', 'mpg', 'mkv'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isVideo());
@@ -1933,6 +1935,34 @@ class AssetTest extends TestCase
         Event::assertNotDispatched(AssetCreated::class);
     }
 
+    #[Test]
+    public function it_throws_an_exception_when_the_uploaded_file_cannot_be_written_to_the_disk()
+    {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
+        Event::fake([AssetSaved::class, AssetUploaded::class, AssetCreated::class]);
+
+        $asset = (new Asset)->container($this->container)->path('asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        chmod($root = Storage::disk('test')->path(''), 0555);
+
+        try {
+            $asset->upload(UploadedFile::fake()->image('asset.jpg', 13, 15));
+
+            $this->fail('An exception should have been thrown.');
+        } catch (UnableToWriteFile $e) {
+            $this->assertStringContainsString('asset.jpg', $e->getMessage());
+        } finally {
+            chmod($root, 0755);
+        }
+
+        Event::assertNotDispatched(AssetSaved::class);
+        Event::assertNotDispatched(AssetUploaded::class);
+        Event::assertNotDispatched(AssetCreated::class);
+    }
+
     private function uploadFileTest()
     {
         Event::fake();
@@ -2089,6 +2119,66 @@ class AssetTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_original_extension_when_uploading_a_gif_into_a_container_with_new_extension_format()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
+            'fm' => 'png',
+        ]]);
+
+        $this->container->sourcePreset('enforce_png');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.gif')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        // GIFs aren't run through the source preset, so they keep their format.
+        Facades\Glide::partialMock()->shouldReceive('server')->never();
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.gif', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertMissing('path/to/asset.png');
+        Storage::disk('test')->assertExists('path/to/asset.gif');
+        $this->assertEquals('path/to/asset.gif', $asset->path());
+    }
+
+    #[Test]
+    public function it_keeps_the_original_extension_when_the_source_preset_fails_to_process_the_upload()
+    {
+        Event::fake();
+
+        config(['statamic.assets.image_manipulation.presets.enforce_png' => [
+            'fm' => 'png',
+        ]]);
+
+        $this->container->sourcePreset('enforce_png');
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        ImageValidator::partialMock()
+            ->shouldReceive('isValidImage')
+            ->with('jpg', 'image/jpeg')
+            ->andReturnTrue()
+            ->once();
+
+        // The original file is stored when the source preset can't be applied, so it keeps its format.
+        $server = Mockery::mock(Server::class);
+        $server->shouldReceive('makeImage')->andThrow(new \Exception('Unable to encode the image.'));
+        Facades\Glide::partialMock()->shouldReceive('server')->andReturn($server);
+
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg', 20, 30));
+
+        $this->assertEquals($asset, $return);
+        Storage::disk('test')->assertMissing('path/to/asset.png');
+        Storage::disk('test')->assertExists('path/to/asset.jpg');
+        $this->assertEquals('path/to/asset.jpg', $asset->path());
+    }
+
+    #[Test]
     public function it_sanitizes_svgs_on_upload()
     {
         Event::fake();
@@ -2173,6 +2263,53 @@ class AssetTest extends TestCase
             'mixed case' => ['Svg'],
             'trailing whitespace' => ['svg '],
             'uppercase with trailing whitespace' => ['SVG '],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('xmlStylesheetSvgProvider')]
+    public function it_removes_xml_stylesheet_instructions_from_svgs_on_upload($svg)
+    {
+        Event::fake();
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', $svg));
+
+        $this->assertStringNotContainsString('xml-stylesheet', $asset->contents());
+    }
+
+    #[Test]
+    #[DataProvider('xmlStylesheetSvgProvider')]
+    public function it_removes_xml_stylesheet_instructions_from_svgs_on_reupload($svg)
+    {
+        Event::fake();
+
+        $asset = (new Asset)->container($this->container)->path('path/to/asset.svg')->syncOriginal();
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $asset->upload(UploadedFile::fake()->createWithContent('asset.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>'));
+
+        Storage::fake('local')->put('path/to/replacement.svg', $svg);
+
+        $asset->reupload(new ReplacementFile('path/to/replacement.svg'));
+
+        $this->assertStringNotContainsString('xml-stylesheet', $asset->contents());
+    }
+
+    public static function xmlStylesheetSvgProvider()
+    {
+        // A processing instruction telling the browser to apply an inline xslt
+        // stylesheet, which would replace the image with arbitrary html.
+        $instruction = '<?xml-stylesheet type="text/xsl" href="data:text/xml;base64,PHhzbDpzdHlsZXNoZWV0Lz4="?>';
+
+        return [
+            'on its own' => [$instruction.'<svg xmlns="http://www.w3.org/2000/svg"/>'],
+            'after a declaration' => ['<?xml version="1.0"?>'.$instruction.'<svg xmlns="http://www.w3.org/2000/svg"/>'],
+            'on separate lines' => ['<?xml version="1.0"?>'."\n".$instruction."\n".'<svg xmlns="http://www.w3.org/2000/svg"/>'],
         ];
     }
 

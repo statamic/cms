@@ -2,11 +2,30 @@
 
 namespace Statamic\StaticCaching;
 
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Illuminate\Support\Str;
+use Statamic\Events\CollectionDeleted;
+use Statamic\Events\CollectionSaved;
+use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeSaved;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntrySaved;
+use Statamic\Events\EntryScheduleReached;
+use Statamic\Events\LocalizedTermDeleted;
+use Statamic\Events\LocalizedTermSaved;
+use Statamic\Events\SiteDeleted;
+use Statamic\Events\SiteSaved;
+use Statamic\Events\StacheCleared;
+use Statamic\Events\StaticCacheCleared;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermSaved;
+use Statamic\Events\UrlInvalidated;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Site;
 use Statamic\StaticCaching\NoCache\DatabaseSession;
@@ -79,6 +98,27 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
+        Event::listen([
+            EntrySaved::class,
+            EntryDeleted::class,
+            EntryScheduleReached::class,
+            CollectionSaved::class,
+            CollectionDeleted::class,
+            CollectionTreeSaved::class,
+            CollectionTreeDeleted::class,
+            TaxonomySaved::class,
+            TaxonomyDeleted::class,
+            TermSaved::class,
+            TermDeleted::class,
+            LocalizedTermSaved::class,
+            LocalizedTermDeleted::class,
+            SiteSaved::class,
+            SiteDeleted::class,
+            StacheCleared::class,
+        ], [WarmableUrls::class, 'clearCache']);
+
+        Event::listen([UrlInvalidated::class, StaticCacheCleared::class], [CachedPages::class, 'clearCache']);
+
         if (config('statamic.static_caching.strategy')) {
             Event::subscribe(Invalidate::class);
         }
@@ -86,8 +126,13 @@ class ServiceProvider extends LaravelServiceProvider
         // When the cascade gets hydrated, insert it into the
         // nocache session so it can filter out contextual data.
         Cascade::hydrated(function ($cascade) {
-            app(Session::class)->setCascade($cascade->toArray());
+            app(Session::class)->setCascade(array_merge(view()->getShared(), $cascade->toArray()));
         });
+
+        VerifyCsrfToken::except([
+            config('statamic.routes.action').'/nocache',
+            config('statamic.routes.action').'/csrf',
+        ]);
 
         Blade::directive('nocache', function ($exp) {
             return '<?php echo app("Statamic\StaticCaching\NoCache\BladeDirective")->handle('.$exp.', \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\'])); ?>';

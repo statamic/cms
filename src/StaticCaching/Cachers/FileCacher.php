@@ -2,6 +2,7 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Closure;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -112,6 +113,14 @@ class FileCacher extends AbstractCacher
         return File::exists($this->getFilePath($url));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $site = Site::findByUrl($url)?->handle();
+        $timestamp = @File::lastModified($this->getFilePath($url, $site));
+
+        return $timestamp === false ? null : $timestamp;
+    }
+
     /**
      * Flush out the entire static cache.
      *
@@ -124,6 +133,8 @@ class FileCacher extends AbstractCacher
         }
 
         $this->flushUrls();
+
+        $this->flushDedicatedStore();
     }
 
     /**
@@ -144,8 +155,10 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $filePath = $this->getFilePath($domain.$url, $site);
+
         $this->getFiles($site)
-            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->filter(fn ($file, $path) => $path === $filePath || str_starts_with($file, $url.'_'))
             ->each(function ($file, $path) {
                 $this->writer->delete($path);
             });
@@ -279,7 +292,12 @@ class FileCacher extends AbstractCacher
             window.livewireScriptConfig.csrf = data.csrf;
         } else {
             // Delays replacing the token until Livewire is initialized. Usually on slow networks.
-            document.addEventListener('livewire:init', () => window.livewireScriptConfig.csrf = data.csrf);
+            // Only applies when Livewire is bundled manually, as livewireScriptConfig doesn't exist otherwise.
+            document.addEventListener('livewire:init', () => {
+                if (window.livewireScriptConfig) {
+                    window.livewireScriptConfig.csrf = data.csrf;
+                }
+            });
         }
 
         document.dispatchEvent(new CustomEvent('statamic:csrf.replaced', { detail: data }));
@@ -344,6 +362,23 @@ EOT;
 EOT;
 
         return $this->nocacheJs ?? $default;
+    }
+
+    public function getCsrfScript(): string
+    {
+        return $this->script('statamic.csrf.js', fn () => $this->getCsrfTokenJs());
+    }
+
+    public function getNocacheScript(): string
+    {
+        return $this->script('statamic.nocache.js', fn () => $this->getNocacheJs());
+    }
+
+    private function script(string $route, Closure $js): string
+    {
+        return config('statamic.static_caching.script_delivery') === 'external'
+            ? '<script src="'.URL::makeRelative(route($route)).'"></script>'
+            : '<script>'.$js().'</script>';
     }
 
     public function shouldOutputJs(): bool

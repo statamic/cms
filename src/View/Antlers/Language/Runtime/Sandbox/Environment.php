@@ -978,7 +978,7 @@ class Environment
             if ($operand instanceof LeftAssignmentOperator) {
                 $varName = $this->nameOf($left);
 
-                $right = $this->checkForFieldValue($this->getValue($rightNode));
+                $right = $this->checkForFieldValue($this->getAssignedValue($rightNode));
 
                 $this->dataRetriever->setRuntimeValue($varName, $this->data, $right);
                 $lastPath = $this->dataRetriever->lastPath();
@@ -1175,6 +1175,15 @@ class Environment
         }
 
         return $stack;
+    }
+
+    private function getAssignedValue($node)
+    {
+        if ($node instanceof VariableNode && $node->isInterpolationReference && ! $node->hasModifiers()) {
+            return $this->nodeProcessor->reduceAssignedInterpolatedVariable($node);
+        }
+
+        return $this->getValue($node);
     }
 
     /**

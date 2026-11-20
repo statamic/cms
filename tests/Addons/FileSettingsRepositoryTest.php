@@ -61,6 +61,28 @@ YAML);
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->all());
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15494
+     */
+    #[Test]
+    public function it_gets_addon_settings_when_the_slug_differs_from_the_package_name()
+    {
+        $addon = $this->makeFromPackage(['slug' => 'custom-slug']);
+
+        Facades\Addon::shouldReceive('get')->with('vendor/test-addon')->andReturn($addon);
+
+        File::put(resource_path('addons/custom-slug.yaml'), <<<'YAML'
+foo: bar
+baz: qux
+YAML);
+
+        $settings = $this->repository->find($addon->id());
+
+        $this->assertInstanceOf(FileSettings::class, $settings);
+        $this->assertEquals($addon, $settings->addon());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $settings->all());
+    }
+
     #[Test]
     public function it_saves_addon_settings()
     {

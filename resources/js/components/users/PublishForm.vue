@@ -50,7 +50,7 @@
                 prioritize
                 v-slot="{ text, action }"
             >
-                <Button variant="primary" @click.prevent="action" :text="text" />
+                <Button variant="primary" @click.prevent="action" :text="text" v-tooltip="saveAndCloseTooltip" />
             </CommandPaletteItem>
 
             <slot name="action-buttons-right" />
@@ -77,6 +77,7 @@ import HasActions from '../publish/HasActions';
 import TwoFactor from '@/components/two-factor/TwoFactor.vue';
 import clone from '@/util/clone.js';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import resetMetaFromResponse from '@/util/resetMetaFromResponse.js';
 import {
     Button,
     Dropdown,
@@ -89,6 +90,7 @@ import {
     CommandPaletteItem
 } from '@/components/ui';
 import ItemActions from '@/components/actions/ItemActions.vue';
+import shortcutLabel from '@/util/shortcutLabel.js';
 import { computed, ref } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 
@@ -124,6 +126,7 @@ export default {
         oauthEnabled: Boolean,
         requiresCurrentPassword: Boolean,
         twoFactor: Object,
+        isInline: Boolean,
     },
 
     data() {
@@ -133,6 +136,9 @@ export default {
             meta: clone(this.initialMeta),
             error: null,
             title: this.initialTitle,
+            saveKeyBinding: null,
+            saveAndCloseKeyBinding: null,
+            closeAfterSave: false,
         };
     },
 
@@ -151,8 +157,13 @@ export default {
             return computed(() => this.$refs.container);
         },
 
-        saving() {
-            return this.savingRef.value;
+        saving: {
+            get() {
+                return this.savingRef.value;
+            },
+            set(value) {
+                this.savingRef.value = value;
+            },
         },
 
         errors() {
@@ -162,9 +173,23 @@ export default {
         isDirty() {
             return this.$dirty.has(this.publishContainer);
         },
+
+        saveAndCloseTooltip() {
+            if (!this.isInline) return null;
+
+            return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
     },
 
     methods: {
+        emitSaved(response) {
+            this.$nextTick(() => {
+                this.$emit('saved', response);
+                if (this.closeAfterSave) this.$emit('close');
+                this.closeAfterSave = false;
+            });
+        },
+
         save() {
             new Pipeline()
                 .provide({
@@ -186,9 +211,11 @@ export default {
 
                     this.title = response.data.title;
 
-                    this.$nextTick(() => this.$emit('saved', response));
+                    this.emitSaved(response);
                 })
                 .catch((e) => {
+                    this.closeAfterSave = false;
+
                     if (!(e instanceof PipelineStopped)) {
                         this.$toast.error(__('Something went wrong'));
                         console.error(e);
@@ -200,6 +227,7 @@ export default {
             if (response.data) {
                 this.title = response.data.title;
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
+                this.meta = resetMetaFromResponse(response.data.meta, this.$refs.container);
             }
         },
 
@@ -221,12 +249,26 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], (e) => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s'], (e) => {
             e.preventDefault();
             this.save();
         });
 
+        if (this.isInline) {
+            this.saveAndCloseKeyBinding = this.$keys.bindGlobal(['mod+shift+s'], (e) => {
+                e.preventDefault();
+                if (this.saving) return;
+                this.closeAfterSave = true;
+                this.save();
+            });
+        }
+
         this.addToCommandPalette();
+    },
+
+    beforeUnmount() {
+        this.saveKeyBinding.destroy();
+        this.saveAndCloseKeyBinding?.destroy();
     },
 };
 </script>

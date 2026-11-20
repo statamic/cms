@@ -2,10 +2,14 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
+use DateTime;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -311,6 +315,27 @@ class EloquentUserTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_last_login_when_the_app_uses_immutable_dates()
+    {
+        Date::use(CarbonImmutable::class);
+
+        // The Control Panel's Localize middleware changes the format too.
+        Date::setToStringFormat(DateTime::ATOM);
+
+        $this->beforeApplicationDestroyed(function () {
+            Date::useDefault();
+            Date::resetToStringFormat();
+        });
+
+        $user = $this->makeUser();
+        $user->model()->mergeCasts(['last_login' => 'datetime']);
+        $user->setLastLogin(now());
+
+        $this->assertInstanceOf(CarbonInterface::class, $user->lastLogin());
+        $this->assertEquals('2019-11-21 23:39:29', $user->lastLogin()->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
     public function it_gets_super_correctly_on_the_model()
     {
         $user = $this->makeUser();
@@ -352,6 +377,32 @@ class EloquentUserTest extends TestCase
 
         $this->assertArrayNotHasKey('null_field', $attributes);
         $this->assertFalse($attributes['not_null_field']);
+    }
+
+    #[Test]
+    public function it_clears_an_existing_database_column_when_set_to_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->set('avatar', null)->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
+    }
+
+    #[Test]
+    public function it_clears_an_existing_database_column_when_merged_with_null()
+    {
+        $user = $this->makeUser();
+        $user->set('avatar', 'hendrix.jpg')->save();
+
+        $this->assertSame('hendrix.jpg', Facades\User::find($user->id())->get('avatar'));
+
+        $user->merge(['avatar' => null])->save();
+
+        $this->assertNull(Facades\User::find($user->id())->get('avatar'));
     }
 
     #[Test]

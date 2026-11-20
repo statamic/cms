@@ -37,6 +37,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', true);
 
+        $this->assertEndpointSuccessful('/api/collections');
+        $this->assertEndpointSuccessful('/api/collections/pages');
+        $this->assertEndpointSuccessful('/api/collections/articles');
         $this->assertEndpointSuccessful('/api/collections/pages/tree');
         $this->assertEndpointSuccessful('/api/collections/pages/entries');
         $this->assertEndpointSuccessful('/api/collections/articles/entries');
@@ -55,6 +58,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', false);
 
+        $this->assertEndpointNotFound('/api/collections');
+        $this->assertEndpointNotFound('/api/collections/pages');
         $this->assertEndpointNotFound('/api/collections/pages/tree');
         $this->assertEndpointNotFound('/api/collections/pages/entries');
         $this->assertEndpointNotFound('/api/collections/articles/entries');
@@ -118,6 +123,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.collections', ['pages']);
 
+        $this->assertEndpointSuccessful('/api/collections');
+        $this->assertEndpointSuccessful('/api/collections/pages');
+        $this->assertEndpointNotFound('/api/collections/articles');
         $this->assertEndpointSuccessful('/api/collections/pages/tree');
         $this->assertEndpointSuccessful('/api/collections/pages/entries');
         $this->assertEndpointNotFound('/api/collections/articles/entries');
@@ -134,6 +142,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', true);
 
+        $this->assertEndpointSuccessful('/api/navs');
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointSuccessful('/api/navs/docs');
         $this->assertEndpointSuccessful('/api/navs/footer/tree');
         $this->assertEndpointSuccessful('/api/navs/docs/tree');
     }
@@ -146,6 +157,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', false);
 
+        $this->assertEndpointNotFound('/api/navs');
+        $this->assertEndpointNotFound('/api/navs/footer');
         $this->assertEndpointNotFound('/api/navs/footer/tree');
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }
@@ -158,6 +171,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.navs', ['footer']);
 
+        $this->assertEndpointSuccessful('/api/navs');
+        $this->assertEndpointSuccessful('/api/navs/footer');
+        $this->assertEndpointNotFound('/api/navs/docs');
         $this->assertEndpointSuccessful('/api/navs/footer/tree');
         $this->assertEndpointNotFound('/api/navs/docs/tree');
     }
@@ -172,6 +188,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', true);
 
+        $this->assertEndpointSuccessful('/api/taxonomies');
+        $this->assertEndpointSuccessful('/api/taxonomies/topics');
+        $this->assertEndpointSuccessful('/api/taxonomies/colours');
         $this->assertEndpointSuccessful('/api/taxonomies/topics/terms');
         $this->assertEndpointSuccessful('/api/taxonomies/colours/terms');
 
@@ -189,6 +208,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', false);
 
+        $this->assertEndpointNotFound('/api/taxonomies');
+        $this->assertEndpointNotFound('/api/taxonomies/topics');
         $this->assertEndpointNotFound('/api/taxonomies/topics/terms');
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms');
 
@@ -206,6 +227,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.taxonomies', ['topics']);
 
+        $this->assertEndpointSuccessful('/api/taxonomies');
+        $this->assertEndpointSuccessful('/api/taxonomies/topics');
+        $this->assertEndpointNotFound('/api/taxonomies/colours');
         $this->assertEndpointSuccessful('/api/taxonomies/topics/terms');
         $this->assertEndpointNotFound('/api/taxonomies/colours/terms');
 
@@ -265,6 +289,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', true);
 
+        $this->assertEndpointSuccessful('/api/asset-containers');
+        $this->assertEndpointSuccessful('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
         $this->assertEndpointSuccessful('/api/assets/main');
         $this->assertEndpointSuccessful('/api/assets/avatars');
 
@@ -280,6 +307,8 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', false);
 
+        $this->assertEndpointNotFound('/api/asset-containers');
+        $this->assertEndpointNotFound('/api/asset-containers/main');
         $this->assertEndpointNotFound('/api/assets/main');
         $this->assertEndpointNotFound('/api/assets/avatars');
 
@@ -295,6 +324,9 @@ class ConfigTest extends TestCase
 
         Facades\Config::set('statamic.api.resources.assets', ['avatars']);
 
+        $this->assertEndpointSuccessful('/api/asset-containers');
+        $this->assertEndpointNotFound('/api/asset-containers/main');
+        $this->assertEndpointSuccessful('/api/asset-containers/avatars');
         $this->assertEndpointNotFound('/api/assets/main');
         $this->assertEndpointSuccessful('/api/assets/avatars');
 
@@ -344,6 +376,23 @@ class ConfigTest extends TestCase
 
         $this->assertEndpointNotFound('/api/forms/contact');
         $this->assertEndpointSuccessful('/api/forms/survey');
+    }
+
+    #[Test]
+    public function config_can_enable_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', true);
+
+        $this->assertEndpointSuccessful('/api/sites');
+        $this->assertEndpointDataCount('/api/sites', 1);
+    }
+
+    #[Test]
+    public function config_can_disable_sites()
+    {
+        Facades\Config::set('statamic.api.resources.sites', false);
+
+        $this->assertEndpointNotFound('/api/sites');
     }
 
     #[Test]

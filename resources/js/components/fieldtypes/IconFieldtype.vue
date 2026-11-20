@@ -7,7 +7,8 @@ import { Button, Combobox, Icon, Input, Modal } from '@/components/ui';
 
 const emit = defineEmits(Fieldtype.emits);
 const props = defineProps(Fieldtype.props);
-const { isReadOnly, update } = Fieldtype.use(emit, props);
+const { isReadOnly, update, expose } = Fieldtype.use(emit, props);
+defineExpose(expose);
 
 const icons = ref([]);
 const loading = ref(true);
@@ -101,8 +102,13 @@ request();
 </script>
 
 <template>
+    <div v-if="loading" class="flex h-10 items-center gap-2 text-sm text-gray-500">
+        <Icon name="loading" class="size-4" />
+        {{ __('Loading') }}
+    </div>
+
     <Combobox
-        v-if="!loading && !isCompact"
+        v-else-if="!isCompact"
         clearable
         :disabled="config.disabled"
         :model-value="value"
@@ -135,7 +141,7 @@ request();
         </template>
     </Combobox>
 
-    <div v-else-if="!loading" class="flex items-center">
+    <div v-else class="flex items-center">
         <Button
             icon-only
             size="base"

@@ -28,13 +28,16 @@ const hasVisibleHeader = computed(() => {
                 scope="col"
             >
                 <ToggleAll v-if="allowsSelections && allowsMultipleSelections" />
+                <span v-else class="sr-only">{{ reorderable ? __('Reorder') : __('Select') }}</span>
             </th>
             <HeaderCell v-for="column in visibleColumns" :key="column.field" :column :data-column="column.field" />
             <!-- <th class="type-column" v-if="type">
                 <template v-if="type === 'entries'">{{ __('Collection') }}</template>
                 <template v-if="type === 'terms'">{{ __('Taxonomy') }}</template>
             </th> -->
-            <th scope="col" class="actions-column" v-if="hasActions" />
+            <th scope="col" class="actions-column" v-if="hasActions">
+                <span class="sr-only">{{ __('Actions') }}</span>
+            </th>
         </tr>
     </thead>
 

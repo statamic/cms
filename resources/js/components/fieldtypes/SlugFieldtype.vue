@@ -112,6 +112,13 @@ export default {
 
     mounted() {
         if (this.config.required && !this.value) this.update(this.$refs.slugify.slug);
+
+        // Lets the publish form know whether the user has taken ownership of the slug.
+        this.$watch(
+            () => this.$refs.slugify.shouldSlugify,
+            (auto) => this.updateMeta({ ...this.meta, auto }),
+            { immediate: true },
+        );
     },
 
     methods: {

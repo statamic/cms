@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
@@ -91,6 +92,19 @@ class TermsTest extends TestCase
 
         $this->assertInstanceOf(LocalizedTerm::class, $augmented);
         $this->assertEquals('tags::one', $augmented->id());
+    }
+
+    #[Test]
+    public function it_augments_to_the_term_of_the_configured_term_when_the_slug_exists_in_multiple_taxonomies()
+    {
+        Term::make('shared')->taxonomy('tags')->dataForLocale('en', ['title' => 'Shared Tag'])->save();
+        Term::make('shared')->taxonomy('categories')->dataForLocale('en', ['title' => 'Shared Category'])->save();
+
+        $tag = $this->fieldtype(['taxonomies' => 'tags', 'max_items' => 1])->augment('shared');
+        $category = $this->fieldtype(['taxonomies' => 'categories', 'max_items' => 1])->augment('shared');
+
+        $this->assertEquals('tags::shared', $tag->id());
+        $this->assertEquals('categories::shared', $category->id());
     }
 
     #[Test]
@@ -375,6 +389,35 @@ class TermsTest extends TestCase
         } else {
             $this->assertNull($collection);
         }
+    }
+
+    #[Test]
+    public function it_attaches_collection_during_augmentation_even_when_no_saved_entry_uses_the_term()
+    {
+        // e.g. Live Preview after selecting a term that hasn't been used by a saved entry yet.
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        $fieldtype = $this->fieldtype(['taxonomies' => 'tags'], $parent, 'tags');
+
+        $augmented = $fieldtype->augment(['one', 'two']);
+
+        $this->assertEquals(['one', 'two'], $augmented->get()->map->slug()->all());
+        $this->assertEquals('blog', $augmented->get()->first()->collection()->handle());
+    }
+
+    #[Test]
+    public function it_falls_back_to_a_collection_where_clause_when_the_query_builder_does_not_support_collection_context()
+    {
+        $parent = EntryFactory::id('parent')->collection('blog')->slug('theparent')->locale('fr')->create();
+
+        $builder = Mockery::mock(Builder::class);
+        $builder->shouldReceive('whereIn')->with('id', ['tags::one'])->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('site', 'fr')->once()->andReturnSelf();
+        $builder->shouldReceive('where')->with('collection', 'blog')->once()->andReturnSelf();
+
+        Term::partialMock()->shouldReceive('query')->andReturn($builder);
+
+        $this->fieldtype(['taxonomies' => 'tags'], $parent, 'tags')->augment(['one']);
     }
 
     public static function collectionAttachmentProvider()

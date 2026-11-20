@@ -20,10 +20,19 @@ class TaxonomyTermsStore extends ChildStore
     protected $valueIndex = Value::class;
     protected $storeIndexes = [
         'slug',
-        'taxonomy',
         'associations' => Indexes\Terms\Associations::class,
-        'site' => Indexes\Terms\Site::class,
+        'site',
     ];
+
+    public function indexes($withUsages = true)
+    {
+        $indexes = parent::indexes($withUsages);
+
+        // The other indexes read the associations, and would build them if they aren't
+        // cached yet. Updating the associations first means they're only built once
+        // when the store is warmed, rather than by the first index and again on update.
+        return $indexes->only('associations')->merge($indexes->except('associations'));
+    }
 
     public function getItemFilter(SplFileInfo $file)
     {
@@ -73,19 +82,40 @@ class TaxonomyTermsStore extends ChildStore
         $this->handleFileChanges();
 
         if ($item = $this->getCachedItem($key)) {
+            // Only sync the original state when it's missing, since re-syncing would
+            // discard changes made to a term being saved.
+            if (empty($item->term()->getOriginal())) {
+                $item->term()->syncOriginal();
+            }
+
             return $item;
         }
 
         [$site, $slug] = explode('::', $key);
 
         if ($path = $this->getPath($key)) {
-            $item = $this->makeItemFromFile($path, File::get($path))->in($site);
+            $contents = File::get($path);
+
+            // A file a fresh listing shows was removed after its path was recorded is
+            // treated as gone, rather than rebuilt from no contents as a new, empty item
+            if ($contents === null) {
+                $listing = @scandir(dirname($path));
+
+                if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                    return null;
+                }
+            }
+
+            $term = $this->makeItemFromFile($path, $contents);
         } else {
-            $item = Term::make($slug)
+            $term = Term::make($slug)
                 ->taxonomy($this->childKey())
-                ->set('title', $this->index('title')->get($key))
-                ->in($site);
+                ->set('title', $this->index('title')->get($key));
         }
+
+        $term->syncOriginal();
+
+        $item = $term->in($site);
 
         $this->cacheItem($item);
 
@@ -103,18 +133,32 @@ class TaxonomyTermsStore extends ChildStore
         $indexes = $this->resolveIndexes()->except('associations');
         $associations = $this->index('associations');
 
-        $associations->forgetEntry($entry->id());
+        $rows = $terms->map(fn ($value, $slug) => [
+            'value' => $value,
+            'slug' => $slug,
+            'entry' => $entry->id(),
+            'collection' => $entry->collectionHandle(),
+            'site' => $entry->locale(),
+        ])->values()->all();
 
-        foreach ($terms as $slug => $value) {
-            $associations->push([
-                'value' => $value,
-                'slug' => $slug,
-                'entry' => $entry->id(),
-                'collection' => $entry->collectionHandle(),
-                'site' => $entry->locale(),
-            ]);
+        // Most saves don't touch an entry's terms. When what's there for the entry is what would be
+        // put there, the associations are left as they are rather than taken out, put back under
+        // new keys and written again. The terms' own indexes are still updated, since what they
+        // hold (how many published entries a term has, say) can change without the terms changing.
+        //
+        // A slug made of digits is a number here, having been an array key, and a string where the
+        // associations were built from the entries, so slugs are compared as strings.
+        $comparable = fn ($rows) => array_map(fn ($row) => ['slug' => (string) $row['slug']] + $row, $rows);
+
+        if ($comparable($associations->forEntry($entry->id())) !== $comparable($rows)) {
+            $associations->forgetEntry($entry->id());
+
+            foreach ($rows as $row) {
+                $associations->push($row);
+            }
+
+            $associations->cache();
         }
-        $associations->cache();
 
         foreach ($terms as $slug => $value) {
             $term = Term::find("$taxonomy::$slug") ?? $this->makeTerm($taxonomy, $slug);
@@ -157,7 +201,19 @@ class TaxonomyTermsStore extends ChildStore
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $paths = $files->mapWithKeys(function ($timestamp, $path) {
-            $term = $this->makeItemFromFile($path, File::get($path));
+            $contents = File::get($path);
+
+            // A file a fresh listing shows was removed after its path was recorded is
+            // treated as gone, rather than rebuilt from no contents as a new, empty item
+            if ($contents === null) {
+                $listing = @scandir(dirname($path));
+
+                if ($listing !== false && ! in_array(basename($path), $listing, true)) {
+                    return [];
+                }
+            }
+
+            $term = $this->makeItemFromFile($path, $contents);
 
             return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
                 $this->cacheItem($localization);
@@ -167,6 +223,8 @@ class TaxonomyTermsStore extends ChildStore
         });
 
         $this->cachePaths($paths);
+
+        Stache::cacheStore()->forever("stache::timestamps::{$this->key()}", $files->all());
 
         return $paths;
     }
@@ -225,6 +283,7 @@ class TaxonomyTermsStore extends ChildStore
 
     protected function getItemFromModifiedPath($path)
     {
-        return parent::getItemFromModifiedPath($path)->localizations()->all();
+        // The parent skips a file that vanished before its read, and returns null for it
+        return parent::getItemFromModifiedPath($path)?->localizations()->all() ?? [];
     }
 }

@@ -36,11 +36,9 @@ class AddViewPaths
 
     private function updatePaths()
     {
-        $site = $this->site;
-
-        $paths = collect($this->paths)->flatMap(function ($path) use ($site) {
+        $paths = collect($this->paths)->flatMap(function ($path) {
             return [
-                $path.'/'.$site,
+                $this->sitePath($path),
                 $path,
             ];
         })->filter()->values()->all();
@@ -53,13 +51,20 @@ class AddViewPaths
         foreach ($this->hints as $namespace => $paths) {
             $paths = collect($paths)->flatMap(function ($path) {
                 return [
-                    $path.'/'.$this->site,
+                    $this->sitePath($path),
                     $path,
                 ];
-            })->values();
+            })->filter()->values();
 
             $this->finder->replaceNamespace($namespace, $paths->all());
         }
+    }
+
+    private function sitePath($path)
+    {
+        $sitePath = $path.'/'.$this->site;
+
+        return is_dir($sitePath) ? $sitePath : null;
     }
 
     private function restore()

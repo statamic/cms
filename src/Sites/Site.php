@@ -3,6 +3,7 @@
 namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\QueryableValue;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Parse;
 use Statamic\Facades\URL;
@@ -14,7 +15,7 @@ use Statamic\View\Antlers\Language\Runtime\RuntimeParser;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Statamic\View\Cascade;
 
-class Site implements Augmentable
+class Site implements Augmentable, QueryableValue
 {
     use HasAugmentedData;
 
@@ -126,6 +127,11 @@ class Site implements Augmentable
 
         $value = Parse::config($value);
 
+        // A value that was only config, as a site's name and URL usually are, has nothing left for Antlers.
+        if (! Str::contains($value, ['{', '@', '<'])) {
+            return StringUtilities::sanitizePhp($value);
+        }
+
         $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
 
@@ -161,6 +167,11 @@ class Site implements Augmentable
     public function rawConfig()
     {
         return $this->rawConfig;
+    }
+
+    public function toQueryableValue()
+    {
+        return $this->handle();
     }
 
     public function __toString()

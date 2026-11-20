@@ -59,6 +59,10 @@ class RenameAsset extends Action
     {
         $asset = $this->items->first();
 
+        // The selected asset may no longer exist (e.g. it was renamed by a
+        // previous request), in which case there's nothing left to rename.
+        abort_unless($asset, 404);
+
         return [
             'filename' => [
                 'type' => 'text',

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { cva } from 'cva';
 import {
     ComboboxAnchor,
@@ -12,76 +12,128 @@ import {
     ComboboxVirtualizer,
     FocusScope
 } from 'reka-ui';
-import { computed, nextTick, ref, useAttrs, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, toRef, useAttrs, useTemplateRef, watch } from 'vue';
 import { twMerge } from 'tailwind-merge';
 import Button from '../Button/Button.vue';
 import Icon from '../Icon/Icon.vue';
 import Badge from '../Badge.vue';
 import fuzzysort from 'fuzzysort';
-import DOMPurify from 'dompurify';
+import DOMPurify, { type Config } from 'dompurify';
 import { SortableList } from '@/components/sortable/Sortable.js';
+import { useUiFieldId } from '@/composables/ui-field-id.js';
 
-const emit = defineEmits(['update:modelValue', 'search', 'selected', 'added']);
+type OptionValue = string | number;
 
-const props = defineProps({
-	/** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
-	adaptiveWidth: { type: Boolean, default: false },
-	/** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
-	align: { type: String, default: 'start' },
-	/** When `true`, the selected value will be clearable. */
-	clearable: { type: Boolean, default: false },
-	/** When `true`, the options dropdown will close after selecting an option. */
-	closeOnSelect: { type: Boolean, default: undefined },
-	disabled: { type: Boolean, default: false },
-	/** When `true`, the focus outline will be more discrete. */
-	discreteFocusOutline: { type: Boolean, default: false },
-	/** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
-	icon: { type: String, default: null },
-	/** ID attribute for the input element */
-	id: { type: String },
-	/** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
-	ignoreFilter: { type: Boolean, default: false },
-	/** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
-	labelHtml: { type: Boolean, default: false },
-	/** The maximum number of selectable options. */
-	maxSelections: { type: Number, default: null },
-	/** The controlled value of the combobox. */
-	modelValue: { type: [Object, String, Number], default: null },
-	/** When `true`, multiple options are allowed. */
-	multiple: { type: Boolean, default: false },
-	/** Key of the option's label in the option's object. */
-	optionLabel: { type: String, default: 'label' },
-	/** Array of option objects */
-	options: { type: Array, default: () => [] },
-	/** Key of the option's value in the option's object. */
-	optionValue: { type: String, default: 'value' },
-	/** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
-	pasteDelimiter: { type: String, default: ',' },
-	placeholder: { type: String, default: () => __('Select...') },
-	readOnly: { type: Boolean, default: false },
-	/** When `true`, the options will be searchable. */
-	searchable: { type: Boolean, default: true },
-	/** Keys of the option object to search against. Defaults to just `optionLabel`. */
-	searchKeys: { type: Array, default: null },
-	/** Determines if the dropdown should open */
-	shouldOpenDropdown: { type: Function, default: () => true },
-	/** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
-	size: { type: String, default: 'base' },
-	/** When `true`, additional options can be added by typing in the search input and pressing enter. */
-	taggable: { type: Boolean, default: false },
-	/** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
-	variant: { type: String, default: 'default' },
-	/** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
-	excludeZManipulation: { type: Boolean, default: false },
+type ModelValue = OptionValue | OptionValue[] | null;
+
+interface Option {
+    /** Icon name displayed next to the label. */
+    icon?: string;
+    /** Image URL displayed next to the label. */
+    image?: string;
+    /** Set on the "Add" option shown while searching a `taggable` combobox. */
+    create?: boolean;
+    /** The label and value live under the keys set by `optionLabel` and `optionValue`. */
+    [key: string]: any;
+}
+
+interface Props {
+    /** When `true`, the dropdown will expand to fit longer option labels. Not recommended for large datasets. */
+    adaptiveWidth?: boolean;
+    /** The preferred alignment against the trigger. May change when collisions occur. <br><br> Options: `start`, `center`, `end` */
+    align?: 'start' | 'center' | 'end';
+    /** When `true`, the selected value will be clearable. */
+    clearable?: boolean;
+    /** When `true`, the options dropdown will close after selecting an option. */
+    closeOnSelect?: boolean;
+    disabled?: boolean;
+    /** When `true`, the focus outline will be more discrete. */
+    discreteFocusOutline?: boolean;
+    /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
+    icon?: string | null;
+    /** ID attribute for the input element. Inherits from parent `Field` when omitted. */
+    id?: string | null;
+    /** When `true`, the Combobox will avoid filtering options, allowing you to handle filtering yourself by listening to the `search` event and updating the `options` prop. */
+    ignoreFilter?: boolean;
+    /** When `true`, the option labels will be rendered with `v-html` instead of `v-text`. */
+    labelHtml?: boolean;
+    /** The maximum number of selectable options. */
+    maxSelections?: number | null;
+    /** The controlled value of the combobox. A single option value, or an array of option values when `multiple` is `true`. */
+    modelValue?: ModelValue;
+    /** When `true`, multiple options are allowed. */
+    multiple?: boolean;
+    /** Key of the option's label in the option's object. */
+    optionLabel?: string;
+    /** Array of option objects, like `{ label: 'Apple', value: 'apple' }`. The label and value keys can be changed with `optionLabel` and `optionValue`. Options may also have an `icon` name or an `image` URL. */
+    options?: Option[];
+    /** Key of the option's value in the option's object. */
+    optionValue?: string;
+    /** The delimiter used to split pasted text into multiple tags. Only used when `taggable` is `true`. */
+    pasteDelimiter?: string;
+    placeholder?: string;
+    readOnly?: boolean;
+    /** When `true`, the options will be searchable. */
+    searchable?: boolean;
+    /** Keys of the option object to search against. Defaults to just `optionLabel`. */
+    searchKeys?: string[] | null;
+    /** Determines if the dropdown should open */
+    shouldOpenDropdown?: (open: boolean) => boolean;
+    /** Controls the size of the combobox. <br><br> Options: `xs`, `sm`, `base`, `lg`, `xl` */
+    size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl';
+    /** When `true`, additional options can be added by typing in the search input and pressing enter. */
+    taggable?: boolean;
+    /** Controls the appearance of the combobox. <br><br> Options: `default`, `filled`, `ghost`, `subtle` */
+    variant?: 'default' | 'filled' | 'ghost' | 'subtle';
+    /** When `true`, skip the elevated z-index override while a modal/stack is open. Use when this combobox can remain open behind an unrelated overlay (e.g. a confirmation modal). */
+    excludeZManipulation?: boolean;
+}
+
+const emit = defineEmits<{
+    'update:modelValue': [value: ModelValue];
+    search: [query: string, loading: () => void];
+    selected: [value: OptionValue];
+    added: [value: OptionValue];
+}>();
+
+const props = withDefaults(defineProps<Props>(), {
+    adaptiveWidth: false,
+    align: 'start',
+    clearable: false,
+    closeOnSelect: undefined,
+    disabled: false,
+    discreteFocusOutline: false,
+    icon: null,
+    id: null,
+    ignoreFilter: false,
+    labelHtml: false,
+    maxSelections: null,
+    modelValue: null,
+    multiple: false,
+    optionLabel: 'label',
+    options: () => [],
+    optionValue: 'value',
+    pasteDelimiter: ',',
+    placeholder: () => __('Select...'),
+    readOnly: false,
+    searchable: true,
+    searchKeys: null,
+    shouldOpenDropdown: () => true,
+    size: 'base',
+    taggable: false,
+    variant: 'default',
+    excludeZManipulation: false,
 });
 
 defineOptions({
     inheritAttrs: false,
 });
 
+const { id, labelId, describedBy, invalid } = useUiFieldId(toRef(props, 'id'));
+
 const attrs = useAttrs();
 
-const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class));
+const wrapperClasses = computed(() => twMerge('w-full min-w-0', attrs.class as string));
 const wrapperAttrs = computed(() => {
     const { class: _, ...rest } = attrs;
     return rest;
@@ -107,7 +159,7 @@ const triggerClasses = computed(() => cva({
             xs: 'px-2 h-6 text-[0.8125rem] rounded-md',
         },
         readOnly: {
-            true: 'border-dashed',
+            true: 'border-dashed read-only-field:not-dark:bg-none read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500',
         },
         disabled: {
             true: 'opacity-50 cursor-not-allowed',
@@ -140,31 +192,43 @@ const itemClasses = cva({
     },
 });
 
-const searchQuery = ref('');
+const searchQuery = ref<string>('');
 const dropdownOpen = ref(false);
+const focusedByPointer = ref(false);
 const rootRef = useTemplateRef('root');
+const wrapperRef = useTemplateRef('wrapper');
 const triggerRef = useTemplateRef('trigger');
 const searchInputRef = useTemplateRef('search');
 
 watch(searchQuery, (value) => emit('search', value, () => {}));
-watch(dropdownOpen, () => searchQuery.value = '');
 
-const getOptionLabel = (option) => {
+watch(dropdownOpen, (open) => {
+    if (!open) searchQuery.value = '';
+});
+
+const labelSanitizeConfig: Config = { USE_PROFILES: { html: true, svg: true } };
+
+const getOptionLabel = (option: Option): string => {
     const label = option?.[props.optionLabel];
     if (props.labelHtml) {
-        return DOMPurify.sanitize(label ?? '', {
-            USE_PROFILES: { html: true, svg: true },
-        });
+        return DOMPurify.sanitize(label ?? '', labelSanitizeConfig);
     }
     return label;
 };
 
-const getOptionValue = (option) => option?.[props.optionValue];
-const matchOptionByValue = (option, value) => getOptionValue(option) === value;
-const isSelected = (option) => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
-const isDisabled = (option) => !isSelected(option) && props.multiple && limitReached.value;
+const getOptionPlainLabel = (option: Option): string => {
+    if (!props.labelHtml) return getOptionLabel(option);
 
-const selectedOptions = computed(() => {
+    return DOMPurify.sanitize(option?.[props.optionLabel] ?? '', { ...labelSanitizeConfig, RETURN_DOM_FRAGMENT: true })
+        .textContent.replace(/\s+/g, ' ').trim();
+};
+
+const getOptionValue = (option: Option): OptionValue => option?.[props.optionValue];
+const matchOptionByValue = (option: Option, value: OptionValue): boolean => getOptionValue(option) === value;
+const isSelected = (option: Option): boolean => selectedOptions.value.some((item) => getOptionValue(item) === getOptionValue(option));
+const isDisabled = (option: Option): boolean => !isSelected(option) && props.multiple && limitReached.value;
+
+const selectedOptions = computed<Option[]>(() => {
     let selections = props.modelValue === null ? [] : props.modelValue;
 
     if (typeof selections === 'string' || typeof selections === 'number') {
@@ -177,8 +241,8 @@ const selectedOptions = computed(() => {
     });
 });
 
-const selectedOption = computed(() => {
-    if (props.multiple || !props.modelValue || selectedOptions.value.length !== 1) {
+const selectedOption = computed<Option | null>(() => {
+    if (props.multiple || props.modelValue === null || selectedOptions.value.length !== 1) {
         return null;
     }
 
@@ -207,7 +271,7 @@ const limitIndicatorColor = computed(() => {
     return 'text-gray';
 });
 
-const canClearSelection = computed(() => props.clearable && props.modelValue);
+const canClearSelection = computed(() => props.clearable && props.modelValue !== null);
 const shouldCloseOnSelect = computed(() => props.closeOnSelect ?? !props.multiple);
 const shouldShowOptionsChevron = computed(() => props.options.length > 0 || props.ignoreFilter);
 const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelections && props.maxSelections !== Infinity);
@@ -216,8 +280,14 @@ const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
     if (props.taggable) return true;
 
-    return dropdownOpen.value || !props.modelValue || (props.multiple && props.placeholder);
+    return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);
 });
+
+// The search input is the combobox whenever it's rendered, so the trigger wrapping it has to give up
+// the role, the tab stop and the popup attributes that reka-ui puts on every trigger.
+const triggerAttrs = computed(() => shouldShowInput.value
+    ? { 'aria-label': undefined, 'aria-haspopup': undefined, 'aria-expanded': undefined }
+    : { role: 'combobox', tabindex: props.disabled || props.readOnly ? -1 : 0 });
 
 const placeholder = computed(() => {
     if (props.multiple && selectedOptions.value.length > 0) {
@@ -225,36 +295,43 @@ const placeholder = computed(() => {
     }
 
     if (selectedOption.value) {
-        return getOptionLabel(selectedOption.value);
+        return getOptionPlainLabel(selectedOption.value);
     }
 
     return props.placeholder;
 });
 
-const filteredOptions = computed(() => {
-    if (!props.searchable || props.ignoreFilter) {
-        return props.options;
+const filteredOptions = computed<Option[]>(() => {
+    let results: Option[] = [...props.options];
+
+    if (props.searchable && !props.ignoreFilter) {
+        const searchResults = props.searchKeys?.length
+            ? fuzzysort.go(searchQuery.value, props.options, { all: true, keys: props.searchKeys })
+            : fuzzysort.go(searchQuery.value, props.options, { all: true, key: props.optionLabel });
+
+        const matches = new Set<Option>(searchResults.map((result) => result.obj));
+
+        results = props.options.filter((option) => matches.has(option));
     }
 
-    const matches = new Set(
-        fuzzysort
-            .go(searchQuery.value, props.options, {
-                all: true,
-                ...(props.searchKeys?.length ? { keys: props.searchKeys } : { key: props.optionLabel }),
-            })
-            .map((result) => result.obj)
-    );
-
-    const results = props.options.filter((option) => matches.has(option));
-
-    if (props.taggable && searchQuery.value && results.length === 0) {
-        results.push({
+    if (shouldShowCreateOption.value) {
+        results.unshift({
             [props.optionLabel]: searchQuery.value,
             [props.optionValue]: searchQuery.value,
+            create: true,
         });
     }
 
     return results;
+});
+
+const shouldShowCreateOption = computed(() => {
+    if (!props.taggable || !searchQuery.value) return false;
+
+    const matchesSearchQuery = (option: Option): boolean =>
+        getOptionPlainLabel(option) === searchQuery.value || String(getOptionValue(option)) === searchQuery.value;
+
+    return !props.options.some(matchesSearchQuery) && !selectedOptions.value.some(matchesSearchQuery);
 });
 
 function clear() {
@@ -262,17 +339,19 @@ function clear() {
     emit('update:modelValue', null);
 }
 
-function select() {
+function select(option: Option) {
+    if (option.create) emit('added', getOptionValue(option));
+
     dropdownOpen.value = !shouldCloseOnSelect.value;
     if (shouldCloseOnSelect.value) triggerRef.value?.$el?.focus();
 }
 
-function deselect(option) {
-    emit('update:modelValue', props.modelValue.filter((item) => item !== option));
+function deselect(value: OptionValue) {
+    emit('update:modelValue', (props.modelValue as OptionValue[]).filter((item) => item !== value));
 }
 
-function updateModelValue(value) {
-    let originalValue = props.modelValue || [];
+function updateModelValue(value: ModelValue) {
+    let originalValue: ModelValue = props.modelValue === null ? [] : props.modelValue;
 
     searchQuery.value = '';
     emit('update:modelValue', value);
@@ -285,7 +364,7 @@ function updateModelValue(value) {
         .forEach((option) => emit('selected', option));
 }
 
-function updateDropdownOpen(open) {
+function updateDropdownOpen(open: boolean) {
     if (open && ! props.shouldOpenDropdown(open)) return;
     if (props.disabled || props.readOnly) return;
 
@@ -297,24 +376,43 @@ function updateDropdownOpen(open) {
     }
 }
 
-function openDropdown(e) {
+function openDropdown(e: KeyboardEvent) {
     if (dropdownOpen.value) return;
-    if (e.key === ' ' && e.target.tagName === 'INPUT') return;
+    if (e.key === ' ' && (e.target as HTMLElement).tagName === 'INPUT') return;
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
     updateDropdownOpen(true);
 }
 
-function onBlur(e) {
+function onFocus(e: FocusEvent) {
+    const byPointer = focusedByPointer.value;
+    focusedByPointer.value = false;
+
+    if (!props.taggable || byPointer || dropdownOpen.value) return;
+    if (!focusCameFromOutside(e)) return;
+
+    updateDropdownOpen(true);
+}
+
+function focusCameFromOutside(e: FocusEvent): boolean {
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+
+    if (!relatedTarget) return false;
+    if ('rekaCollectionItem' in relatedTarget.dataset) return false;
+
+    return !wrapperRef.value?.contains(relatedTarget);
+}
+
+function onBlur(e: FocusEvent) {
     if (!props.taggable) return;
 
-    let isInsideDropdown = 'rekaCollectionItem' in (e.relatedTarget?.dataset ?? {});
+    let isInsideDropdown = 'rekaCollectionItem' in ((e.relatedTarget as HTMLElement | null)?.dataset ?? {});
     if (isInsideDropdown) return;
 
     pushTaggableOption(e);
 }
 
-function onPaste(e) {
+function onPaste(e: ClipboardEvent) {
     if (!props.taggable || !props.multiple) return;
 
     e.preventDefault();
@@ -326,22 +424,26 @@ function onPaste(e) {
         .map((v) => v.trim())
         .filter((v) => v !== '');
 
-    updateModelValue([...(props.modelValue ?? []), ...tags]);
+    updateModelValue([...((props.modelValue as OptionValue[]) ?? []), ...tags]);
 }
 
-function pushTaggableOption(e) {
+function pushTaggableOption(e: KeyboardEvent | FocusEvent) {
     if (!props.taggable) return;
-    if (e.target.value === '') return;
+    if (e.defaultPrevented) return; // Reka prevents the event's default when it selects a highlighted option.
+
+    const value = (e.target as HTMLInputElement).value;
+
+    if (value === '') return;
 
     e.preventDefault();
 
     const alreadySelected = props.multiple
-        ? props.modelValue?.includes(e.target.value)
-        : props.modelValue === e.target.value;
+        ? (props.modelValue as OptionValue[] | null)?.includes(value)
+        : props.modelValue === value;
 
     if (!alreadySelected) {
-        emit('added', e.target.value);
-        updateModelValue(props.multiple ? [...(props.modelValue ?? []), e.target.value] : e.target.value);
+        emit('added', value);
+        updateModelValue(props.multiple ? [...((props.modelValue as OptionValue[]) ?? []), value] : value);
     }
 
     searchQuery.value = '';
@@ -350,7 +452,7 @@ function pushTaggableOption(e) {
 }
 
 function scrollToSelectedOption() {
-    if (props.multiple || !props.modelValue) return;
+    if (props.multiple || props.modelValue === null) return;
 
     rootRef.value?.highlightSelected?.();
 }
@@ -369,7 +471,13 @@ defineExpose({
 </script>
 
 <template>
-    <div :class="wrapperClasses" v-bind="wrapperAttrs">
+    <div
+        ref="wrapper"
+        :class="wrapperClasses"
+        v-bind="wrapperAttrs"
+        @pointerdown="focusedByPointer = true"
+        @click="focusedByPointer = false"
+    >
         <div class="flex w-full min-w-0">
             <ComboboxRoot
                 ref="root"
@@ -390,7 +498,11 @@ defineExpose({
                     <ComboboxTrigger
                         as="div"
                         ref="trigger"
-                        :tabindex="disabled || readOnly ? -1 : 0"
+                        v-bind="triggerAttrs"
+                        :id="shouldShowInput ? undefined : id"
+                        :aria-labelledby="shouldShowInput ? undefined : labelId"
+                        :aria-describedby="shouldShowInput ? undefined : describedBy"
+                        :aria-invalid="!shouldShowInput && invalid ? 'true' : undefined"
                         :class="triggerClasses"
                         data-ui-combobox-trigger
                         @keydown.enter="openDropdown"
@@ -401,6 +513,8 @@ defineExpose({
                                 v-if="shouldShowInput"
                                 :id
                                 :placeholder
+                                :aria-describedby="describedBy"
+                                :aria-invalid="invalid ? 'true' : undefined"
                                 ref="search"
                                 class="w-full bg-transparent text-gray-900 dark:text-gray-300 opacity-100 focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 [&::-webkit-search-cancel-button]:hidden cursor-pointer"
                                 :class="{
@@ -409,6 +523,7 @@ defineExpose({
                                 type="search"
                                 autocomplete="off"
                                 v-model="searchQuery"
+                                @focus="onFocus"
                                 @blur="onBlur"
                                 @paste="onPaste"
                                 @keydown.enter="pushTaggableOption"
@@ -420,8 +535,8 @@ defineExpose({
                                 data-ui-combobox-selected-option
                             >
                                 <slot v-if="selectedOption" name="selected-option" v-bind="{ option: selectedOption }">
-                                    <div v-if="icon" class="size-4">
-                                        <Icon :name="icon" class="text-gray-900 dark:text-white dark:opacity-50" />
+                                    <div v-if="selectedOption.icon || icon" class="size-4">
+                                        <Icon :name="selectedOption.icon ?? icon" class="text-gray-900 dark:text-white dark:opacity-50" />
                                     </div>
                                     <span v-if="labelHtml" v-html="getOptionLabel(selectedOption)" class="block truncate" />
                                     <span v-else v-text="getOptionLabel(selectedOption)" class="block truncate" />
@@ -480,7 +595,8 @@ defineExpose({
                                 <!-- Hidden width measurer for wide dropdown mode -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
                                     <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
-                                        {{ getOptionLabel(option) }}
+                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
+                                        <template v-else>{{ getOptionLabel(option) }}</template>
                                     </div>
                                 </div>
 
@@ -494,7 +610,7 @@ defineExpose({
                                     v-if="filteredOptions.length"
                                     :estimate-size="40"
                                     :options="filteredOptions"
-                                    :text-content="(opt) => getOptionLabel(opt)"
+                                    :text-content="getOptionPlainLabel"
                                     v-slot="{ option }"
                                 >
                                     <div class="py-1 px-2 w-full overflow-x-hidden">
@@ -502,17 +618,21 @@ defineExpose({
                                             as="button"
                                             :key="`${getOptionValue(option)}-${isDisabled(option)}`"
                                             :value="getOptionValue(option)"
-                                            :text-value="getOptionLabel(option)"
+                                            :text-value="getOptionPlainLabel(option)"
                                             :disabled="isDisabled(option)"
                                             :class="itemClasses({ size: size, selected: isSelected(option) })"
                                             :data-ui-combobox-item="getOptionValue(option)"
-                                            :title="getOptionLabel(option)"
-                                            @select="select"
+                                            :title="getOptionPlainLabel(option)"
+                                            @select="select(option)"
                                         >
                                             <slot name="option" v-bind="option">
-                                                <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionLabel(option)">
-                                                <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
-                                                <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
+                                                <template v-else>
+                                                    <img v-if="option.image" :src="option.image" class="size-5 rounded-full" :alt="getOptionPlainLabel(option)">
+                                                    <Icon v-else-if="option.icon" :name="option.icon" />
+                                                    <span v-if="labelHtml" class="truncate" v-html="getOptionLabel(option)" />
+                                                    <span class="truncate" v-else>{{ __(getOptionLabel(option)) }}</span>
+                                                </template>
                                             </slot>
                                         </ComboboxItem>
                                     </div>
@@ -535,7 +655,7 @@ defineExpose({
             </div>
         </div>
 
-        <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
+        <slot name="selected-options" v-bind="{ disabled, readOnly, getOptionLabel, getOptionPlainLabel, getOptionValue, labelHtml, deselect }">
             <SortableList
                 v-if="multiple"
                 data-ui-combobox-selected-options
@@ -547,13 +667,14 @@ defineExpose({
                 :model-value="modelValue"
                 @update:modelValue="updateModelValue"
             >
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2" :class="{ 'mt-2.5': selectedOptions.length }">
                     <div
                         v-for="option in selectedOptions"
                         :key="getOptionValue(option)"
-                        class="sortable-item mt-2 cursor-grab active:cursor-grabbing"
+                        class="sortable-item cursor-grab active:cursor-grabbing"
                     >
-                        <Badge pill size="lg" class="[&>*]:st-text-trim-ex-alphabetic">
+                        <Badge pill size="lg" class="[&>*:not(svg)]:st-text-trim-optical">
+                            <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
 
@@ -561,7 +682,7 @@ defineExpose({
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="opacity-75 hover:opacity-100 cursor-pointer"
-                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
+                                :aria-label="__('Remove :label', { label: getOptionPlainLabel(option) })"
                                 @click="deselect(getOptionValue(option))"
                             >
                                 &times;
@@ -577,10 +698,3 @@ defineExpose({
     </div>
 </template>
 
-<style scoped>
-    @supports(text-box: ex alphabetic) {
-        [data-ui-badge] {
-            padding-block: 0.65rem;
-        }
-    }
-</style>

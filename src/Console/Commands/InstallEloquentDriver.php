@@ -371,7 +371,18 @@ class InstallEloquentDriver extends Command
                     File::put(
                         config_path('statamic/eloquent-driver.php'),
                         Str::of(File::get(config_path('statamic/eloquent-driver.php')))
-                            ->replace("'model' => \Statamic\Eloquent\Entries\EntryModel::class", "'model' => \Statamic\Eloquent\Entries\UuidEntryModel::class")
+                            ->replace(
+                                [
+                                    'use Statamic\Eloquent\Entries\EntryModel;',
+                                    "'model' => EntryModel::class",
+                                    "'model' => \Statamic\Eloquent\Entries\EntryModel::class",
+                                ],
+                                [
+                                    'use Statamic\Eloquent\Entries\UuidEntryModel;',
+                                    "'model' => UuidEntryModel::class",
+                                    "'model' => \Statamic\Eloquent\Entries\UuidEntryModel::class",
+                                ]
+                            )
                             ->__toString()
                     );
 
@@ -701,7 +712,7 @@ class InstallEloquentDriver extends Command
             $matches = [];
             preg_match("/'{$repository}' => \[(.*?)],/s", $baseConfig, $matches);
 
-            $repositoryInBaseConfig = $matches[0] ?? null;
+            $repositoryInBaseConfig = $this->qualifyImportedClasses($matches[0] ?? '', $baseConfig);
 
             $config = $config->replace(
                 '];',
@@ -717,6 +728,19 @@ class InstallEloquentDriver extends Command
                     "'{$repository}' => [\n        'driver' => 'eloquent'"
                 )
                 ->__toString()
+        );
+    }
+
+    private function qualifyImportedClasses(string $code, string $baseConfig): string
+    {
+        preg_match_all('/^use ([\w\\\\]+\\\\(\w+));$/m', $baseConfig, $imports);
+
+        $imports = array_combine($imports[2], $imports[1]);
+
+        return preg_replace_callback(
+            '/(?<![\w\\\\])(\w+)::class/',
+            fn ($match) => isset($imports[$match[1]]) ? "\\{$imports[$match[1]]}::class" : $match[0],
+            $code
         );
     }
 

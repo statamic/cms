@@ -25,6 +25,10 @@ class FormExportController extends CpController
             $exporter->setSubmissions($this->getScopedSubmissions($request, $form));
         }
 
+        if ($request->filled('columns')) {
+            $exporter->setColumns(explode(',', $request->input('columns')));
+        }
+
         return $request->has('download') ? $exporter->download() : $exporter->response();
     }
 

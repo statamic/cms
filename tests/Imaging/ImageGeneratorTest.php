@@ -20,6 +20,7 @@ use Statamic\Exceptions\InvalidRemoteUrlException;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\File;
 use Statamic\Facades\Glide;
+use Statamic\Facades\Image;
 use Statamic\Imaging\GuzzleAdapter;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\RemoteUrlValidator;
@@ -96,6 +97,30 @@ class ImageGeneratorTest extends TestCase
         $this->assertEquals($expectedCacheManifest, Glide::cacheStore()->get($manifestCacheKey));
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($manipulationCacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_does_not_check_ffmpeg_availability_for_non_video_assets()
+    {
+        // Regression test: non-video assets shouldn't trigger ffmpeg detection, since
+        // that shells out via Symfony Process and can throw on hosts where proc_open
+        // is disabled, breaking every image request instead of just video thumbnails.
+        $this->mock(\Statamic\Console\Processes\Ffmpeg::class, function ($mock) {
+            $mock->shouldNotReceive('available');
+            $mock->shouldNotReceive('ffmpegBinary');
+        });
+
+        Storage::fake('test');
+        $file = UploadedFile::fake()->image('foo/hoff.jpg', 30, 60);
+        Storage::disk('test')->putFileAs('foo', $file, 'hoff.jpg');
+        $container = tap(AssetContainer::make('test_container')->disk('test'))->save();
+        $asset = tap($container->makeAsset('foo/hoff.jpg'))->save();
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $this->makeGenerator()->generateByAsset($asset, ['w' => 100]);
+
+        $this->addToAssertionCount(1);
     }
 
     #[Test]
@@ -190,6 +215,42 @@ class ImageGeneratorTest extends TestCase
         $this->assertContains($expectedPath, $paths);
         $this->assertEquals($expectedPath, Glide::cacheStore()->get($cacheKey));
         Event::assertDispatchedTimes(GlideImageGenerated::class, 1);
+    }
+
+    #[Test]
+    public function it_generates_an_image_with_the_jpeg_format()
+    {
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), file_get_contents($image->getPathname()));
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $path = $this->makeGenerator()->generateByPath($imagePath, ['fm' => 'jpeg']);
+
+        $md5 = $this->getGlideMd5($imagePath, ['fm' => 'jpg']);
+
+        $this->assertEquals("paths/testimages/foo/hoff.jpg/{$md5}/hoff.jpg", $path);
+        $this->assertContains($path, $this->generatedImagePaths());
+    }
+
+    #[Test]
+    public function it_generates_an_image_with_a_preset_using_the_jpeg_format()
+    {
+        Image::registerCustomManipulationPresets(['jpeg_preset' => ['w' => 20, 'fm' => 'jpeg']]);
+
+        $imagePath = 'testimages/foo/hoff.jpg';
+
+        $image = UploadedFile::fake()->image('', 30, 60);
+        File::put(public_path($imagePath), file_get_contents($image->getPathname()));
+
+        ImageValidator::shouldReceive('isValidImage')->andReturnTrue();
+
+        $path = $this->makeGenerator()->generateByPath($imagePath, ['p' => 'jpeg_preset']);
+
+        $this->assertStringEndsWith('/hoff.jpg', $path);
+        $this->assertContains($path, $this->generatedImagePaths());
     }
 
     #[Test]
@@ -389,6 +450,19 @@ class ImageGeneratorTest extends TestCase
 
         $this->assertSame($container->disk()->filesystem()->getDriver(), $filesystem);
         $this->assertEquals(['mark' => 'foo/hoff.jpg'], $generator->getParams());
+    }
+
+    #[Test]
+    public function the_watermark_is_dropped_when_an_asset_encoded_url_string_no_longer_resolves()
+    {
+        Storage::fake('test');
+        tap(AssetContainer::make('test_container')->disk('test'))->save();
+
+        $generator = $this->makeGenerator();
+
+        $generator->setParams(['mark' => 'asset::'.base64_encode('test_container/foo/deleted.jpg')]);
+
+        $this->assertEquals(['mark' => null], $generator->getParams());
     }
 
     #[Test]

@@ -20,9 +20,8 @@ import { Motion } from 'motion-v';
 
 const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
-const sections = tab.sections;
 const visibleSections = computed(() => {
-    return sections.filter((section) => {
+    return tab.value.sections.filter((section) => {
         return section.fields.some((field) => {
             return new ShowField(
                 visibleValues.value,
@@ -120,6 +119,11 @@ function toggleSection(section) {
         overflow: clip;
         /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
         overflow-clip-margin: 2.5rem;
+        /* As of 2026-11-10 Safari doesn't support overflow-clip-margin, so pad the clip box out instead or it cuts off the card's ring and shadow. */
+        @supports not (overflow-clip-margin: 1px) {
+            padding: 0.25rem;
+            margin: -0.25rem;
+        }
     }
 }
 

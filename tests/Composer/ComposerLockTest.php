@@ -3,6 +3,7 @@
 namespace Tests\Composer;
 
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Composer\Lock;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
@@ -15,6 +16,7 @@ class ComposerLockTest extends TestCase
 {
     private $files;
     private $lockPath;
+    private $envLockPath;
     private $previousLockPath;
 
     public function setUp(): void
@@ -24,6 +26,7 @@ class ComposerLockTest extends TestCase
         $this->files = app(Filesystem::class);
 
         $this->lockPath = base_path('composer.lock');
+        $this->envLockPath = base_path('composer.testing.lock');
         $this->previousLockPath = storage_path('statamic/updater/composer.lock.bak');
 
         $this->removeLockFiles();
@@ -32,6 +35,8 @@ class ComposerLockTest extends TestCase
     public function tearDown(): void
     {
         $this->removeLockFiles();
+
+        unset($_ENV['COMPOSER']);
 
         parent::tearDown();
     }
@@ -44,6 +49,41 @@ class ComposerLockTest extends TestCase
         PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
 
         $this->assertTrue(Lock::file()->exists());
+    }
+
+    #[Test]
+    #[DataProvider('composerEnvProvider')]
+    public function it_derives_lock_filename_from_composer_env_var($composerEnv, $expectedFilename)
+    {
+        if ($composerEnv) {
+            $_ENV['COMPOSER'] = $composerEnv;
+        }
+
+        $this->assertEquals($expectedFilename, Lock::filename());
+        $this->assertEquals(base_path($expectedFilename), Lock::file()->path());
+    }
+
+    public static function composerEnvProvider()
+    {
+        return [
+            'unset' => [null, 'composer.lock'],
+            'json extension' => ['composer.testing.json', 'composer.testing.lock'],
+            'no extension' => ['composer-testing', 'composer-testing.lock'],
+        ];
+    }
+
+    #[Test]
+    public function it_reads_the_lock_file_named_by_the_composer_env_var()
+    {
+        $_ENV['COMPOSER'] = 'composer.testing.json';
+
+        $this->assertFalse(Lock::file()->exists());
+
+        PackToTheFuture::generateComposerLock('package/one', '2.0.0', $this->lockPath);
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->envLockPath);
+
+        $this->assertTrue(Lock::file()->exists());
+        $this->assertEquals('1.0.0', Lock::file()->getInstalledVersion('package/one'));
     }
 
     #[Test]
@@ -192,7 +232,7 @@ class ComposerLockTest extends TestCase
 
     private function removeLockFiles()
     {
-        foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
+        foreach ([$this->lockPath, $this->envLockPath, $this->previousLockPath] as $lockFile) {
             if ($this->files->exists($lockFile)) {
                 $this->files->delete($lockFile);
             }

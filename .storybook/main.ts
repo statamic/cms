@@ -9,9 +9,14 @@ const config: StorybookConfig = {
     addons: [
         '@storybook/addon-docs',
         '@storybook/addon-a11y',
-        '@storybook/addon-vitest'
+        '@storybook/addon-vitest',
+        '@storybook/addon-mcp'
     ],
     staticDirs: ['./public'],
+    features: {
+        componentsManifest: true,
+        experimentalDocgenServer: true,
+    },
     framework: {
         name: '@storybook/vue3-vite',
         options: {

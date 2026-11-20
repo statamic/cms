@@ -341,8 +341,8 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
             $template = $this->taxonomy()->termTemplate();
 
-            if ($collection = $this->collection()) {
-                $template = $collection->handle().'.'.$template;
+            if ($this->collection() && ! $this->taxonomy()->hasCustomTermTemplate()) {
+                $template = $this->collection()->handle().'.'.$template;
             }
 
             return $template;
@@ -485,6 +485,11 @@ class LocalizedTerm implements Arrayable, ArrayAccess, Augmentable, BulkAugmenta
 
     public function getQueryableValue(string $field)
     {
+        // Avoid resolving the Site object.
+        if ($field === 'site') {
+            return $this->locale();
+        }
+
         if (in_array($method = Str::camel($field), $this->queryableMethods())) {
             return $this->{$method}();
         }

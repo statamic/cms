@@ -81,9 +81,7 @@ class CsrfTokenReplacer implements Replacer
             Str::position($contents, '</head>'),
         ])->filter()->min();
 
-        $js = "<script>{$cacher->getCsrfTokenJs()}</script>";
-
-        $contents = Str::substrReplace($contents, $js, $insertBefore, 0);
+        $contents = Str::substrReplace($contents, $cacher->getCsrfScript(), $insertBefore, 0);
 
         $response->setContent($contents);
     }

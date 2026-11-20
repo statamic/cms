@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,6 +13,7 @@ use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Fieldtypes\Replicator;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -85,10 +87,9 @@ class ReplicatorSetController extends CpController
 
     private function getConfig(array $config, array $remainingFieldPathComponents): array
     {
-        $isGroupOrGrid = isset($config['type']) && in_array($config['type'], ['group', 'grid']);
-        $isReplicator = isset($config['type']) && in_array($config['type'], ['bard', 'replicator']);
+        $hasNestedFields = isset($config['type']) && isset($config['fields']);
 
-        if ($isReplicator) {
+        if ($this->isReplicator($config)) {
             $flattenedSets = $this->flattenSets($config['sets'] ?? []);
 
             if (count($remainingFieldPathComponents) === 1) {
@@ -100,7 +101,7 @@ class ReplicatorSetController extends CpController
             return $this->getConfig($flattenedSets, $remainingFieldPathComponents);
         }
 
-        if ($isGroupOrGrid) {
+        if ($hasNestedFields) {
             array_shift($remainingFieldPathComponents);
 
             $fields = $this->resolveFields($config['fields'] ?? []);
@@ -113,6 +114,15 @@ class ReplicatorSetController extends CpController
         array_shift($remainingFieldPathComponents);
 
         return $this->getConfig($fields[$remainingFieldPathComponents[0]]['field'], $remainingFieldPathComponents);
+    }
+
+    private function isReplicator(array $config): bool
+    {
+        if (! is_string($type = $config['type'] ?? null)) {
+            return false;
+        }
+
+        return rescue(fn () => FieldtypeRepository::find($type), report: false) instanceof Replicator;
     }
 
     private function flattenSets(array $sets): array

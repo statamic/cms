@@ -258,7 +258,7 @@ class Entries extends Relationship
     {
         $column = OrderBy::column($request->sort, 'title');
 
-        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+        if (! $request->sort && ! $request->search && $this->configuredCollectionsShareSort()) {
             $column = $this->getFirstCollectionFromRequest($request)->sortField();
         }
 
@@ -269,11 +269,26 @@ class Entries extends Relationship
     {
         $order = $request->order ?? 'asc';
 
-        if (! $request->sort && ! $request->search && count($this->getConfiguredCollections()) < 2) {
+        if (! $request->sort && ! $request->search && $this->configuredCollectionsShareSort()) {
             $order = $this->getFirstCollectionFromRequest($request)->sortDirection();
         }
 
         return $order;
+    }
+
+    protected function configuredCollectionsShareSort(): bool
+    {
+        if (count($handles = $this->getConfiguredCollections()) < 2) {
+            return true;
+        }
+
+        $sorts = collect($handles)
+            ->map(fn ($handle) => Collection::findByHandle($handle))
+            ->map(fn ($collection) => $collection ? [$collection->sortField(), $collection->sortDirection()] : null)
+            ->unique();
+
+        // Structure order is per collection, so it can't order entries across collections.
+        return $sorts->count() === 1 && $sorts->first() && $sorts->first()[0] !== 'order';
     }
 
     public function initialSortColumn()
@@ -410,6 +425,14 @@ class Entries extends Relationship
 
     private function queryBuilder($values)
     {
+        $ids = $this->entriesInTheirSite($values)->map->id()->all();
+
+        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
+            ->whereIn('id', $ids);
+    }
+
+    private function entriesInTheirSite($values)
+    {
         $site = Site::current()->handle();
         if (($parent = $this->field()->parent()) && $parent instanceof Localization) {
             $site = $parent->locale();
@@ -419,18 +442,13 @@ class Entries extends Relationship
         // filter out entries that don't exist in the current site. They would do that.
         $shouldLocalize = ! $this->canSelectAcrossSites();
 
-        $ids = (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
+        return (new OrderedQueryBuilder(Entry::query(), $ids = Arr::wrap($values)))
             ->whereIn('id', $ids)
             ->get()
             ->when($shouldLocalize, fn ($entries) => $entries
                 ->map(fn ($entry) => $entry->in($site))
                 ->filter()
-            )
-            ->map->id()
-            ->all();
-
-        return (new StatusQueryBuilder(new OrderedQueryBuilder(Entry::query(), $ids)))
-            ->whereIn('id', $ids);
+            );
     }
 
     public function augment($values)
@@ -523,7 +541,13 @@ class Entries extends Relationship
 
     protected function getItemsForPreProcessIndex($values): SupportCollection
     {
-        return $this->queryBuilder($values)->whereAnyStatus()->get();
+        // Nothing selected, so there's nothing to go looking for.
+        if (empty(Arr::wrap($values))) {
+            return $this->collect([]);
+        }
+
+        // These are the entries a query for them in any status would find, so they aren't looked for a second time.
+        return Entry::applySubstitutions($this->entriesInTheirSite($values)->unique->id()->values());
     }
 
     public function relationshipQueryBuilder()

@@ -86,6 +86,10 @@ class CollectionRepository implements RepositoryContract
     {
         $this->store->save($collection);
 
+        if ($collection->isDirty('sites')) {
+            $this->stache->store('entries')->store($collection->handle())->clear();
+        }
+
         if ($collection->orderable()) {
             $this->stache->store('entries')->store($collection->handle())->index('order')->update();
         }

@@ -73,7 +73,7 @@ class TermsController extends CpController
     {
         $query = $taxonomy->queryTerms();
 
-        $query->where('site', Site::selected());
+        $query->where('site', Site::selected()->handle());
 
         if ($search = request('search')) {
             if ($taxonomy->hasSearchIndex()) {
@@ -167,14 +167,21 @@ class TermsController extends CpController
 
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => [
-                'required',
-                new Slug,
-                new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
-            ],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => [
+                    'required',
+                    new Slug,
+                    new UniqueTermValue(taxonomy: $taxonomy->handle(), except: $term->id(), site: $site->handle()),
+                ],
+            ])
+            ->withReplacements([
+                'id' => $term->id(),
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values();
 
@@ -190,19 +197,26 @@ class TermsController extends CpController
             $term->merge($values);
         }
 
-        $term->slug($request->slug);
+        $slugIsLocalized = $term->hasOrigin()
+            && $term->blueprint()->field('slug')->isLocalizable()
+            && in_array('slug', $request->input('_localized'));
+
+        if (! $term->hasOrigin() || $slugIsLocalized) {
+            $term->slug($request->slug);
+        }
 
         $term->published($request->published);
 
         $saved = $term->updateLastModified(User::current())->save();
 
-        [$values] = $this->extractFromFields($term, $term->blueprint());
+        [$values, $meta] = $this->extractFromFields($term, $term->blueprint());
 
         return (new TermResource($term))
             ->additional([
                 'saved' => $saved,
                 'data' => [
                     'values' => $values,
+                    'meta' => $meta,
                 ],
             ]);
     }
@@ -274,10 +288,16 @@ class TermsController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
-        ]);
+        $fields
+            ->validator()
+            ->withRules([
+                'title' => 'required',
+                'slug' => ['required', new UniqueTermValue(taxonomy: $taxonomy->handle(), site: $site->handle())],
+            ])
+            ->withReplacements([
+                'taxonomy' => $taxonomy->handle(),
+                'site' => $site->handle(),
+            ])->validate();
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
@@ -296,14 +316,14 @@ class TermsController extends CpController
             $term
                 ->in($defaultSite)
                 ->published($published)
-                ->data($values)
-                ->slug($slug);
+                ->data($values);
         }
 
         $term
             ->published($published)
-            ->data($values)
-            ->slug($slug);
+            ->data($values);
+
+        $term->term()->slug($slug);
 
         $saved = $term->updateLastModified(User::current())->save();
 

@@ -334,7 +334,15 @@ class Blueprint implements Arrayable, ArrayAccess, Augmentable, ContainsQueryabl
     {
         $this->parent = $parent;
 
-        $this->resetBlueprintCache()->resetFieldsCache();
+        $this->resetFieldsCache();
+
+        // The cache survives when the new parent uses the same blueprint. Give the new
+        // parent copies of the fields, so fields handed out earlier keep their parent.
+        if ($this->fieldsCache) {
+            $this->fieldsCache = $this->fieldsCache->newInstance()
+                ->setFields($this->fieldsCache->all()->map(fn ($field) => clone $field))
+                ->setParent($parent);
+        }
 
         return $this;
     }
