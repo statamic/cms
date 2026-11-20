@@ -5,6 +5,7 @@ namespace Statamic\Assets;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Flysystem\DirectoryListing;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use Statamic\Facades\Stache;
 use Statamic\Support\Str;
 
@@ -309,7 +310,14 @@ class AssetContainerContents
 
     private function ttl()
     {
-        return Stache::isWatcherEnabled() ? 0 : null;
+        // The watcher is for picking up changes made on disk. Listing a remote disk on
+        // every request is far too expensive for that, so those stay cached.
+        return Stache::isWatcherEnabled() && $this->isLocal() ? 0 : null;
+    }
+
+    private function isLocal(): bool
+    {
+        return $this->container->disk()->filesystem()->getAdapter() instanceof LocalFilesystemAdapter;
     }
 
     public function cacheStore()
