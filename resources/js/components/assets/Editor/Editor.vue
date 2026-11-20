@@ -48,9 +48,9 @@
                                 />
                                 <ui-button inset size="sm" v-if="asset.isEditable && isImage && isFocalPointEditorEnabled" @click.prevent="openFocalPointEditor" icon="focus" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Focal Point')" />
                                 <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
-                                <!-- Prototype: ask the AI to do things with the image (see AiImage.vue), after Crop with the other image edits -->
-                                <ui-button inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-spark" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Ask AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
+                                <!-- Prototype: ask the AI to do things with the image (see AiImage.vue), after Rename -->
+                                <ui-button inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-spark" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Ask AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
                                 <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
