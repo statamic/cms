@@ -227,7 +227,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
             return false;
         }
 
-        return $this->container()->files()->contains($path);
+        return $this->container()->contents()->hasFile($path);
     }
 
     public function getRawMeta()
@@ -293,9 +293,11 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
         if ($this->exists()) {
             $attributes = Attributes::asset($this)->get();
 
+            // The listing already holds the size and timestamp of every file,
+            // so only ask the disk for them when it somehow doesn't.
             $meta = array_merge($meta, [
-                'size' => $this->disk()->size($this->path()),
-                'last_modified' => $this->disk()->lastModified($this->path()),
+                'size' => $this->listingAttribute('size') ?? $this->disk()->size($this->path()),
+                'last_modified' => $this->listingAttribute('timestamp') ?? $this->disk()->lastModified($this->path()),
                 'width' => Arr::get($attributes, 'width'),
                 'height' => Arr::get($attributes, 'height'),
                 'mime_type' => $this->disk()->mimeType($this->path()),
@@ -315,7 +317,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     protected function metaExists()
     {
-        return $this->container()->metaFiles()->contains($this->metaPath());
+        return $this->container()->contents()->hasMetaFile($this->metaPath());
     }
 
     public function writeMeta($meta)
@@ -606,7 +608,25 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta('last_modified') ?? 0, config('app.timezone'));
+        $timestamp = $this->listingAttribute('timestamp') ?? $this->meta('last_modified') ?? 0;
+
+        return Carbon::createFromTimestamp($timestamp, config('app.timezone'));
+    }
+
+    /**
+     * Get a value the container listing already knows about this file.
+     *
+     * The listing holds the size and timestamp of every file, so these can be
+     * answered without reading (or generating) the asset's meta file, which
+     * is a request per asset when the container is on a remote disk.
+     */
+    private function listingAttribute($key)
+    {
+        if (! $path = $this->path()) {
+            return null;
+        }
+
+        return $this->container()->contents()->file($path)[$key] ?? null;
     }
 
     /**
@@ -925,7 +945,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
      */
     public function size()
     {
-        return $this->meta('size');
+        return $this->listingAttribute('size') ?? $this->meta('size');
     }
 
     /**
@@ -982,6 +1002,8 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
                 Svg::sanitize($contents)
             );
         }
+
+        $this->container()->contents()->add($this->path())->save();
 
         $this->clearCaches();
         $this->writeMeta($this->generateMeta());

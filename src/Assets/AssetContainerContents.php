@@ -176,6 +176,48 @@ class AssetContainerContents
         return $this->all()->where('type', 'dir');
     }
 
+    /**
+     * Whether an asset file exists at the given path.
+     *
+     * This looks the path up directly rather than filtering the whole listing,
+     * so checking one asset doesn't cost a pass over every file in the container.
+     */
+    public function hasFile($path): bool
+    {
+        return $this->isFile($path) && ! $this->isMetaPath($path) && ! $this->isIgnoredPath($path);
+    }
+
+    /**
+     * Get the listing attributes (type, path, timestamp, size) of an asset file.
+     */
+    public function file($path): ?array
+    {
+        return $this->hasFile($path) ? $this->all()->get($path) : null;
+    }
+
+    /**
+     * Whether a meta file exists at the given path.
+     */
+    public function hasMetaFile($path): bool
+    {
+        return $this->isFile($path) && $this->isMetaPath($path);
+    }
+
+    private function isFile($path): bool
+    {
+        return ($this->all()->get($path)['type'] ?? null) === 'file';
+    }
+
+    private function isMetaPath($path): bool
+    {
+        return Str::startsWith($path, '.meta/') || Str::contains($path, '/.meta/');
+    }
+
+    private function isIgnoredPath($path): bool
+    {
+        return Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
+    }
+
     public function metaFilesIn($folder, $recursive)
     {
         if (isset($this->metaFiles[$key = $folder.($recursive ? '-recursive' : '')])) {
