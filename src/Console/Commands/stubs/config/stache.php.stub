@@ -22,9 +22,14 @@ return [
     |
     | Here you may configure which Cache Store the Stache uses.
     |
+    | Set this to "stache_compiled" to keep the Stache as PHP files, which
+    | OPcache holds in shared memory. Pages that read a lot of entries are
+    | quicker for it. It needs OPcache to be enabled, and it is kept on
+    | this server's disk, so it isn't shared between servers.
+    |
     */
 
-    'cache_store' => null,
+    'cache_store' => env('STATAMIC_STACHE_CACHE_STORE'),
 
     /*
     |--------------------------------------------------------------------------
