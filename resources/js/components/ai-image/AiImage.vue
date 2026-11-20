@@ -41,6 +41,9 @@ const skillPill =
 // inside the card's 1px border, so it's 13px up and 2px further right, to line up with where the pills sat.
 const columnStyle = { marginBottom: '13px' };
 
+// A kept image says so with a small purple pill in its bottom right corner, 21px tall, saying "Kept", with 8px either side. The text is
+// trimmed like a Badge's, which centres its capitals and baseline, then lifted 1px, as the p's descender made it look low.
+
 // Cancel shows while images are being made (and stops them) or once they're back (and puts them away), leaving the original as it was
 const cancellable = computed(() => loading.value || variations.value.length > 0);
 
@@ -56,9 +59,16 @@ function generate() {
     }, 1800);
 }
 
+// Sending and cancelling take away the button you pressed (the skill pill, Cancel), so focus goes back to the input first, rather than
+// being lost when the button goes. (Keep stays put: it turns into Kept.)
+function focusInputIfInCard() {
+    document.activeElement?.closest('[data-ai-image-card]')?.querySelector('textarea')?.focus();
+}
+
 // Sending clears the box for the next request, as in the AI chat
 function send() {
     if (loading.value) return;
+    focusInputIfInCard();
     instruction.value = '';
     generate();
 }
@@ -71,6 +81,7 @@ function keep(index) {
 }
 
 function dismiss() {
+    focusInputIfInCard();
     clearTimeout(timer);
     loading.value = false;
     variations.value = [];
@@ -94,9 +105,40 @@ const originalSize = ref(null);
 
 function preview(index) {
     if (previewing.value === null) {
+        // Its exact size, fractions included: offsetWidth rounds to whole pixels, which nudged the image (and the card) by a fraction
         const image = imageBox.value?.querySelector('img');
-        originalSize.value = image ? { width: `${image.offsetWidth}px`, height: `${image.offsetHeight}px` } : null;
+        const size = image?.getBoundingClientRect();
+        originalSize.value = size ? { width: `${size.width}px`, height: `${size.height}px` } : null;
     }
+    showPreview(index);
+}
+
+// Going from one image to the next fades over 150ms: the image showing is copied into a layer on top, exactly over it, which fades out over
+// the new one. Reduced motion switches at once.
+const fading = ref(null);
+const fadeLayer = useTemplateRef('fadeLayer');
+let fadeCount = 0;
+
+function showPreview(index) {
+    if (index === previewing.value) return;
+    const image = imageBox.value?.querySelector('img');
+
+    if (image && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const box = imageBox.value.getBoundingClientRect();
+        const rect = image.getBoundingClientRect();
+        const count = ++fadeCount;
+        fading.value = {
+            key: count,
+            src: image.currentSrc || image.src,
+            css: image.getAttribute('style') ?? '',
+            fit: getComputedStyle(image).objectFit,
+            place: { left: `${rect.left - box.left}px`, top: `${rect.top - box.top}px`, width: `${rect.width}px`, height: `${rect.height}px` },
+        };
+        nextTick(() => {
+            fadeLayer.value?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-out', fill: 'forwards' }).finished.then(() => count === fadeCount && (fading.value = null), () => {});
+        });
+    }
+
     previewing.value = index;
 }
 
@@ -110,9 +152,10 @@ const ratio = computed(() => (props.asset.width && props.asset.height ? `${props
 const input = useTemplateRef('input');
 watch(open, (isOpen) => isOpen && nextTick(() => input.value?.$el?.querySelector('textarea')?.focus()));
 
-// Enter sends, as in the AI chat. Shift+Enter starts a new line. Esc closes it, rather than the editor.
+// Enter in the input sends, as in the AI chat (on a button, it presses the button). Shift+Enter starts a new line. Esc closes it, rather
+// than the editor.
 function onKeydown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && event.target.tagName === 'TEXTAREA') {
         event.preventDefault();
         send();
     }
@@ -131,18 +174,82 @@ onBeforeUnmount(() => clearTimeout(timer));
         <div ref="imageBox" class="relative flex min-h-0 max-w-full items-center justify-center">
             <slot v-bind="shown" />
 
+            <!-- The image that was showing, fading out over the new one (see showPreview) -->
+            <div v-if="fading" ref="fadeLayer" :key="fading.key" class="pointer-events-none absolute overflow-hidden" :style="fading.place">
+                <img :src="fading.src" :style="fading.css" class="size-full! max-h-none! max-w-none!" :class="fading.fit === 'cover' ? 'object-cover' : 'object-contain'" alt="" />
+            </div>
+
             <template v-if="open">
-                <span v-if="hovered" class="absolute start-0 -top-8 rounded-md bg-ai px-2 py-1 text-xs font-medium whitespace-nowrap text-white shadow-sm">{{ __('Previewing :name', { name: hovered.label }) }}</span>
+                <!-- A tab on the photo's top edge, flush with it and square at the bottom, saying which image is showing -->
+                <span v-if="hovered" class="absolute start-0 bottom-full rounded-t-md bg-ai px-2 py-1 text-xs font-medium whitespace-nowrap text-white">{{ __('Previewing :name', { name: hovered.label }) }}</span>
 
                 <!-- Ask for something. It's the AI chat's floating card (see PanelLayout.vue and AiChat.vue), with the input straight on the card and
                      the chat's icon in front of it. It's always dark, to suit the dark area round the image, and see-through, so it takes on the
                      photo's colours, with no edge or glow (see components/ai.css). There's no ×: Ask AI and Esc close it, as Ask does the chat
                      before it's started. The skill pills sit beside the card in this wrapper, not inside it: inside, their blur would only see the
                      card, so they'd never look frosted. -->
-                <div class="dark group/card absolute end-4 bottom-4 z-10 w-84 max-w-[calc(100%-2rem)] animate-in duration-150 fade-in-0 slide-in-from-bottom-2" @keydown="onKeydown">
+                <div data-ai-image-card class="dark group/card absolute end-4 bottom-4 z-10 w-84 max-w-[calc(100%-2rem)] animate-in duration-150 fade-in-0 slide-in-from-bottom-2" @keydown="onKeydown">
+                    <div class="ai-chat-card backdrop-blur-xl backdrop-saturate-150 rounded-xl border border-transparent ps-2.25" data-glass :data-working="loading || undefined">
+                        <form class="relative p-2 ps-0.25" @submit.prevent="send">
+                            <!-- The chat's icon in front of the text (see AiChat.vue). There's no send button: Enter sends. -->
+                            <Icon name="ai-chat" class="pointer-events-none absolute start-2.5 top-[16.5px] z-(--z-index-above) size-4 text-white/85" />
+                            <Textarea
+                                ref="input"
+                                v-model="instruction"
+                                rows="1"
+                                resize="none"
+                                elastic
+                                :placeholder="__('Ask for changes…')"
+                                :aria-label="__('Ask the AI about this image')"
+                                class="min-h-[34px] border-0 ps-8.5! pt-[3.5px]! pb-[6px]! shadow-none! outline-hidden placeholder:overflow-hidden placeholder:whitespace-nowrap placeholder:text-white/85 text-white! dark:bg-transparent!"
+                                :class="cancellable ? 'pe-16!' : 'pe-2!'"
+                            />
+
+                            <p class="sr-only" role="status">{{ loading ? __('Creating 4 images…') : variations.length ? __('4 images to choose from') : '' }}</p>
+                        </form>
+
+                        <!-- The new images, in a column above the card, as the AI's answer, cropped to the original's shape. A strip of them under the
+                             image looked like a gallery of the folder's images. Hovering one, or tabbing to it, shows it in the image's place. They come
+                             after the input in the page, so Tab goes from the input up through them, one stop each: Keep, or Kept once
+                             it's kept. Tabbing away from them puts the original back. -->
+                        <div v-if="loading || variations.length" class="absolute -end-0.5 bottom-full flex w-24 flex-col gap-1.5" :style="columnStyle" @mouseleave="showPreview(null)" @focusout="!$event.currentTarget.contains($event.relatedTarget) && showPreview(null)">
+                            <template v-if="loading">
+                                <div v-for="i in 4" :key="i" class="w-full animate-pulse rounded-md bg-white/10" :style="{ aspectRatio: ratio }" />
+                            </template>
+                            <div v-for="(variation, i) in variations" v-else :key="variation.file">
+                                <div class="group relative w-full overflow-hidden rounded-md shadow-lg ring-2 ring-transparent focus-within:ring-ai hover:ring-ai" :style="{ aspectRatio: ratio }" @mouseenter="preview(i)">
+                                    <img :src="variation.src" :style="variation.style" class="size-full object-cover" alt="" />
+
+                                    <!-- Keep, as a white bar across the bottom on hover or focus, which turns into the purple Kept pill. It's one button, so
+                                         focus stays on it when you keep it, and a kept image can still be tabbed to and previewed. Kept does nothing. -->
+                                    <button
+                                        type="button"
+                                        class="absolute bottom-1 text-2xs font-medium"
+                                        :class="
+                                            kept.has(i)
+                                                ? 'end-1 flex h-[21px] cursor-default items-center rounded-full bg-ai px-2 text-white'
+                                                : 'inset-x-1 cursor-pointer rounded bg-white/90 py-0.5 text-gray-900 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                                        "
+                                        :aria-disabled="kept.has(i) || undefined"
+                                        @focus="preview(i)"
+                                        @click="keep(i)"
+                                    >
+                                        <span v-if="kept.has(i)" class="-translate-y-px st-text-trim-optical-cap">{{ __('Kept') }}</span>
+                                        <template v-else>{{ __('Keep') }}</template>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cancel sits at the end of the input, where the chat has Clear. It comes after the new images in the page, so it's the last
+                             stop for Tab. -->
+                        <button v-if="cancellable" type="button" :class="cancelLink" class="absolute end-2 bottom-[12.5px]" @mousedown.prevent @click="dismiss">{{ __('Cancel') }}</button>
+                    </div>
+
                     <!-- The skills, as pills above the card while you're in it and haven't typed anything, as the chat's are. Picking one runs it,
                          and they make way for the new images (see columnStyle).
-                         mousedown.prevent keeps focus in the input, so they stay put. Their instructions show in a tooltip on hover. -->
+                         mousedown.prevent keeps focus in the input, so they stay put. Their instructions show in a tooltip on hover. They come after
+                         the card in the page, as the chat's do, so Tab goes from the input to them. -->
                     <div
                         v-if="!instruction && !cancellable"
                         class="pointer-events-none absolute -end-px bottom-full mb-3 flex justify-end gap-1.5 opacity-0 transition-opacity group-focus-within/card:pointer-events-auto group-focus-within/card:opacity-100"
@@ -159,44 +266,6 @@ onBeforeUnmount(() => clearTimeout(timer));
                         >
                             <span class="st-text-trim-optical-cap">{{ saved.name }}</span>
                         </button>
-                    </div>
-
-                    <div class="ai-chat-card backdrop-blur-xl backdrop-saturate-150 rounded-xl border border-transparent ps-2.25" data-glass :data-working="loading || undefined">
-                        <!-- The new images, in a column above the card, as the AI's answer, cropped to the original's shape. A strip of them under the
-                             image looked like a gallery of the folder's images. Hovering one shows it in the image's place. -->
-                        <div v-if="loading || variations.length" class="absolute -end-0.5 bottom-full flex w-24 flex-col gap-1.5" :style="columnStyle" @mouseleave="previewing = null">
-                            <template v-if="loading">
-                                <div v-for="i in 4" :key="i" class="w-full animate-pulse rounded-md bg-white/10" :style="{ aspectRatio: ratio }" />
-                            </template>
-                            <div v-for="(variation, i) in variations" v-else :key="variation.file">
-                                <div class="group relative w-full overflow-hidden rounded-md shadow-lg ring-2 ring-transparent hover:ring-ai" :style="{ aspectRatio: ratio }" @mouseenter="preview(i)">
-                                    <img :src="variation.src" :style="variation.style" class="size-full object-cover" alt="" />
-                                    <button v-if="!kept.has(i)" type="button" class="absolute inset-x-1 bottom-1 cursor-pointer rounded bg-white/90 py-0.5 text-2xs font-medium text-gray-900 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" @focus="preview(i)" @click="keep(i)">{{ __('Keep') }}</button>
-                                    <span v-else class="absolute end-1 bottom-1 flex items-center gap-1 rounded bg-ai px-1 py-0.5 text-2xs font-medium text-white"><Icon name="checkmark" class="size-2.5!" />{{ __('Kept') }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <form class="relative p-2 ps-0.25" @submit.prevent="send">
-                            <!-- The chat's icon in front of the text (see AiChat.vue). There's no send button: Enter sends. -->
-                            <Icon name="ai-chat" class="pointer-events-none absolute start-2.5 top-[16.5px] z-(--z-index-above) size-4 text-white/85" />
-                            <Textarea
-                                ref="input"
-                                v-model="instruction"
-                                rows="1"
-                                resize="none"
-                                elastic
-                                :placeholder="__('Ask for changes…')"
-                                :aria-label="__('Ask the AI about this image')"
-                                class="min-h-[34px] border-0 ps-8.5! pt-[3.5px]! pb-[6px]! shadow-none! outline-hidden placeholder:overflow-hidden placeholder:whitespace-nowrap placeholder:text-white/85 text-white! dark:bg-transparent!"
-                                :class="cancellable ? 'pe-16!' : 'pe-2!'"
-                            />
-
-                            <!-- Cancel sits at the end, where the chat has Clear -->
-                            <button v-if="cancellable" type="button" :class="cancelLink" class="absolute end-2 bottom-[12.5px]" @mousedown.prevent @click="dismiss">{{ __('Cancel') }}</button>
-
-                            <p class="sr-only" role="status">{{ loading ? __('Creating 4 images…') : variations.length ? __('4 images to choose from') : '' }}</p>
-                        </form>
                     </div>
                 </div>
             </template>
