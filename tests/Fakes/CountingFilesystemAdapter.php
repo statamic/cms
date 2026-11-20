@@ -2,17 +2,18 @@
 
 namespace Tests\Fakes;
 
+use Illuminate\Filesystem\Filesystem;
 use League\Flysystem\Config;
 use League\Flysystem\DecoratedAdapter;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use RuntimeException;
 
 /**
  * A non-local Flysystem adapter that tallies what a remote disk would be asked to do.
  *
- * It wraps an in-memory adapter, so code under test takes the same path it would
- * for S3 and friends, while the bytes actually pulled can be asserted on.
+ * It wraps a local adapter on a temporary directory, so code under test takes the same
+ * path it would for S3 and friends, while the bytes actually pulled can be asserted on.
  */
 class CountingFilesystemAdapter extends DecoratedAdapter
 {
@@ -24,10 +25,18 @@ class CountingFilesystemAdapter extends DecoratedAdapter
     public int $writes = 0;
 
     private ?int $objectReadsAllowed = null;
+    private string $root;
 
     public function __construct()
     {
-        parent::__construct(new InMemoryFilesystemAdapter);
+        $this->root = sys_get_temp_dir().'/statamic-counting-disk-'.bin2hex(random_bytes(8));
+
+        parent::__construct(new LocalFilesystemAdapter($this->root));
+    }
+
+    public function __destruct()
+    {
+        (new Filesystem)->deleteDirectory($this->root);
     }
 
     public function reset(): void

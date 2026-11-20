@@ -50,7 +50,6 @@
         "laravel/pao": "^1.1",
         "laravel/pint": "1.16.0",
         "laravel/socialite": "^5.28",
-        "league/flysystem-memory": "^3.0",
         "mockery/mockery": "^1.6.10",
         "orchestra/testbench": "^10.8 || ^11.0",
         "pestphp/pest": "^4.7",
