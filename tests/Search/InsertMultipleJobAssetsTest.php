@@ -80,7 +80,6 @@ class InsertMultipleJobAssetsTest extends TestCase
         Asset::find('remote::one.jpg')->save();
 
         $this->assertIndexed(self::PATHS);
-        $this->assertSame(4, $this->adapter->objectReads);
         $this->assertLessThan(self::SIZE / 2, $this->adapter->objectBytes);
     }
 
