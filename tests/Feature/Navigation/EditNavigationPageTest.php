@@ -95,6 +95,34 @@ class EditNavigationPageTest extends TestCase
     }
 
     #[Test]
+    public function it_gets_the_stored_value_of_a_link_to_an_entry()
+    {
+        $this->withoutExceptionHandling();
+        $this->mockTextFieldtype();
+        $user = tap(User::make()->makeSuper())->save();
+        $nav = tap(Nav::make('test'))->save();
+        $nav->makeTree('en', [
+            [
+                'id' => 'id7',
+                'title' => 'The title',
+                'url' => 'entry::123',
+            ],
+        ])->save();
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('navigation.test')->andReturn(Blueprint::makeFromFields([]));
+
+        // The form gets the reference, not the url it resolves to, so that saving keeps the link.
+        $this
+            ->actingAs($user)
+            ->request($nav, 'id7')
+            ->assertJson([
+                'values' => [
+                    'url' => 'entry::123 (preprocessed)',
+                ],
+            ]);
+    }
+
+    #[Test]
     public function it_gets_the_values_for_a_text_only_nav_item()
     {
         $this->withoutExceptionHandling();

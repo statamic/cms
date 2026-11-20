@@ -126,7 +126,7 @@ class NavigationPagesController extends CpController
             ->merge($page->pageData())
             ->merge([
                 'title' => $page->title(),
-                'url' => $page->reference() ? null : $page->url(),
+                'url' => $page->reference() ? null : $page->customUrl(),
             ])->all();
     }
 
