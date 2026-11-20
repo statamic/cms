@@ -3,6 +3,7 @@ Schema::table('USERS_TABLE', function (Blueprint $table) {
             $table->string('avatar')->nullable();
             $table->json('preferences')->nullable();
             $table->timestamp('last_login')->nullable();
+            $table->string('name')->nullable()->change();
             $table->string('password')->nullable()->change();
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();

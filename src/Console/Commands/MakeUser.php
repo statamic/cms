@@ -85,6 +85,12 @@ class MakeUser extends Command
             $this->password = $password;
         }
 
+        $this->data = collect([
+            'name' => $this->option('name'),
+            'first_name' => $this->option('first-name'),
+            'last_name' => $this->option('last-name'),
+        ])->filter()->all();
+
         // If email argument exists, non-interactively create user.
         if ($this->email = $this->argument('email')) {
             return $this->createUser();
@@ -126,7 +132,7 @@ class MakeUser extends Command
             return $this->promptSeparateNameFields();
         }
 
-        $this->data['name'] = text(label: 'Name');
+        $this->data['name'] ??= text(label: 'Name');
 
         return $this;
     }
@@ -138,8 +144,8 @@ class MakeUser extends Command
      */
     protected function promptSeparateNameFields()
     {
-        $this->data['first_name'] = text(label: 'First Name');
-        $this->data['last_name'] = text(label: 'Last Name');
+        $this->data['first_name'] ??= text(label: 'First Name');
+        $this->data['last_name'] ??= text(label: 'Last Name');
 
         return $this;
     }
@@ -194,8 +200,11 @@ class MakeUser extends Command
 
         $user = User::make()
             ->email($this->email)
-            ->data($this->data)
-            ->password($this->password);
+            ->data($this->data);
+
+        if ($this->password) {
+            $user->password($this->password);
+        }
 
         if ($this->super || $this->option('super')) {
             $user->makeSuper();
@@ -265,6 +274,9 @@ class MakeUser extends Command
         return array_merge(parent::getOptions(), [
             ['super', '', InputOption::VALUE_NONE, 'Generate a super user with permission to do everything'],
             ['password', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given password'],
+            ['name', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given name'],
+            ['first-name', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given first name'],
+            ['last-name', '', InputOption::VALUE_OPTIONAL, 'Generate a user with given last name'],
         ]);
     }
 }
