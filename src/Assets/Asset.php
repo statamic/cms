@@ -237,7 +237,7 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     public function meta($key = null)
     {
-        if (func_num_args() === 1) {
+        if (! is_null($key)) {
             return $this->metaValue($key);
         }
 
@@ -273,10 +273,12 @@ class Asset implements Arrayable, ArrayAccess, AssetContract, Augmentable, Conta
 
     private function metaValue($key)
     {
-        $value = Arr::get($this->meta(), $key);
+        $meta = $this->meta();
 
-        if (! is_null($value)) {
-            return $value;
+        // A null value is a legitimate result, e.g. a video getID3 can't read.
+        // Only meta that is missing the key entirely needs to be regenerated.
+        if (Arr::has($meta, $key)) {
+            return Arr::get($meta, $key);
         }
 
         $this->cacheStore()->forget($this->metaCacheKey());
