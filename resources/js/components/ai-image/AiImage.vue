@@ -7,8 +7,8 @@ import { variationsOf } from './mock-image-variations.js';
 // Prototype: ask the AI for things to do with an image, in the asset editor. Opening it pins a prompt card to the image's corner, as in
 // Wix Harmony. There's no frame round the image (it looked like a crop) and no "Image" chip in the card, as the editor only has the one
 // image. For now it makes variations: the "Make variations" skill (or anything typed) comes back with four new images, in the card.
-// Hovering one shows it in the image's place, and Keep saves it as a new asset next to the original.
-// Nothing is saved until you click Keep, and the original is never changed, as with the AI chat, where your own save is the approval.
+// Hovering one shows it in the image's place, and Save adds it as a new asset next to the original.
+// Nothing is saved until you click Save, and the original is never changed, as with the AI chat, where your own save is the approval.
 // The image itself comes in the slot, which gets the src and style to show (the original, or the variation being previewed).
 const props = defineProps({
     asset: { type: Object, required: true },
@@ -19,7 +19,7 @@ const open = defineModel('open', { type: Boolean, default: false });
 const instruction = ref('');
 const loading = ref(false);
 const variations = ref([]);
-const kept = ref(new Set());
+const saved = ref(new Set());
 const previewing = ref(null);
 let timer = null;
 
@@ -37,8 +37,8 @@ const skillPill =
     'flex cursor-pointer whitespace-nowrap rounded-full bg-gray-900/55 px-2.5 py-[8.5px] text-xs text-white backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-gray-900/70 aria-disabled:cursor-default aria-disabled:opacity-60';
 
 
-// A kept image says so with a small purple pill in its bottom right corner, 21px tall, saying "Kept", with 8px either side. The text is
-// trimmed like a Badge's, which centres its capitals and baseline, then lifted 1px, as the p's descender made it look low.
+// A saved image says so with a small purple pill in its bottom right corner, 21px tall, saying "Saved", with 8px either side. The text is
+// trimmed like a Badge's, which centres its capitals and baseline.
 
 // Cancel shows while images are being made (and stops them) or once they're back (and puts them away), leaving the original as it was
 const cancellable = computed(() => loading.value || variations.value.length > 0);
@@ -50,13 +50,13 @@ function generate() {
     clearTimeout(timer);
     timer = setTimeout(() => {
         variations.value = variationsOf(props.asset);
-        kept.value = new Set();
+        saved.value = new Set();
         loading.value = false;
     }, 1800);
 }
 
 // Sending and cancelling take away the button you pressed (the skill pill, Cancel), so focus goes back to the input first, rather than
-// being lost when the button goes. (Keep stays put: it turns into Kept.)
+// being lost when the button goes. (Save stays put: it turns into Saved.)
 function focusInputIfInCard() {
     document.activeElement?.closest('[data-ai-image-card]')?.querySelector('textarea')?.focus();
 }
@@ -69,10 +69,10 @@ function send() {
     generate();
 }
 
-// Keep saves it as a new asset in the same folder (prototype: nothing is saved, it just says so)
-function keep(index) {
-    if (kept.value.has(index)) return;
-    kept.value = new Set([...kept.value, index]);
+// Save adds it as a new asset in the same folder (prototype: nothing is saved, it just says so)
+function save(index) {
+    if (saved.value.has(index)) return;
+    saved.value = new Set([...saved.value, index]);
     toast.success(__('Saved as :file', { file: variations.value[index].file }));
 }
 
@@ -208,8 +208,8 @@ onBeforeUnmount(() => clearTimeout(timer));
                              pills' place: the pills go once you've asked, and the column starts where they were, 12px above the card and level with its
                              right edge (13px up and 2px out, as it's placed from inside the card's 1px border). A strip of them under the
                              image looked like a gallery of the folder's images. Hovering one, or tabbing to it, shows it in the image's place. They come
-                             after the input in the page, so Tab goes from the input up through them, one stop each: Keep, or Kept once
-                             it's kept. Tabbing away from them puts the original back. -->
+                             after the input in the page, so Tab goes from the input up through them, one stop each: Save, or Saved once
+                             it's saved. Tabbing away from them puts the original back. -->
                         <div v-if="loading || variations.length" class="absolute -end-0.5 bottom-full mb-[13px] flex w-24 flex-col gap-1.5" @mouseleave="showPreview(null)" @focusout="!$event.currentTarget.contains($event.relatedTarget) && showPreview(null)">
                             <template v-if="loading">
                                 <div v-for="i in 4" :key="i" class="w-full animate-pulse rounded-md bg-white/10" :style="{ aspectRatio: ratio }" />
@@ -218,22 +218,22 @@ onBeforeUnmount(() => clearTimeout(timer));
                                 <div class="group relative w-full overflow-hidden rounded-md shadow-lg ring-2 ring-transparent focus-within:ring-ai hover:ring-ai" :style="{ aspectRatio: ratio }" @mouseenter="preview(i)">
                                     <img :src="variation.src" :style="variation.style" class="size-full object-cover" alt="" />
 
-                                    <!-- Keep, as a white bar across the bottom on hover or focus, which turns into the purple Kept pill. It's one button, so
-                                         focus stays on it when you keep it, and a kept image can still be tabbed to and previewed. Kept does nothing. -->
+                                    <!-- Save, as a white bar across the bottom on hover or focus, which turns into the purple Saved pill. It's one button, so
+                                         focus stays on it when you save it, and a saved image can still be tabbed to and previewed. Saved does nothing. -->
                                     <button
                                         type="button"
                                         class="absolute bottom-1 text-2xs font-medium"
                                         :class="
-                                            kept.has(i)
+                                            saved.has(i)
                                                 ? 'end-1 flex h-[21px] cursor-default items-center rounded-full bg-ai px-2 text-white'
                                                 : 'inset-x-1 cursor-pointer rounded bg-white/90 py-0.5 text-gray-900 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
                                         "
-                                        :aria-disabled="kept.has(i) || undefined"
+                                        :aria-disabled="saved.has(i) || undefined"
                                         @focus="preview(i)"
-                                        @click="keep(i)"
+                                        @click="save(i)"
                                     >
-                                        <span v-if="kept.has(i)" class="-translate-y-px st-text-trim-optical-cap">{{ __('Kept') }}</span>
-                                        <template v-else>{{ __('Keep') }}</template>
+                                        <span v-if="saved.has(i)" class="st-text-trim-optical-cap">{{ __('Saved') }}</span>
+                                        <template v-else>{{ __('Save') }}</template>
                                     </button>
                                 </div>
                             </div>
@@ -253,16 +253,16 @@ onBeforeUnmount(() => clearTimeout(timer));
                         class="pointer-events-none absolute -end-px bottom-full mb-3 flex justify-end gap-1.5 opacity-0 transition-opacity group-focus-within/card:pointer-events-auto group-focus-within/card:opacity-100"
                     >
                         <button
-                            v-for="saved in imagePrompts"
-                            :key="saved.name"
+                            v-for="skill in imagePrompts"
+                            :key="skill.name"
                             type="button"
                             :class="skillPill"
                             :aria-disabled="loading"
-                            v-tooltip="{ content: saved.instructions, hoverOnly: true, class: 'max-w-48 text-xs text-pretty' }"
+                            v-tooltip="{ content: skill.instructions, hoverOnly: true, class: 'max-w-48 text-xs text-pretty' }"
                             @mousedown.prevent
                             @click="send"
                         >
-                            <span class="st-text-trim-optical-cap">{{ saved.name }}</span>
+                            <span class="st-text-trim-optical-cap">{{ skill.name }}</span>
                         </button>
                     </div>
                 </div>
