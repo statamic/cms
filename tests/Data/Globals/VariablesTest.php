@@ -421,4 +421,19 @@ EOT;
         $this->assertEquals($variables->id(), $found->id());
         $this->assertEquals('bar', $found->get('foo'));
     }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'toggle', 'default' => true]]);
+        BlueprintRepository::shouldReceive('find')->with('globals.settings')->andReturn($blueprint);
+
+        $variables = GlobalSet::make('settings')->in('en');
+
+        $this->assertTrue($variables->getQueryableValue('foo'));
+
+        $variables->set('foo', false);
+
+        $this->assertFalse($variables->getQueryableValue('foo'));
+    }
 }

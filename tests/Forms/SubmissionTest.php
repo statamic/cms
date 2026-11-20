@@ -252,4 +252,19 @@ class SubmissionTest extends TestCase
         $this->assertEquals('A', $submission->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
     }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'toggle', 'default' => true]]);
+        Blueprint::shouldReceive('find')->with('forms.test')->andReturn($blueprint);
+
+        $submission = Form::make('test')->makeSubmission();
+
+        $this->assertTrue($submission->getQueryableValue('foo'));
+
+        $submission->set('foo', false);
+
+        $this->assertFalse($submission->getQueryableValue('foo'));
+    }
 }

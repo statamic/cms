@@ -467,7 +467,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return $value;
         }
 
-        return $field->fieldtype()->toQueryableValue($value);
+        return $field->toQueryableValue($value);
     }
 
     private function queryableMethods(): array

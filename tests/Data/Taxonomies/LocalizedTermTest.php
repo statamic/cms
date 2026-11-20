@@ -305,4 +305,20 @@ class LocalizedTermTest extends TestCase
         $this->assertSame('en', (new LocalizedTerm(new Term, 'en'))->getQueryableValue('site'));
         $this->assertSame('removed', (new LocalizedTerm(new Term, 'removed'))->getQueryableValue('site'));
     }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Blueprint::makeFromFields(['foo' => ['type' => 'toggle', 'default' => true]]);
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/tags')->andReturn(collect(['tags' => $blueprint]));
+        Taxonomy::make('tags')->save();
+
+        $localized = (new Term)->taxonomy('tags')->in('en');
+
+        $this->assertTrue($localized->getQueryableValue('foo'));
+
+        $localized->set('foo', false);
+
+        $this->assertFalse($localized->getQueryableValue('foo'));
+    }
 }

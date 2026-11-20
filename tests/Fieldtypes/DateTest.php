@@ -836,6 +836,15 @@ class DateTest extends TestCase
         $this->assertEquals('timezones', $dateTimeSection['fields']['timezone']['dictionary']);
     }
 
+    #[Test]
+    public function it_does_not_use_a_default_of_now_as_the_queryable_value()
+    {
+        $field = new Field('test', ['type' => 'date', 'default' => 'now']);
+
+        $this->assertNull($field->toQueryableValue(null));
+        $this->assertEquals('2012-01-04', $field->toQueryableValue('2012-01-04')->format('Y-m-d'));
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_replace([
