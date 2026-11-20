@@ -30,19 +30,22 @@ class AugmentedPage extends AugmentedEntry
             return $this->cachedKeys;
         }
 
-        $keys = collect($this->hasEntry
-            ? parent::keys()
-            : ['title', 'url', 'uri', 'permalink', 'id']);
+        $keys = array_merge(
+            collect($this->hasEntry ? parent::keys() : ['title', 'url', 'uri', 'permalink', 'id'])->all(),
+            array_keys($this->page->data()->all()),
+            array_keys(collect($this->page->supplements())->all()),
+            array_keys($this->blueprintFields()->all()),
+            ['entry_id'],
+        );
 
-        $keys = $keys
-            ->merge($this->page->data()->keys())
-            ->merge($this->page->supplements()->keys())
-            ->merge($this->blueprintFields()->keys())
-            ->merge(['entry_id']);
+        if (Statamic::isApiRoute()) {
+            $keys = $this->apiKeys($keys)->all();
+        }
 
-        $keys = Statamic::isApiRoute() ? $this->apiKeys($keys) : $keys;
+        $keys = array_unique($keys, SORT_REGULAR);
+        asort($keys, SORT_REGULAR);
 
-        return $this->cachedKeys = $keys->unique()->sort()->values()->all();
+        return $this->cachedKeys = array_values($keys);
     }
 
     private function apiKeys($keys)
