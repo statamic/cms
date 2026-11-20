@@ -1143,7 +1143,7 @@ class FakeTokenHandler
 {
     public function handle(\Statamic\Contracts\Tokens\Token $token, \Illuminate\Http\Request $request, \Closure $next)
     {
-        return $next($token);
+        return $next($request);
     }
 }
 
