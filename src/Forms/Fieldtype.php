@@ -130,7 +130,7 @@ class Fieldtype extends Relationship
             return [
                 'id' => $form->handle(),
                 'title' => __($form->title()),
-                'submissions' => $form->submissions()->count(),
+                'submissions' => $form->querySubmissions()->whereStatus('finalized')->count(),
             ];
         };
 

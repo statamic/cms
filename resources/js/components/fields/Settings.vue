@@ -5,10 +5,11 @@
 
     <StackHeader v-if="!loading" :title="__(values.display) || __(config.display) || config.handle" :icon="fieldtype.icon">
         <template #actions>
-            <Button v-if="!showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
-            <Button v-if="!(isNestedField)" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" v-tooltip="saveAndCloseShortcutLabel" />
-            <Button v-if="isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
-            <Button v-if="isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
+            <Button v-if="!canSaveRoot" variant="primary" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="canSaveRoot && !showSaveOnlyAtTopLevel" variant="default" @click.prevent="commit" :text="__('Apply')" />
+            <Button v-if="canSaveRoot && !isNestedField" variant="primary" @click.prevent="commitAndSave" icon="save" :text="showSaveOnlyAtTopLevel ? __('Save') : __('Apply & Save')" v-tooltip="saveAndCloseShortcutLabel" />
+            <Button v-if="canSaveRoot && isNestedField" variant="default" @click.prevent="commitAndSaveAll" :text="__('Save All')" v-tooltip="saveAllShortcutLabel" />
+            <Button v-if="canSaveRoot && isNestedField" variant="primary" @click.prevent="commitAndSaveTopStack" icon="save" :text="__('Save')" />
         </template>
     </StackHeader>
 
@@ -113,6 +114,9 @@ export default {
         },
         commitParentField: {
             default: null
+        },
+        fieldSettingsApi: {
+            default: null
         }
     },
 
@@ -187,6 +191,10 @@ export default {
             }
 
             return this.fieldtypeConfig;
+        },
+
+        canSaveRoot() {
+            return this.fieldSettingsApi?.canSaveRoot ?? true;
         },
 
         isNestedField() {
@@ -276,17 +284,19 @@ export default {
 
             this.clearErrors();
 
-            this.$axios
-                .post(cp_url('fields/update'), {
-                    id: this.id,
-                    type: this.type,
-                    values: this.values,
-                    fields: this.fields,
-                    isInsideSet: this.isInsideSet,
-                })
-                .then((response) => {
+            const update = this.fieldSettingsApi?.update
+                ?? ((payload) => this.$axios.post(cp_url('fields/update'), payload).then((response) => response.data));
+
+            update({
+                id: this.id,
+                type: this.type,
+                values: this.values,
+                fields: this.fields,
+                isInsideSet: this.isInsideSet,
+            })
+                .then((values) => {
                     this.$refs.container?.clearDirtyState();
-                    this.$emit('committed', response.data, this.editedFields);
+                    this.$emit('committed', values, this.editedFields);
 
                     if (shouldCommitParent && this.commitParentField) {
 						this.$nextTick(() => {
@@ -297,7 +307,7 @@ export default {
                         return;
                     }
 
-                    if (shouldSaveRoot) {
+                    if (shouldSaveRoot && this.canSaveRoot) {
                         this.saveRootForm();
                     }
 
@@ -384,20 +394,22 @@ export default {
         load() {
             const field = this.fields.find(f => f.handle === this.config.handle);
 
-            this.$axios
-                .post(cp_url('fields/edit'), {
-                    type: this.type,
-                    reference: field?.type === 'reference' ? field.field_reference : false,
-                    values: this.config,
-                })
-                .then((response) => {
+            const edit = this.fieldSettingsApi?.edit
+                ?? ((payload) => this.$axios.post(cp_url('fields/edit'), payload).then((response) => response.data));
+
+            edit({
+                type: this.type,
+                reference: field?.type === 'reference' ? field.field_reference : false,
+                values: this.config,
+            })
+                .then((data) => {
                     this.loading = false;
-                    this.fieldtype = response.data.fieldtype;
-                    this.blueprint = response.data.blueprint;
-                    this.values = response.data.values;
-                    this.meta = { ...response.data.meta };
-                    this.originValues = response.data.originValues;
-                    this.originMeta = response.data.originMeta;
+                    this.fieldtype = data.fieldtype;
+                    this.blueprint = data.blueprint;
+                    this.values = data.values;
+                    this.meta = { ...data.meta };
+                    this.originValues = data.originValues;
+                    this.originMeta = data.originMeta;
                 })
                 .catch((e) => {
                     this.loading = false;

@@ -1,0 +1,27 @@
+import { Canvas, Meta, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as StarRatingStories from '../StarRating.stories';
+
+<Meta of={StarRatingStories} />
+
+# StarRating
+A row of stars for collecting a rating. It's a native range input under the hood, so it's keyboard accessible.
+
+Nothing is filled in until the rating is set. The thumb still sits at the minimum so it lines up with the first star, but the fill stays hidden until the field is used or a value is provided.
+<Canvas of={StarRatingStories._DocsIntro} sourceState={'shown'} />
+
+## Half stars
+Set `step` to `0.5` to allow ratings like 3.5.
+<Canvas of={StarRatingStories._HalfStars} sourceState={'shown'} />
+
+## Number of stars
+Use `max` to change how many stars are shown.
+<Canvas of={StarRatingStories._Max} sourceState={'shown'} />
+
+## Sizes
+<Canvas of={StarRatingStories._Sizes} sourceState={'shown'} />
+
+## Disabled
+<Canvas of={StarRatingStories._Disabled} sourceState={'shown'} />
+
+## Arguments
+<ArgTypes of={StarRatingStories} />

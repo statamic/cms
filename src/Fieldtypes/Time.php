@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Illuminate\Support\Facades\Date;
 use Statamic\Fields\Fieldtype;
 use Statamic\Rules\TimeFieldtype as ValidationRule;
@@ -56,5 +57,15 @@ class Time extends Fieldtype
     public function rules(): array
     {
         return [new ValidationRule($this)];
+    }
+
+    public function previewValue(): mixed
+    {
+        return now()->format('H:i');
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->time('H:i');
     }
 }

@@ -13,12 +13,8 @@
             />
         </div>
         <ToggleGroup v-model="mode" size="sm" class="-me-1" data-markdown-mode-toggle>
-            <div v-tooltip="__('Writing Mode')">
-                <ToggleItem icon="pencil" value="write" />
-            </div>
-            <div v-tooltip="__('Preview Mode')">
-                <ToggleItem icon="eye" value="preview" />
-            </div>
+            <ToggleItem icon="pencil" value="write" :tooltip="__('Writing Mode')" />
+            <ToggleItem icon="eye" value="preview" :tooltip="__('Preview Mode')" />
         </ToggleGroup>
     </div>
 </template>

@@ -1,8 +1,9 @@
 <script setup>
-import { computed, inject, useAttrs, useSlots } from 'vue';
+import { computed, inject, onBeforeUnmount, useAttrs, useSlots } from 'vue';
 import { cva } from 'cva';
 import { twMerge } from 'tailwind-merge';
 import { ToggleGroupItem } from 'reka-ui';
+import { useTooltip } from '@/composables/tooltip.js';
 import Icon from '../Icon/Icon.vue';
 
 defineOptions({ inheritAttrs: false });
@@ -12,6 +13,8 @@ const props = defineProps({
     value: { type: String, required: true },
     /** Label text to display in the toggle item */
     label: { type: String, default: null },
+    /** Tooltip text. Also used as the accessible name when `aria-label` is omitted. */
+    tooltip: { type: String, default: null },
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
     icon: { type: String, default: null },
     /** When `true`, disables the toggle item */
@@ -23,19 +26,59 @@ const props = defineProps({
 const attrs = useAttrs();
 const variant = inject('toggleVariant', 'default');
 const size = inject('toggleSize', 'base');
+const { show, hide, dismissFor } = useTooltip();
 
 const slots = useSlots();
 const hasDefaultSlot = !!slots.default;
 const iconOnly = computed(() => !!props.icon && !hasDefaultSlot && !props.label);
 
-// Compute accessible label
+let tooltipEl = null;
+
 const accessibleLabel = computed(() => {
+    if (attrs['aria-label']) {
+        return attrs['aria-label'];
+    }
+
+    if (props.tooltip) {
+        return props.tooltip;
+    }
+
     if (hasDefaultSlot) {
-        // If there's a default slot, let the content speak for itself
         return props.label || null;
     }
-    // For icon-only buttons, ensure we have a label
+
     return props.label || (props.icon ? `Toggle ${props.value}` : null);
+});
+
+function showTooltip(event) {
+    if (!props.tooltip || !(event.currentTarget instanceof Element)) {
+        return;
+    }
+
+    tooltipEl = event.currentTarget;
+    show(tooltipEl, props.tooltip);
+}
+
+function hideTooltip() {
+    if (!props.tooltip) {
+        return;
+    }
+
+    hide();
+}
+
+function dismissTooltip(event) {
+    if (!props.tooltip) {
+        return;
+    }
+
+    dismissFor(event.currentTarget, event);
+}
+
+onBeforeUnmount(() => {
+    if (tooltipEl) {
+        dismissFor(tooltipEl);
+    }
 });
 
 const toggleItemClasses = computed(() => {
@@ -99,6 +142,10 @@ const restAttrs = computed(() => {
         :disabled="disabled"
         :class="toggleItemClasses"
         data-ui-group-target
+        @mouseenter="showTooltip"
+        @mouseleave="hideTooltip"
+        @focus="showTooltip"
+        @blur="dismissTooltip"
     >
         <Icon
             v-if="icon"
@@ -106,10 +153,10 @@ const restAttrs = computed(() => {
             class="text-gray-400"
             :aria-hidden="!iconOnly"
         />
-        <span v-if="hasDefaultSlot">
+        <span v-if="hasDefaultSlot" class="-mt-[1px]">
             <slot />
         </span>
-        <span v-else-if="label">
+        <span v-else-if="label" class="-mt-[1px]">
             {{ label }}
         </span>
     </ToggleGroupItem>

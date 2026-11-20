@@ -79,7 +79,8 @@
         /* Same corners as the card, so it never shows behind them */
         @apply sm:rounded-2xl sm:rounded-r-xl sm:dark:rounded-none;
         @variant sm {
-            /* Less the scroller's padding */
+            /* #content-card's vertical padding offsets the card from the scroller, so match it */
+            top: 0.5rem;
             --backing-height: calc(100vh - 3.5rem - 1rem);
         }
         .nav-closed & {
