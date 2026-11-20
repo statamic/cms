@@ -180,6 +180,7 @@ return [
     'licensing_error_no_domains' => 'No domains defined',
     'licensing_error_no_site_key' => 'No site license key',
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
+    'licensing_error_unknown_edition' => 'The :edition edition set in config/statamic/editions.php doesn\'t exist',
     'licensing_error_unknown_site' => 'Unknown site',
     'licensing_error_unlicensed' => 'Unlicensed',
     'licensing_incorrect_key_format_body' => 'Your site key format is incorrect. Site keys are 16-character alphanumeric strings. Get your current key from your account at <a href="https://statamic.com" class="underline">statamic.com</a>. Do not use legacy UUID license keys.',

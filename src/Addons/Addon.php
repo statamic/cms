@@ -488,13 +488,19 @@ final class Addon
 
     public function edition()
     {
-        $configured = config('statamic.editions.addons.'.$this->package());
+        $configured = $this->configuredEdition();
 
-        if ($configured && ! $this->editions()->contains($configured)) {
-            throw new \Exception("Invalid edition [$configured] for addon ".$this->package());
-        }
+        return $this->editions()->contains($configured) ? $configured : $this->editions()->first();
+    }
 
-        return $configured ?? $this->editions()->first();
+    public function configuredEdition()
+    {
+        return config('statamic.editions.addons.'.$this->package());
+    }
+
+    public function hasUnknownEdition()
+    {
+        return $this->configuredEdition() && ! $this->editions()->contains($this->configuredEdition());
     }
 
     public function editions($editions = null)
