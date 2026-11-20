@@ -133,10 +133,14 @@ class Index extends BaseIndex
 
     public function update()
     {
+        // Leave an empty index behind rather than none. Otherwise anything saved while
+        // the jobs are still queued finds no index and starts the whole update again.
+        $this->locked(fn () => $this->save(collect()));
+
         $this->pending = collect();
 
         try {
-            parent::update();
+            $this->searchables()->lazy()->each(fn ($searchables) => $this->insertMultiple($searchables));
         } finally {
             [$pending, $this->pending] = [$this->pending, null];
         }
