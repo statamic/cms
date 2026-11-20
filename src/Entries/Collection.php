@@ -382,7 +382,7 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
             ->setNamespace('collections.'.$this->handle());
 
         $contents = $blueprint->contents();
-        $contents['title'] = Str::singular($this->title());
+        $contents['title'] = Str::startsWith(app()->getLocale(), 'en') ? Str::singular($this->title()) : $this->title();
         $blueprint->setContents($contents);
 
         return $blueprint;
