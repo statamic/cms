@@ -302,6 +302,27 @@
     scrollbar-width: none;
 }
 
+/* GROUP AI / GLASS FADING IN
+=================================================== */
+/* The image's AI card's skill pills (see AiImage.vue) come in as the floating chat's do on its card (see AiChat.vue): the card is there at
+   once, and the pills fade in where they are, over 150ms. They fade by their fill, text and blur rather than their opacity: anything fading by
+   opacity can't blur what's behind it until it's fully shown, so the frosting would snap in at the end. */
+.ai-glass-in {
+    animation: ai-glass-in 150ms ease backwards;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+@keyframes ai-glass-in {
+    from {
+        background-color: transparent;
+        color: transparent;
+        backdrop-filter: blur(0) saturate(1);
+    }
+}
+
 /* GROUP AI / ALT TEXT SKELETON
 =================================================== */
 /* The line in an image's Alt Text field while the AI writes its alt text (see AiAltWrite.vue): a 10px grey bar, fading down to a quarter and
