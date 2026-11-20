@@ -4,6 +4,10 @@ namespace Tests\Antlers\Runtime;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Entries\Collection;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
+use Statamic\View\Antlers\Language\Exceptions\RuntimeException;
+use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
 use Tests\Antlers\Fixtures\Addon\Modifiers\VarTestModifier;
 use Tests\Antlers\ParserTestCase;
@@ -68,5 +72,28 @@ EOT;
         $this->renderString($template, ['value' => 'value'], true);
 
         $this->assertSame(['test{}', 'param_two{}'], VarTestModifier::$params);
+    }
+
+    public function test_parameter_style_modifiers_skip_null_like_chained_modifiers()
+    {
+        $data = ['empty_field' => new Value(null, 'empty_field', new Text)];
+
+        $this->assertSame('', $this->renderString('{{ empty_field count="true" }}', $data, true));
+        $this->assertSame('null', $this->renderString('{{ empty_field to_json="true" }}', $data, true));
+    }
+
+    public function test_parameter_style_modifiers_check_access_before_skipping_null()
+    {
+        $banned = GlobalRuntimeState::$bannedModifierPaths;
+        GlobalRuntimeState::$bannedModifierPaths = ['upper'];
+        GlobalRuntimeState::$throwErrorOnAccessViolation = true;
+
+        $this->expectException(RuntimeException::class);
+
+        try {
+            $this->renderString('{{ empty_field upper="true" }}', ['empty_field' => new Value(null, 'empty_field', new Text)], true);
+        } finally {
+            GlobalRuntimeState::$bannedModifierPaths = $banned;
+        }
     }
 }
