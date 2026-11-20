@@ -7,7 +7,7 @@ use Attribute;
 /**
  * Runs the modifier for null values, which Antlers skips by default.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
 class AcceptsNull
 {
 }

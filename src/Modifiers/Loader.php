@@ -2,6 +2,7 @@
 
 namespace Statamic\Modifiers;
 
+use ReflectionClass;
 use ReflectionMethod;
 use Statamic\Support\Str;
 use Statamic\View\State\StateManager;
@@ -38,8 +39,8 @@ class Loader
 
         [$class, $method] = $this->resolve($binding);
 
-        return static::$acceptsNull[$binding] ??= method_exists($class, $method)
-            && (new ReflectionMethod($class, $method))->getAttributes(AcceptsNull::class);
+        return static::$acceptsNull[$binding] ??= (new ReflectionClass($class))->getAttributes(AcceptsNull::class)
+            || (method_exists($class, $method) && (new ReflectionMethod($class, $method))->getAttributes(AcceptsNull::class));
     }
 
     protected function resolve($binding)

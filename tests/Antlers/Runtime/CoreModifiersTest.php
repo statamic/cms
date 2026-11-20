@@ -653,6 +653,24 @@ EOT;
         $this->assertSame('NULL', $this->renderString('{{ bare | accepts_null }}', $data, true));
         $this->assertSame('NULL', $this->renderString('{{ wrapped | accepts_null }}', $data, true));
     }
+
+    public function test_modifier_classes_marked_with_accepts_null_run_for_null()
+    {
+        (new #[AcceptsNull] class extends Modifier
+        {
+            protected static $handle = 'class_accepts_null';
+
+            public function index($value)
+            {
+                return var_export($value, true);
+            }
+        })::register();
+
+        $data = ['bare' => null, 'wrapped' => new Value(null)];
+
+        $this->assertSame('NULL', $this->renderString('{{ bare | class_accepts_null }}', $data, true));
+        $this->assertSame('NULL', $this->renderString('{{ wrapped | class_accepts_null }}', $data, true));
+    }
 }
 
 class SimpleEntryObject implements Arrayable
