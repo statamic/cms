@@ -36,10 +36,6 @@ const imagePrompts = [{ name: __('Make variations'), instructions: __('Make 4 ne
 const skillPill =
     'flex cursor-pointer whitespace-nowrap rounded-full bg-gray-900/55 px-2.5 py-[8.5px] text-xs text-white backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-gray-900/70 aria-disabled:cursor-default aria-disabled:opacity-60';
 
-// The new images stack upwards in a slim column (96px) above the card, on the photo's right edge. They take the skill pills' place: the
-// pills go once you've asked, and the column starts where they were, 12px above the card and level with its right edge. It's placed from
-// inside the card's 1px border, so it's 13px up and 2px further right, to line up with where the pills sat.
-const columnStyle = { marginBottom: '13px' };
 
 // A kept image says so with a small purple pill in its bottom right corner, 21px tall, saying "Kept", with 8px either side. The text is
 // trimmed like a Badge's, which centres its capitals and baseline, then lifted 1px, as the p's descender made it look low.
@@ -208,11 +204,13 @@ onBeforeUnmount(() => clearTimeout(timer));
                             <p class="sr-only" role="status">{{ loading ? __('Creating 4 images…') : variations.length ? __('4 images to choose from') : '' }}</p>
                         </form>
 
-                        <!-- The new images, in a column above the card, as the AI's answer, cropped to the original's shape. A strip of them under the
+                        <!-- The new images, in a slim column (96px) above the card, as the AI's answer, cropped to the original's shape. They take the skill
+                             pills' place: the pills go once you've asked, and the column starts where they were, 12px above the card and level with its
+                             right edge (13px up and 2px out, as it's placed from inside the card's 1px border). A strip of them under the
                              image looked like a gallery of the folder's images. Hovering one, or tabbing to it, shows it in the image's place. They come
                              after the input in the page, so Tab goes from the input up through them, one stop each: Keep, or Kept once
                              it's kept. Tabbing away from them puts the original back. -->
-                        <div v-if="loading || variations.length" class="absolute -end-0.5 bottom-full flex w-24 flex-col gap-1.5" :style="columnStyle" @mouseleave="showPreview(null)" @focusout="!$event.currentTarget.contains($event.relatedTarget) && showPreview(null)">
+                        <div v-if="loading || variations.length" class="absolute -end-0.5 bottom-full mb-[13px] flex w-24 flex-col gap-1.5" @mouseleave="showPreview(null)" @focusout="!$event.currentTarget.contains($event.relatedTarget) && showPreview(null)">
                             <template v-if="loading">
                                 <div v-for="i in 4" :key="i" class="w-full animate-pulse rounded-md bg-white/10" :style="{ aspectRatio: ratio }" />
                             </template>
@@ -247,7 +245,7 @@ onBeforeUnmount(() => clearTimeout(timer));
                     </div>
 
                     <!-- The skills, as pills above the card while you're in it and haven't typed anything, as the chat's are. Picking one runs it,
-                         and they make way for the new images (see columnStyle).
+                         and they make way for the new images.
                          mousedown.prevent keeps focus in the input, so they stay put. Their instructions show in a tooltip on hover. They come after
                          the card in the page, as the chat's do, so Tab goes from the input to them. -->
                     <div
