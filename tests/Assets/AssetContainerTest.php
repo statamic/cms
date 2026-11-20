@@ -5,6 +5,7 @@ namespace Tests\Assets;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -15,12 +16,16 @@ use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\PathTraversalDetected;
+use League\Flysystem\UnableToRetrieveMetadata;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Assets\AssetRepository;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Contracts\Assets\AssetRepository as AssetRepositoryContract;
 use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerCreating;
 use Statamic\Events\AssetContainerDeleted;
@@ -817,6 +822,96 @@ class AssetContainerTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_return_an_asset_when_a_listed_file_is_missing()
+    {
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        $this->assertNull($container->asset($missing));
+        $this->assertMissingPathWasDropped($container, $missing);
+
+        $kept = $container->asset('keep.txt');
+
+        $this->assertInstanceOf(AssetContract::class, $kept);
+        $this->assertSame('keep.txt', $kept->path());
+    }
+
+    #[Test]
+    public function it_does_not_throw_when_reading_meta_for_a_missing_listed_file()
+    {
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        $asset = $container->makeAsset($missing);
+
+        $this->assertSame(['data' => []], $asset->meta());
+        $this->assertFalse(Storage::disk('stale_assets')->exists('social_images/collection-events/.meta/missing.png.yaml'));
+        $this->assertMissingPathWasDropped($container, $missing);
+    }
+
+    #[Test]
+    public function it_keeps_a_listed_file_when_metadata_cannot_be_read()
+    {
+        $path = 'notes.txt';
+        $filesystem = Mockery::mock(FilesystemAdapter::class);
+        $filesystem->shouldReceive('get')->andReturn(null);
+        $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('exists')->once()->andReturn(true);
+        $filesystem->shouldReceive('put')->never();
+
+        [$container, $asset] = $this->containerWithListedFile($path, $filesystem);
+
+        $this->assertSame(['data' => []], $asset->meta());
+        $this->assertNull(Cache::get($asset->metaCacheKey()));
+        $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
+    }
+
+    #[Test]
+    public function it_does_not_drop_a_listed_file_when_the_existence_check_throws()
+    {
+        $path = 'notes.txt';
+        $filesystem = Mockery::mock(FilesystemAdapter::class);
+        $filesystem->shouldReceive('get')->andReturn(null);
+        $filesystem->shouldReceive('size')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('exists')->andThrow(UnableToRetrieveMetadata::create($path, 'file_size'));
+        $filesystem->shouldReceive('put')->never();
+
+        [$container, $asset] = $this->containerWithListedFile($path, $filesystem);
+
+        try {
+            $asset->meta();
+        } catch (UnableToRetrieveMetadata) {
+            $this->assertNull(Cache::get($asset->metaCacheKey()));
+            $this->assertTrue(Cache::get('asset-list-contents-'.$container->handle())->has($path));
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    #[Test]
+    public function it_keeps_stored_asset_data_when_dropping_a_missing_file()
+    {
+        $repository = $this->partialMock(AssetRepository::class);
+        $repository->shouldNotReceive('delete');
+        $this->instance(AssetRepositoryContract::class, $repository);
+
+        [$container, $missing] = $this->containerWithStaleListedFile();
+
+        Storage::disk('stale_assets')->put(
+            'social_images/collection-events/.meta/missing.png.yaml',
+            "data:\n  alt: 'Event poster'\n"
+        );
+
+        $container->makeAsset($missing)->generateMeta();
+
+        $this->assertMissingPathWasDropped($container, $missing);
+        $this->assertSame(
+            "data:\n  alt: 'Event poster'\n",
+            Storage::disk('stale_assets')->get('social_images/collection-events/.meta/missing.png.yaml')
+        );
+    }
+
+    #[Test]
     public function it_makes_an_asset_at_given_path()
     {
         $container = $this->containerWithDisk();
@@ -1099,5 +1194,73 @@ class AssetContainerTest extends TestCase
         Facades\AssetContainer::shouldReceive('findByHandle')->andReturn($container);
 
         return $container;
+    }
+
+    private function containerWithListedFile(string $path, FilesystemAdapter $filesystem): array
+    {
+        Blink::flush();
+
+        $handle = 'listed_'.md5($path.microtime());
+
+        Cache::put('asset-list-contents-'.$handle, collect([
+            $path => [
+                'type' => 'file',
+                'path' => $path,
+                'basename' => basename($path),
+                'filename' => pathinfo($path, PATHINFO_FILENAME),
+                'dirname' => '',
+                'extension' => pathinfo($path, PATHINFO_EXTENSION),
+            ],
+        ]));
+
+        $container = (new AssetContainer)->handle($handle)->disk($filesystem);
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with($handle)->andReturn($container);
+
+        return [$container, $container->makeAsset($path)];
+    }
+
+    private function containerWithStaleListedFile(): array
+    {
+        Blink::flush();
+
+        Storage::fake('stale_assets');
+        Storage::disk('stale_assets')->put('keep.txt', 'still here');
+
+        $missing = 'social_images/collection-events/missing.png';
+        $handle = 'stale_'.md5($missing.microtime());
+
+        Cache::put('asset-list-contents-'.$handle, collect([
+            'keep.txt' => [
+                'type' => 'file',
+                'path' => 'keep.txt',
+                'basename' => 'keep.txt',
+                'filename' => 'keep',
+                'dirname' => '',
+                'extension' => 'txt',
+            ],
+            $missing => [
+                'type' => 'file',
+                'path' => $missing,
+                'basename' => 'missing.png',
+                'filename' => 'missing',
+                'dirname' => 'social_images/collection-events',
+                'extension' => 'png',
+            ],
+        ]));
+
+        $container = (new AssetContainer)->handle($handle)->disk('stale_assets');
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with($handle)->andReturn($container);
+
+        return [$container, $missing];
+    }
+
+    private function assertMissingPathWasDropped($container, string $missing): void
+    {
+        $listed = Cache::get('asset-list-contents-'.$container->handle());
+
+        $this->assertFalse($listed->has($missing));
+        $this->assertTrue($listed->has('keep.txt'));
     }
 }
