@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, useId, useTemplateRef, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import { Button } from '@ui';
 import { steer, suggestFor } from './mock-suggestions.js';
@@ -148,6 +148,10 @@ const button = useTemplateRef('button');
 const panel = useTemplateRef('panel');
 const { place, fit, scroller, switched } = useSidebarCard(open, anchor, () => toggled(false), panel);
 
+// Under the field, the card is fixed and anchored to it, rather than placed inside it: a field's section clips what overflows it, which cut
+// the card off at the bottom of a section when there's no sidebar
+const fieldAnchor = `--ai-suggest-${useId()}`;
+
 // The floating AI chat sits over the same corner, so it's put away while the suggestions are open. Bringing it back (with Ask or its shortcut)
 // puts the suggestions away instead. A docked chat has its own column, so it's left alone.
 const chat = useAiChat();
@@ -272,6 +276,8 @@ function follow(text) {
 
 <template>
     <span ref="anchor" hidden />
+    <!-- The field's box, for the card under it to be anchored to -->
+    <span class="pointer-events-none absolute inset-0" :style="{ anchorName: fieldAnchor }" aria-hidden="true" />
 
     <!-- It stays highlighted, with a purple icon, while the suggestions are open -->
     <Button
@@ -292,7 +298,11 @@ function follow(text) {
          and is never taller than fits on screen (see use-sidebar-card.js). The wrapper lets clicks through to the page below the card. -->
     <!-- Without a sidebar to open over (a narrow window, or no sidebar in the blueprint), it opens under the field instead, like a dropdown -->
     <Teleport v-if="open" :to="scroller || 'body'" :disabled="!place">
-        <div :class="place ? 'pointer-events-none absolute z-(--z-index-modal)' : 'absolute top-full z-(--z-index-modal) mt-2 end-0 w-80'" :style="place">
+        <!-- Under the field, it lines up with the field's end, and opens above it when there isn't room below -->
+        <div
+            :class="place ? 'pointer-events-none absolute z-(--z-index-modal)' : 'fixed z-(--z-index-modal) my-2 w-80 [position-area:block-end_span-inline-start] [position-try-fallbacks:flip-block]'"
+            :style="place ?? { positionAnchor: fieldAnchor }"
+        >
             <div :class="place ? 'pointer-events-auto sticky top-4 flex flex-col' : 'flex max-h-[60vh] flex-col'" :style="place && fit">
                 <div class="min-h-0 overflow-y-auto" :class="['rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-800', cardEntrance(switched)]">
                     <!-- Up and down move between the suggestions and the "Make it…" box, as well as Tab -->
