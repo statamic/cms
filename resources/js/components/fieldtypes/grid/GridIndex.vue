@@ -1,5 +1,5 @@
 <template>
-    <div v-if="value">
+    <div v-if="value != null">
         {{ __n(':count row|:count rows', value) }}
     </div>
 </template>

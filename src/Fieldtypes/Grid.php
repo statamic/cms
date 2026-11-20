@@ -115,6 +115,11 @@ class Grid extends Fieldtype
         return Arr::removeNullValues($row);
     }
 
+    public function preProcessIndex($data)
+    {
+        return is_array($data) ? count($data) : $data;
+    }
+
     public function preProcess($data)
     {
         $data = collect($data);

@@ -124,6 +124,11 @@ class Replicator extends Fieldtype
         return Arr::removeNullValues($row);
     }
 
+    public function preProcessIndex($data)
+    {
+        return is_array($data) ? count($data) : $data;
+    }
+
     public function preProcess($data)
     {
         return collect($data)->map(function ($row, $i) {
