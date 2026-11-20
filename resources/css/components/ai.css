@@ -301,3 +301,25 @@
 .nav-main.ai-demos-scrolling {
     scrollbar-width: none;
 }
+
+/* GROUP AI / ALT TEXT SKELETON
+=================================================== */
+/* The line in an image's Alt Text field while the AI writes its alt text (see AiAltWrite.vue): a 10px grey bar, fading down to a quarter and
+   back every 1.2s. Darker than a usual skeleton, and pulsing further and faster, so it's obvious something's happening. */
+.ai-skeleton {
+    height: 0.625rem;
+    background-color: var(--color-gray-300);
+    animation: ai-skeleton-pulse 1.2s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+.dark .ai-skeleton {
+    background-color: var(--color-gray-600);
+}
+
+@keyframes ai-skeleton-pulse {
+    50% { opacity: 0.25; }
+}

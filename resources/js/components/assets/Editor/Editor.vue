@@ -262,6 +262,13 @@ export default {
         },
     },
 
+    // Prototype: the image, for its Alt Text field's suggest button to write alt text from (see Field.vue)
+    provide() {
+        return {
+            aiAltAsset: () => (this.asset?.isImage ? this.asset : null),
+        };
+    },
+
     data() {
         return {
             loading: true,
