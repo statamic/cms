@@ -6,7 +6,7 @@ import { variationsOf } from './mock-image-variations.js';
 
 // Prototype: ask the AI for things to do with an image, in the asset editor. Opening it pins a prompt card to the image's corner, as in
 // Wix Harmony. There's no frame round the image (it looked like a crop) and no "Image" chip in the card, as the editor only has the one
-// image. For now it makes variations: the "Generate similar images" skill (or anything typed) comes back with four new images, in the card.
+// image. For now it makes variations: the "Make variations" skill (or anything typed) comes back with four new images, in the card.
 // Hovering one shows it in the image's place, and Keep saves it as a new asset next to the original.
 // Nothing is saved until you click Keep, and the original is never changed, as with the AI chat, where your own save is the approval.
 // The image itself comes in the slot, which gets the src and style to show (the original, or the variation being previewed).
@@ -28,7 +28,7 @@ const cancelLink = 'flex h-6.5 cursor-pointer items-center rounded-md px-1.5 tex
 
 // Prototype: the skills for images, as the chat has its own (see AiChatPrompts.vue). They'd come from Settings → AI, as a third
 // kind beside page and field skills. For now there's one, which makes four images like this one.
-const imagePrompts = [{ name: __('Generate similar images'), instructions: __('Make 4 new images with the same subject and style as this one.') }];
+const imagePrompts = [{ name: __('Make variations'), instructions: __('Make 4 new images with the same subject and style as this one.') }];
 
 // The skill pills have the card's own decoration (see-through, with what's behind blurred, and no edge), a little lighter than it: 55% of
 // the same gray-900, against the card's 70%. Their text is trimmed like a Badge's, so it sits in the middle, with 8.5px above and below,
