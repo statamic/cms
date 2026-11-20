@@ -124,19 +124,9 @@ class Replicator extends Fieldtype
         return Arr::removeNullValues($row);
     }
 
-    /**
-     * Listings only show how many sets there are, so only each set's id,
-     * type and enabled state are sent rather than everything in them.
-     */
     public function preProcessIndex($data)
     {
-        if (! is_array($data)) {
-            return $data;
-        }
-
-        return array_map(function ($set) {
-            return is_array($set) ? Arr::only($set, [RowId::handle(), 'type', 'enabled']) : $set;
-        }, $data);
+        return is_array($data) ? count($data) : $data;
     }
 
     public function preProcess($data)

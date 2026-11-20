@@ -1,5 +1,5 @@
 <template>
-    <div v-if="value">
+    <div v-if="value != null">
         {{ __n(':count set|:count sets', value) }}
     </div>
 </template>

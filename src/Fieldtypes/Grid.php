@@ -115,19 +115,9 @@ class Grid extends Fieldtype
         return Arr::removeNullValues($row);
     }
 
-    /**
-     * Listings only show how many rows there are, so only each row's id
-     * is sent rather than everything in it.
-     */
     public function preProcessIndex($data)
     {
-        if (! is_array($data)) {
-            return $data;
-        }
-
-        return array_map(function ($row) {
-            return is_array($row) ? Arr::only($row, [RowId::handle()]) : $row;
-        }, $data);
+        return is_array($data) ? count($data) : $data;
     }
 
     public function preProcess($data)

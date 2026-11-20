@@ -94,7 +94,7 @@ class ViewEntryListingTest extends TestCase
     }
 
     #[Test]
-    public function it_only_lists_the_ids_and_types_of_replicator_sets_and_grid_rows()
+    public function it_only_lists_the_counts_of_replicator_sets_and_grid_rows()
     {
         $collection = tap(Collection::make('test'))->save();
 
@@ -129,11 +129,7 @@ class ViewEntryListingTest extends TestCase
 
         $entry = $response->json('data.0');
 
-        $this->assertSame([
-            ['id' => 'set-a', 'type' => 'text'],
-            ['id' => 'set-b', 'type' => 'text', 'enabled' => false],
-        ], $entry['sets']);
-
-        $this->assertSame([['id' => 'row-a'], ['id' => 'row-b'], ['id' => 'row-c']], $entry['rows']);
+        $this->assertSame(2, $entry['sets']);
+        $this->assertSame(3, $entry['rows']);
     }
 }
