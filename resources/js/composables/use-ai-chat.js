@@ -57,6 +57,15 @@ const dictateRequest = ref(false);
 // Prototype: whether phase 2's features (dictating) are showing. They're only for demoing: a phase 2 demo switches them on, and a
 // phase 1 demo (or reloading the page) switches them off again.
 const phaseTwo = ref(false);
+// Prototype: while an image is open in the asset editor, the AI chat's shortcut (⌘/) opens the image's own AI card instead (see Editor.vue).
+// It hands this a function that does, and takes it away again when it closes. The latest one wins, so a nested editor takes over.
+const shortcutOverrides = [];
+export function overrideShortcut(handler) {
+    shortcutOverrides.push(handler);
+    return () => shortcutOverrides.splice(shortcutOverrides.indexOf(handler), 1);
+}
+export const shortcutOverride = () => shortcutOverrides.at(-1) ?? null;
+
 // Where focus was before it moved into the chat, so Esc and the shortcut can hand it back.
 let previousFocus = null;
 

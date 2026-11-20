@@ -50,7 +50,8 @@
                                 <ui-button inset size="sm" v-if="canCrop" @click.prevent="openCropEditor" icon="crop" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Crop')" />
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <!-- Prototype: ask the AI to do things with the image (see AiImage.vue), after Rename -->
-                                <ui-button inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-spark" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Ask AI')" :aria-pressed="aiOpen" />
+                                <!-- While its card is open, it looks pressed in: a dark sunken fill, with a shadow along its top edge -->
+                                <ui-button ref="askAi" inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-chat" variant="ghost" class="[&_svg]:!opacity-45" :class="{ 'bg-black/40! shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)]': aiOpen }" :text="__('Ask AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
                                 <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
@@ -79,7 +80,8 @@
                         >
                             <!-- Image -->
                             <!-- Prototype: wrapped so the AI can show what it makes in the image's place (see AiImage.vue) -->
-                            <AiImage v-if="asset.isImage" :asset="asset" v-model:open="aiOpen" v-slot="{ src, style }">
+                            <!-- Closing the card from inside it (Esc) puts focus back on Ask AI, which opened it, rather than losing it with the card -->
+                            <AiImage v-if="asset.isImage" :asset="asset" v-model:open="aiOpen" @closed="$refs.askAi?.$el?.focus()" v-slot="{ src, style }">
                                 <div class="max-w-full max-h-full overflow-hidden" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-md`]: asset.can_be_transparent && showCheckerboard }">
                                     <img :src="src" :style="style" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
                                 </div>
@@ -218,6 +220,7 @@ import shortcutLabel from '@/util/shortcutLabel.js';
 import useCheckerboard from '@/composables/checkerboard.js';
 import { permissions } from '@api';
 import AiImage from '@/components/ai-image/AiImage.vue';
+import useAiChat, { overrideShortcut } from '@/composables/use-ai-chat.js';
 
 export default {
     emits: ['previous', 'next', 'saved', 'closed', 'created', 'action-started', 'action-completed'],
@@ -357,9 +360,13 @@ export default {
             if (this.readOnly || this.loading || this.saving) return;
             this.saveAndClose();
         });
+
+        // Prototype: while an image is open here, the AI chat's shortcut (⌘/) opens its AI card instead (see AiImage.vue)
+        this.removeShortcutOverride = overrideShortcut(this.aiShortcut);
     },
 
     beforeUnmount() {
+        this.removeShortcutOverride?.();
         window.removeEventListener('keydown', this.keydown);
         this.saveKeyBinding.destroy();
         this.saveAndCloseKeyBinding.destroy();
@@ -598,6 +605,18 @@ export default {
 
         canRunAction(handle) {
             return this.actions.find((action) => action.handle == handle);
+        },
+
+        // Prototype: ⌘/ works on the image's AI card as it does on the chat: closed opens it (with focus in its input), open but unfocused
+        // focuses it, and focused closes it, putting focus back on Ask AI. Anything that isn't an image (or someone who can't use AI)
+        // gets the chat as usual.
+        aiShortcut() {
+            if (!this.canUseAi) return useAiChat().shortcut();
+            const textarea = () => document.querySelector('[data-ai-image-card] textarea');
+            if (!this.aiOpen) return (this.aiOpen = true);
+            if (!document.activeElement?.closest('[data-ai-image-card]')) return textarea()?.focus();
+            this.aiOpen = false;
+            this.$nextTick(() => this.$refs.askAi?.$el?.focus());
         },
 
         runAction(actions, handle) {

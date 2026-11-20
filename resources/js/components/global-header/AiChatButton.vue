@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
 import { Icon } from '@ui';
-import useAiChat from '@/composables/use-ai-chat.js';
+import useAiChat, { shortcutOverride } from '@/composables/use-ai-chat.js';
 
 const { open, toggle, shortcut, focus, dictate, phaseTwo } = useAiChat();
 
@@ -20,6 +20,10 @@ onMounted(() => {
         if (dialog && !dialog.hasAttribute('data-command-palette')) return;
 
         e.preventDefault();
+
+        // Prototype: an image open in the asset editor has its own AI card, which the shortcut opens instead (see Editor.vue). The two are
+        // separate: from inside the chat, the shortcut is still the chat's, so it closes the chat rather than opening the card.
+        if (!dialog && shortcutOverride() && !e.target?.closest?.('[data-ai-chat]')) return shortcutOverride()();
 
         if (dialog) {
             // Close the palette (the same as pressing Escape), then wait for it to hand focus back before moving it into the chat. If the chat is already open it's focused, not closed.
