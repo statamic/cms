@@ -326,6 +326,28 @@ EOT;
     }
 
     #[Test]
+    public function it_gets_blueprints_in_a_custom_namespace_using_slashes()
+    {
+        $dir = '/path/to/custom';
+        $overrideDir = '/path/to/resources/blueprints/vendor/collections/blog';
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with($overrideDir)->once()->andReturnFalse();
+        File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
+            new FileCollection([$dir.'/first.yaml'])
+        );
+        File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
+
+        $this->repo->addNamespace('collections.blog', $dir);
+
+        $blueprints = $this->repo->in('collections/blog');
+
+        $this->assertCount(1, $blueprints);
+        $this->assertEquals(['first'], $blueprints->map->handle()->values()->all());
+        $this->assertEquals(['collections.blog'], $blueprints->map->namespace()->values()->all());
+        $this->assertEquals(['First Blueprint'], $blueprints->map->title()->values()->all());
+    }
+
+    #[Test]
     public function it_gets_blueprints_in_a_custom_namespace_with_overrides()
     {
         File::shouldReceive('withAbsolutePaths')->twice()->andReturnSelf();
