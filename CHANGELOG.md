@@ -1,5 +1,68 @@
 # Release Notes
 
+## 6.43.0 (2026-11-20)
+
+### What's new
+- Add a substring parameter to the mark modifier [#15955](https://github.com/statamic/cms/issues/15955) by @edalzell
+- Make Glide cache permissions configurable [#15920](https://github.com/statamic/cms/issues/15920) by @duncanmcclean
+- Add option to copy data when replacing an asset [#15865](https://github.com/statamic/cms/issues/15865) by @ryanmitchell
+
+### What's fixed
+- Rebuild a collection's entries when its sites change [#15906](https://github.com/statamic/cms/issues/15906) by @edalzell
+- Fix drag handle shifting when a second Grid row or Replicator set is added [#15913](https://github.com/statamic/cms/issues/15913) by @mynetx
+- Fix Vue warning: v-tooltip on ToggleItem in markdown toolbar [#15916](https://github.com/statamic/cms/issues/15916) by @ionutrusenL
+- Fix CSRF token mismatch on statically cached pages when using Precognition [#15939](https://github.com/statamic/cms/issues/15939) by @duncanmcclean
+- Fix switching sites when creating a term [#15938](https://github.com/statamic/cms/issues/15938) by @duncanmcclean
+- Fix reordering a descending collection flipping its order [#15937](https://github.com/statamic/cms/issues/15937) by @duncanmcclean
+- Fix contains field conditions against numeric entry IDs [#15936](https://github.com/statamic/cms/issues/15936) by @duncanmcclean
+- Fix required validation passing on an emptied Bard field [#15935](https://github.com/statamic/cms/issues/15935) by @duncanmcclean
+- Fix site filter not updating after switching sites [#15931](https://github.com/statamic/cms/issues/15931) by @duncanmcclean
+- Fix filtering by date range fields [#15924](https://github.com/statamic/cms/issues/15924) by @duncanmcclean
+- Fix refresh loop when running Vite dev server [#15923](https://github.com/statamic/cms/issues/15923) by @duncanmcclean
+- Prevent editing terms that haven't been created yet [#15922](https://github.com/statamic/cms/issues/15922) by @duncanmcclean
+- Fix Glide tag with absolute asset URLs [#15918](https://github.com/statamic/cms/issues/15918) by @duncanmcclean
+- Fix half measure static cache serving pages missing from the URL index [#15914](https://github.com/statamic/cms/issues/15914) by @duncanmcclean
+- Fix middle ellipsis for unknown font families [#15904](https://github.com/statamic/cms/issues/15904) by @daun
+- Fix saving untouched navigation defaults [#15926](https://github.com/statamic/cms/issues/15926) by @duncanmcclean
+- Fix fieldtype meta not refreshing after publishing entries and running actions [#15921](https://github.com/statamic/cms/issues/15921) by @duncanmcclean
+- Throw an exception when an uploaded file can't be written to the disk [#15919](https://github.com/statamic/cms/issues/15919) by @duncanmcclean
+- Keep view shared data dynamic within nocache tags [#15928](https://github.com/statamic/cms/issues/15928) by @duncanmcclean
+- Prevent recursive fieldset imports inside nested fields [#15925](https://github.com/statamic/cms/issues/15925) by @duncanmcclean
+- Fix translator not discovering strings containing brackets [#15942](https://github.com/statamic/cms/issues/15942) by @duncanmcclean
+- Fix select field preview disappearing after reordering replicator sets [#15803](https://github.com/statamic/cms/issues/15803) by @lazerg
+- Fix raw markup in tooltips and labels of HTML combobox options [#15915](https://github.com/statamic/cms/issues/15915) by @jasonbaciulis
+- Add TypeScript to the Combobox component [#15917](https://github.com/statamic/cms/issues/15917) by @duncanmcclean
+- Fix install:eloquent-driver not switching to UuidEntryModel [#15948](https://github.com/statamic/cms/issues/15948) by @jezzdk
+- Map the jpeg Glide format to jpg [#15932](https://github.com/statamic/cms/issues/15932) by @lwekuiper
+- Don't re-paginate already-paginated URLs in `static:warm` [#15282](https://github.com/statamic/cms/issues/15282) by @steveparks
+- Prevent replacing an asset with itself [#15947](https://github.com/statamic/cms/issues/15947) by @edalzell
+- Report failed actions as failures [#15950](https://github.com/statamic/cms/issues/15950) by @jacksleight
+- Restore links on read-only relationship fields [#15949](https://github.com/statamic/cms/issues/15949) by @jacksleight
+- Prevent term localizations from saving a copy of the non-localizable slug [#15952](https://github.com/statamic/cms/issues/15952) by @duncanmcclean
+- Fix Antlers profiler tab with Laravel Debugbar 4 [#15957](https://github.com/statamic/cms/issues/15957) by @duncanmcclean
+- Keep which indexes are used when the Stache is cleared [#15897](https://github.com/statamic/cms/issues/15897) by @DanielDarrenJones
+- Build sibling URIs once when validating a collection tree [#15901](https://github.com/statamic/cms/issues/15901) by @edalzell
+- Make each taxonomy into an array once per terms listing [#15876](https://github.com/statamic/cms/issues/15876) by @ryanmitchell
+- Use the shared collection sort in multi-collection entries fields [#15953](https://github.com/statamic/cms/issues/15953) by @daun
+- Prevent duplicate field handles across imported fieldsets [#15933](https://github.com/statamic/cms/issues/15933) by @duncanmcclean
+- Skip a Stache file that is removed while it is being read [#15903](https://github.com/statamic/cms/issues/15903) by @joshdaugherty
+- Don't store nocache regions for uncached responses [#15945](https://github.com/statamic/cms/issues/15945) by @edalzell
+- Fix `raw` modifier on values returned from tags [#15874](https://github.com/statamic/cms/issues/15874) by @duncanmcclean
+- Only process visible columns on the first users listing request [#15969](https://github.com/statamic/cms/issues/15969) by @edalzell
+- Keep the uploaded extension when the source preset doesn't convert the file [#15972](https://github.com/statamic/cms/issues/15972) by @brstreet2
+- Cache term augmentation with taxonomy-qualified ID [#15974](https://github.com/statamic/cms/issues/15974) by @Boefjim
+- Stop every save queuing a full reindex while the Comb index is missing [#15981](https://github.com/statamic/cms/issues/15981) by @edalzell
+- Don't regenerate asset meta when a value is null [#15978](https://github.com/statamic/cms/issues/15978) by @edalzell
+- Fix the Control Panel crashing when an addon is configured with an edition it doesn't have [#15973](https://github.com/statamic/cms/issues/15973) by @duncanmcclean
+- Fix non-interactive make:user with Eloquent users [#15943](https://github.com/statamic/cms/issues/15943) by @edalzell
+- Only send the counts of replicator sets and grid rows to listings [#15811](https://github.com/statamic/cms/issues/15811) by @DanielDarrenJones
+- French translations [#15910](https://github.com/statamic/cms/issues/15910) by @ebeauchamps
+- Add missing French translations for save shortcut tooltips [#15941](https://github.com/statamic/cms/issues/15941) by @lazerg
+- Fix Latin letters in Russian and Ukrainian currency names [#15982](https://github.com/statamic/cms/issues/15982) by @bardrop
+- Bump follow-redirects from 1.16.1 to 1.16.3 in the npm_and_yarn group across 1 directory [#15911](https://github.com/statamic/cms/issues/15911) by @dependabot
+
+
+
 ## 6.42.0 (2026-11-13)
 
 ### What's new
