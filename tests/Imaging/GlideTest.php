@@ -93,16 +93,16 @@ class GlideTest extends TestCase
      * @see https://github.com/statamic/cms/issues/8199
      */
     #[Test]
-    public function local_cache_uses_configured_permissions()
+    #[DataProvider('localCachePermissionsProvider')]
+    public function local_cache_uses_configured_permissions_with_defaults($config, $expectedDirectory, $expectedFile)
     {
         $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
 
         config([
-            'statamic.assets.image_manipulation.cache' => true,
-            'statamic.assets.image_manipulation.cache_path' => public_path('img'),
-            'statamic.assets.image_manipulation.permissions' => [
-                'directory' => 0775,
-                'file' => 0664,
+            'statamic.assets.image_manipulation' => [
+                'cache' => true,
+                'cache_path' => public_path('img'),
+                ...$config,
             ],
         ]);
 
@@ -114,8 +114,18 @@ class GlideTest extends TestCase
             umask($umask);
         }
 
-        $this->assertEquals('0775', substr(sprintf('%o', fileperms(public_path('img/foo'))), -4));
-        $this->assertEquals('0664', substr(sprintf('%o', fileperms(public_path('img/foo/bar.jpg'))), -4));
+        $this->assertSame($expectedDirectory, fileperms(public_path('img/foo')) & 0777);
+        $this->assertSame($expectedFile, fileperms(public_path('img/foo/bar.jpg')) & 0777);
+    }
+
+    public static function localCachePermissionsProvider(): array
+    {
+        return [
+            'configured permissions' => [['permissions' => ['directory' => 0775, 'file' => 0664]], 0775, 0664],
+            'missing permissions block' => [[], 0755, 0644],
+            'missing file permission' => [['permissions' => ['directory' => 0775]], 0775, 0644],
+            'missing directory permission' => [['permissions' => ['file' => 0664]], 0755, 0664],
+        ];
     }
 
     #[Test]
