@@ -154,7 +154,7 @@ class SharedErrorsStaticCachingTest extends TestCase
             ->assertSee('404 session-two-token', false)
             ->assertDontSee('session-one-token', false);
 
-        // A repeat hit on that second URL, now cached under its own URL,
+        // A repeat hit on that second URL, served from the shared cache again,
         // must still resolve session two's current token, not a frozen one.
         $this->withSession(['_token' => 'session-two-token'])
             ->get('/nope-two')
@@ -198,12 +198,9 @@ class SharedErrorsStaticCachingTest extends TestCase
         // shared cache captured when it was seeded.
         $this->get('/nope-two')->assertNotFound()->assertSee('404 2', false);
 
-        // Repeat hits to that second URL, now cached under its own URL, must
-        // keep rendering the region fresh too. Before the fix, the first
-        // request served from the shared cache baked the region's rendered
-        // output into the per-URL cache entry, so every later hit on that
-        // URL replayed the same frozen value forever - the same class of
-        // cross-visitor leak this PR fixes for CSRF tokens.
+        // Repeat hits to that second URL must keep rendering the region fresh
+        // too, rather than replaying a value frozen into a cache entry for
+        // that URL - the same class of cross-visitor leak as with CSRF tokens.
         $this->get('/nope-two')->assertNotFound()->assertSee('404 3', false);
         $this->get('/nope-two')->assertNotFound()->assertSee('404 4', false);
     }

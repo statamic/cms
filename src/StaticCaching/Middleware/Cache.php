@@ -89,7 +89,9 @@ class Cache
         $response = $next($request);
 
         if ($this->shouldBeCached($request, $response)) {
-            $preparedResponse = $this->makeReplacementsAndCacheResponse($request, $response);
+            $cacheUnderRealUrl = $this->shouldCacheUnderRealUrl($response);
+
+            $preparedResponse = $this->makeReplacementsAndCacheResponse($request, $response, $cacheUnderRealUrl);
 
             // The clone above is what gets cached, and keeps any replacer placeholders
             // (e.g. nocache regions, CSRF tokens) intact for future requests to expand
@@ -104,11 +106,11 @@ class Cache
 
             $this->nocache->write();
 
-            // The page is also cached under its real URL, and a repeat request to
+            // When the page is also cached under its real URL, a repeat request to
             // that same URL restores the session by its real URL. If the shared-error
             // flow repointed the session, persist it under the real URL too so that
             // repeat request doesn't fall through to an uncached render.
-            if ($this->nocache->url() !== $nocacheUrl) {
+            if ($cacheUnderRealUrl && $this->nocache->url() !== $nocacheUrl) {
                 $this->nocache->setUrl($nocacheUrl)->write();
             }
 
@@ -126,6 +128,19 @@ class Cache
         }
 
         return $response;
+    }
+
+    /**
+     * Whether the response should be cached under the URL that was requested.
+     *
+     * With shared errors, every error is served from the one shared copy, so an
+     * error doesn't also need caching under its own URL. Caching it there anyway
+     * adds every distinct erroring URL to the cached URL index, which grows
+     * without bound when bots or broken links request endless unique URLs.
+     */
+    private function shouldCacheUnderRealUrl($response): bool
+    {
+        return $response->isSuccessful() || ! config('statamic.static_caching.share_errors');
     }
 
     private function copyError($request, $response)
@@ -170,7 +185,7 @@ class Cache
         }
     }
 
-    private function makeReplacementsAndCacheResponse($request, $response): SymfonyResponse
+    private function makeReplacementsAndCacheResponse($request, $response, bool $cache = true): SymfonyResponse
     {
         $cachedResponse = clone $response;
 
@@ -178,7 +193,9 @@ class Cache
             $this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse, $response));
         }
 
-        $this->cacher->cachePage($request, $cachedResponse);
+        if ($cache) {
+            $this->cacher->cachePage($request, $cachedResponse);
+        }
 
         return $cachedResponse;
     }
