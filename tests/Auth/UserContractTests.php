@@ -821,4 +821,19 @@ trait UserContractTests
 
         return $class;
     }
+
+    #[Test]
+    public function it_uses_a_fields_default_as_the_queryable_value()
+    {
+        $blueprint = Blueprint::makeFromFields(['my_toggle' => ['type' => 'toggle', 'default' => true]]);
+        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
+
+        $user = $this->user();
+
+        $this->assertTrue($user->getQueryableValue('my_toggle'));
+
+        $user->set('my_toggle', false);
+
+        $this->assertFalse($user->getQueryableValue('my_toggle'));
+    }
 }
