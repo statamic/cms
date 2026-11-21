@@ -128,13 +128,15 @@ class FileCacher extends AbstractCacher
      */
     public function flush()
     {
-        foreach ($this->getCachePaths() as $path) {
-            $this->writer->flush($path);
-        }
-
+        // Wipe the store before the files, so any page written while the
+        // files are being deleted keeps the nocache regions it just stored.
         $this->flushUrls();
 
         $this->flushDedicatedStore();
+
+        foreach ($this->getCachePaths() as $path) {
+            $this->writer->flush($path);
+        }
     }
 
     /**

@@ -182,6 +182,30 @@ class FileCacherTest extends TestCase
     }
 
     #[Test]
+    public function flushing_wipes_the_store_before_deleting_the_files()
+    {
+        config(['cache.stores.static_cache' => ['driver' => 'array']]);
+        $cache = Cache::store('static_cache');
+        $cache->forever('nocache::session.abc', ['regions' => ['one']]);
+
+        $writer = \Mockery::mock(Writer::class);
+        $cacher = $this->fileCacher(['path' => 'test/path', 'base_url' => 'http://example.com'], $writer, $cache);
+        $cacher->cacheUrl('one', '/one');
+
+        $stateWhenDeletingFiles = null;
+        $writer->shouldReceive('flush')->once()->andReturnUsing(function () use ($cache, $cacher, &$stateWhenDeletingFiles) {
+            $stateWhenDeletingFiles = [
+                'session' => $cache->get('nocache::session.abc'),
+                'urls' => $cacher->getUrls()->all(),
+            ];
+        });
+
+        $cacher->flush();
+
+        $this->assertSame(['session' => null, 'urls' => []], $stateWhenDeletingFiles);
+    }
+
+    #[Test]
     public function invalidating_a_url_thats_not_cached_will_do_nothing()
     {
         $writer = \Mockery::spy(Writer::class);
