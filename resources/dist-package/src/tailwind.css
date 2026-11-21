@@ -1,0 +1,6 @@
+@layer addon-theme, addon-utilities;
+@import "tailwindcss/theme.css" layer(addon-theme) source(none);
+@import "tailwindcss/utilities.css" layer(addon-utilities) source(none);
+@import "./ui.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
