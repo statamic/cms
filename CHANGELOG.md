@@ -1,5 +1,12 @@
 # Release Notes
 
+## 6.43.1 (2026-11-21)
+
+### What's fixed
+- Fall back to default Glide cache permissions when not configured [#15987](https://github.com/statamic/cms/issues/15987) by @davideprevosto
+
+
+
 ## 6.43.0 (2026-11-20)
 
 ### What's new
