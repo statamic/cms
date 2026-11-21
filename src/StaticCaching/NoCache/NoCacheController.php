@@ -37,7 +37,7 @@ class NoCacheController
             'csrf' => csrf_token(),
             'regions' => $session
                 ->regionKeys()
-                ->mapWithKeys(fn ($key) => [$key => $this->render($session, $replacer, $key)])
+                ->mapWithKeys(fn (string $key) => [$key => $this->render($session, $replacer, $key)])
                 ->reject(fn ($contents) => is_null($contents)),
         ];
     }
