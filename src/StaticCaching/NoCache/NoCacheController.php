@@ -38,7 +38,7 @@ class NoCacheController
             'regions' => $session
                 ->regionKeys()
                 ->mapWithKeys(fn (string $key) => [$key => $this->render($session, $replacer, $key)])
-                ->reject(fn ($contents) => is_null($contents)),
+                ->reject(fn (?string $contents) => is_null($contents)),
         ];
     }
 
