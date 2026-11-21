@@ -118,6 +118,33 @@ class GlideTest extends TestCase
         $this->assertEquals('0664', substr(sprintf('%o', fileperms(public_path('img/foo/bar.jpg'))), -4));
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/15986
+     */
+    #[Test]
+    public function local_cache_falls_back_to_default_permissions_when_not_configured()
+    {
+        $this->markTestSkippedInWindows('Windows does not support Unix file permissions.');
+
+        // Simulate a config file published before the permissions option existed.
+        config([
+            'statamic.assets.image_manipulation.cache' => true,
+            'statamic.assets.image_manipulation.cache_path' => public_path('img'),
+            'statamic.assets.image_manipulation.permissions' => null,
+        ]);
+
+        $umask = umask(0022);
+
+        try {
+            Glide::cacheDisk()->put('foo/bar.jpg', 'image');
+        } finally {
+            umask($umask);
+        }
+
+        $this->assertEquals('0755', substr(sprintf('%o', fileperms(public_path('img/foo'))), -4));
+        $this->assertEquals('0644', substr(sprintf('%o', fileperms(public_path('img/foo/bar.jpg'))), -4));
+    }
+
     #[Test]
     public function hybrid_caching_will_make_a_filesystem_using_the_cache_path_location()
     {
