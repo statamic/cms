@@ -66,13 +66,15 @@ class StaticCacheManager extends Manager
 
     public function flush()
     {
-        $this->driver()->flush();
-
+        // Clear nocache data before the driver deletes files, so a page cached
+        // while the files are being deleted keeps the nocache data it just stored.
         $this->flushNocache();
 
-        // The built-in cachers already wipe the dedicated store from their own flush(),
-        // but null and custom drivers don't, and flushNocache() relies on it being wiped.
-        if ($this->hasCustomStore()) {
+        $this->driver()->flush();
+
+        // The file cacher wipes the dedicated store itself, before it deletes its files.
+        // Wiping it again here would take the nocache data of pages cached since.
+        if ($this->hasCustomStore() && ! $this->driver() instanceof FileCacher) {
             $this->cacheStore()->flush();
         }
 
