@@ -66,8 +66,8 @@ class GlideManager
             'root' => $root,
             'visibility' => 'public',
             'permissions' => [
-                'file' => ['public' => Config::get('statamic.assets.image_manipulation.permissions.file')],
-                'dir' => ['public' => Config::get('statamic.assets.image_manipulation.permissions.directory')],
+                'file' => ['public' => Config::get('statamic.assets.image_manipulation.permissions.file', 0644)],
+                'dir' => ['public' => Config::get('statamic.assets.image_manipulation.permissions.directory', 0755)],
             ],
         ]);
     }
