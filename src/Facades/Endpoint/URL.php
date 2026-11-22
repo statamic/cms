@@ -428,6 +428,7 @@ class URL
 
     private function parse(string $url): array
     {
+        // A dummy origin prevents path segments ending in :digits from being parsed as host:port.
         if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
             $parts = parse_url('http://statamic.invalid'.$url) ?: [];
             unset($parts['scheme'], $parts['host']);
