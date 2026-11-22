@@ -19,6 +19,22 @@ use Tests\TestCase;
 class FileCacherTest extends TestCase
 {
     #[Test]
+    public function nocache_request_waits_for_the_csrf_request()
+    {
+        $cacher = $this->fileCacher();
+
+        $this->assertStringContainsString('window.statamicCsrfRequest = fetch(\'/!/csrf\'', $cacher->getCsrfTokenJs());
+
+        $nocacheJs = $cacher->getNocacheJs();
+        $wait = strpos($nocacheJs, 'Promise.resolve(window.statamicCsrfRequest)');
+        $fetch = strpos($nocacheJs, 'fetch(\'/!/nocache\'');
+
+        $this->assertNotFalse($wait);
+        $this->assertNotFalse($fetch);
+        $this->assertLessThan($fetch, $wait);
+    }
+
+    #[Test]
     public function gets_cache_paths_when_multiple_paths_are_provided()
     {
         $cacher = $this->fileCacher([
