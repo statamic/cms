@@ -14,6 +14,8 @@ use Statamic\Facades\File;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\StaticCaching\NoCache\Region;
+use Statamic\StaticCaching\NoCache\Session;
 use Tests\TestCase;
 
 class FileCacherTest extends TestCase
@@ -195,6 +197,49 @@ class FileCacherTest extends TestCase
         $cacher->flush();
 
         $this->assertNull($cache->get('untracked'));
+    }
+
+    #[Test]
+    public function a_page_cached_while_flushing_keeps_its_nocache_regions()
+    {
+        config(['cache.stores.static_cache' => ['driver' => 'array']]);
+        $cache = Cache::store('static_cache');
+        $path = sys_get_temp_dir().'/statamic-file-cacher-'.uniqid();
+        $url = 'http://example.com/one';
+        $regionKey = null;
+
+        // Stands in for a request that finishes rendering while the flush is deleting files.
+        $writer = new class extends Writer
+        {
+            public $concurrentRequest;
+
+            public function flush($path)
+            {
+                parent::flush($path);
+
+                ($this->concurrentRequest)();
+            }
+        };
+
+        $cacher = $this->fileCacher(['path' => $path, 'base_url' => 'http://example.com', 'lock_hold_length' => 0], $writer, $cache);
+
+        $writer->concurrentRequest = function () use ($cacher, $url, &$regionKey) {
+            $session = new Session($url);
+            $regionKey = $session->pushRegion('Log in', [], 'antlers.html')->key();
+
+            $cacher->cachePage(Request::create($url), 'html');
+            $session->write();
+        };
+
+        try {
+            $cacher->flush();
+
+            $this->assertFileExists($path.'/one_.html');
+            $this->assertEquals(['/one'], $cacher->getUrls()->values()->all());
+            $this->assertInstanceOf(Region::class, (new Session($url))->restore()->region($regionKey));
+        } finally {
+            File::delete($path);
+        }
     }
 
     #[Test]
