@@ -3,15 +3,17 @@
         class="page-tree-branch flex"
         :class="{ 'page-tree-branch--has-children': hasChildren, 'focus-outline': moving }"
         :data-moving="moving || undefined"
+        :tabindex="canKeyboardMove ? -1 : undefined"
+        :data-reorder-focus="canKeyboardMove || undefined"
     >
         <slot name="branch-action" :branch="page">
-            <!-- The handle: drag it, or click it or press Space to move it with the arrow keys. Focus comes back here when you're done. -->
+            <!-- The handle: drag it, or click it or press Space to move it with the arrow keys. When you're done, focus goes to the whole row
+                 (with no ring), so Tab comes back to this handle next, as replicator sets do. -->
             <DragHandle
                 v-if="editable && canKeyboardMove"
                 keyboard-reorder
                 :keyboard-instructions="__('messages.keyboard_tree_reorder_handle_instructions')"
                 class="w-6 shrink-0 self-stretch h-auto!"
-                data-reorder-focus
                 @keyboard-reorder="startMoving('start')"
             />
             <div v-else-if="editable" class="page-move w-6" />
