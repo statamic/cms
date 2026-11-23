@@ -40,6 +40,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected static $extraConfigFields = [];
+    protected static $extraConfigFieldPositions = [];
     private static ?WeakMap $configDefaults = null;
     protected $icon;
 
@@ -215,10 +216,13 @@ abstract class Fieldtype implements Arrayable
         $fields = $this->configFieldItems();
         $extras = collect($this->extraConfigFieldItems());
         $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
+        $positions = $this->extraConfigFieldPositions();
         $extraFields = $extras
             ->reject(fn ($_, $key) => is_int($key))
             ->map(fn ($field, $handle) => compact('handle', 'field'))
-            ->values()->all();
+            ->values();
+        $positionedFields = $extraFields->filter(fn ($extra) => isset($positions[$extra['handle']]))->values()->all();
+        $extraFields = $extraFields->reject(fn ($extra) => isset($positions[$extra['handle']]))->values()->all();
 
         if (empty($fields) && $extras->isEmpty()) {
             return [];
@@ -255,6 +259,12 @@ abstract class Fieldtype implements Arrayable
             }
 
             $sections = $sections->all();
+        }
+
+        [$sections, $unplaced] = $this->placeExtraConfigFields($sections, $positionedFields, $positions);
+
+        if (! empty($unplaced)) {
+            $sections[] = ['fields' => $unplaced];
         }
 
         return array_merge($sections, $extraSections->map(function ($section) {
@@ -309,6 +319,43 @@ abstract class Fieldtype implements Arrayable
         return $this->configFields;
     }
 
+    /**
+     * Puts each positioned extra field right after the field it names, in whichever
+     * section that field is in. Any that can't be placed are handed back.
+     */
+    private function placeExtraConfigFields(array $sections, array $positionedFields, array $positions): array
+    {
+        $unplaced = [];
+
+        foreach ($positionedFields as $extra) {
+            $placed = false;
+
+            foreach ($sections as $index => $section) {
+                $at = array_search($positions[$extra['handle']], array_column($section['fields'], 'handle'), true);
+
+                if ($at !== false) {
+                    array_splice($sections[$index]['fields'], $at + 1, 0, [$extra]);
+                    $placed = true;
+                    break;
+                }
+            }
+
+            if (! $placed) {
+                $unplaced[] = $extra;
+            }
+        }
+
+        return [$sections, $unplaced];
+    }
+
+    protected function extraConfigFieldPositions(): array
+    {
+        return array_merge(
+            self::$extraConfigFieldPositions[static::class] ?? [],
+            Fieldtype::$extraConfigFieldPositions[Fieldtype::class] ?? [],
+        );
+    }
+
     protected function extraConfigFieldItems(): array
     {
         return array_merge(
@@ -324,9 +371,16 @@ abstract class Fieldtype implements Arrayable
         self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
     }
 
-    public static function appendConfigField(string $field, array $config): void
+    /**
+     * @param  string|null  $after  The handle of an existing config field to place this one right after.
+     */
+    public static function appendConfigField(string $field, array $config, ?string $after = null): void
     {
         self::appendConfigFields([$field => $config]);
+
+        if ($after !== null) {
+            self::$extraConfigFieldPositions[static::class][$field] = $after;
+        }
     }
 
     public function icon()
