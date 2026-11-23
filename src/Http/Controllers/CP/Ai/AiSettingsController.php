@@ -461,268 +461,279 @@ class AiSettingsController extends CpController
 
     private function blueprint(): Blueprint
     {
-        return Blueprint::make()->setContents([
-            'tabs' => [
-                'main' => [
-                    'sections' => [
-                        [
+        $sections = [
+            [
+                'display' => __('Provider'),
+                'instructions' => __('Which AI service runs the AI chat and writes suggestions. Your content is sent to it, so pick one you trust with it.'),
+                'fields' => [
+                    [
+                        'handle' => 'provider',
+                        'field' => [
+                            'type' => 'select',
                             'display' => __('Provider'),
-                            'instructions' => __('Which AI service runs the AI chat and writes suggestions. Your content is sent to it, so pick one you trust with it.'),
-                            'fields' => [
-                                [
-                                    'handle' => 'provider',
-                                    'field' => [
-                                        'type' => 'select',
-                                        'display' => __('Provider'),
-                                        'options' => [
-                                            'anthropic' => 'Anthropic (Claude)',
-                                            'openai' => 'OpenAI',
-                                            'google' => 'Google (Gemini)',
-                                            'mistral' => 'Mistral',
-                                            'ollama' => __('Ollama (self-hosted)'),
-                                        ],
-                                        'width' => 50,
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'model',
-                                    'field' => [
-                                        'type' => 'text',
-                                        'display' => __('Model'),
-                                        'instructions' => __("Leave empty for the provider's recommended model."),
-                                        'placeholder' => 'claude-sonnet-5-5',
-                                        'width' => 50,
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'suggestions_model',
-                                    'field' => [
-                                        'type' => 'text',
-                                        'display' => __('Model for Suggestions'),
-                                        'instructions' => __('Suggestions run often and only need short answers, so a smaller, cheaper model usually does. Leave empty to use the model above.'),
-                                        'placeholder' => 'claude-haiku-5-5',
-                                        'if' => ['suggestions' => true],
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'api_key',
-                                    'field' => [
-                                        'type' => 'text',
-                                        'input_type' => 'password',
-                                        'display' => __('API Key'),
-                                        'instructions' => __('Kept in your .env file as STATAMIC_AI_KEY, never with your content.'),
-                                        'unless' => ['provider' => 'ollama'],
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'ollama_url',
-                                    'field' => [
-                                        'type' => 'text',
-                                        'display' => __('Ollama URL'),
-                                        'placeholder' => 'http://localhost:11434',
-                                        'if' => ['provider' => 'ollama'],
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'connection',
-                                    'field' => [
-                                        'type' => 'ai_status',
-                                        'show' => 'connection',
-                                        'display' => __('Connection'),
-                                        'instructions' => __('Check the details above work before anyone relies on them.'),
-                                    ],
-                                ],
+                            'options' => [
+                                'anthropic' => 'Anthropic (Claude)',
+                                'openai' => 'OpenAI',
+                                'google' => 'Google (Gemini)',
+                                'mistral' => 'Mistral',
+                                'ollama' => __('Ollama (self-hosted)'),
                             ],
+                            'width' => 50,
                         ],
-                        [
-                            'display' => __('Features'),
-                            // Bold, as it's the one thing about AI that isn't set on this page
-                            'instructions' => __('Who can use them is set per role, with the **Use AI** permission.'),
+                    ],
+                    [
+                        'handle' => 'model',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Model'),
+                            'instructions' => __("Leave empty for the provider's recommended model."),
+                            'placeholder' => 'claude-sonnet-5-5',
+                            'width' => 50,
+                        ],
+                    ],
+                    [
+                        'handle' => 'suggestions_model',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Model for Suggestions'),
+                            'instructions' => __('Suggestions run often and only need short answers, so a smaller, cheaper model usually does. Leave empty to use the model above.'),
+                            'placeholder' => 'claude-haiku-5-5',
+                            'if' => ['suggestions' => true],
+                        ],
+                    ],
+                    [
+                        'handle' => 'api_key',
+                        'field' => [
+                            'type' => 'text',
+                            'input_type' => 'password',
+                            'display' => __('API Key'),
+                            'instructions' => __('Kept in your .env file as STATAMIC_AI_KEY, never with your content.'),
+                            'unless' => ['provider' => 'ollama'],
+                        ],
+                    ],
+                    [
+                        'handle' => 'ollama_url',
+                        'field' => [
+                            'type' => 'text',
+                            'display' => __('Ollama URL'),
+                            'placeholder' => 'http://localhost:11434',
+                            'if' => ['provider' => 'ollama'],
+                        ],
+                    ],
+                    [
+                        'handle' => 'connection',
+                        'field' => [
+                            'type' => 'ai_status',
+                            'show' => 'connection',
+                            'display' => __('Connection'),
+                            'instructions' => __('Check the details above work before anyone relies on them.'),
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Features'),
+                // Bold, as it's the one thing about AI that isn't set on this page
+                'instructions' => __('Who can use them is set per role, with the **Use AI** permission.'),
+                'fields' => [
+                    [
+                        'handle' => 'assistant',
+                        'field' => [
+                            'type' => 'toggle',
+                            'display' => __('AI Chat'),
+                            'instructions' => __('Opened from the *Ask* button in the header.'),
+                            'width' => 50,
+                        ],
+                    ],
+                    [
+                        'handle' => 'suggestions',
+                        'field' => [
+                            'type' => 'toggle',
+                            'display' => __('Suggestions on fields'),
+                            'instructions' => __('Switched on for each field in its blueprint.'),
+                            'width' => 50,
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Writing Style'),
+                'instructions' => __('Given to the AI with every request, so what it writes sounds like the rest of the site.'),
+                'fields' => [
+                    [
+                        'handle' => 'instructions',
+                        'field' => [
+                            'type' => 'textarea',
+                            'display' => __('Instructions'),
+                            'instructions' => __('Tone, spelling, and words to use or avoid.'),
+                            'placeholder' => __('British English. Friendly but not chatty. Say "customers", never "users".'),
+                        ],
+                    ],
+                    [
+                        'handle' => 'collection_instructions',
+                        'field' => [
+                            'type' => 'grid',
+                            'display' => __('Per Collection'),
+                            'instructions' => __('Extra instructions for entries in a particular collection, on top of the ones above.'),
+                            'add_row' => __('Add Collection'),
+                            'fullscreen' => false,
                             'fields' => [
                                 [
-                                    'handle' => 'assistant',
+                                    'handle' => 'collection',
                                     'field' => [
-                                        'type' => 'toggle',
-                                        'display' => __('AI Chat'),
-                                        'instructions' => __('Opened from the *Ask* button in the header.'),
-                                        'width' => 50,
+                                        'type' => 'collections',
+                                        'display' => __('Collection'),
+                                        'max_items' => 1,
+                                        'mode' => 'select',
                                     ],
                                 ],
-                                [
-                                    'handle' => 'suggestions',
-                                    'field' => [
-                                        'type' => 'toggle',
-                                        'display' => __('Suggestions on fields'),
-                                        'instructions' => __('Switched on for each field in its blueprint.'),
-                                        'width' => 50,
-                                    ],
-                                ],
-                            ],
-                        ],
-                        [
-                            'display' => __('Writing Style'),
-                            'instructions' => __('Given to the AI with every request, so what it writes sounds like the rest of the site.'),
-                            'fields' => [
                                 [
                                     'handle' => 'instructions',
                                     'field' => [
                                         'type' => 'textarea',
                                         'display' => __('Instructions'),
-                                        'instructions' => __('Tone, spelling, and words to use or avoid.'),
-                                        'placeholder' => __('British English. Friendly but not chatty. Say "customers", never "users".'),
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'collection_instructions',
-                                    'field' => [
-                                        'type' => 'grid',
-                                        'display' => __('Per Collection'),
-                                        'instructions' => __('Extra instructions for entries in a particular collection, on top of the ones above.'),
-                                        'add_row' => __('Add Collection'),
-                                        'fullscreen' => false,
-                                        'fields' => [
-                                            [
-                                                'handle' => 'collection',
-                                                'field' => [
-                                                    'type' => 'collections',
-                                                    'display' => __('Collection'),
-                                                    'max_items' => 1,
-                                                    'mode' => 'select',
-                                                ],
-                                            ],
-                                            [
-                                                'handle' => 'instructions',
-                                                'field' => [
-                                                    'type' => 'textarea',
-                                                    'display' => __('Instructions'),
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                                // Only on multisite, e.g. British English on the UK site and American English on the US one
-                                ...(Site::multiEnabled() ? [[
-                                    'handle' => 'site_instructions',
-                                    'field' => [
-                                        'type' => 'grid',
-                                        'display' => __('Per Site'),
-                                        'instructions' => __("Extra instructions for a particular site. The AI already writes in each site's language."),
-                                        'add_row' => __('Add Site'),
-                                        'fullscreen' => false,
-                                        'fields' => [
-                                            [
-                                                'handle' => 'site',
-                                                'field' => [
-                                                    'type' => 'sites',
-                                                    'display' => __('Site'),
-                                                    'max_items' => 1,
-                                                    'mode' => 'select',
-                                                ],
-                                            ],
-                                            [
-                                                'handle' => 'instructions',
-                                                'field' => [
-                                                    'type' => 'textarea',
-                                                    'display' => __('Instructions'),
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ]] : []),
-                            ],
-                        ],
-                        [
-                            'display' => __('Page Skills'),
-                            // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
-                            'header_actions' => 'page-prompts-actions',
-                            'instructions' => __('Whole-page jobs, run from the AI chat.'),
-                            'fields' => [$this->pagePromptsField()],
-                        ],
-                        [
-                            'display' => __('Field Skills'),
-                            'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
-                            'fields' => [$this->fieldPromptsField()],
-                        ],
-                        [
-                            'display' => __('Image Skills'),
-                            'header_actions' => 'image-prompts-actions',
-                            'instructions' => __('Image edits, offered under *Ask AI* in the asset editor.'),
-                            'fields' => [$this->imagePromptsField()],
-                        ],
-                        [
-                            'display' => __('Scheduled Prompts'),
-                            'header_actions' => 'scheduled-prompts-actions',
-                            'instructions' => __('Reports the AI writes on its own, on a schedule, like a weekly check of the whole site. Each run is kept under *Tools → AI Reports*. They only read: anything they find is left for your team to change.'),
-                            'fields' => [$this->scheduledPromptsField()],
-                        ],
-                        [
-                            'display' => __('Kept Out of AI'),
-                            'instructions' => __('Anything you add here is never sent to the AI provider, even for users who can see it. Use this for personal details, like names and email addresses, and anything confidential.'),
-                            'fields' => [
-                                [
-                                    'handle' => 'excluded_collections',
-                                    'field' => [
-                                        'type' => 'collections',
-                                        'display' => __('Collections'),
-                                        'mode' => 'select',
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'excluded_taxonomies',
-                                    'field' => [
-                                        'type' => 'taxonomies',
-                                        'display' => __('Taxonomies'),
-                                        'mode' => 'select',
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'excluded_fields',
-                                    'field' => [
-                                        'type' => 'taggable',
-                                        'display' => __('Fields'),
-                                        'instructions' => __('Field handles to leave out wherever they appear, like `email` or `phone`.'),
-                                        'placeholder' => __('Type a handle and press Enter'),
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'excluded_other',
-                                    'field' => [
-                                        'type' => 'checkboxes',
-                                        'display' => __('Also Keep Out'),
-                                        'options' => [
-                                            'users' => __('Users'),
-                                            'form_submissions' => __('Form submissions'),
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                        [
-                            'display' => __('Spending'),
-                            'fields' => [
-                                [
-                                    'handle' => 'usage',
-                                    'field' => [
-                                        'type' => 'ai_status',
-                                        'show' => 'usage',
-                                        'display' => __('This Month'),
-                                    ],
-                                ],
-                                [
-                                    'handle' => 'monthly_limit',
-                                    'field' => [
-                                        'type' => 'integer',
-                                        'display' => __('Monthly Limit'),
-                                        'instructions' => __('The AI chat and suggestions pause for the rest of the month once the provider has charged this much. Leave empty for no limit.'),
-                                        'prepend' => '$',
-                                        'width' => 50,
                                     ],
                                 ],
                             ],
                         ],
                     ],
+                    // Only on multisite, e.g. British English on the UK site and American English on the US one
+                    ...(Site::multiEnabled() ? [[
+                        'handle' => 'site_instructions',
+                        'field' => [
+                            'type' => 'grid',
+                            'display' => __('Per Site'),
+                            'instructions' => __("Extra instructions for a particular site. The AI already writes in each site's language."),
+                            'add_row' => __('Add Site'),
+                            'fullscreen' => false,
+                            'fields' => [
+                                [
+                                    'handle' => 'site',
+                                    'field' => [
+                                        'type' => 'sites',
+                                        'display' => __('Site'),
+                                        'max_items' => 1,
+                                        'mode' => 'select',
+                                    ],
+                                ],
+                                [
+                                    'handle' => 'instructions',
+                                    'field' => [
+                                        'type' => 'textarea',
+                                        'display' => __('Instructions'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ]] : []),
                 ],
             ],
-        ]);
+            [
+                'display' => __('Page Skills'),
+                // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
+                'header_actions' => 'page-prompts-actions',
+                'instructions' => __('Whole-page jobs, run from the AI chat.'),
+                'fields' => [$this->pagePromptsField()],
+            ],
+            [
+                'display' => __('Field Skills'),
+                'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
+                'fields' => [$this->fieldPromptsField()],
+            ],
+            [
+                'display' => __('Image Skills'),
+                'header_actions' => 'image-prompts-actions',
+                'instructions' => __('Image edits, offered under *Ask AI* in the asset editor.'),
+                'fields' => [$this->imagePromptsField()],
+            ],
+            [
+                'display' => __('Scheduled Prompts'),
+                'header_actions' => 'scheduled-prompts-actions',
+                'instructions' => __('Reports the AI writes on its own, on a schedule, like a weekly check of the whole site. Each run is kept under *Tools → AI Reports*. They only read: anything they find is left for your team to change.'),
+                'fields' => [$this->scheduledPromptsField()],
+            ],
+            [
+                'display' => __('Kept Out of AI'),
+                'instructions' => __('Anything you add here is never sent to the AI provider, even for users who can see it. Use this for personal details, like names and email addresses, and anything confidential.'),
+                'fields' => [
+                    [
+                        'handle' => 'excluded_collections',
+                        'field' => [
+                            'type' => 'collections',
+                            'display' => __('Collections'),
+                            'mode' => 'select',
+                        ],
+                    ],
+                    [
+                        'handle' => 'excluded_taxonomies',
+                        'field' => [
+                            'type' => 'taxonomies',
+                            'display' => __('Taxonomies'),
+                            'mode' => 'select',
+                        ],
+                    ],
+                    [
+                        'handle' => 'excluded_fields',
+                        'field' => [
+                            'type' => 'taggable',
+                            'display' => __('Fields'),
+                            'instructions' => __('Field handles to leave out wherever they appear, like `email` or `phone`.'),
+                            'placeholder' => __('Type a handle and press Enter'),
+                        ],
+                    ],
+                    [
+                        'handle' => 'excluded_other',
+                        'field' => [
+                            'type' => 'checkboxes',
+                            'display' => __('Also Keep Out'),
+                            'options' => [
+                                'users' => __('Users'),
+                                'form_submissions' => __('Form submissions'),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'display' => __('Spending'),
+                'fields' => [
+                    [
+                        'handle' => 'usage',
+                        'field' => [
+                            'type' => 'ai_status',
+                            'show' => 'usage',
+                            'display' => __('This Month'),
+                        ],
+                    ],
+                    [
+                        'handle' => 'monthly_limit',
+                        'field' => [
+                            'type' => 'integer',
+                            'display' => __('Monthly Limit'),
+                            'instructions' => __('The AI chat and suggestions pause for the rest of the month once the provider has charged this much. Leave empty for no limit.'),
+                            'prepend' => '$',
+                            'width' => 50,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        return Blueprint::make()->setContents(['tabs' => $this->arrange($sections)]);
+    }
+
+    /**
+     * The settings, set once, on the first tab. The skills, which change most, get a tab of their own, and the scheduled prompts get
+     * another, as they aren't skills: they run on their own and write reports.
+     */
+    private function arrange(array $sections): array
+    {
+        [$provider, $features, $style, $page, $field, $image, $scheduled, $keptOut, $spending] = $sections;
+
+        return [
+            'general' => ['display' => __('Settings'), 'sections' => [$provider, $features, $style, $keptOut, $spending]],
+            'skills' => ['display' => __('Skills'), 'sections' => [$page, $field, $image]],
+            'scheduled' => ['display' => __('Scheduled'), 'sections' => [$scheduled]],
+        ];
     }
 }
