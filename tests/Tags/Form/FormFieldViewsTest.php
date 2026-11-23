@@ -94,6 +94,48 @@ class FormFieldViewsTest extends FormTestCase
         $this->assertStringContainsString('step="'.$step.'"', $output);
     }
 
+    #[Test]
+    #[DataProvider('paragraphTextProvider')]
+    public function paragraph_renders_its_text_as_html($language, $text)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'intro', 'field' => ['type' => 'paragraph', 'text' => $text]]);
+
+        $this->assertStringContainsString("<div>{$text}</div>", $output);
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function heading_renders_its_subheading_as_html($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'title', 'field' => ['type' => 'heading', 'display' => 'Hello', 'subheading' => '<strong>Hi</strong>']]);
+
+        $this->assertStringContainsString('<div><h2>Hello</h2><p><strong>Hi</strong></p></div>', $output);
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function heading_without_a_subheading_has_no_empty_paragraph($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'title', 'field' => ['type' => 'heading', 'display' => 'Hello']]);
+
+        $this->assertStringContainsString('<div><h2>Hello</h2></div>', $output);
+    }
+
+    public static function paragraphTextProvider()
+    {
+        return collect(['antlers', 'blade'])->flatMap(fn ($language) => [
+            "plain text ({$language})" => [$language, 'Hi'],
+            "inline html ({$language})" => [$language, '<strong>Hi</strong>'],
+            "block html ({$language})" => [$language, '<ul><li>One</li></ul>'],
+        ])->all();
+    }
+
     public static function currencyStepProvider()
     {
         return collect(['antlers', 'blade'])->flatMap(fn ($language) => [

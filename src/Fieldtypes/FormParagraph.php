@@ -2,7 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
-class FormParagraph extends Html
+use Statamic\Fields\Fieldtype;
+
+class FormParagraph extends Fieldtype
 {
     protected $selectable = false;
 }
