@@ -34,10 +34,10 @@ class AiSettingsController extends CpController
 
         $values = array_merge($this->defaults(), Cache::get(self::CACHE_KEY, []));
 
-        // The prompts are kept in one list, each saying where it's used, but the form splits them into page prompts (a Replicator, whose rows need to say which set they are) and field prompts (a table)
+        // The prompts are kept in one list, each saying where it's used, but the form splits them into page prompts and field prompts (both Replicators, whose rows need to say which set they are)
         $prompts = collect(self::savedPrompts());
         $values['page_prompts'] = $prompts->where('use_on', '!=', 'fields')->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->values()->all();
-        $values['field_prompts'] = $prompts->where('use_on', 'fields')->map(fn ($prompt) => ['name' => $prompt['name'] ?? null, 'instructions' => $prompt['instructions'] ?? null])->values()->all();
+        $values['field_prompts'] = $prompts->where('use_on', 'fields')->map(fn ($prompt) => ['type' => 'prompt', ...$prompt])->values()->all();
         unset($values['prompts']);
         $values['image_prompts'] = self::savedImagePrompts();
 
@@ -383,20 +383,27 @@ class AiSettingsController extends CpController
         ]];
     }
 
-    // Field prompts are short, one-line instructions, so a plain table of names and instructions is enough
+    // Field skills, like page skills: collapsed, a row shows its name in the badge, then the start of its instructions, and its switch turns
+    // it off. They're offered on every field with suggestions, so there's nothing to say where or for whom.
     private function fieldPromptsField(): array
     {
         return ['handle' => 'field_prompts', 'field' => [
-            'type' => 'grid',
+            'type' => 'replicator',
             'display' => __('Field Skills'),
             'hide_display' => true,
             'full_width_setting' => true,
-            'add_row' => __('Add Skill'),
-            'fullscreen' => false,
-            'fields' => [
-                ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'width' => 33]],
-                ['handle' => 'instructions', 'field' => ['type' => 'text', 'display' => __('Instructions'), 'placeholder' => __('Make it shorter, keeping what it says.')]],
-            ],
+            'collapse' => true,
+            'previews' => true,
+            'button_label' => __('Add Skill'),
+            'insert_between' => false,
+            'actions' => false,
+            'header_actions' => 'field-prompts-actions',
+            'sets' => ['main' => ['display' => __('Skills'), 'sets' => [
+                'prompt' => ['display' => __('Field Skill'), 'icon' => 'ai-chat', 'title_field' => 'name', 'switch_labels' => [__('Offered'), __('Switched off')], 'fields' => [
+                    ['handle' => 'name', 'field' => ['type' => 'text', 'display' => __('Name'), 'placeholder' => __('Shorter'), 'replicator_preview' => false]],
+                    ['handle' => 'instructions', 'field' => ['type' => 'textarea', 'display' => __('Instructions'), 'placeholder' => __('Make it shorter, keeping what it says.')]],
+                ]],
+            ]]],
         ]];
     }
 
@@ -637,6 +644,7 @@ class AiSettingsController extends CpController
             ],
             [
                 'display' => __('Field Skills'),
+                'header_actions' => 'field-prompts-actions',
                 'instructions' => __('Quick rewrites offered in the suggestions menu on fields.'),
                 'fields' => [$this->fieldPromptsField()],
             ],
