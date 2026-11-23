@@ -231,3 +231,19 @@ test('its own instructions and position are used', async () => {
 
     expect(api.status.value).toBe('Tree instructions');
 });
+
+test('its position is only tracked while it is moving', async () => {
+    const positionKey = vi.fn(() => 'key');
+    const { api, indexRef } = mountReorder({ options: { positionKey } });
+    positionKey.mockClear();
+
+    indexRef.value = 2;
+    await nextTick();
+    expect(positionKey).not.toHaveBeenCalled();
+
+    api.startMoving('start');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+    expect(positionKey).toHaveBeenCalled();
+    expect(api.status.value).toBe('messages.keyboard_item_reorder_instructions');
+});

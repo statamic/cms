@@ -257,9 +257,11 @@ export function useKeyboardItemReorder({
     }
 
     watch(
-        () => (positionKey ? toValue(positionKey) : toValue(index)),
-        () => {
-            if (!moving.value) return;
+        // Only while it's moving: a tree's position key reads its whole sibling list, too much to track on every item all the time
+        () => (moving.value ? (positionKey ? toValue(positionKey) : toValue(index)) : null),
+        (position, previous) => {
+            // Not when it starts or stops moving, only when it moves
+            if (!moving.value || previous === null) return;
             announcePosition();
             scrollMovingItemIntoView();
         },
