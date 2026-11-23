@@ -1,5 +1,21 @@
 # Release Notes
 
+## 6.43.2 (2026-11-23)
+
+### What's fixed
+- Match the asset table's file name focus outline to entry titles [#16011](https://github.com/statamic/cms/issues/16011) by @jaygeorge
+- Improve CP TrimStrings performance with large Bard content [#16012](https://github.com/statamic/cms/issues/16012) by @jasonvarga
+- Fix URL parsing for paths containing colons followed by digits [#15997](https://github.com/statamic/cms/issues/15997) by @daun
+- Wait for the csrf request before the nocache request [#15994](https://github.com/statamic/cms/issues/15994) by @theluckystrike
+- Wipe the static cache store before deleting files on flush [#15991](https://github.com/statamic/cms/issues/15991) by @edalzell
+- Stop tree rows with children growing taller than the others [#16014](https://github.com/statamic/cms/issues/16014) by @jaygeorge
+- Clear nocache data before the file driver deletes files on flush [#15993](https://github.com/statamic/cms/issues/15993) by @edalzell
+- Skip nocache regions missing from the store in the nocache route [#15992](https://github.com/statamic/cms/issues/15992) by @edalzell
+- Keep the asset listing cached on remote disks when the watcher is enabled [#15980](https://github.com/statamic/cms/issues/15980) by @edalzell
+- Only fill old input into the form that was submitted [#16013](https://github.com/statamic/cms/issues/16013) by @daun
+
+
+
 ## 6.43.1 (2026-11-21)
 
 ### What's fixed
