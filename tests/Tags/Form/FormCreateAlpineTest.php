@@ -195,6 +195,7 @@ class FormCreateAlpineTest extends FormTestCase
         $output = $this->tag('{{ form:newsletter js="alpine" }}{{ /form:newsletter }}');
 
         $this->assertStringNotContainsString('Frodo Braggins', $output);
+        $this->assertStringContainsString('&quot;name&quot;:null', $output);
     }
 
     #[Test]
