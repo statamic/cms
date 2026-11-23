@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import useAiChat from '@/composables/use-ai-chat.js';
 import { cp_url } from '@/bootstrap/globals.js';
 import { suggestionsEmpty, suggestionsFail, suggestionsSlow } from '@/components/ai-suggest/use-ai-suggest.js';
-import { canEditAi } from './mock-runs.js';
+import { canEditAi, pretendSave } from './mock-runs.js';
 
 // Prototype: buttons at the bottom of the nav that play out a request in the AI chat, for demoing the branch. Each starts a new chat and
 // types the request in, as if you had. What happens is up to the mock runs (see mock-runs.js). Phase 2's are things for later, which
@@ -71,10 +71,14 @@ function runOnPage(run) {
 
 // Field suggestions: go to the summer sale entry, then click the Subtitle field's suggest icon, as you would
 const summerSaleUrl = cp_url('collections/ai_suggestions/entries/7f3c2a10-ai00-4c1e-9b2a-sugg00000001');
-async function suggestSubtitle({ wait, find }, fails = false, empty = false, slow = false) {
+async function suggestSubtitle(helpers, fails = false, empty = false, slow = false) {
+    return suggestField(helpers, 'subtitle', fails, empty, slow);
+}
+
+async function suggestField({ wait, find }, handle, fails = false, empty = false, slow = false) {
     if (!window.location.href.startsWith(summerSaleUrl)) router.visit(summerSaleUrl);
     // The field's id is on its input, so find that, then the suggest button beside it: the nearest parent that has one
-    const input = await find('[id^="field_"][id$="_subtitle"]');
+    const input = await find(`[id^="field_"][id$="_${handle}"]`);
     let parent = input;
     while (parent && !parent.querySelector('button[aria-label="Suggest"]')) parent = parent.parentElement;
     const button = parent?.querySelector('button[aria-label="Suggest"]');
@@ -101,6 +105,212 @@ const suggestSubtitleEmpty = (helpers) => suggestSubtitle(helpers, false, true);
 
 // And again, but they take a long time
 const suggestSubtitleSlow = (helpers) => suggestSubtitle(helpers, false, false, true);
+
+// A Bard field's suggestions, which open over the entry's sidebar rather than under the field
+const suggestBody = (helpers) => suggestField(helpers, 'body');
+
+// Image demos, in the asset editor: one of the demo site's elephant photos (it has a cut-out for Remove background), opened as you would
+// from Assets. Each starts with the image's AI card closed and empty, so they can be played in any order, and again.
+const elephantUrl = cp_url('assets/browse/assets/carousel/mylon-ollila-j4ocwyap_cs-unsplash.jpg/edit');
+// A button by the text it shows (innerText, as textContent would include its icon's hidden SVG title), or by its first line, for the list of
+// skills, whose buttons go on to the start of the instructions
+const buttonWithText = (text, within = document) =>
+    [...(within ?? document).querySelectorAll('button')].find((button) => button.innerText.trim() === text || button.innerText.trim().split('\n')[0] === text);
+
+async function findButton(text, within, timeout = 8000) {
+    for (let waited = 0; waited < timeout; waited += 100) {
+        const button = buttonWithText(text, typeof within === 'function' ? within() : within);
+        if (button) return button;
+        await wait(100);
+    }
+    return null;
+}
+
+// Types into a text box a letter at a time, as you would, so Vue's v-model sees each one
+async function typeInto(box, text) {
+    const setValue = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(box), 'value').set;
+    box.focus();
+    for (const letter of text) {
+        setValue.call(box, box.value + letter);
+        box.dispatchEvent(new Event('input', { bubbles: true }));
+        await wait(45);
+    }
+}
+
+const press = (element, key, options = {}) => element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...options }));
+const card = () => document.querySelector('[data-ai-image-card]');
+
+// Moves focus as Tab would, a stop at a time, with the focus ring showing (focusVisible, as the demo's started with a click), so you can
+// see where it's going. It goes through the controls in the page's order, from what has focus now to the target.
+async function tabTo(target, within) {
+    const stops = [...within.querySelectorAll('button, textarea, input')].filter((element) => element.offsetParent && !element.disabled);
+    const to = stops.indexOf(target);
+    let from = stops.indexOf(document.activeElement);
+    if (to < 0) return;
+    if (from < 0 || from > to) from = to - 1;
+    for (let i = from + 1; i <= to; i++) {
+        stops[i].focus({ focusVisible: true });
+        await wait(450);
+    }
+}
+
+// Enter on a focused button presses it. A made-up Enter doesn't, so it's clicked, as Enter would.
+async function pressEnter(button) {
+    await wait(250);
+    button.click();
+}
+const cardInput = () => card()?.querySelector('textarea');
+
+// The elephant open in the asset editor
+async function openElephant() {
+    if (!window.location.href.startsWith(elephantUrl) || !buttonWithText('Edit with AI')) router.visit(elephantUrl);
+    const askAi = await findButton('Edit with AI');
+    if (!askAi) return null;
+    // Suggest a filename leaves Rename's dialog open, so cancel it
+    const renaming = [...document.querySelectorAll('[role=dialog]')].find((dialog) => dialog.innerText.startsWith('Rename'));
+    if (renaming) {
+        buttonWithText('Cancel', renaming)?.click();
+        await wait(400);
+    }
+    return askAi;
+}
+
+// …with its AI card open and empty. A card that's already open (from the demo before) is cleared with Cancel, as you would, rather than
+// closed and opened again; a closed one is opened with Edit with AI.
+async function openImageCard() {
+    const askAi = await openElephant();
+    if (!askAi) return null;
+    if (cardInput()) {
+        buttonWithText('Cancel', card())?.click();
+        const box = cardInput();
+        Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(box, '');
+        box.dispatchEvent(new Event('input', { bubbles: true }));
+        box.focus();
+        await wait(500);
+        return card();
+    }
+    await wait(900);
+    // Tabbed to from Rename, beside it, then pressed
+    const rename = buttonWithText('Rename');
+    if (rename) {
+        rename.focus({ focusVisible: true });
+        await wait(450);
+    }
+    askAi.focus({ focusVisible: true });
+    await pressEnter(askAi);
+    await find('[data-ai-image-card] textarea');
+    await wait(900);
+    return card();
+}
+
+// Runs a skill as you would from the keyboard: Tab from the input along the pills to its own, then Enter. One past the first three is in
+// the list "+ N" opens, so Tab goes to that, Enter opens it, and the arrow keys go down the list to it. It leaves what comes back for
+// you to hover.
+async function runImageSkill(name) {
+    const wrapper = await openImageCard();
+    if (!wrapper) return;
+    const pill = buttonWithText(name, wrapper);
+    if (pill) {
+        await tabTo(pill, wrapper);
+        return pressEnter(pill);
+    }
+    const more = [...wrapper.querySelectorAll('button')].find((button) => button.innerText.trim().startsWith('+'));
+    if (!more) return;
+    await tabTo(more, wrapper);
+    await pressEnter(more);
+    // The list opens with focus back in the input, where Up and Down go through it
+    await wait(700);
+    const names = [...wrapper.querySelectorAll('button')].filter((button) => button.offsetParent).map((button) => button.innerText.trim().split('\n')[0]);
+    const steps = names.indexOf(name) + 1;
+    for (let i = 0; i < steps; i++) {
+        press(cardInput(), 'ArrowDown');
+        await wait(450);
+    }
+    press(cardInput(), 'Enter');
+}
+
+// Edit with AI, then its skill pills fade in. An open card is closed first (Esc), so you see it open.
+async function openAskAi() {
+    if (!(await openElephant())) return;
+    if (cardInput()) {
+        press(cardInput(), 'Escape');
+        await wait(600);
+    }
+    await openImageCard();
+}
+
+// The upscales only show before and after while one's hovered, so once they're back, the first is shown that way
+async function upscale() {
+    await runImageSkill('Upscale');
+    await wait(2400);
+    card()?.querySelector('.group.relative')?.dispatchEvent(new MouseEvent('mouseenter'));
+}
+
+// Erase something: picked from the list, then a stroke painted over the left of the image, then Erase
+async function eraseSomething() {
+    await runImageSkill('Erase something');
+    const canvas = await find('canvas.cursor-crosshair', 3000);
+    if (!canvas) return;
+    await wait(800);
+    const rect = canvas.getBoundingClientRect();
+    const at = (x, y, type) => canvas.dispatchEvent(new PointerEvent(type, { bubbles: true, pointerId: 1, clientX: rect.left + rect.width * x, clientY: rect.top + rect.height * y }));
+    at(0.22, 0.5, 'pointerdown');
+    for (let step = 0; step <= 24; step++) {
+        at(0.22 + (step / 24) * 0.14, 0.5 + Math.sin(step / 3) * 0.06, 'pointermove');
+        await wait(30);
+    }
+    at(0.36, 0.5, 'pointerup');
+    await wait(700);
+    // Painting leaves focus in the input, so Tab goes from there to Erase
+    const erase = await findButton('Erase', card(), 2000);
+    if (!erase) return;
+    await tabTo(erase, card());
+    await pressEnter(erase);
+}
+
+// Create a skill, as in the chat: a /command that matches nothing offers to make it, Enter opens the form named after it, the instructions
+// are typed in, then Tab to Save and Enter. The save is only pretend (pretendSave), so nothing is left in Settings → AI, and the skill an
+// earlier play made is taken away first. Once it's saved, its command is in the input, and Enter runs it.
+const page = usePage();
+async function createImageSkill() {
+    page.props._statamic.aiImagePrompts = (page.props._statamic.aiImagePrompts ?? []).filter((skill) => !skill.demo);
+    if (!(await openImageCard())) return;
+    await typeInto(cardInput(), '/moody-black-and-white');
+    await wait(1200);
+    press(cardInput(), 'Enter');
+    const instructions = await find('[data-ai-image-card] textarea:not([aria-label])', 2000);
+    if (!instructions) return;
+    await wait(600);
+    await typeInto(instructions, 'Black and white, with deep shadows and strong contrast.');
+    await wait(600);
+    const save = buttonWithText('Save', card());
+    if (!save) return;
+    await tabTo(save, card());
+    pretendSave.value = true;
+    await pressEnter(save);
+    await find('[data-ai-image-card] textarea[aria-label]:not(:placeholder-shown)', 3000);
+    pretendSave.value = false;
+    await wait(1200);
+    press(cardInput(), 'Enter');
+}
+
+// The asset editor's Alt Text field, written by the AI (with Added by AI and Undo once it's in)
+async function writeAltText() {
+    if (!(await openElephant())) return;
+    const button = await find('button[aria-label="Write alt text"]');
+    button?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    await wait(700);
+    button?.click();
+}
+
+// Rename, then the AI suggests a filename that says what's in it
+async function suggestFilename() {
+    if (!(await openElephant())) return;
+    (await findButton('Rename'))?.click();
+    const button = await find('button[aria-label="Suggest a filename"]');
+    await wait(800);
+    button?.click();
+}
 
 // Grouped, as the list got long. Each group's demos keep their order from before.
 const groups = [
@@ -143,6 +353,21 @@ const groups = [
             { label: 'Suggest down, can’t edit', run: suggestSubtitleFails, text: 'The same, but the AI doesn’t respond, and you can’t edit the AI settings', canEditAi: false },
             { label: 'Suggest empty', run: suggestSubtitleEmpty, text: 'The same, but the AI has no suggestions' },
             { label: 'Suggest slow', run: suggestSubtitleSlow, text: 'The same, but the AI takes a long time' },
+            { label: 'Bard suggestions', run: suggestBody, text: 'Clicks the suggest icon on the summer sale’s Body, a Bard field, whose suggestions open over the sidebar' },
+        ],
+    },
+    {
+        title: 'Images',
+        demos: [
+            { label: 'Edit with AI', run: openAskAi, text: 'Opens an elephant photo in the asset editor and clicks Edit with AI: the card, with its skill pills' },
+            { label: 'Make variations', run: () => runImageSkill('Make variations'), text: 'Runs Make variations, then previews each new image in the original’s place' },
+            { label: 'Remove background', run: () => runImageSkill('Remove background'), text: 'Cuts out the elephants, on see-through and on white' },
+            { label: 'Extend', run: () => runImageSkill('Extend'), text: 'Widens or heightens the image to Wide, Square and Portrait' },
+            { label: 'Upscale', run: upscale, text: 'Makes it 2× and 4×, each previewed before and after, split down the middle' },
+            { label: 'Erase something', run: eraseSomething, text: 'Picks Erase something from the list (+ 2), paints over part of the image, then erases it' },
+            { label: 'Create a skill', run: createImageSkill, text: 'Types /moody-black-and-white, which matches nothing, creates it from the offer, saves it, then runs it', canEditAi: true },
+            { label: 'Write alt text', run: writeAltText, text: 'Clicks the AI button on the Alt Text field: a pulsing line, then the text, with Added by AI and Undo' },
+            { label: 'Suggest a filename', run: suggestFilename, text: 'Clicks Rename, then the AI button on its Filename field' },
         ],
     },
     {
