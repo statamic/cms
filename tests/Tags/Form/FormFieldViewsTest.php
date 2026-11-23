@@ -35,6 +35,48 @@ class FormFieldViewsTest extends FormTestCase
     }
 
     #[Test]
+    #[DataProvider('choiceFieldProvider')]
+    public function choice_field_with_an_option_keyed_zero_has_nothing_selected_without_a_value($language, $field, $attribute)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'choice', 'field' => $field]);
+
+        $this->assertStringContainsString('value="0"', $output);
+        $this->assertStringNotContainsString($attribute, $output);
+    }
+
+    #[Test]
+    #[DataProvider('choiceFieldProvider')]
+    public function choice_field_selects_the_old_value_keyed_zero($language, $field, $attribute)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $output = $this->renderField(['handle' => 'choice', 'field' => $field], ['choice' => '0']);
+
+        $this->assertMatchesRegularExpression('/value="0"[^>]*'.$attribute.'/', $output);
+        $this->assertSame(1, substr_count($output, $attribute));
+    }
+
+    public static function choiceFieldProvider()
+    {
+        $options = [
+            ['key' => '0', 'value' => 'Red'],
+            ['key' => '1', 'value' => 'Green'],
+            ['key' => '2', 'value' => 'Blue'],
+        ];
+
+        $fields = [
+            'dropdown' => [['type' => 'select', 'options' => $options], 'selected'],
+            'multiple choice' => [['type' => 'radio', 'options' => $options], 'checked'],
+        ];
+
+        return collect(['antlers', 'blade'])->flatMap(fn ($language) => collect($fields)->mapWithKeys(fn ($field, $name) => [
+            "{$name} ({$language})" => [$language, ...$field],
+        ]))->all();
+    }
+
+    #[Test]
     #[DataProvider('templateLanguageProvider')]
     public function unrated_star_rating_is_not_submitted($language)
     {

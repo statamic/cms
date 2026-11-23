@@ -9,7 +9,7 @@
             {{ if multiple }}
                 {{ if value|in_array:key }}checked{{ /if }}
             {{ else }}
-                {{ if value == key }}checked{{ /if }}
+                {{ if (value | to_string) === (key | to_string) }}checked{{ /if }}
             {{ /if }}
             {{ if validate|contains:required && (! multiple || options|count == 1) }}required{{ /if }}
             {{ if error }}
