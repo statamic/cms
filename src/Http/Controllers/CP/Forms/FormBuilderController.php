@@ -6,6 +6,7 @@ use Facades\Statamic\Forms\Fields\FormFieldtypeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Statamic\Exceptions\FormFieldtypeNotFoundException;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\Field;
@@ -52,9 +53,9 @@ class FormBuilderController extends CpController
 
         $this->ensureFormsProIsNotRequired($form);
 
-        $request->validate([
-            'pages' => ['required', 'array', 'min:1'],
-            'pages.*.sections' => ['required', 'array', 'min:1'],
+        $this->validateFormFieldsRequest($request, [
+            'pages.*.sections.*.fields.*._id' => ['required'],
+            'pages.*.sections.*.fields.*.fieldtype' => ['nullable', 'required_if:pages.*.sections.*.fields.*.type,inline,reference', 'string'],
         ]);
 
         $this->validateFields($request);
@@ -116,11 +117,26 @@ class FormBuilderController extends CpController
         foreach ($request->pages as $page) {
             foreach ($page['sections'] ?? [] as $section) {
                 foreach ($section['fields'] ?? [] as $field) {
-                    if (in_array($field['type'], ['import', 'link_fields'])) {
+                    if ($field['type'] === 'link_fields') {
                         continue;
                     }
 
-                    $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
+                    if ($field['type'] === 'import') {
+                        if (! Fieldset::find($field['fieldset'])) {
+                            $errors["{$field['_id']}.fieldset"] = [__('statamic::validation.fieldset_not_found', ['handle' => $field['fieldset']])];
+                        }
+
+                        continue;
+                    }
+
+                    try {
+                        $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
+                    } catch (FormFieldtypeNotFoundException) {
+                        $errors["{$field['_id']}.fieldtype"] = [__('statamic::validation.fieldtype_not_found', ['handle' => $field['fieldtype']])];
+
+                        continue;
+                    }
+
                     $blueprint = $this->configBlueprint($fieldtype->configBlueprint());
 
                     $fields = $blueprint

@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -132,6 +133,19 @@ trait ManagesFormFields
                 return array_merge(FormFieldTransformer::toVue($field), ['_id' => Str::random()]);
             })->values()->all(),
         ];
+    }
+
+    private function validateFormFieldsRequest(Request $request, array $rules = []): void
+    {
+        $request->validate([
+            'pages' => ['required', 'array', 'min:1'],
+            'pages.*.sections' => ['required', 'array', 'min:1'],
+            'pages.*.sections.*.fields' => ['array'],
+            'pages.*.sections.*.fields.*.type' => ['required', Rule::in(['inline', 'reference', 'import', 'link_fields'])],
+            'pages.*.sections.*.fields.*.fieldtype' => ['nullable', 'required_if:pages.*.sections.*.fields.*.type,inline', 'string'],
+            'pages.*.sections.*.fields.*.fieldset' => ['nullable', 'required_if:pages.*.sections.*.fields.*.type,import', 'string'],
+            ...$rules,
+        ]);
     }
 
     private function setFormFields(Request $request, Form $form): Form

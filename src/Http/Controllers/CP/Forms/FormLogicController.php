@@ -34,6 +34,8 @@ class FormLogicController extends CpController
 
         $this->ensureFormsProIsNotRequired($form);
 
+        $this->validateFormFieldsRequest($request);
+
         $this->setFormFields($request, $form);
 
         $form->save();
