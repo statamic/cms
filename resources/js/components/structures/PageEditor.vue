@@ -29,6 +29,7 @@
                     ref="container"
                     :name="publishContainer"
                     :blueprint="adjustedBlueprint"
+                    :is-creating="creating"
                     :meta="meta"
                     :errors="errors"
                     :origin-values="originValues"

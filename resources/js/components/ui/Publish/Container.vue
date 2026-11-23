@@ -24,6 +24,11 @@ const props = defineProps({
     reference: {
         type: String,
     },
+    /** Whether the item is being created, rather than edited. False unless the form says so. */
+    isCreating: {
+        type: Boolean,
+        default: false,
+    },
 	/** The blueprint's publish array. */
     blueprint: {
         type: Object,
@@ -300,6 +305,7 @@ const builtInProvides = {
     name: toRef(() => props.name),
     parentContainer,
     blueprint: toRef(() => props.blueprint),
+    isCreating: toRef(() => props.isCreating),
     reference: toRef(() => props.reference),
     values,
     extraValues,
@@ -353,6 +359,8 @@ onMounted(() => {
     Statamic.$events.$emit('publish-container-created', {
         name: props.name,
         reference: toRef(() => props.reference),
+        blueprint: toRef(() => props.blueprint),
+        isCreating: toRef(() => props.isCreating),
         site: toRef(() => props.site),
         values,
         setFieldValue,

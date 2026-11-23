@@ -62,6 +62,7 @@ function save() {
             :blueprint="fieldset"
             v-model="values"
             :reference="initialReference"
+            :is-creating="isCreating"
             :meta="meta"
             :errors="errors"
             as-config

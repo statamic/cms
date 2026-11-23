@@ -74,6 +74,7 @@
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
+            :is-creating="isCreating"
             :as-config="asConfig"
             v-model="values"
             :meta="meta"
