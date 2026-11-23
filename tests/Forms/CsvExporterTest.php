@@ -62,6 +62,25 @@ class CsvExporterTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_export_fields_that_dont_collect_a_value()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'intro', 'field' => ['type' => 'heading', 'display' => 'Intro']],
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'gap', 'field' => ['type' => 'spacer']],
+                ['handle' => 'notes', 'field' => ['type' => 'html']],
+            ],
+        ]))->save();
+
+        FormSubmission::make()->form($form)->data(['name' => 'John'])->save();
+
+        $csv = (new CsvExporter)->setForm($form)->setConfig([])->export();
+
+        $this->assertStringStartsWith("name,date\n", $csv);
+    }
+
+    #[Test]
     public function it_exports_only_the_selected_columns_in_form_order()
     {
         $form = $this->makeFormWithSubmission();

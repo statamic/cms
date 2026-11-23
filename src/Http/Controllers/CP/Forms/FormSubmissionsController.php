@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use Statamic\CP\Column;
 use Statamic\Facades\Scope;
 use Statamic\Forms\FakeSubmissionGenerator;
+use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
@@ -64,8 +65,9 @@ class FormSubmissionsController extends CpController
                 'downloadUrl' => $exporter->downloadUrl(),
                 'supportsColumnSelection' => $exporter->supportsColumnSelection(),
             ])->values(),
-            'exportColumns' => $form->fields()
-                ->map(fn ($field) => ['handle' => $field->handle(), 'title' => __($field->display())])
+            'exportColumns' => $form->formFields()->fields()
+                ->filter(fn (FormField $field) => $field->fieldtype()->collectsValue())
+                ->map(fn (FormField $field) => ['handle' => $field->handle(), 'title' => __($field->display())])
                 ->push(['handle' => 'date', 'title' => __('Date')])
                 ->values(),
             'redirectUrl' => cp_route('forms.index'),
