@@ -101,7 +101,8 @@ const suggestions = [
     { text: 'Create a landing page for the summer sale', icon: 'page' },
 ];
 
-watch(prompt, (value) => value && (showHelp.value = false));
+// Typing puts the help away. A / on its own is what opened it (see onKeydown), so it stays.
+watch(prompt, (value) => value && value !== '/' && (showHelp.value = false));
 
 // Saved prompts, set up on Settings → AI and run with /their-name. The server only sends the ones for this user's role. Ones for particular collections are only offered on those collections' pages. Field prompts belong in the suggestions menu on fields, not here.
 const page = usePage();
@@ -116,9 +117,11 @@ const savedPrompts = computed(() => {
 const promptPills = computed(() => savedPrompts.value.slice(0, 3));
 const morePrompts = computed(() => savedPrompts.value.length - promptPills.value.length);
 
-// Typing / and then a letter (the / itself opens the help) turns the input into a command, with a menu of the matching saved prompts. Enter runs the highlighted one.
+// Typing / and then a letter turns the input into a command, with a menu of the matching saved prompts. Enter runs the highlighted one. The / on
+// its own shows in the input and opens the help, listing them all, so the menu only takes over once there's a letter after it (or the help's
+// been put away with the / still there).
 const commandQuery = computed(() => prompt.value.match(/^\/([\w-]*)$/)?.[1]?.toLowerCase() ?? null);
-const commandMenuOpen = computed(() => commandQuery.value !== null);
+const commandMenuOpen = computed(() => !!commandQuery.value || (commandQuery.value === '' && !showHelp.value));
 const commands = computed(() => [...savedPrompts.value, { name: __('Start a new chat'), command: 'clear', builtIn: true }]);
 // A command matches from its start, and a saved prompt also from the start of any word in its name ("/check" finds Legal check)
 const commandMatches = computed(() =>
@@ -195,7 +198,7 @@ async function onKeydown(event) {
 
     // Up and down highlight the saved prompts in the help, from the bottom (Up) or the top (Down), opening it first if it's closed. Docked, before the first message, they're for the examples instead.
     const promptsInHelp = savedPrompts.value.length && (!showHelp.value || helpView.value === 'main');
-    if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && !prompt.value && promptsInHelp && !examplesVisible.value) {
+    if (event.target.tagName === 'TEXTAREA' && (event.key === 'ArrowDown' || event.key === 'ArrowUp') && (!prompt.value || (prompt.value === '/' && showHelp.value)) && promptsInHelp && !examplesVisible.value) {
         event.preventDefault();
         const count = savedPrompts.value.length;
         const from = showHelp.value ? activeHelpPrompt.value : -1;
@@ -215,11 +218,16 @@ async function onKeydown(event) {
     if (showHelp.value && event.target.tagName === 'TEXTAREA' && !['Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Tab'].includes(event.key)) {
         showHelp.value = false;
 
-        // / opens the help, so pressing it again closes it rather than typing a slash
-        if (event.key === '/') return event.preventDefault();
+        // / opens the help (and shows in the input), so pressing it again closes it, taking the / away, rather than typing another
+        if (event.key === '/') {
+            event.preventDefault();
+            if (prompt.value === '/') prompt.value = '';
+            return;
+        }
 
-        // A letter or number after the / starts a command, so put the slash back in front of it
-        if (/^[a-z0-9]$/i.test(event.key) && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        // A letter or number after the / starts a command. Help opened some other way (the "+ 2" pill) has no / in the input, so put one
+        // in front of it.
+        if (/^[a-z0-9]$/i.test(event.key) && !event.metaKey && !event.ctrlKey && !event.altKey && prompt.value !== '/') {
             event.preventDefault();
             prompt.value = '/' + event.key;
             return;
@@ -273,8 +281,9 @@ async function onKeydown(event) {
         return;
     }
 
+    // / in the empty input types it, as in the image's AI card, and opens the help, listing the saved prompts
     if (event.key === '/' && !prompt.value && !event.metaKey && !event.ctrlKey && !event.altKey) {
-        event.preventDefault();
+        helpView.value = 'main';
         showHelp.value = true;
     } else if (event.key === 'Escape') {
         // Stop other Escape handlers in the CP (like closing a stack) from also acting.
@@ -282,6 +291,8 @@ async function onKeydown(event) {
 
         if (showHelp.value) {
             showHelp.value = false;
+            // The / that opened it goes with it
+            if (prompt.value === '/') prompt.value = '';
             focusInput();
         } else {
             // Leave the chat open, and hand focus back to the page.
@@ -298,7 +309,8 @@ function shrinkInput() {
 
 function send(text = prompt.value) {
     text = text.trim();
-    if (!text) return;
+    // A / on its own is only the help open, not a message
+    if (!text || text === '/') return;
 
     showHelp.value = false;
 
