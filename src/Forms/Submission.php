@@ -80,9 +80,9 @@ class Submission implements Augmentable, ContainsQueryableValues, SubmissionCont
         [$internal, $data] = collect($data)->partition(fn ($value, $key) => $this->isInternalKey($key));
 
         // A full data replacement would otherwise drop the internal lifecycle
-        // keys, so carry over the existing _partial, _marked_spam_at and _site values
+        // keys, so carry over the existing _partial, _marked_spam_at, _site and _fake values
         // unless the incoming payload provides its own.
-        $this->internal = $this->internal->only(['_partial', '_marked_spam_at', '_site'])->merge($internal);
+        $this->internal = $this->internal->only(['_partial', '_marked_spam_at', '_site', '_fake'])->merge($internal);
 
         return $this->traitData($data);
     }
