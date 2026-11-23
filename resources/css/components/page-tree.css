@@ -23,6 +23,11 @@
         */
         content-visibility: auto;
         contain-intrinsic-size: auto 44px;
+
+        /* Paint outside the row while it's moved with the keyboard, for the arrow keys hint beside it (content-visibility clips it) */
+        &[data-moving] {
+            content-visibility: visible;
+        }
     }
 
     .page-move {

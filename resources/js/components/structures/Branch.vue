@@ -4,9 +4,6 @@
         :class="{ 'page-tree-branch--has-children': hasChildren, 'focus-outline': moving }"
         :data-moving="moving || undefined"
     >
-        <!-- While it's being moved with the keyboard: the arrow keys it takes, inside the row before its menu, as the panel clips anything
-             outside it -->
-        <KeyboardReorderIndicator :moving="moving" side="inside" :keys="['←', '↑', '↓', '→']" />
         <slot name="branch-action" :branch="page">
             <!-- The handle: drag it, or click it or press Space to move it with the arrow keys. Focus comes back here when you're done. -->
             <DragHandle
@@ -29,6 +26,9 @@
             :aria-label="__('messages.keyboard_tree_reorder_instructions')"
         />
         <div v-if="canKeyboardMove" class="sr-only" aria-live="polite">{{ reorderStatus }}</div>
+        <!-- While it's being moved with the keyboard: ↑ ↓ outside the row, on the side it was started from (the handle or the menu), as
+             replicator sets do. ← → move it in and out a level too, but the hint keeps to the two, as four keys was too busy. -->
+        <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
         <div class="flex flex-1 items-center px-1.5 text-xs leading-normal">
             <div class="flex gap-2 sm:gap-3 grow items-center py-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
@@ -140,6 +140,7 @@ export default {
 
         const {
             moving,
+            moveOrigin,
             rootEl: reorderFocusEl,
             status: reorderStatus,
             startMoving,
@@ -163,7 +164,7 @@ export default {
             instructions: () => __('messages.keyboard_tree_reorder_instructions'),
         });
 
-        return { canKeyboardMove, moving, reorderFocusEl, reorderStatus, startMoving };
+        return { canKeyboardMove, moving, reorderFocusEl, reorderStatus, startMoving, moveOrigin };
     },
 
     data() {
