@@ -473,14 +473,12 @@ onUnmounted(() => {
                         <ToggleItem
                             :value="FieldView.Expanded"
                             icon="expand"
-                            :aria-label="__('Expanded view')"
-                            v-tooltip="__('Expanded view')"
+                            :tooltip="__('Expanded view')"
                         />
                         <ToggleItem
                             :value="FieldView.Collapsed"
                             icon="collapse"
-                            :aria-label="__('Collapsed view')"
-                            v-tooltip="__('Collapsed view')"
+                            :tooltip="__('Collapsed view')"
                         />
                     </ToggleGroup>
                 </div>
