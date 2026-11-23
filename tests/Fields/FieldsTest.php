@@ -839,6 +839,52 @@ class FieldsTest extends TestCase
     }
 
     #[Test]
+    public function it_runs_the_augmenting_hook_before_augmenting_fields()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
+        {
+            public function augment($data)
+            {
+                return $data.' augmented';
+            }
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow augmented';
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturn(new Field('one', ['type' => 'fieldtype']));
+        FieldRepository::shouldReceive('find')->with('two')->andReturn(new Field('two', ['type' => 'fieldtype']));
+
+        $shallow = [];
+
+        Fields::hook('augmenting', function ($payload, $next) use (&$shallow) {
+            $shallow[] = $payload->shallow;
+
+            // Fill an empty field from the value of another one.
+            $payload->fields = $payload->fields->newInstance()->setFields(
+                $payload->fields->all()->map(fn ($field) => $field->handle() === 'two'
+                    ? $field->newInstance()->setValue($payload->fields->all()->get('one')->value().' again')
+                    : $field
+                )
+            );
+
+            return $next($payload);
+        });
+
+        $fields = (new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two'],
+        ]))->addValues(['one' => 'foo']);
+
+        $this->assertEquals(['one' => 'foo augmented', 'two' => 'foo again augmented'], $fields->augment()->values()->all());
+        $this->assertEquals(['one' => 'foo shallow augmented', 'two' => 'foo again shallow augmented'], $fields->shallowAugment()->values()->all());
+        $this->assertEquals([false, true], $shallow);
+        $this->assertEquals(['one' => 'foo', 'two' => null], $fields->values()->all());
+    }
+
+    #[Test]
     public function it_augments_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype
