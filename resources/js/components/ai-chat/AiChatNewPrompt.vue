@@ -62,6 +62,8 @@ const page = usePage();
 
 async function save() {
     if (saving.value) return;
+    // Save is disabled while it saves, which would drop focus from it, so hold focus on the form until it's done (then it goes to the input)
+    if (root.value?.contains(document.activeElement) && document.activeElement.tagName === 'BUTTON') root.value.focus({ preventScroll: true });
     saving.value = true;
     errors.value = {};
 
@@ -116,7 +118,7 @@ function onKeydown(event) {
 
 <template>
     <!-- A heading like the saved prompts', then the fields, then the buttons -->
-    <div ref="root" class="space-y-2 p-2" @keydown="onKeydown">
+    <div ref="root" tabindex="-1" class="space-y-2 p-2 outline-none" @keydown="onKeydown">
         <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('New skill') }}</p>
 
         <!-- No card round the fields: the popup is already white and the inputs have their own borders -->
