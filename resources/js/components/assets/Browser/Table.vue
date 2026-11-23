@@ -145,7 +145,7 @@
                         </div>
                     </div>
                     <button
-                        class="cursor-pointer normal-nums select-none group-hover:text-ui-accent-text/80 dark:group-hover:text-ui-accent-text text-start rounded-xs focus-visible:[--focus-outline-offset:4px]"
+                        class="cursor-pointer normal-nums select-none group-hover:text-ui-accent-text/80 dark:group-hover:text-ui-accent-text text-start focus-visible:rounded-xs focus-visible:[--focus-outline-offset:4px]"
                         @click="$emit('edit-asset', asset)"
                     >
                         {{ isSearching ? asset.path : asset.basename }}
