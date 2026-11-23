@@ -24,9 +24,11 @@ use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
+use Symfony\Component\Uid\Uuid;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Webauthn\PublicKeyCredentialSource;
+use Webauthn\TrustPath\EmptyTrustPath;
 
 #[Group('user')]
 #[Group('2fa')]
@@ -440,6 +442,94 @@ class FileUserTest extends TestCase
 
         $this->assertSame('456', (string) YAML::file($path)->parse()['id']);
         $this->assertFileDoesNotExist(dirname($path).'/jane@example.com.yaml');
+    }
+
+    #[Test]
+    public function it_keeps_two_factor_changes_made_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')
+            ->set('two_factor_secret', 'old-secret')
+            ->set('two_factor_recovery_codes', 'old-codes')
+            ->set('two_factor_confirmed_at', 1000);
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->set('two_factor_recovery_codes', 'new-codes')->save();
+
+        $copy->set('name', 'John')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertSame('new-codes', $yaml['two_factor_recovery_codes']);
+        $this->assertSame('old-secret', $yaml['two_factor_secret']);
+        $this->assertSame('John', $yaml['name']);
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->remove('two_factor_secret')->remove('two_factor_recovery_codes')->remove('two_factor_confirmed_at')->save();
+
+        $copy->set('name', 'Johnny')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertArrayNotHasKey('two_factor_secret', $yaml);
+        $this->assertArrayNotHasKey('two_factor_recovery_codes', $yaml);
+        $this->assertArrayNotHasKey('two_factor_confirmed_at', $yaml);
+        $this->assertSame('Johnny', $yaml['name']);
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_keeps_passkeys_removed_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->setPasskeys(collect([
+            $this->passkey($user, 'A'),
+            $this->passkey($user, 'B'),
+        ]));
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        $other = UserAPI::find('123');
+        $other->passkeys()->first()->delete();
+
+        $copy->set('name', 'John')->save();
+
+        $this->assertSame(['B'], array_column(YAML::file($path)->parse()['passkeys'], 'name'));
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->passkeys()->first()->delete();
+
+        $copy->set('name', 'Johnny')->save();
+
+        $this->assertArrayNotHasKey('passkeys', YAML::file($path)->parse());
+    }
+
+    #[Test]
+    #[Group('passkeys')]
+    public function it_saves_passkeys_changed_through_a_copy_loaded_before_another_change()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->setPasskeys(collect([
+            $this->passkey($user, 'A'),
+        ]));
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->set('name', 'John')->save();
+
+        $copy->setPasskeys($copy->passkeys()->push($this->passkey($copy, 'B')));
+        $copy->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertSame(['A', 'B'], array_column($yaml['passkeys'], 'name'));
+    }
+
+    private function passkey(User $user, string $name): Passkey
+    {
+        $credential = new PublicKeyCredentialSource('key-'.$name, 'public-key', [], 'none', new EmptyTrustPath, Uuid::v4(), 'public-key-'.$name, 'user-handle', 0);
+
+        return (new Passkey)->setUser($user)->setName($name)->setCredential($credential);
     }
 
     #[Test]

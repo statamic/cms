@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey as PasskeyContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
@@ -221,6 +222,8 @@ class User extends BaseUser
                 $this->email(pathinfo($current['path'], PATHINFO_FILENAME));
             } elseif ($key === 'password_hash') {
                 $this->passwordHash($stored[$key] ?? $value);
+            } elseif ($key === 'passkeys') {
+                $this->setPasskeysFromFileData($stored['passkeys'] ?? []);
             } elseif (Arr::has($stored, $key)) {
                 $this->set($key, $stored[$key]);
             } else {
@@ -237,7 +240,21 @@ class User extends BaseUser
             'groups' => $this->get('groups') ?? [],
             'super' => (bool) $this->get('super'),
             'password_hash' => $this->passwordHash(),
+            'passkeys' => $this->passkeys()->map(fn ($passkey) => $passkey->fileData())->all(),
+            'two_factor_secret' => $this->get('two_factor_secret'),
+            'two_factor_recovery_codes' => $this->get('two_factor_recovery_codes'),
+            'two_factor_confirmed_at' => $this->get('two_factor_confirmed_at'),
         ];
+    }
+
+    protected function setPasskeysFromFileData(array $passkeys)
+    {
+        $this->setPasskeys(collect($passkeys)->map(function ($data) {
+            return app(PasskeyContract::class)
+                ->setUser($this)
+                ->setName($data['name'])
+                ->setCredential($data['credential']);
+        }));
     }
 
     /**
