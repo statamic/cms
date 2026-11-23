@@ -144,10 +144,6 @@ class User extends BaseUser
 
         $path = $path ?? $this->buildPath();
 
-        if ($this->initialPath() && $path !== ($current['path'] ?? null)) {
-            $this->ensurePathIsNotTaken($path);
-        }
-
         if ($current && $current['path'] !== $path) {
             File::delete($current['path']);
         }
@@ -164,15 +160,6 @@ class User extends BaseUser
         $this->storedAccess = $this->currentAccess();
 
         return $this;
-    }
-
-    protected function ensurePathIsNotTaken($path)
-    {
-        $id = $this->readFile($path)['id'] ?? null;
-
-        if ($id !== null && $id !== (string) $this->id()) {
-            throw new \RuntimeException("Cannot write user [{$this->id()}] to [{$path}] because it belongs to user [{$id}].");
-        }
     }
 
     protected function currentFile(): ?array

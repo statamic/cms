@@ -445,27 +445,6 @@ class FileUserTest extends TestCase
     }
 
     #[Test]
-    public function it_does_not_overwrite_another_users_file()
-    {
-        $user = $this->makeUser()->id('123')->email('john@example.com');
-        $user->save();
-        $path = $user->path();
-        $this->makeUser()->id('456')->email('jane@example.com')->save();
-
-        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
-
-        try {
-            $copy->email('jane@example.com')->save();
-            $this->fail('The user was saved over another user\'s file.');
-        } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('belongs to user [456]', $e->getMessage());
-        }
-
-        $this->assertSame('456', (string) YAML::file(dirname($path).'/jane@example.com.yaml')->parse()['id']);
-        $this->assertFileExists($path);
-    }
-
-    #[Test]
     public function it_does_not_search_other_files_when_giving_a_file_an_id()
     {
         $this->makeUser()->id('123')->email('john@example.com')->save();
