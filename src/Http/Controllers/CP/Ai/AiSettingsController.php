@@ -126,7 +126,7 @@ class AiSettingsController extends CpController
 
     /**
      * The image skills, shared with every CP page (see HandleInertiaRequests), for the image's AI card in the asset editor (see AiImage.vue).
-     * They're kept like page skills: a list the site can change, switch off or add to. Each starts from one of the things the image model
+     * They're kept like chat skills: a list the site can change, switch off or add to. Each starts from one of the things the image model
      * can do (or a plain edit), with its own instructions, how many images it makes and what shape, and pictures of the look it's after.
      * The ones it comes with each start from that thing, as it is.
      */
@@ -357,7 +357,7 @@ class AiSettingsController extends CpController
     {
         return ['handle' => 'page_prompts', 'field' => [
             'type' => 'replicator',
-            'display' => __('Page Skills'),
+            'display' => __('Chat Skills'),
             'hide_display' => true,
             'full_width_setting' => true,
             'collapse' => true,
@@ -383,7 +383,7 @@ class AiSettingsController extends CpController
         ]];
     }
 
-    // Field skills, like page skills: collapsed, a row shows its name in the badge, then the start of its instructions, and its switch turns
+    // Field skills, like chat skills: collapsed, a row shows its name in the badge, then the start of its instructions, and its switch turns
     // it off. They're offered on every field with suggestions, so there's nothing to say where or for whom.
     private function fieldPromptsField(): array
     {
@@ -407,7 +407,7 @@ class AiSettingsController extends CpController
         ]];
     }
 
-    // Image skills, like page skills: collapsed, a row shows its name in the badge, then the start of its instructions. Each starts from one
+    // Image skills, like chat skills: collapsed, a row shows its name in the badge, then the start of its instructions. Each starts from one
     // of the things the image model can do (or a plain edit), and says how many images it makes, what shape, and what they should look like.
     private function imagePromptsField(): array
     {
@@ -636,10 +636,12 @@ class AiSettingsController extends CpController
                 ],
             ],
             [
-                'display' => __('Page Skills'),
+                // Chat skills: run from the AI chat, on one page or across the whole site, so they're named after where they run, as field
+                // and image skills are
+                'display' => __('Chat Skills'),
+                'instructions' => __('Jobs for the AI chat, on one page or across the whole site.'),
                 // Prototype: where the prompts put their expand/collapse button (see Sections.vue)
                 'header_actions' => 'page-prompts-actions',
-                'instructions' => __('Whole-page jobs, run from the AI chat.'),
                 'fields' => [$this->pagePromptsField()],
             ],
             [
