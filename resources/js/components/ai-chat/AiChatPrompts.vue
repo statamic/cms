@@ -104,13 +104,14 @@ onBeforeUnmount(() => shownFor && dismissFor(shownFor));
             >
                 <!-- The highlighted one (the one Enter runs) gets a purple-to-blue pill (the colours of the chat input's focus edge) just outside the card, nearly as tall as the row, against the panel's edge. Being outside, it never moves the text. -->
                 <span v-if="index === active" aria-hidden="true" class="absolute inset-y-1 -start-2 w-1 rounded-full bg-linear-to-b from-ai to-ai-end" />
-                <!-- The name, then the start of its instructions on the same line, cut short (they're all in the tooltip) -->
+                <!-- The name, then the start of its instructions on the same line, cut short (they're all in the tooltip). A very long name is cut
+                     short too, once the instructions have gone, so the row keeps to the card's width. -->
                 <span class="flex min-w-0 flex-1 items-baseline gap-2">
-                    <span class="shrink-0 text-sm/5 text-gray-900 dark:text-gray-200">{{ prompt.name }}</span>
-                    <span v-if="prompt.instructions" class="truncate text-xs/5 text-gray-500 dark:text-gray-400">{{ prompt.instructions }}</span>
+                    <span class="min-w-0 truncate text-sm/5 text-gray-900 dark:text-gray-200">{{ prompt.name }}</span>
+                    <span v-if="prompt.instructions" class="min-w-0 shrink-[100] truncate text-xs/5 text-gray-500 dark:text-gray-400">{{ prompt.instructions }}</span>
                 </span>
-                <!-- The command in a key, like the keyboard shortcuts, as it's something you type -->
-                <span class="inline-flex h-5 shrink-0 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ prompt.command }}</span>
+                <!-- The command in a key, like the keyboard shortcuts, as it's something you type. A long one is cut short with "…". -->
+                <span class="inline-flex h-5 max-w-[45%] min-w-0 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700"><span class="truncate">/{{ prompt.command }}</span></span>
             </button>
         </div>
     </div>
