@@ -7,6 +7,7 @@ function mountReorder({
     index = 1,
     total = 3,
     onMove = vi.fn(),
+    options = {},
     template = `
         <div data-moving="true" data-reorder-focus tabindex="-1">
             <div data-reorder-focus tabindex="-1">nested</div>
@@ -24,6 +25,7 @@ function mountReorder({
                 index: indexRef,
                 total: totalRef,
                 onMove,
+                ...options,
             });
 
             return { ...api, indexRef };
@@ -158,4 +160,74 @@ test('menu teardown focusin does not cancel a session started after escape', asy
     expect(api.moving.value).toBe(true);
 
     wrapper.unmount();
+});
+
+async function startTreeMove(options, { index = 1, total = 3 } = {}) {
+    const result = mountReorder({ index, total, options });
+    result.api.startMoving('start');
+    vi.advanceTimersByTime(50);
+    await nextTick();
+    return result;
+}
+
+const key = (name) => window.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true }));
+
+test('in a tree, right indents and left outdents', async () => {
+    const onIndent = vi.fn();
+    const onOutdent = vi.fn();
+    await startTreeMove({ onIndent, onOutdent, canIndent: () => true, canOutdent: () => true });
+
+    key('ArrowRight');
+    key('ArrowLeft');
+
+    expect(onIndent).toHaveBeenCalledTimes(1);
+    expect(onOutdent).toHaveBeenCalledTimes(1);
+});
+
+test('in a tree, a move it cannot make announces where it is instead', async () => {
+    const onIndent = vi.fn();
+    const onOutdent = vi.fn();
+    const { api } = await startTreeMove({
+        onIndent,
+        onOutdent,
+        canIndent: () => false,
+        canOutdent: () => false,
+        positionMessage: () => 'Level 1, item 2 of 3',
+    });
+
+    key('ArrowRight');
+    await nextTick();
+
+    expect(onIndent).not.toHaveBeenCalled();
+    expect(api.status.value).toBe('Level 1, item 2 of 3');
+});
+
+test('left and right do nothing in a plain list', async () => {
+    const { api, onMove } = await startTreeMove({});
+
+    key('ArrowRight');
+    key('ArrowLeft');
+
+    expect(onMove).not.toHaveBeenCalled();
+    expect(api.moving.value).toBe(true);
+});
+
+test('an only child in a tree can still start moving, to move out a level', async () => {
+    const { api } = await startTreeMove({ onOutdent: vi.fn(), canOutdent: () => true }, { index: 0, total: 1 });
+
+    expect(api.moving.value).toBe(true);
+});
+
+test('its own canMoveUp stops a move up, e.g. above a root page', async () => {
+    const { onMove } = await startTreeMove({ canMoveUp: () => false });
+
+    key('ArrowUp');
+
+    expect(onMove).not.toHaveBeenCalled();
+});
+
+test('its own instructions and position are used', async () => {
+    const { api } = await startTreeMove({ instructions: () => 'Tree instructions' });
+
+    expect(api.status.value).toBe('Tree instructions');
 });

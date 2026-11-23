@@ -7,10 +7,29 @@ let activeSession = null;
  * Keyboard reordering: activate from the drag handle or Move menu, then
  * ArrowUp/ArrowDown to reorder, Enter/Escape to finish.
  *
+ * Trees (e.g. a navigation or a structured collection) can also pass `onIndent` and `onOutdent`,
+ * with `canIndent` and `canOutdent`, for ArrowRight (nest under the item above) and ArrowLeft
+ * (move out a level). They can pass their own `canMoveUp`/`canMoveDown` (e.g. so nothing moves
+ * above a root page), `positionKey` (what changes when the item moves, as an indent may not
+ * change its index), and `positionMessage` and `instructions` for what screen readers hear.
+ *
  * Keys are handled on window (capture) so this still works if the dropdown steals
  * focus back to its trigger after closing.
  */
-export function useKeyboardItemReorder({ index, total, onMove }) {
+export function useKeyboardItemReorder({
+    index,
+    total,
+    onMove,
+    onIndent = null,
+    onOutdent = null,
+    canIndent = () => false,
+    canOutdent = () => false,
+    canMoveUp: canMoveUpOverride = null,
+    canMoveDown: canMoveDownOverride = null,
+    positionKey = null,
+    positionMessage = null,
+    instructions = null,
+}) {
     const moving = ref(false);
     const moveOrigin = ref('end');
     const rootEl = ref(null);
@@ -23,14 +42,16 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         stopMoving: () => stopMoving(),
     };
 
-    const canMoveUp = computed(() => toValue(index) > 0);
-    const canMoveDown = computed(() => toValue(index) < toValue(total) - 1);
+    const canMoveUp = computed(() => (canMoveUpOverride ? toValue(canMoveUpOverride) : toValue(index) > 0));
+    const canMoveDown = computed(() => (canMoveDownOverride ? toValue(canMoveDownOverride) : toValue(index) < toValue(total) - 1));
 
     function announcePosition() {
-        const message = __('messages.keyboard_item_reorder_position', {
-            current: toValue(index) + 1,
-            total: toValue(total),
-        });
+        const message = positionMessage
+            ? toValue(positionMessage)
+            : __('messages.keyboard_item_reorder_position', {
+                  current: toValue(index) + 1,
+                  total: toValue(total),
+              });
 
         // Clear first so aria-live re-announces when stuck at an edge.
         status.value = '';
@@ -91,6 +112,28 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             event.stopPropagation();
             if (canMoveDown.value) {
                 onMove(toValue(index), toValue(index) + 1);
+            } else {
+                announcePosition();
+            }
+            return;
+        }
+
+        if (onIndent && event.key === 'ArrowRight') {
+            event.preventDefault();
+            event.stopPropagation();
+            if (toValue(canIndent)) {
+                onIndent();
+            } else {
+                announcePosition();
+            }
+            return;
+        }
+
+        if (onOutdent && event.key === 'ArrowLeft') {
+            event.preventDefault();
+            event.stopPropagation();
+            if (toValue(canOutdent)) {
+                onOutdent();
             } else {
                 announcePosition();
             }
@@ -165,7 +208,8 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
         // Ignore non-string args (e.g. click/keyboard events bound directly).
         moveOrigin.value = origin === 'start' ? 'start' : 'end';
 
-        if (toValue(total) < 2) return;
+        // Nothing to do on its own, unless it can still move in or out a level (an only child in a tree)
+        if (toValue(total) < 2 && !toValue(canIndent) && !toValue(canOutdent)) return;
 
         // Wait for the dropdown to finish closing / restoring focus, otherwise
         // our focus and the first keypress get eaten by the menu teardown.
@@ -176,7 +220,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
             activeSession = session;
 
             moving.value = true;
-            status.value = __('messages.keyboard_item_reorder_instructions');
+            status.value = instructions ? toValue(instructions) : __('messages.keyboard_item_reorder_instructions');
             beginIgnoringOutside();
             bindListeners();
             focusRoot();
@@ -213,7 +257,7 @@ export function useKeyboardItemReorder({ index, total, onMove }) {
     }
 
     watch(
-        () => toValue(index),
+        () => (positionKey ? toValue(positionKey) : toValue(index)),
         () => {
             if (!moving.value) return;
             announcePosition();
