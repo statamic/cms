@@ -5,7 +5,7 @@ import { toast } from '@api';
 import { variationsOf } from './mock-image-variations.js';
 import { cutoutsOf, erasuresOf, extensionsOf, upscalesOf } from './mock-image-edits.js';
 import AiChatPrompts from '@/components/ai-chat/AiChatPrompts.vue';
-import AiImageNewSkill from './AiImageNewSkill.vue';
+import AiChatNewPrompt from '@/components/ai-chat/AiChatNewPrompt.vue';
 import { usePage } from '@inertiajs/vue3';
 // Prototype: whether the person can open Settings → AI, set by the demos in the nav
 import { canEditAi } from '@/components/ai-chat/mock-runs.js';
@@ -84,7 +84,7 @@ function onCardFocusOut(event) {
 }
 const [variationsSkill, cutoutSkill, extendSkill, upscaleSkill, eraseSkill] = builtInSkills;
 
-// The image skills, from Settings → AI (or saved from here, with Save as skill), kept like page skills: the ones it comes with, and any the
+// The image skills, from Settings → AI (or made here, from the / list), kept like chat skills: the ones it comes with, and any the
 // site has changed or added. Each starts from something the image model can do, or a plain edit (which here makes variations), and makes as
 // many images as it says. (Prototype: its instructions and look aren't used, as nothing goes to an AI. An extend puts the shape it asks for
 // first.)
@@ -168,35 +168,36 @@ function send() {
     if (loading.value) return;
     focusInputIfInCard();
     const skill = brushing.value ? eraseSkill : skillFor(instruction.value);
-    asked.value = instruction.value.trim() ? { instructions: instruction.value.trim(), startsFrom: skill === variationsSkill ? 'edit' : skill.command } : null;
     instruction.value = '';
     generate(skill);
 }
 
-// Save as skill: once a typed request has come back with images, it can be kept as an image skill, to run again with its /command. Only
-// for people who can edit Settings → AI, as it adds to it. Skills you picked are already skills, so it's only for typed requests.
-const asked = ref(null);
+// New image skills, made here as the chat makes its skills, from the / list, with the same form (AiChatNewPrompt.vue), for people who can
+// edit Settings → AI, as it adds to it. Two ways in, as in the chat: Create beside the list's heading, and a /command that matches nothing
+// (named after it). New ones start as a plain edit; Settings → AI is where to start one from another skill.
 const newSkillFrom = ref(null);
-const canSaveSkill = computed(() => canEditAi.value && asked.value && variations.value.length > 0 && !loading.value);
+const canCreateCommand = computed(() => canEditAi.value && !!commandQuery.value && !listedSkills.value.length);
+const createHighlighted = ref(true);
+watch(commandQuery, () => (createHighlighted.value = true));
 
-function startNewSkill() {
-    newSkillFrom.value = asked.value;
+function startNewSkill(from = {}) {
+    newSkillFrom.value = { command: '', ...from };
+    showSkills.value = false;
+    if (commandQuery.value !== null) instruction.value = '';
 }
 
-// Back to the link that opened it, or the input once it's saved (the link goes)
+// Back to the input, where the / list was
 function cancelNewSkill() {
     newSkillFrom.value = null;
-    nextTick(() => saveSkillLink.value?.focus());
+    nextTick(() => input.value?.$el?.querySelector('textarea')?.focus());
 }
 
+// Once it's saved, its command is put in the input with the list open on it, so Enter runs it, as in the chat
 function savedNewSkill(command) {
     newSkillFrom.value = null;
-    asked.value = null;
+    instruction.value = '/' + command;
     nextTick(() => input.value?.$el?.querySelector('textarea')?.focus());
-    toast.success(__('Saved. Run it with /:command', { command }));
 }
-
-const saveSkillLink = useTemplateRef('saveSkillLink');
 
 // Save adds it as a new asset in the same folder (prototype: nothing is saved, it just says so)
 function save(index) {
@@ -208,7 +209,6 @@ function save(index) {
 function dismiss() {
     focusInputIfInCard();
     newSkillFrom.value = null;
-    asked.value = null;
     clearTimeout(timer);
     request++;
     loading.value = false;
@@ -358,6 +358,11 @@ watch(open, (isOpen) => isOpen && nextTick(() => input.value?.$el?.querySelector
 function onKeydown(event) {
     const inInput = event.target.tagName === 'TEXTAREA';
 
+    if (inInput && canCreateCommand.value && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+        event.preventDefault();
+        createHighlighted.value = !createHighlighted.value;
+        return;
+    }
     if (inInput && skillsOpen.value && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
         event.preventDefault();
         const count = listedSkills.value.length;
@@ -368,6 +373,7 @@ function onKeydown(event) {
     }
     if (event.key === 'Enter' && !event.shiftKey && inInput) {
         event.preventDefault();
+        if (canCreateCommand.value && createHighlighted.value) return startNewSkill({ command: commandQuery.value });
         if (skillsOpen.value && activeSkill.value >= 0) return pickFromList(listedSkills.value[activeSkill.value]);
         send();
         return;
@@ -455,7 +461,7 @@ onBeforeUnmount(() => clearTimeout(timer));
                                 :placeholder="brushing ? __('Paint over it, or describe it…') : __('Ask for image changes…')"
                                 :aria-label="__('Ask the AI about this image')"
                                 class="min-h-[34px] border-0 ps-8.5! pt-[3.5px]! pb-[6px]! shadow-none! outline-hidden placeholder:overflow-hidden placeholder:whitespace-nowrap placeholder:text-white/85 text-white! dark:bg-transparent!"
-                                :class="canSaveSkill ? 'pe-36!' : cancellable ? 'pe-16!' : 'pe-2!'"
+                                :class="cancellable ? 'pe-16!' : 'pe-2!'"
                             />
 
                             <p class="sr-only" role="status">{{ status }}</p>
@@ -502,7 +508,7 @@ onBeforeUnmount(() => clearTimeout(timer));
                          mousedown.prevent keeps focus in the input, so they stay put. Their instructions show in a tooltip on hover. They come after
                          the card in the page, as the chat's do, so Tab goes from the input to them. -->
                     <div
-                        v-if="!instruction && !cancellable && !skillsOpen"
+                        v-if="!instruction && !cancellable && !skillsOpen && !newSkillFrom"
                         class="absolute -end-px bottom-full mb-3 hidden max-w-full justify-end gap-1.5 group-focus-within/card:flex"
                     >
                         <button
@@ -541,15 +547,33 @@ onBeforeUnmount(() => clearTimeout(timer));
                         leave-active-class="transition duration-150 ease-out motion-reduce:transition-none"
                         leave-to-class="translate-y-3 opacity-0"
                     >
-                        <div v-if="skillsOpen && !cancellable" class="absolute -start-px bottom-full z-(--z-index-portal) mb-3 w-[calc(100%+2px)] rounded-2xl border border-gray-700 bg-gray-900 shadow-ui-xl">
-                            <AiChatPrompts v-if="listedSkills.length" :prompts="listedSkills" :active="activeSkill" @pick="pickFromList" />
+                        <div v-if="skillsOpen && !cancellable && !newSkillFrom" class="absolute -start-px bottom-full z-(--z-index-portal) mb-3 w-[calc(100%+2px)] rounded-2xl border border-gray-700 bg-gray-900 shadow-ui-xl">
+                            <AiChatPrompts v-if="listedSkills.length" :prompts="listedSkills" :active="activeSkill" :create="canEditAi" @pick="pickFromList" @create="startNewSkill()" />
+                            <!-- A /command that matches nothing offers to make it, named after what was typed, as the chat does (see AiChat.vue) -->
+                            <div v-else-if="canCreateCommand" class="space-y-2 p-2">
+                                <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('No skill matches.') }}</p>
+                                <button
+                                    type="button"
+                                    :aria-selected="createHighlighted"
+                                    :class="[
+                                        'relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-start text-sm/5 text-gray-900 ring ring-gray-200 transition-colors dark:text-gray-200 dark:ring-gray-700/80',
+                                        createHighlighted ? 'bg-gray-50 dark:bg-gray-800/60' : 'bg-white hover:bg-gray-50 dark:bg-gray-850 dark:hover:bg-gray-800',
+                                    ]"
+                                    @mousedown.prevent
+                                    @click="startNewSkill({ command: commandQuery })"
+                                >
+                                    <span v-if="createHighlighted" aria-hidden="true" class="absolute inset-y-1 -start-2 w-1 rounded-full bg-linear-to-b from-ai to-ai-end" />
+                                    {{ __('Create a skill') }}
+                                    <span class="inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ commandQuery }}</span>
+                                </button>
+                            </div>
                             <p v-else class="px-3 py-3 text-sm text-gray-400">{{ __('No skill matches. Enter sends it as a request.') }}</p>
                         </div>
                     </Transition>
 
-                    <!-- Save as skill's form, in the same place as the list of skills, while the new images make way for it -->
+                    <!-- A new skill's form, the chat's own, in the same place as the list of skills, while the new images make way for it -->
                     <div v-if="newSkillFrom" class="absolute -start-px bottom-full z-(--z-index-portal) mb-3 w-[calc(100%+2px)] rounded-2xl border border-gray-700 bg-gray-900 shadow-ui-xl">
-                        <AiImageNewSkill :from="newSkillFrom" :built-in="builtInSkills" @saved="savedNewSkill" @cancel="cancelNewSkill" />
+                        <AiChatNewPrompt :from="newSkillFrom.command" starts-from="edit" @saved="savedNewSkill" @cancel="cancelNewSkill" />
                     </div>
 
                     <!-- While you're painting what to erase, Erase takes the skills' place. It's always shown (painting doesn't need the input
@@ -564,8 +588,6 @@ onBeforeUnmount(() => clearTimeout(timer));
                          border). It's out here, after the new images, the skills and Erase, so it's the last stop for Tab: while you're painting,
                          Tab goes from the input to Erase, then Cancel. -->
                     <div v-if="cancellable" class="absolute end-[calc(var(--spacing)*2+1px)] bottom-[13.5px] flex items-center">
-                        <!-- Save as skill, for a typed request that's come back, before Cancel, which stays the last stop for Tab -->
-                        <button v-if="canSaveSkill" ref="saveSkillLink" type="button" :class="cancelLink" :aria-expanded="!!newSkillFrom" @mousedown.prevent @click="startNewSkill">{{ __('Save as skill') }}</button>
                         <button type="button" :class="cancelLink" @mousedown.prevent @click="dismiss">{{ __('Cancel') }}</button>
                     </div>
                 </div>

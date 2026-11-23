@@ -243,6 +243,10 @@ const scheduled = reactive({ time: null });
 // permission for it yet), but the two demos in the nav set this to show both outcomes (see AiChatDemos.vue).
 export const canEditAi = ref(true);
 
+// Prototype: while a demo saves a new skill (see AiChatDemos.vue), the save is only pretend, so nothing is left in Settings → AI and the demo
+// can be played again. A skill saved that way is marked demo, so the next play takes it away first.
+export const pretendSave = ref(false);
+
 const ideaScenarios = [
     {
         // Phase 2: "Write meta descriptions for the pages missing one or over the limit", from Fix with AI on a report (see Report.vue). It

@@ -3,20 +3,25 @@ import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue';
 import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
 import { Button, Field, Input, Textarea } from '@ui';
+import { pretendSave } from './mock-runs.js';
 
 // Prototype: a new saved prompt, made from the chat's / menu rather than on Settings → AI. Just a name and instructions: it's offered everywhere,
-// to everyone, like a new one on Settings → AI, which is still where to limit it to some collections or roles.
+// to everyone, like a new one on Settings → AI, which is still where to limit it to some collections or roles. The image's AI card (see
+// AiImage.vue) makes its image skills with it too, so the two work the same way: given startsFrom, it's an image skill.
 const props = defineProps({
     /** What was typed after the /, if it came from a command that matched nothing. It becomes the name, so "/legal" starts as "Legal". */
     from: { type: String, default: '' },
     /** Prototype: the Create a prompt demo's { instructions }, which it types in and then pretends to save (see AiChatDemos.vue) */
     demo: { type: Object, default: null },
+    /** For an image skill, what it starts from (one of the image model's skills, or "edit"). Without it, it's a chat skill. */
+    startsFrom: { type: String, default: null },
 });
 
 const emit = defineEmits(['saved', 'cancel']);
 
 const name = ref(props.from ? props.from.replace(/-/g, ' ').replace(/^./, (letter) => letter.toUpperCase()) : '');
 const instructions = ref('');
+const isImage = props.startsFrom !== null;
 const errors = ref({});
 const saving = ref(false);
 
@@ -62,17 +67,27 @@ async function save() {
 
     // The demo's save is only pretend, so nothing is left in Settings → AI and it can be played again. Its prompt is marked, so the
     // next play takes it away first (see AiChat.vue).
-    if (props.demo) {
+    if (props.demo || pretendSave.value) {
         await wait(600);
-        const prompt = { name: name.value, command: command.value, instructions: instructions.value, collections: [], use_on: 'page', demo: true };
-        page.props._statamic.aiPrompts = [...(page.props._statamic.aiPrompts ?? []), prompt];
+        if (isImage) {
+            const prompt = { name: name.value, command: command.value, instructions: instructions.value, starts_from: props.startsFrom, makes: 2, shape: 'original', containers: [], demo: true };
+            page.props._statamic.aiImagePrompts = [...(page.props._statamic.aiImagePrompts ?? []), prompt];
+        } else {
+            const prompt = { name: name.value, command: command.value, instructions: instructions.value, collections: [], use_on: 'page', demo: true };
+            page.props._statamic.aiPrompts = [...(page.props._statamic.aiPrompts ?? []), prompt];
+        }
         saving.value = false;
         return emit('saved', command.value);
     }
 
     try {
+        // The prompts come with every page, so swap in the new list rather than waiting for the next one
+        if (isImage) {
+            const { data } = await axios.post(cp_url('ai/image-prompts'), { name: name.value, instructions: instructions.value, starts_from: props.startsFrom });
+            page.props._statamic.aiImagePrompts = data.imagePrompts;
+            return emit('saved', data.command);
+        }
         const { data } = await axios.post(cp_url('ai/prompts'), { name: name.value, instructions: instructions.value });
-        // The chat's prompts come with every page, so swap in the new list rather than waiting for the next one
         page.props._statamic.aiPrompts = data.prompts;
         emit('saved', data.command);
     } catch (error) {
@@ -107,10 +122,10 @@ function onKeydown(event) {
         <!-- No card round the fields: the popup is already white and the inputs have their own borders -->
         <div class="space-y-3 px-1 py-1">
             <Field :label="__('Name')" :error="errors.name?.[0]">
-                <Input v-model="name" size="sm" :placeholder="__('Legal check')" />
+                <Input v-model="name" size="sm" :placeholder="isImage ? __('Moody black and white') : __('Legal check')" />
             </Field>
             <Field :label="__('Instructions')" :error="errors.instructions?.[0]">
-                <Textarea v-model="instructions" rows="3" :placeholder="__('What the AI should do, as you would ask a colleague.')" />
+                <Textarea v-model="instructions" rows="3" :placeholder="isImage ? __('What to change, and how it should look.') : __('What the AI should do, as you would ask a colleague.')" />
             </Field>
             <!-- What you'll type to run it, so you know before saving -->
             <p class="flex min-h-5 items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
