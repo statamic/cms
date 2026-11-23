@@ -182,6 +182,22 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_does_not_render_old_data_in_x_data_for_a_different_form()
+    {
+        $this->createForm(handle: 'newsletter');
+
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:newsletter js="alpine" }}{{ /form:newsletter }}');
+
+        $this->assertStringNotContainsString('Frodo Braggins', $output);
+    }
+
+    #[Test]
     public function it_renders_scoped_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
