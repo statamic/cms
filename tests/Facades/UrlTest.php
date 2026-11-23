@@ -681,6 +681,36 @@ class UrlTest extends TestCase
         $this->assertSame($expected, URL::makeRelative($url));
     }
 
+    #[Test]
+    #[DataProvider('colonPathProvider')]
+    public function it_preserves_paths_containing_colons($slug)
+    {
+        $path = '/blog/'.$slug;
+
+        $this->assertSame($path, URL::makeRelative($path));
+        $this->assertSame($path.'?x=1#y', URL::makeRelative($path.'?x=1#y'));
+        $this->assertSame($path, URL::makeRelative('/'.$path));
+        $this->assertSame($slug, URL::slug($path));
+        $this->assertSame('/blog', URL::parent($path));
+
+        URL::enforceTrailingSlashes();
+
+        $this->assertSame($path.'/', URL::makeRelative($path));
+        $this->assertSame($path.'/?x=1#y', URL::makeRelative($path.'?x=1#y'));
+        $this->assertSame('/blog/', URL::parent($path));
+    }
+
+    public static function colonPathProvider()
+    {
+        return [
+            ['author:john'],
+            ['category:news'],
+            ['year:2026'],
+            ['min:0'],
+            ['page:2'],
+        ];
+    }
+
     public static function relativeProvider()
     {
         return [
