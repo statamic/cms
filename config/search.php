@@ -63,6 +63,24 @@ return [
             ],
         ],
 
+        'typesense' => [
+            'credentials' => [
+                'api_key' => env('TYPESENSE_API_KEY', ''),
+                'search_only_api_key' => env('TYPESENSE_SEARCH_ONLY_API_KEY'),
+            ],
+            'nodes' => [
+                [
+                    'host' => env('TYPESENSE_HOST', 'localhost'),
+                    'port' => env('TYPESENSE_PORT', '8108'),
+                    'path' => env('TYPESENSE_PATH', ''),
+                    'protocol' => env('TYPESENSE_PROTOCOL', 'http'),
+                ],
+            ],
+            'client' => [
+                'connection_timeout_seconds' => env('TYPESENSE_CONNECTION_TIMEOUT_SECONDS', 2),
+            ],
+        ],
+
     ],
 
     /*

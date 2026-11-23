@@ -55,13 +55,16 @@
         "pestphp/pest": "^4.7",
         "phpstan/phpstan": "^2.2",
         "phpunit/phpunit": "^12.5.23",
-        "spatie/laravel-ray": "^1.43.6"
+        "spatie/laravel-ray": "^1.43.6",
+        "typesense/typesense-php": "^6.0"
     },
     "conflict": {
-        "algolia/algoliasearch-client-php": "<4.32"
+        "algolia/algoliasearch-client-php": "<4.32",
+        "typesense/typesense-php": "<6.0"
     },
     "suggest": {
-        "algolia/algoliasearch-client-php": "Required to use Algolia search driver (^4.32)"
+        "algolia/algoliasearch-client-php": "Required to use Algolia search driver (^4.32)",
+        "typesense/typesense-php": "Required to use Typesense search driver (^6.0)"
     },
     "config": {
         "optimize-autoloader": true,
@@ -69,7 +72,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
         }
     },
     "extra": {
