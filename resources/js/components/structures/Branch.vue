@@ -8,12 +8,13 @@
     >
         <slot name="branch-action" :branch="page">
             <!-- The handle: drag it, or click it or press Space to move it with the arrow keys. When you're done, focus goes to the whole row
-                 (with no ring), so Tab comes back to this handle next, as replicator sets do. -->
+                 (with no ring), so Tab comes back to this handle next, as replicator sets do. Its focus ring is a pill 5px inside it, so it
+                 stays within the row rather than taking the row's corners and poking out past it. -->
             <DragHandle
                 v-if="editable && canKeyboardMove"
                 keyboard-reorder
                 :keyboard-instructions="__('messages.keyboard_tree_reorder_handle_instructions')"
-                class="w-6 shrink-0 self-stretch h-auto!"
+                class="w-6 shrink-0 self-stretch h-auto! rounded-full! outline-offset-[-5px]!"
                 @keyboard-reorder="startMoving('start')"
             />
             <div v-else-if="editable" class="page-move w-6" />
