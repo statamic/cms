@@ -337,7 +337,10 @@ function paintAt(event) {
 }
 
 function startPainting(event) {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    // A demo's made-up pointer can't be captured (see AiChatDemos.vue), so carry on without it
+    try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {}
     drawing = false;
     paintAt(event);
     drawing = true;
@@ -412,7 +415,7 @@ onBeforeUnmount(() => clearTimeout(timer));
                     <span class="absolute end-2 top-2 rounded-full bg-ai px-2 py-0.5 text-2xs font-medium text-white">{{ __('After') }}</span>
                 </div>
 
-                <!-- Erase something: paint over what to take out -->
+                <!-- Erase something: paint over what to take out. mousedown.prevent keeps focus in the input as you paint, so Tab goes on to Erase. -->
                 <canvas
                     v-if="brushing"
                     ref="brushCanvas"
@@ -420,6 +423,7 @@ onBeforeUnmount(() => clearTimeout(timer));
                     :style="brushPlace"
                     aria-hidden="true"
                     @pointerdown="startPainting"
+                    @mousedown.prevent
                     @pointermove="paint"
                     @pointerup="stopPainting"
                     @pointercancel="stopPainting"
@@ -491,14 +495,6 @@ onBeforeUnmount(() => clearTimeout(timer));
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Cancel sits at the end of the input, where the chat has Clear. It comes after the new images in the page, so it's the last
-                             stop for Tab. -->
-                        <div v-if="cancellable" class="absolute end-2 bottom-[12.5px] flex items-center">
-                            <!-- Save as skill, for a typed request that's come back, before Cancel, which stays the last stop for Tab -->
-                            <button v-if="canSaveSkill" ref="saveSkillLink" type="button" :class="cancelLink" :aria-expanded="!!newSkillFrom" @mousedown.prevent @click="startNewSkill">{{ __('Save as skill') }}</button>
-                            <button type="button" :class="cancelLink" @mousedown.prevent @click="dismiss">{{ __('Cancel') }}</button>
-                        </div>
                     </div>
 
                     <!-- The skills, as pills above the card while you're in it and haven't typed anything, as the chat's are. Picking one runs it,
@@ -557,11 +553,20 @@ onBeforeUnmount(() => clearTimeout(timer));
                     </div>
 
                     <!-- While you're painting what to erase, Erase takes the skills' place. It's always shown (painting doesn't need the input
-                         focused). Pressing it, or Enter in the input, erases what's painted, or what's described. -->
+                         focused, and leaves focus there). Pressing it, or Enter in the input, erases what's painted, or what's described. -->
                     <div v-if="brushing" class="absolute -end-px bottom-full mb-3 flex justify-end">
                         <button type="button" :class="skillPill" @mousedown.prevent @click="send">
                             <span class="st-text-trim-optical-cap">{{ __('Erase') }}</span>
                         </button>
+                    </div>
+
+                    <!-- Cancel sits at the end of the input, where the chat has Clear (1px further in than it was inside the card, for the card's
+                         border). It's out here, after the new images, the skills and Erase, so it's the last stop for Tab: while you're painting,
+                         Tab goes from the input to Erase, then Cancel. -->
+                    <div v-if="cancellable" class="absolute end-[calc(var(--spacing)*2+1px)] bottom-[13.5px] flex items-center">
+                        <!-- Save as skill, for a typed request that's come back, before Cancel, which stays the last stop for Tab -->
+                        <button v-if="canSaveSkill" ref="saveSkillLink" type="button" :class="cancelLink" :aria-expanded="!!newSkillFrom" @mousedown.prevent @click="startNewSkill">{{ __('Save as skill') }}</button>
+                        <button type="button" :class="cancelLink" @mousedown.prevent @click="dismiss">{{ __('Cancel') }}</button>
                     </div>
                 </div>
             </template>
