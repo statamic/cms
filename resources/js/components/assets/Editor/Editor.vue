@@ -51,7 +51,7 @@
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <!-- Prototype: ask the AI to do things with the image (see AiImage.vue), after Rename -->
                                 <!-- While its card is open, it looks pressed in: a dark sunken fill, with a shadow along its top edge -->
-                                <ui-button ref="askAi" inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-chat" v-tooltip="askAiTooltip" variant="ghost" class="[&_svg]:!opacity-45" :class="{ 'bg-black/40! shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)]': aiOpen }" :text="__('Ask AI')" :aria-pressed="aiOpen" />
+                                <ui-button ref="askAi" inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-chat" v-tooltip="askAiTooltip" variant="ghost" class="[&_svg]:!opacity-45" :class="{ 'bg-black/40! shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)]': aiOpen }" :text="__('Edit with AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
                                 <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
@@ -80,7 +80,7 @@
                         >
                             <!-- Image -->
                             <!-- Prototype: wrapped so the AI can show what it makes in the image's place (see AiImage.vue) -->
-                            <!-- Closing the card from inside it (Esc) puts focus back on Ask AI, which opened it, rather than losing it with the card -->
+                            <!-- Closing the card from inside it (Esc) puts focus back on Edit with AI, which opened it, rather than losing it with the card -->
                             <AiImage v-if="asset.isImage" :asset="asset" v-model:open="aiOpen" @closed="$refs.askAi?.$el?.focus()" v-slot="{ src, style }">
                                 <div class="max-w-full max-h-full overflow-hidden" :class="{ [`bg-checkerboard bg-checkerboard-${checkerboardMode} rounded-md`]: asset.can_be_transparent && showCheckerboard }">
                                     <img :src="src" :style="style" class="relative asset-thumb shadow-ui-xl max-w-full max-h-full object-contain" />
@@ -302,7 +302,7 @@ export default {
             return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
         },
 
-        // Prototype: ⌘/ opens the image's AI card while it's open here (see aiShortcut), so Ask AI's tooltip gives the shortcut. Just the
+        // Prototype: ⌘/ opens the image's AI card while it's open here (see aiShortcut), so Edit with AI's tooltip gives the shortcut. Just the
         // shortcut, as the button already says what it is.
         askAiTooltip() {
             return shortcutLabel('mod+/');
@@ -614,7 +614,7 @@ export default {
         },
 
         // Prototype: ⌘/ works on the image's AI card as it does on the chat: closed opens it (with focus in its input), open but unfocused
-        // focuses it, and focused closes it, putting focus back on Ask AI. Anything that isn't an image (or someone who can't use AI)
+        // focuses it, and focused closes it, putting focus back on Edit with AI. Anything that isn't an image (or someone who can't use AI)
         // gets the chat as usual.
         aiShortcut() {
             if (!this.canUseAi) return useAiChat().shortcut();

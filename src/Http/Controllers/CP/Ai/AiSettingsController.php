@@ -653,7 +653,7 @@ class AiSettingsController extends CpController
             [
                 'display' => __('Image Skills'),
                 'header_actions' => 'image-prompts-actions',
-                'instructions' => __('Image edits, offered under *Ask AI* in the asset editor.'),
+                'instructions' => __('Image edits, offered under *Edit with AI* in the asset editor.'),
                 'fields' => [$this->imagePromptsField()],
             ],
             [

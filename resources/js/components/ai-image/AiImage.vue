@@ -220,7 +220,7 @@ function dismiss() {
 
 const emit = defineEmits(['closed']);
 
-// Closing it from inside (Esc) takes away what had focus, so it tells the editor, which puts focus back on Ask AI (see Editor.vue)
+// Closing it from inside (Esc) takes away what had focus, so it tells the editor, which puts focus back on Edit with AI (see Editor.vue)
 function close() {
     const hadFocus = !!document.activeElement?.closest('[data-ai-image-card]');
     dismiss();
@@ -427,7 +427,7 @@ onBeforeUnmount(() => clearTimeout(timer));
 
                 <!-- Ask for something. It's the AI chat's floating card (see PanelLayout.vue and AiChat.vue), with the input straight on the card and
                      the chat's icon in front of it. It's always dark, to suit the dark area round the image, and see-through, so it takes on the
-                     photo's colours, with no edge or glow (see components/ai.css). There's no ×: Ask AI and Esc close it, as Ask does the chat
+                     photo's colours, with no edge or glow (see components/ai.css). There's no ×: Edit with AI and Esc close it, as Ask does the chat
                      before it's started. The skill pills sit beside the card in this wrapper, not inside it: inside, their blur would only see the
                      card, so they'd never look frosted. -->
                 <!-- 400px wide, so three skill pills and "+ 2" fit over it -->
