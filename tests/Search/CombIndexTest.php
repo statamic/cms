@@ -12,9 +12,11 @@ use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Search\Searchable;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Search;
 use Statamic\Search\Comb\Index;
 use Statamic\Search\Documents;
+use Statamic\Search\InsertMultipleJob;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -125,26 +127,49 @@ class CombIndexTest extends TestCase
     }
 
     #[Test]
-    public function updating_on_a_sync_queue_writes_the_index_file_once()
+    public function updating_on_a_sync_queue_writes_the_documents_once()
     {
         $files = $this->prepareUpdate(250);
 
         Search::index('test')->update();
 
-        $files->shouldHaveReceived('put')->once();
+        // Once to empty the index, and once for all of the documents.
+        $files->shouldHaveReceived('put')->twice();
         $this->assertCount(250, json_decode(file_get_contents($this->tmpDir.'/test.json'), true));
     }
 
     #[Test]
-    public function updating_on_a_faked_bus_deletes_the_index_and_writes_nothing()
+    public function updating_on_a_faked_bus_leaves_an_empty_index()
     {
         Bus::fake();
         $files = $this->prepareUpdate(3);
 
         Search::index('test')->update();
 
-        $files->shouldNotHaveReceived('put');
-        $this->assertFileDoesNotExist($this->tmpDir.'/test.json');
+        $files->shouldHaveReceived('put')->once();
+        $this->assertSame([], json_decode(file_get_contents($this->tmpDir.'/test.json'), true));
+    }
+
+    #[Test]
+    public function saving_while_a_missing_index_is_being_rebuilt_does_not_rebuild_it_again()
+    {
+        Bus::fake();
+        $this->prepareUpdate(3);
+        unlink($this->tmpDir.'/test.json');
+
+        $entry = Entry::find('entry-1');
+        $alreadyDispatched = Bus::dispatched(InsertMultipleJob::class)->count();
+
+        Search::updateWithinIndexes($entry);
+        Search::updateWithinIndexes($entry);
+
+        $documents = Bus::dispatched(InsertMultipleJob::class)
+            ->slice($alreadyDispatched)
+            ->map(fn ($job) => $job->documents->count())
+            ->values()
+            ->all();
+
+        $this->assertSame([3, 1], $documents);
     }
 
     #[Test]

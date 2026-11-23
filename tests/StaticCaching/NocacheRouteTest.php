@@ -6,6 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Collection;
+use Statamic\Facades\StaticCache;
 use Statamic\StaticCaching\NoCache\Session;
 use Tests\FakesContent;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -53,6 +54,53 @@ class NocacheRouteTest extends TestCase
                 'regions' => [
                     $regionOne->key() => 'First 1 Dustin Test',
                     $regionTwo->key() => 'Second 2 Will Test',
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_skips_regions_missing_from_the_cache_store()
+    {
+        $this->createPage('test', ['with' => ['title' => 'Test']]);
+
+        $session = new Session('http://localhost/test');
+        $missing = $session->pushRegion('Missing', [], 'antlers.html');
+        $surviving = $session->pushRegion('Surviving {{ name }}', ['name' => 'Dustin'], 'antlers.html');
+        $session->write();
+
+        StaticCache::cacheStore()->forget('nocache::region.'.$missing->key());
+
+        $this
+            ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
+            ->assertOk()
+            ->assertExactJson([
+                'csrf' => csrf_token(),
+                'regions' => [
+                    $surviving->key() => 'Surviving Dustin',
+                ],
+            ]);
+    }
+
+    #[Test]
+    public function it_skips_regions_with_a_nested_region_missing_from_the_cache_store()
+    {
+        $this->createPage('test', ['with' => ['title' => 'Test']]);
+
+        $session = new Session('http://localhost/test');
+        $missing = $session->pushRegion('Missing', [], 'antlers.html');
+        $session->pushRegion('<span class="nocache" data-nocache="'.$missing->key().'">NOCACHE_PLACEHOLDER</span>', [], 'antlers.html');
+        $surviving = $session->pushRegion('Surviving', [], 'antlers.html');
+        $session->write();
+
+        StaticCache::cacheStore()->forget('nocache::region.'.$missing->key());
+
+        $this
+            ->postJson('/!/nocache', ['url' => 'http://localhost/test'])
+            ->assertOk()
+            ->assertExactJson([
+                'csrf' => csrf_token(),
+                'regions' => [
+                    $surviving->key() => 'Surviving',
                 ],
             ]);
     }

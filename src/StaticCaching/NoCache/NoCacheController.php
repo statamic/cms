@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\NoCache;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Statamic\StaticCaching\Replacers\NoCacheReplacer;
 use Statamic\Support\Str;
 
@@ -35,9 +36,20 @@ class NoCacheController
         return [
             'csrf' => csrf_token(),
             'regions' => $session
-                ->regions()
-                ->map->render()
-                ->map(fn ($contents) => $replacer->replace($contents)),
+                ->regionKeys()
+                ->mapWithKeys(fn (string $key) => [$key => $this->render($session, $replacer, $key)])
+                ->reject(fn (?string $contents) => is_null($contents)),
         ];
+    }
+
+    private function render(Session $session, NoCacheReplacer $replacer, string $key): ?string
+    {
+        try {
+            return $replacer->replace($session->region($key)->render());
+        } catch (RegionNotFound $e) {
+            Log::debug("Static cache region [{$e->getRegion()}] not found while rendering region [{$key}]. Skipping it.");
+
+            return null;
+        }
     }
 }

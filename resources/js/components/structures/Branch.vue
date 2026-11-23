@@ -23,7 +23,7 @@
 
                 <ui-button
                     v-if="hasChildren"
-                    class="transition duration-100 [&_svg]:size-4! -mx-1.5"
+                    class="transition duration-100 [&_svg]:size-4! -mx-1.5 -my-1"
                     icon="chevron-down"
                     size="xs"
                     round

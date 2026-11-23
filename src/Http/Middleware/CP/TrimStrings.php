@@ -26,11 +26,16 @@ class TrimStrings extends TransformsRequest
      */
     protected function cleanArray(array $data, $keyPrefix = '')
     {
-        if ($this->isTextNode($data)) {
-            $this->except[] = $keyPrefix.'text';
+        if (! $this->isTextNode($data)) {
+            return parent::cleanArray($data, $keyPrefix);
         }
 
-        return parent::cleanArray($data, $keyPrefix);
+        $text = $data['text'];
+
+        $data = parent::cleanArray($data, $keyPrefix);
+        $data['text'] = $text;
+
+        return $data;
     }
 
     /**

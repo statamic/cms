@@ -1653,16 +1653,33 @@ class CoreModifiers extends Modifier
      */
     public function mark($value, $params, $context)
     {
+        [$flags, $params] = collect($params)->partition(
+            fn (mixed $param): bool => is_string($param) && in_array(strtolower($param), ['substring:true', 'substring:false'], true)
+        );
+
+        $substring = ! $flags->contains(fn (string $flag): bool => strtolower($flag) === 'substring:false');
+
+        $params = $params->values()->all();
+
         if (! $words = $params[0] ?? $context['get']['q'] ?? null) {
             return $value;
         }
 
-        $params[0] = collect(preg_split('/\s+/', $words))
-            ->map(fn ($word) => preg_quote($word, '/'))
-            ->filter()
+        $pattern = collect(preg_split('/\s+/', $words))
+            ->map(fn (string $word): string => preg_quote($word, '/'))
+            ->filter(fn (string $word): bool => $word !== '')
             ->join('|');
 
-        return $this->regexMark($value, $params);
+        if ($substring || $pattern === '') {
+            $params[0] = $pattern;
+
+            return $this->regexMark($value, $params);
+        }
+
+        // The unicode flag lets the boundaries treat accented and non-Latin letters as word characters.
+        $params[0] = '(?<![\p{L}\p{N}_])(?:'.$pattern.')(?![\p{L}\p{N}_])';
+
+        return $this->markWithFlags($value, $params, 'isu');
     }
 
     /**
@@ -2090,24 +2107,7 @@ class CoreModifiers extends Modifier
      */
     public function regexMark($value, $params)
     {
-        if (! $pattern = array_shift($params)) {
-            return $value;
-        }
-
-        $attributes = $this->buildAttributesFromParameters($params);
-
-        return Html::mapText($value, function ($text) use ($pattern, $attributes) {
-            $text = Html::decode($text);
-
-            return Str::mapRegex($text, "/({$pattern})/is", function ($part, $match) use ($attributes) {
-                $part = Html::entities($part);
-                if ($match) {
-                    $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
-                }
-
-                return $part;
-            });
-        });
+        return $this->markWithFlags($value, $params, 'is');
     }
 
     /**
@@ -3270,6 +3270,28 @@ class CoreModifiers extends Modifier
         }
 
         return $attributes;
+    }
+
+    private function markWithFlags($value, $params, string $flags)
+    {
+        if (! $pattern = array_shift($params)) {
+            return $value;
+        }
+
+        $attributes = $this->buildAttributesFromParameters($params);
+
+        return Html::mapText($value, function ($text) use ($pattern, $attributes, $flags) {
+            $text = Html::decode($text);
+
+            return Str::mapRegex($text, "/({$pattern})/{$flags}", function ($part, $match) use ($attributes) {
+                $part = Html::entities($part);
+                if ($match) {
+                    $part = '<mark'.Html::attributes($attributes).'>'.$part.'</mark>';
+                }
+
+                return $part;
+            });
+        });
     }
 
     private function getMathModifierNumber($params, $context)

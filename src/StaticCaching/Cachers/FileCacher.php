@@ -128,13 +128,15 @@ class FileCacher extends AbstractCacher
      */
     public function flush()
     {
-        foreach ($this->getCachePaths() as $path) {
-            $this->writer->flush($path);
-        }
-
+        // Wipe the store before the files, so any page written while the
+        // files are being deleted keeps the nocache regions it just stored.
         $this->flushUrls();
 
         $this->flushDedicatedStore();
+
+        foreach ($this->getCachePaths() as $path) {
+            $this->writer->flush($path);
+        }
     }
 
     /**
@@ -265,7 +267,7 @@ class FileCacher extends AbstractCacher
 
         $default = <<<EOT
 (function() {
-    fetch('/!/csrf', {
+    window.statamicCsrfRequest = fetch('/!/csrf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -339,14 +341,18 @@ EOT;
 
     var map = createMap();
 
-    fetch('{$nocacheUrl}', {
+    // Wait for the csrf request, so both requests share one session and the
+    // csrf token in the page matches the session cookie the browser keeps.
+    Promise.resolve(window.statamicCsrfRequest)
+    .catch(() => {})
+    .then(() => fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
-    })
+    }))
     .then((response) => response.json())
     .then((data) => {
         map = createMap();

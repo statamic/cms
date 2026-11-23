@@ -44,8 +44,17 @@ class AddonLicense extends License
         return $this->response['exists'];
     }
 
+    public function valid()
+    {
+        return ! $this->addon?->hasUnknownEdition() && parent::valid();
+    }
+
     public function invalidReason()
     {
+        if ($this->addon?->hasUnknownEdition()) {
+            return trans('statamic::messages.licensing_error_unknown_edition', ['edition' => $this->addon->configuredEdition()]);
+        }
+
         switch (Arr::get($this->response, 'reason')) {
             case 'outside_license_range':
                 [$start, $end] = $this->response['range'];
