@@ -53,8 +53,8 @@ class UserGroupTest extends TestCase
     {
         config(['statamic.users.repositories.file.paths.groups' => __DIR__.'/../__fixtures__/dev-null/groups.yaml']);
 
-        $userA = tap(UserAPI::make())->save();
-        $userB = tap(UserAPI::make())->save();
+        $userA = tap(UserAPI::make()->email('a@example.com'))->save();
+        $userB = tap(UserAPI::make()->email('b@example.com'))->save();
         $group = tap(UserGroup::make()->handle('test'))->save();
 
         $this->assertInstanceOf(Collection::class, $group->users());

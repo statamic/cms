@@ -144,6 +144,10 @@ class User extends BaseUser
 
         $path = $path ?? $this->buildPath();
 
+        if ($this->initialPath() && $path !== ($current['path'] ?? null)) {
+            $this->ensurePathIsNotTaken($path);
+        }
+
         if ($current && $current['path'] !== $path) {
             File::delete($current['path']);
         }
@@ -162,12 +166,28 @@ class User extends BaseUser
         return $this;
     }
 
+    protected function ensurePathIsNotTaken($path)
+    {
+        $id = $this->readFile($path)['id'] ?? null;
+
+        if ($id !== null && $id !== (string) $this->id()) {
+            throw new \RuntimeException("Cannot write user [{$this->id()}] to [{$path}] because it belongs to user [{$id}].");
+        }
+    }
+
     protected function currentFile(): ?array
     {
         $initial = $this->initialPath();
+        $candidate = $initial ?? $this->path();
 
-        if ($data = $this->readOwnFile($candidate = $initial ?? $this->path())) {
-            return ['path' => $candidate, 'data' => $data];
+        if ($file = $this->readFile($candidate)) {
+            if ($file['id'] === (string) $this->id()) {
+                return ['path' => $candidate, 'data' => $file['data']];
+            }
+
+            if ($file['id'] === null) {
+                return ['path' => $candidate, 'data' => null];
+            }
         }
 
         if (! $initial) {
@@ -176,37 +196,42 @@ class User extends BaseUser
 
         $directory = dirname($initial);
 
-        foreach (@scandir($directory) ?: [] as $file) {
-            if (! str_ends_with($file, '.yaml')) {
+        foreach (@scandir($directory) ?: [] as $name) {
+            $path = $directory.'/'.$name;
+
+            if (! str_ends_with($name, '.yaml') || ! str_contains((string) File::get($path), (string) $this->id())) {
                 continue;
             }
 
-            if ($data = $this->readOwnFile($path = $directory.'/'.$file)) {
-                return ['path' => $path, 'data' => $data];
+            if (($file = $this->readFile($path)) && $file['id'] === (string) $this->id()) {
+                return ['path' => $path, 'data' => $file['data']];
             }
         }
 
         return null;
     }
 
-    protected function readOwnFile($path): ?array
+    protected function readFile($path): ?array
     {
-        if (! File::exists($path) || ! str_contains($contents = (string) File::get($path), (string) $this->id())) {
+        if (! File::exists($path)) {
             return null;
         }
 
         try {
-            $data = YAML::file($path)->parse($contents);
+            $data = YAML::file($path)->parse((string) File::get($path));
         } catch (ParseException) {
-            return null;
+            $data = null;
         }
 
-        return (string) ($data['id'] ?? '') === (string) $this->id() ? $data : null;
+        return [
+            'id' => isset($data['id']) ? (string) $data['id'] : null,
+            'data' => isset($data['id']) ? $data : null,
+        ];
     }
 
     protected function mergeStoredAccess(array $current)
     {
-        if (! $this->storedAccess) {
+        if (! $this->storedAccess || ! $current['data']) {
             return;
         }
 
