@@ -988,6 +988,22 @@ EOT
     }
 
     #[Test]
+    public function it_only_renders_old_input_for_the_submitted_form()
+    {
+        $this->createForm(handle: 'newsletter');
+
+        $this
+            ->post('/!/forms/contact', ['email' => 'not-an-email'])
+            ->assertSessionHasErrors(['email'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:contact }}');
+        $this->assertStringContainsString('[email=not-an-email]', $output);
+
+        $output = $this->tag('{{ form:newsletter }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:newsletter }}');
+        $this->assertStringContainsString('[email=]', $output);
+    }
+
+    #[Test]
     public function it_will_submit_form_and_render_success()
     {
         $this->assertEmpty(Form::find('contact')->submissions());
