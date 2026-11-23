@@ -87,7 +87,14 @@ class ImageChoice extends Fieldtype
             return Asset::find($image)?->url();
         }
 
+        $handle = config('statamic.assets.image_choice_images.container');
+
+        if ($handle && $container = AssetContainer::find($handle)) {
+            return $container->asset($image)?->url();
+        }
+
         return AssetContainer::all()
+            ->lazy()
             ->map(fn ($container) => $container->asset($image))
             ->filter()
             ->first()
