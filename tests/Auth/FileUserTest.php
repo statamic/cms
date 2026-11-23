@@ -366,6 +366,83 @@ class FileUserTest extends TestCase
     }
 
     #[Test]
+    public function it_deletes_a_user_whose_email_was_changed_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->assignRole('author');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->email('jane@example.com')->save();
+
+        $copy->delete();
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileDoesNotExist(dirname($path).'/jane@example.com.yaml');
+
+        Stache::clear();
+
+        $this->assertNull(UserAPI::find('123'));
+    }
+
+    #[Test]
+    public function it_keeps_an_email_changed_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->assignRole('author');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->email('jane@example.com')->save();
+
+        $copy->removeRole('author')->save();
+
+        $newPath = dirname($path).'/jane@example.com.yaml';
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileExists($newPath);
+        $this->assertEmpty(YAML::file($newPath)->parse()['roles'] ?? []);
+        $this->assertSame('jane@example.com', $copy->email());
+
+        Stache::clear();
+
+        $this->assertEmpty(UserAPI::find('123')->get('roles'));
+    }
+
+    #[Test]
+    public function it_moves_its_file_when_its_own_email_is_changed_after_the_file_was_renamed_elsewhere()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->email('jane@example.com')->save();
+
+        $copy->email('jack@example.com')->save();
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileDoesNotExist(dirname($path).'/jane@example.com.yaml');
+        $this->assertFileExists(dirname($path).'/jack@example.com.yaml');
+    }
+
+    #[Test]
+    public function it_does_not_delete_another_users_file_at_its_old_path()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->email('jane@example.com')->save();
+        $this->makeUser()->id('456')->email('john@example.com')->save();
+
+        $copy->delete();
+
+        $this->assertSame('456', (string) YAML::file($path)->parse()['id']);
+        $this->assertFileDoesNotExist(dirname($path).'/jane@example.com.yaml');
+    }
+
+    #[Test]
     #[Group('passkeys')]
     public function it_gets_passkeys()
     {

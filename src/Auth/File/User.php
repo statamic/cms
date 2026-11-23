@@ -18,6 +18,7 @@ use Statamic\Facades\YAML;
 use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Yaml\ParseException;
 
 /**
  * A user.
@@ -26,7 +27,6 @@ class User extends BaseUser
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty {
         data as traitData;
-        writeFile as traitWriteFile;
     }
 
     protected $id;
@@ -121,21 +121,35 @@ class User extends BaseUser
 
     public function deleteFile()
     {
-        File::delete($this->path());
+        if ($current = $this->currentFile()) {
+            File::delete($current['path']);
+        }
 
         $this->initialPath(null);
     }
 
     protected function wasDeleted(): bool
     {
-        return $this->initialPath() && ! File::exists($this->initialPath());
+        return $this->initialPath() && ! $this->currentFile();
     }
 
     public function writeFile($path = null)
     {
-        $this->mergeStoredAccess();
+        $current = $this->currentFile();
 
-        $this->traitWriteFile($path);
+        if ($current) {
+            $this->mergeStoredAccess($current);
+        }
+
+        $path = $path ?? $this->buildPath();
+
+        if ($current && $current['path'] !== $path) {
+            File::delete($current['path']);
+        }
+
+        File::put($path, $this->fileContents());
+
+        $this->initialPath($path);
 
         $this->syncStoredAccess();
     }
@@ -147,28 +161,65 @@ class User extends BaseUser
         return $this;
     }
 
-    protected function mergeStoredAccess()
+    protected function currentFile(): ?array
     {
-        $path = $this->initialPath();
+        $initial = $this->initialPath();
 
-        if (! $this->storedAccess || ! $path || ! File::exists($path)) {
-            return;
+        if ($data = $this->readOwnFile($candidate = $initial ?? $this->path())) {
+            return ['path' => $candidate, 'data' => $data];
         }
 
-        $stored = YAML::file($path)->parse();
-
-        if ((string) ($stored['id'] ?? '') !== (string) $this->id()) {
-            return;
+        if (! $initial) {
+            return null;
         }
 
-        $current = $this->currentAccess();
+        $directory = dirname($initial);
 
-        foreach ($this->storedAccess as $key => $value) {
-            if ($current[$key] !== $value) {
+        foreach (@scandir($directory) ?: [] as $file) {
+            if (! str_ends_with($file, '.yaml')) {
                 continue;
             }
 
-            if ($key === 'password_hash') {
+            if ($data = $this->readOwnFile($path = $directory.'/'.$file)) {
+                return ['path' => $path, 'data' => $data];
+            }
+        }
+
+        return null;
+    }
+
+    protected function readOwnFile($path): ?array
+    {
+        if (! File::exists($path) || ! str_contains($contents = (string) File::get($path), (string) $this->id())) {
+            return null;
+        }
+
+        try {
+            $data = YAML::file($path)->parse($contents);
+        } catch (ParseException) {
+            return null;
+        }
+
+        return (string) ($data['id'] ?? '') === (string) $this->id() ? $data : null;
+    }
+
+    protected function mergeStoredAccess(array $current)
+    {
+        if (! $this->storedAccess) {
+            return;
+        }
+
+        $stored = $current['data'];
+        $access = $this->currentAccess();
+
+        foreach ($this->storedAccess as $key => $value) {
+            if ($access[$key] !== $value) {
+                continue;
+            }
+
+            if ($key === 'email') {
+                $this->email(pathinfo($current['path'], PATHINFO_FILENAME));
+            } elseif ($key === 'password_hash') {
                 $this->passwordHash($stored[$key] ?? $value);
             } elseif (Arr::has($stored, $key)) {
                 $this->set($key, $stored[$key]);
@@ -181,6 +232,7 @@ class User extends BaseUser
     protected function currentAccess()
     {
         return [
+            'email' => $this->email(),
             'roles' => $this->get('roles') ?? [],
             'groups' => $this->get('groups') ?? [],
             'super' => (bool) $this->get('super'),
