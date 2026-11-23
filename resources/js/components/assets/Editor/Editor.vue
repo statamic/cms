@@ -51,7 +51,7 @@
                                 <ui-button inset size="sm" v-if="canRunAction('rename_asset')" @click.prevent="runAction(actions, 'rename_asset')" icon="rename" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Rename')" />
                                 <!-- Prototype: ask the AI to do things with the image (see AiImage.vue), after Rename -->
                                 <!-- While its card is open, it looks pressed in: a dark sunken fill, with a shadow along its top edge -->
-                                <ui-button ref="askAi" inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-chat" variant="ghost" class="[&_svg]:!opacity-45" :class="{ 'bg-black/40! shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)]': aiOpen }" :text="__('Ask AI')" :aria-pressed="aiOpen" />
+                                <ui-button ref="askAi" inset size="sm" v-if="canUseAi" @click="aiOpen = !aiOpen" icon="ai-chat" v-tooltip="askAiTooltip" variant="ghost" class="[&_svg]:!opacity-45" :class="{ 'bg-black/40! shadow-[inset_0_1px_3px_rgb(0_0_0/0.6)]': aiOpen }" :text="__('Ask AI')" :aria-pressed="aiOpen" />
                                 <ui-button inset size="sm" v-if="canRunAction('move_asset')" @click.prevent="runAction(actions, 'move_asset')" icon="move-folder" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Move to Folder')" />
                                 <ui-button inset size="sm" v-if="canRunAction('replace_asset')" @click.prevent="runAction(actions, 'replace_asset')" icon="replace" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Replace')" />
                                 <ui-button inset size="sm" v-if="canRunAction('reupload_asset')" @click.prevent="runAction(actions, 'reupload_asset')" icon="upload-cloud" variant="ghost" class="[&_svg]:!opacity-45" :text="__('Reupload')" />
@@ -300,6 +300,12 @@ export default {
 
         saveAndCloseTooltip() {
             return __('Save & Close (:shortcut)', { shortcut: shortcutLabel('mod+shift+s') });
+        },
+
+        // Prototype: ⌘/ opens the image's AI card while it's open here (see aiShortcut), so Ask AI's tooltip gives the shortcut. Just the
+        // shortcut, as the button already says what it is.
+        askAiTooltip() {
+            return shortcutLabel('mod+/');
         },
 
         // Prototype: whether the AI can be asked about the image (see AiImage.vue)
