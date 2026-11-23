@@ -156,7 +156,15 @@
                         <DropdownMenu>
                             <!-- Move it with the arrow keys, as the handle does (see structures/Branch.vue) -->
                             <DropdownItem v-if="canMove" :text="__('Move')" icon="move-vertical" @click="startMoving" />
-                            <DropdownSeparator v-if="canMove" />
+                            <DropdownSeparator
+                                v-if="
+                                    canMove &&
+                                    (canCreateChildEntry(depth, isRoot) ||
+                                        shouldShowSkeleton ||
+                                        branchTreeActions(actions).length ||
+                                        canDeleteTreeBranch(branch, isRoot))
+                                "
+                            />
                             <template v-if="canCreateChildEntry(depth, isRoot)">
                                 <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                                 <DropdownItem
