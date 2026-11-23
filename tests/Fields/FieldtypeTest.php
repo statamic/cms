@@ -593,8 +593,65 @@ class FieldtypeTest extends TestCase
 
         $sections = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'];
 
-        $this->assertEquals(['foo'], array_column($sections[0]['fields'], 'handle'));
-        $this->assertEquals(['baz'], array_column($sections[1]['fields'], 'handle'));
+        $this->assertCount(1, $sections);
+        $this->assertEquals(['foo', 'baz'], array_column($sections[0]['fields'], 'handle'));
+    }
+
+    #[Test]
+    public function it_keeps_the_order_of_fields_placed_after_the_same_field()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('one', ['type' => 'text'], after: 'foo');
+        $fieldtype::appendConfigField('two', ['type' => 'text'], after: 'foo');
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'one', 'two', 'bar'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
+    public function it_can_place_an_appended_config_field_after_another_appended_one()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('second', ['type' => 'text'], after: 'first');
+        $fieldtype::appendConfigField('first', ['type' => 'text'], after: 'foo');
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'first', 'second', 'bar'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
+    public function appending_a_config_field_again_replaces_where_it_was_placed()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('baz', ['type' => 'text'], after: 'foo');
+        $fieldtype::appendConfigField('baz', ['type' => 'text']);
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'bar', 'baz'], array_column($fields, 'handle'));
     }
 
     #[Test]
