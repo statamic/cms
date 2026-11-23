@@ -135,7 +135,7 @@
                 />
             </template>
 
-            <template #branch-options-dropdown="{ branch, removeBranch, depth, isRoot }">
+            <template #branch-options-dropdown="{ branch, removeBranch, depth, isRoot, canMove, startMoving }">
                 <ItemActions
                     v-if="branch.entry"
                     :url="entriesActionUrl"
@@ -154,6 +154,9 @@
                         :class="{ invisible: isRoot && branch.actions && !branchTreeActions(actions).length }"
                     >
                         <DropdownMenu>
+                            <!-- Move it with the arrow keys, as the handle does (see structures/Branch.vue) -->
+                            <DropdownItem v-if="canMove" :text="__('Move')" icon="move-vertical" @click="startMoving" />
+                            <DropdownSeparator v-if="canMove" />
                             <template v-if="canCreateChildEntry(depth, isRoot)">
                                 <DropdownLabel :text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                                 <DropdownItem
