@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class Currency extends FormFieldtype
 {
     protected static $fieldtype = 'float';
-    protected $description = 'Collects a monetary amount.';
     protected $icon = 'currency';
     protected $categories = ['number'];
     protected $keywords = ['money', 'number'];

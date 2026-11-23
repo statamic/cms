@@ -53,7 +53,7 @@ const props = withDefaults(defineProps<{
     rules: true,
     addLabel: () => __('Add Connection'),
     deleteHeading: () => __('Delete Connection'),
-    deleteDescription: () => __('Are you sure you want to delete this connection?'),
+    deleteDescription: () => __('statamic::messages.form_connection_delete_confirmation'),
 });
 
 const sortableItemClass = 'connection-item';

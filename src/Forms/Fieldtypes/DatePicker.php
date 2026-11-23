@@ -8,7 +8,6 @@ use Statamic\Support\Arr;
 class DatePicker extends FormFieldtype
 {
     protected static $fieldtype = 'date';
-    protected $description = 'Lets respondents pick a date.';
     protected $icon = 'calendar';
     protected $categories = ['datetime'];
 

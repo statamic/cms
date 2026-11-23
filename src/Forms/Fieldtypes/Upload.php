@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Upload extends FormFieldtype
 {
     protected static $fieldtype = 'form_upload';
-    protected $description = 'Upload files - store them permanently or use them temporarily.';
     protected $icon = 'upload-cloud';
     protected $categories = ['media'];
     protected $order = 6;

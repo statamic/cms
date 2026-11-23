@@ -15,7 +15,6 @@ use function Statamic\trans as __;
 class Ranking extends FormFieldtype
 {
     protected static $fieldtype = 'ranking';
-    protected $description = 'A ranking input for ordering items by preference.';
     protected $icon = 'rank';
     protected $categories = ['rate'];
     protected $order = 4;

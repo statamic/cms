@@ -14,7 +14,6 @@ use function Statamic\trans as __;
 class Number extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
-    protected $description = 'Collects a number. You can set minimum and maximum values.';
     protected $icon = 'number';
     protected $categories = ['number'];
     protected $keywords = ['integer', 'float'];

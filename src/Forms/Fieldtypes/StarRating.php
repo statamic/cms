@@ -17,7 +17,6 @@ use function Statamic\trans as __;
 class StarRating extends FormFieldtype
 {
     protected static $fieldtype = 'star_rating';
-    protected $description = 'A star rating input for collecting ratings.';
     protected $icon = 'star';
     protected $categories = ['rate'];
     protected $order = 3;

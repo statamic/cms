@@ -15,7 +15,6 @@ use function Statamic\trans as __;
 class Dictionary extends FormFieldtype
 {
     protected static $fieldtype = 'dictionary';
-    protected $description = 'Select from a predefined list like countries, timezones, or currencies.';
     protected $icon = 'fieldtype-dictionary';
     protected $categories = ['choice'];
     protected $keywords = ['countries', 'timezones', 'currencies'];

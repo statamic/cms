@@ -11,7 +11,6 @@ use function Statamic\trans as __;
 class Paragraph extends FormFieldtype
 {
     protected static $fieldtype = 'html';
-    protected $description = 'A paragraph to provide information in your form.';
     protected $icon = 'text-short';
     protected $categories = ['information'];
     protected $collectsValue = false;

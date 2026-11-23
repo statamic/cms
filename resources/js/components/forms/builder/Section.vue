@@ -33,6 +33,10 @@ const addLinkFieldsPlaceholder = () => {
     dirty();
 };
 
+const [emptySectionTextBefore, emptySectionTextAfter] = __('statamic::messages.form_builder_empty_section')
+    .split(':link')
+    .map((text) => text.trim());
+
 const toggleCollapsed = () => {
     props.section.collapsibleInteracted = true;
     props.section.collapsed = !props.section.collapsed;
@@ -212,8 +216,9 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                             :class="{ 'h-[670px]': isOnlySection, 'h-[200px]': !isOnlySection }"
                         >
                             <div>
-                                <span class="text-zinc-500 mr-2">{{ __('Drag fields here to build your form or') }}</span>
+                                <span v-if="emptySectionTextBefore" class="text-zinc-500 mr-2">{{ emptySectionTextBefore }}</span>
                                 <Button size="xs" pill icon="link" :text="__('Link Existing')" @click="addLinkFieldsPlaceholder" />
+                                <span v-if="emptySectionTextAfter" class="text-zinc-500 ml-2">{{ emptySectionTextAfter }}</span>
                             </div>
                         </div>
                     </div>
@@ -248,7 +253,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
                                     class="border border-dashed rounded-lg p-4 flex items-center justify-center"
                                     @click.stop="isInspectingLinkFields(field) || inspectLinkFields(field)"
                                 >
-                                    <span class="text-zinc-500 mr-2">{{ __('Select a field or fieldset to import') }}</span>
+                                    <span class="text-zinc-500 mr-2">{{ __('statamic::messages.form_builder_select_field_to_import') }}</span>
                                 </div>
 
                                 <ImportField
@@ -281,7 +286,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
         <ConfirmationModal
             v-model:open="confirmingDelete"
             :title="__('Delete Section')"
-            :body-text="__('Are you sure you want to delete this section? All fields in this section will also be deleted.')"
+            :body-text="__('statamic::messages.form_builder_delete_section_confirmation')"
             :button-text="__('Delete')"
             danger
             @confirm="deleteSection"
@@ -290,7 +295,7 @@ const isFieldInLastRow = (index): boolean => index >= rowBoundaries.value.lastRo
         <ConfirmationModal
             v-model:open="confirmingFieldDeletion"
             :title="__('Delete Field')"
-            :body-text="__('Are you sure you want to delete this field? This action cannot be undone.')"
+            :body-text="__('statamic::messages.form_builder_delete_field_confirmation')"
             :button-text="__('Delete')"
             danger
             @confirm="deleteField"

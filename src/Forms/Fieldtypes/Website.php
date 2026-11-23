@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Website extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = "Collects a website address and ensures it's properly formatted.";
     protected $icon = 'website';
     protected $categories = ['contact'];
     protected $keywords = ['url'];

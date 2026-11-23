@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class LongAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'textarea';
-    protected $description = 'A larger field for detailed responses, comments, or messages.';
     protected $icon = 'text-long';
     protected $categories = ['text'];
     protected $keywords = ['textarea'];

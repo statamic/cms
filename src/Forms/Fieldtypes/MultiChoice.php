@@ -17,7 +17,6 @@ class MultiChoice extends FormFieldtype
     use HasHideableOptions;
 
     protected static $fieldtype = 'radio';
-    protected $description = 'A question with a range of answer options. Respondents can only choose one answer.';
     protected $icon = 'fieldtype-radio';
     protected $categories = ['choice'];
     protected $keywords = ['radio'];

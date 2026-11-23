@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class ImageChoice extends FormFieldtype
 {
     protected static $fieldtype = 'image_choice';
-    protected $description = 'An image-based choice selector for visual options.';
     protected $icon = 'image-select';
     protected $categories = ['choice', 'media'];
     protected $order = 5;

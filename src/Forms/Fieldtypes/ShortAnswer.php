@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class ShortAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = 'A simple field for short, one-line answers.';
     protected $icon = 'text-short';
     protected $categories = ['text'];
     protected $keywords = ['text'];

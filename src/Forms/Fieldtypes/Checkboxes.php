@@ -17,7 +17,6 @@ class Checkboxes extends FormFieldtype
     use HasHideableOptions;
 
     protected static $fieldtype = 'checkboxes';
-    protected $description = 'Respondents can select multiple options from a list.';
     protected $icon = 'fieldtype-checkboxes';
     protected $categories = ['choice'];
     protected $order = 4;

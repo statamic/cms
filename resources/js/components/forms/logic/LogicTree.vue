@@ -288,7 +288,7 @@ onUnmounted(() => {
                                             'ring-1 ring-blue-500': isFieldSelected(field),
                                         }"
                                         :style="fieldConnection(field) ? { '--end-connection': fieldConnection(field).endConnection } : null"
-                                        v-tooltip="field.type === 'import' ? __(`Logic can't be added to imported fields. Please edit the fieldset instead.`) : null"
+                                        v-tooltip="field.type === 'import' ? __('statamic::messages.form_logic_imported_field_unsupported') : null"
                                         @click="selectField(field)"
                                     >
                                         <LogicTreeFieldset v-if="field.type === 'import'" :field="field" />

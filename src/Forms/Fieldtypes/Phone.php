@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Phone extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = 'A field for collecting phone numbers.';
     protected $icon = 'mail-sign-hashtag';
     protected $categories = ['contact'];
     protected $order = 4;

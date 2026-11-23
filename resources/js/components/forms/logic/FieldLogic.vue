@@ -156,7 +156,7 @@ watch(
             <LogicEmptyState
                 v-if="fieldsWithLogic.length === 0"
                 :heading="__('No field logic yet')"
-                :description="__('Show or hide fields based on previous answers.')"
+                :description="__('statamic::messages.form_logic_field_empty_description')"
             >
                 <AddLogicRuleButton
                     v-if="availableFields.length > 0"

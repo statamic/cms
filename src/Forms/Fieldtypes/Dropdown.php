@@ -17,7 +17,6 @@ class Dropdown extends FormFieldtype
     use HasHideableOptions;
 
     protected static $fieldtype = 'select';
-    protected $description = 'A dropdown list where respondents pick from your options.';
     protected $icon = 'fieldtype-select';
     protected $categories = ['choice'];
     protected $keywords = ['select'];

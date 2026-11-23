@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Name extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = "Collects someone's name.";
     protected $icon = 'user-avatar-flush';
     protected $categories = ['contact'];
     protected $order = 1;

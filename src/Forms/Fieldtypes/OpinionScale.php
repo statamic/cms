@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class OpinionScale extends FormFieldtype
 {
     protected static $fieldtype = 'opinion_scale';
-    protected $description = 'An opinion scale for measuring agreement or satisfaction.';
     protected $icon = 'scale-up';
     protected $categories = ['rate'];
     protected $order = 2;

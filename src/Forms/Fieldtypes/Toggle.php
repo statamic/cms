@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class Toggle extends FormFieldtype
 {
     protected static $fieldtype = 'toggle';
-    protected $description = 'A simple yes or no switch.';
     protected $icon = 'fieldtype-toggle';
     protected $categories = ['choice'];
     protected $order = 5;

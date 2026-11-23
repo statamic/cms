@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Spacer extends FormFieldtype
 {
     protected static $fieldtype = 'spacer';
-    protected $description = 'Add visual spacing between form fields.';
     protected $icon = 'fieldtype-width';
     protected $categories = ['structure'];
     protected $collectsValue = false;
