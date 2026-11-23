@@ -163,3 +163,8 @@ main.nav-closed {
 body > .draggable-mirror {
     z-index: var(--z-index-draggable);
 }
+
+/* Don't clone expanded set bodies into the drag mirror. */
+body > .draggable-mirror [data-set-body] {
+    display: none;
+}

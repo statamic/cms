@@ -129,9 +129,9 @@ export default {
                 if (source?.matches?.('[data-drag-handle]')) {
                     source.dispatchEvent(new CustomEvent('statamic-drag-start'));
                 }
-                this.$emit('dragstart');
+                this.$emit('dragstart', event);
             });
-            this.sortable.on('drag:stop', () => this.$emit('dragend'));
+            this.sortable.on('drag:stop', (event) => this.$emit('dragend', event));
 
             this.sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
                 this.$emit('update:model-value', arrayMove(this.modelValue, oldIndex, newIndex));

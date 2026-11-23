@@ -21,18 +21,18 @@ import { Motion } from 'motion-v';
 const { blueprint, container, visibleValues, extraValues, revealerValues, asConfig, hiddenFields, setHiddenField } = injectContainerContext();
 const tab = injectTabContext();
 const visibleSections = computed(() => {
+    const showField = new ShowField(
+        visibleValues.value,
+        extraValues.value,
+        visibleValues.value,
+        revealerValues.value,
+        hiddenFields.value,
+        setHiddenField,
+        { container },
+    );
+
     return tab.value.sections.filter((section) => {
-        return section.fields.some((field) => {
-            return new ShowField(
-                visibleValues.value,
-                extraValues.value,
-                visibleValues.value,
-                revealerValues.value,
-                hiddenFields.value,
-                setHiddenField,
-                { container }
-            ).showField(field, field.handle);
-        });
+        return section.fields.some((field) => showField.showField(field, field.handle));
     });
 });
 
