@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue';
 import axios from 'axios';
 import { usePage } from '@inertiajs/vue3';
-import { Button, Field, Input, Textarea } from '@ui';
+import { Button, Field, Icon, Input, Textarea } from '@ui';
 import { pretendSave } from './mock-runs.js';
 
 // Prototype: a new saved prompt, made from the chat's / menu rather than on Settings → AI. Just a name and instructions: it's offered everywhere,
@@ -22,6 +22,9 @@ const emit = defineEmits(['saved', 'cancel']);
 const name = ref(props.from ? props.from.replace(/-/g, ' ').replace(/^./, (letter) => letter.toUpperCase()) : '');
 const instructions = ref('');
 const isImage = props.startsFrom !== null;
+
+// The /command in a key, as in the list of skills (see AiChatPrompts.vue). A long one is cut short with "…", so it never pushes the row wider.
+const keyClass = 'inline-flex h-5 max-w-[45%] min-w-0 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700';
 const errors = ref({});
 const saving = ref(false);
 
@@ -117,9 +120,14 @@ function onKeydown(event) {
 </script>
 
 <template>
-    <!-- A heading like the saved prompts', then the fields, then the buttons -->
+    <!-- A heading, then the fields, then one row along the foot: what you'll type to run it on the left, and the buttons on the right -->
     <div ref="root" tabindex="-1" class="space-y-2 p-2 outline-none" @keydown="onKeydown">
-        <p class="px-1 text-xs text-gray-500 dark:text-gray-400">{{ __('New skill') }}</p>
+        <!-- The chat's icon in front of the title, which says which kind of skill it makes: a chat skill in the chat, an image skill in the
+             image's AI card -->
+        <h3 class="flex items-center gap-2 px-1 pt-0.5 pb-1 text-sm font-medium text-gray-900 dark:text-white">
+            <Icon name="ai-chat" class="size-4 text-gray-500 dark:text-gray-400" />
+            {{ isImage ? __('New image skill') : __('New chat skill') }}
+        </h3>
 
         <!-- No card round the fields: the popup is already white and the inputs have their own borders -->
         <div class="space-y-3 px-1 py-1">
@@ -129,19 +137,22 @@ function onKeydown(event) {
             <Field :label="__('Instructions')" :error="errors.instructions?.[0]">
                 <Textarea v-model="instructions" rows="3" :placeholder="isImage ? __('What to change, and how it should look.') : __('What the AI should do, as you would ask a colleague.')" />
             </Field>
-            <!-- What you'll type to run it, so you know before saving -->
-            <p class="flex min-h-5 items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                <template v-if="command">
-                    {{ __('Run it with') }}
-                    <span class="inline-flex h-5 items-center rounded-md bg-gray-100 px-1.5 text-2xs font-medium text-gray-600 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">/{{ command }}</span>
-                </template>
-                <template v-else>{{ __('Offered everywhere. Limit it on Settings → AI.') }}</template>
-            </p>
         </div>
 
-        <div class="flex items-center justify-end gap-2 px-1">
-            <Button size="sm" variant="ghost" :text="__('Cancel')" @click="emit('cancel')" />
-            <Button size="sm" variant="primary" :text="__('Save')" :loading="saving" :disabled="!name.trim() || !instructions.trim()" @click="save" />
+        <!-- What you'll type to run it, so you know before saving, beside the buttons. A long command is cut short with "…", so the buttons
+             stay put. -->
+        <div class="flex items-center justify-between gap-2 px-1">
+            <p class="flex min-h-5 min-w-0 items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                <template v-if="command">
+                    <span class="shrink-0">{{ __('Run it with') }}</span>
+                    <span :class="keyClass" class="max-w-none!"><span class="truncate">/{{ command }}</span></span>
+                </template>
+                <template v-else>{{ __('Offered everywhere.') }}</template>
+            </p>
+            <div class="flex shrink-0 items-center gap-2">
+                <Button size="sm" variant="ghost" :text="__('Cancel')" @click="emit('cancel')" />
+                <Button size="sm" variant="primary" :text="__('Save')" :loading="saving" :disabled="!name.trim() || !instructions.trim()" @click="save" />
+            </div>
         </div>
     </div>
 </template>
