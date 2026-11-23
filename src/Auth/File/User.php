@@ -184,10 +184,6 @@ class User extends BaseUser
             if ($file['id'] === (string) $this->id()) {
                 return ['path' => $candidate, 'data' => $file['data']];
             }
-
-            if ($file['id'] === null) {
-                return ['path' => $candidate, 'data' => null];
-            }
         }
 
         if (! $initial) {
@@ -223,15 +219,14 @@ class User extends BaseUser
             $data = null;
         }
 
-        return [
-            'id' => isset($data['id']) ? (string) $data['id'] : null,
-            'data' => isset($data['id']) ? $data : null,
-        ];
+        $id = is_array($data) && ($data['id'] ?? null) ? (string) $data['id'] : null;
+
+        return ['id' => $id, 'data' => $id === null ? null : $data];
     }
 
     protected function mergeStoredAccess(array $current)
     {
-        if (! $this->storedAccess || ! $current['data']) {
+        if (! $this->storedAccess) {
             return;
         }
 

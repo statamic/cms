@@ -482,6 +482,54 @@ class FileUserTest extends TestCase
     }
 
     #[Test]
+    public function it_gives_an_id_to_a_file_with_an_empty_id()
+    {
+        $this->makeUser()->id('123')->email('john@example.com')->save();
+        $path = $this->makeUser()->email('jane@example.com')->path();
+        File::put($path, "id: ''\nname: Jane\n");
+
+        $user = Stache::store('users')->makeItemFromFile($path, File::get($path));
+
+        $this->assertNotEmpty($user->id());
+        $this->assertSame((string) $user->id(), (string) YAML::file($path)->parse()['id']);
+    }
+
+    #[Test]
+    public function it_does_not_save_a_deleted_user_over_a_file_without_an_id_at_its_old_path()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->makeSuper();
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->delete();
+        File::put($path, "name: Someone\n");
+
+        $this->assertFalse($copy->set('name', 'John')->save());
+        $this->assertSame("name: Someone\n", File::get($path));
+
+        $copy->delete();
+        $this->assertSame("name: Someone\n", File::get($path));
+    }
+
+    #[Test]
+    public function it_follows_a_renamed_file_when_a_file_without_an_id_is_at_its_old_path()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->email('jane@example.com')->save();
+        File::put($path, "name: Someone\n");
+
+        $copy->set('foo', 'bar')->save();
+
+        $this->assertSame("name: Someone\n", File::get($path));
+        $this->assertSame('bar', YAML::file(dirname($path).'/jane@example.com.yaml')->parse()['foo']);
+    }
+
+    #[Test]
     public function it_keeps_two_factor_changes_made_after_it_was_loaded()
     {
         $user = $this->makeUser()->id('123')->email('john@example.com')

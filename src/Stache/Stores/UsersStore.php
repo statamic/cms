@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Contracts\Auth\Passkey;
+use Statamic\Facades\File;
 use Statamic\Facades\Role as UserRole;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -69,7 +70,7 @@ class UsersStore extends BasicStore
             }));
 
         if (Arr::get($data, 'password') || isset($idGenerated)) {
-            $user->writeFile();
+            File::put($path, $user->fileContents());
         }
 
         // $this->queueGroups($user);
