@@ -135,7 +135,8 @@ trait RendersForms
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
         $missing = Str::random();
-        $old = old($field->handle(), $missing);
+        $hasOld = ! $field->form() || $errors->any();
+        $old = $hasOld ? old($field->handle(), $missing) : $missing;
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;
 
@@ -153,7 +154,7 @@ trait RendersForms
             'instructions' => $field->instructions(),
             'error' => $errors->first($field->handle()) ?: null,
             'default' => $default,
-            'old' => old($field->handle()),
+            'old' => $hasOld ? old($field->handle()) : null,
             'value' => $value,
         ], $field->fieldtype()->extraRenderableFieldData());
 
