@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Facades\Statamic\Fields\Validator as FieldValidator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
@@ -55,6 +56,16 @@ class SubmitForm
     }
 
     public function submit(array $data, array $files = []): SubmissionResult
+    {
+        if (! $this->form->get('submission_limit')) {
+            return $this->process($data, $files);
+        }
+
+        return Cache::lock('form-submission-limit-'.$this->form->handle(), 60)
+            ->block(30, fn () => $this->process($data, $files));
+    }
+
+    private function process(array $data, array $files): SubmissionResult
     {
         throw_if($this->form->restricted(), new FormRestrictedException($this->form));
 
