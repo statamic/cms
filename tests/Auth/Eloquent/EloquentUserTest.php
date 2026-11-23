@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Hash;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
@@ -261,6 +262,75 @@ class EloquentUserTest extends TestCase
 
         $this->assertSame(['direct'], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
         $this->assertSame(['usergroup'], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
+    #[Test]
+    public function it_keeps_roles_and_groups_removed_after_they_were_loaded()
+    {
+        $role = Facades\Role::make('author');
+        $group = (new UserGroup)->handle('editors');
+        Facades\Role::shouldReceive('find')->with('author')->andReturn($role);
+        Facades\UserGroup::shouldReceive('find')->with('editors')->andReturn($group);
+
+        $user = $this->createPermissible()->assignRole($role)->addToGroup($group);
+        $user->save();
+
+        $copy = (new EloquentUser)->model(User::find($user->id()));
+        $copy->permissions();
+
+        $admin = (new EloquentUser)->model(User::find($user->id()));
+        $admin->explicitRoles([])->groups([]);
+        $admin->save();
+
+        $copy->password('new-secret')->save();
+
+        $this->assertSame([], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
+        $this->assertSame([], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
+    #[Test]
+    public function it_saves_roles_changed_through_a_copy_loaded_before_another_change()
+    {
+        $author = Facades\Role::make('author');
+        $publisher = Facades\Role::make('publisher');
+        $group = (new UserGroup)->handle('editors');
+        Facades\Role::shouldReceive('find')->with('author')->andReturn($author);
+        Facades\Role::shouldReceive('find')->with('publisher')->andReturn($publisher);
+        Facades\UserGroup::shouldReceive('find')->with('editors')->andReturn($group);
+
+        $user = $this->createPermissible()->assignRole($author);
+        $user->save();
+
+        $copy = (new EloquentUser)->model(User::find($user->id()));
+        $copy->permissions();
+
+        $admin = (new EloquentUser)->model(User::find($user->id()));
+        $admin->addToGroup($group);
+        $admin->save();
+
+        $copy->assignRole($publisher)->save();
+
+        $this->assertEqualsCanonicalizing(['author', 'publisher'], \DB::table(config('statamic.users.tables.role_user', 'role_user'))->where('user_id', $user->id())->pluck('role_id')->all());
+        $this->assertSame(['editors'], \DB::table(config('statamic.users.tables.group_user', 'group_user'))->where('user_id', $user->id())->pluck('group_id')->all());
+    }
+
+    #[Test]
+    public function it_keeps_a_password_and_super_changed_after_they_were_loaded()
+    {
+        $user = $this->createPermissible()->password('old-secret')->makeSuper();
+        $user->save();
+
+        $copy = (new EloquentUser)->model(User::find($user->id()));
+
+        $admin = (new EloquentUser)->model(User::find($user->id()));
+        $admin->password('reset-secret')->set('super', false)->save();
+
+        $copy->set('name', 'John')->save();
+
+        $model = User::find($user->id());
+        $this->assertTrue(Hash::check('reset-secret', $model->password));
+        $this->assertFalse((bool) $model->super);
+        $this->assertSame('John', $model->name);
     }
 
     public function makeUser()

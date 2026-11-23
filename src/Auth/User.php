@@ -207,6 +207,10 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
+        if ($isNew && $this->wasDeleted()) {
+            return false;
+        }
+
         if ($withEvents) {
             if ($isNew && UserCreating::dispatch($this) === false) {
                 return false;
@@ -234,6 +238,11 @@ abstract class User implements Arrayable, ArrayAccess, Augmentable, Authenticata
         $this->syncOriginal();
 
         return $this;
+    }
+
+    protected function wasDeleted(): bool
+    {
+        return false;
     }
 
     public function deleteQuietly()

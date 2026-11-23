@@ -26,6 +26,7 @@ class User extends BaseUser
 {
     use ContainsData, ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty {
         data as traitData;
+        writeFile as traitWriteFile;
     }
 
     protected $id;
@@ -33,6 +34,7 @@ class User extends BaseUser
     protected Collection $passkeys;
     protected $password;
     protected $permissions;
+    protected $storedAccess;
 
     public function __construct()
     {
@@ -115,6 +117,75 @@ class User extends BaseUser
             rtrim(Stache::store('users')->directory(), '/'),
             $this->email(),
         ]);
+    }
+
+    public function deleteFile()
+    {
+        File::delete($this->path());
+
+        $this->initialPath(null);
+    }
+
+    protected function wasDeleted(): bool
+    {
+        return $this->initialPath() && ! File::exists($this->initialPath());
+    }
+
+    public function writeFile($path = null)
+    {
+        $this->mergeStoredAccess();
+
+        $this->traitWriteFile($path);
+
+        $this->syncStoredAccess();
+    }
+
+    public function syncStoredAccess()
+    {
+        $this->storedAccess = $this->currentAccess();
+
+        return $this;
+    }
+
+    protected function mergeStoredAccess()
+    {
+        $path = $this->initialPath();
+
+        if (! $this->storedAccess || ! $path || ! File::exists($path)) {
+            return;
+        }
+
+        $stored = YAML::file($path)->parse();
+
+        if ((string) ($stored['id'] ?? '') !== (string) $this->id()) {
+            return;
+        }
+
+        $current = $this->currentAccess();
+
+        foreach ($this->storedAccess as $key => $value) {
+            if ($current[$key] !== $value) {
+                continue;
+            }
+
+            if ($key === 'password_hash') {
+                $this->passwordHash($stored[$key] ?? $value);
+            } elseif (Arr::has($stored, $key)) {
+                $this->set($key, $stored[$key]);
+            } else {
+                $this->remove($key);
+            }
+        }
+    }
+
+    protected function currentAccess()
+    {
+        return [
+            'roles' => $this->get('roles') ?? [],
+            'groups' => $this->get('groups') ?? [],
+            'super' => (bool) $this->get('super'),
+            'password_hash' => $this->passwordHash(),
+        ];
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Tests\Auth;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -11,11 +12,18 @@ use Statamic\Auth\File\Passkey;
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Events\UserCreated;
+use Statamic\Events\UserSaved;
+use Statamic\Facades\File;
 use Statamic\Facades\Role;
 use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\Stache;
+use Statamic\Facades\User as UserAPI;
 use Statamic\Facades\UserGroup;
 use Statamic\Facades\UserGroup as UserGroupAPI;
+use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Webauthn\PublicKeyCredentialSource;
@@ -216,6 +224,145 @@ class FileUserTest extends TestCase
 
         $this->assertEquals('A', $user->getSupplement('bar'));
         $this->assertEquals('B', $clone->getSupplement('bar'));
+    }
+
+    #[Test]
+    public function it_does_not_save_a_user_that_was_deleted_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->password('secret');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->delete();
+
+        Event::fake();
+
+        $this->assertFalse($copy->password('new-secret')->save());
+        $this->assertFileDoesNotExist($path);
+        $this->assertNull(UserAPI::find('123'));
+        Event::assertNotDispatched(UserCreated::class);
+        Event::assertNotDispatched(UserSaved::class);
+    }
+
+    #[Test]
+    public function it_saves_a_user_again_after_deleting_it()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com');
+        $user->save();
+        $user->delete();
+
+        $this->assertFileDoesNotExist($user->path());
+
+        $this->assertSame($user, $user->save());
+        $this->assertFileExists($user->path());
+        $this->assertNotNull(UserAPI::find('123'));
+    }
+
+    #[Test]
+    public function it_keeps_access_changed_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->assignRole('author')->addToGroup('editors')->makeSuper();
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->removeRole('author')->removeFromGroup('editors')->set('super', false)->save();
+
+        $copy->password('new-secret')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertEmpty($yaml['roles'] ?? []);
+        $this->assertEmpty($yaml['groups'] ?? []);
+        $this->assertFalse($yaml['super'] ?? false);
+        $this->assertEmpty(UserAPI::find('123')->get('roles'));
+        $this->assertTrue(Hash::check('new-secret', UserAPI::find('123')->password()));
+    }
+
+    #[Test]
+    public function it_saves_access_changed_through_a_copy_loaded_before_another_change()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->assignRole('author');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->addToGroup('editors')->save();
+
+        $copy->assignRole('publisher')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertEquals(['author', 'publisher'], $yaml['roles'] ?? []);
+        $this->assertEquals(['editors'], $yaml['groups'] ?? []);
+    }
+
+    #[Test]
+    public function it_keeps_a_password_reset_after_it_was_loaded()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->password('old-secret');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        UserAPI::find('123')->password('reset-secret')->save();
+
+        $copy->set('name', 'John')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertTrue(Hash::check('reset-secret', $yaml['password_hash']));
+        $this->assertSame('John', $yaml['name']);
+        $this->assertTrue(Hash::check('reset-secret', UserAPI::find('123')->password()));
+    }
+
+    #[Test]
+    public function it_hashes_a_plain_text_password_from_its_file()
+    {
+        $path = $this->makeUser()->email('john@example.com')->path();
+        File::put($path, "id: '123'\npassword: secret\n");
+
+        $user = Stache::store('users')->makeItemFromFile($path, File::get($path));
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertTrue(Hash::check('secret', $user->password()));
+        $this->assertTrue(Hash::check('secret', $yaml['password_hash']));
+        $this->assertArrayNotHasKey('password', $yaml);
+    }
+
+    #[Test]
+    public function it_keeps_its_own_access_when_its_file_is_read_while_empty()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->password('secret')->assignRole('author')->makeSuper();
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        File::put($path, '');
+
+        $copy->set('name', 'John')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertTrue(Hash::check('secret', $yaml['password_hash']));
+        $this->assertSame(['author'], $yaml['roles']);
+        $this->assertTrue($yaml['super']);
+        $this->assertSame('John', $yaml['name']);
+    }
+
+    #[Test]
+    public function it_keeps_its_own_password_when_its_file_is_read_while_partially_written()
+    {
+        $user = $this->makeUser()->id('123')->email('john@example.com')->password('secret')->assignRole('author');
+        $user->save();
+        $path = $user->path();
+
+        $copy = Stache::store('users')->makeItemFromFile($path, File::get($path));
+        File::put($path, Str::before(File::get($path), 'password_hash'));
+
+        $copy->set('name', 'John')->save();
+
+        $yaml = YAML::file($path)->parse();
+        $this->assertTrue(Hash::check('secret', $yaml['password_hash']));
+        $this->assertSame(['author'], $yaml['roles']);
+        $this->assertSame('John', $yaml['name']);
     }
 
     #[Test]

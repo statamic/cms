@@ -74,6 +74,6 @@ class UsersStore extends BasicStore
 
         // $this->queueGroups($user);
 
-        return $user;
+        return $user->syncStoredAccess();
     }
 }
