@@ -1,8 +1,34 @@
 <template>
-    <div class="page-tree-branch flex" :class="{ 'page-tree-branch--has-children': hasChildren }">
+    <div
+        class="page-tree-branch flex"
+        :class="{ 'page-tree-branch--has-children': hasChildren, 'focus-outline': moving }"
+        :data-moving="moving || undefined"
+    >
+        <!-- While it's being moved with the keyboard: the arrow keys it takes, inside the row before its menu, as the panel clips anything
+             outside it -->
+        <KeyboardReorderIndicator :moving="moving" side="inside" :keys="['←', '↑', '↓', '→']" />
         <slot name="branch-action" :branch="page">
-            <div v-if="editable" class="page-move w-6" />
+            <!-- The handle: drag it, or click it or press Space to move it with the arrow keys. Focus comes back here when you're done. -->
+            <DragHandle
+                v-if="editable && canKeyboardMove"
+                keyboard-reorder
+                :keyboard-instructions="__('messages.keyboard_tree_reorder_handle_instructions')"
+                class="w-6 shrink-0 self-stretch h-auto!"
+                data-reorder-focus
+                @keyboard-reorder="startMoving('start')"
+            />
+            <div v-else-if="editable" class="page-move w-6" />
         </slot>
+        <!-- Holds focus while it's moving, so the arrow keys come to it rather than the tree. Only there while moving, as the tree's
+             items take their names from everything in them, and its instructions would be read out on every one. -->
+        <button
+            v-if="canKeyboardMove && moving"
+            ref="reorderFocusEl"
+            type="button"
+            class="sr-only"
+            :aria-label="__('messages.keyboard_tree_reorder_instructions')"
+        />
+        <div v-if="canKeyboardMove" class="sr-only" aria-live="polite">{{ reorderStatus }}</div>
         <div class="flex flex-1 items-center px-1.5 text-xs leading-normal">
             <div class="flex gap-2 sm:gap-3 grow items-center py-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
@@ -62,9 +88,13 @@
                         :depth="depth"
                         :remove-branch="remove"
                         :is-root="isRoot"
+                        :can-move="canKeyboardMove"
+                        :start-moving="() => startMoving('end')"
                     >
                         <Dropdown placement="left-start" :class="{ invisible: isRoot }">
                             <DropdownMenu>
+                                <DropdownItem v-if="canKeyboardMove" :text="__('Move')" icon="move-vertical" @click="startMoving('end')" />
+                                <DropdownSeparator v-if="canKeyboardMove" />
                                 <slot
                                     name="branch-options"
                                     :branch="page"
@@ -81,11 +111,14 @@
 </template>
 
 <script>
-import { Dropdown, DropdownMenu, Icon } from '@/components/ui';
+import { computed, inject } from 'vue';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSeparator, DragHandle, Icon } from '@/components/ui';
 import { Link } from '@inertiajs/vue3';
+import { useKeyboardItemReorder } from '@/composables/keyboard-item-reorder.js';
+import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
 export default {
-    components: { Link, Dropdown, DropdownMenu, Icon },
+    components: { Link, Dropdown, DropdownItem, DropdownMenu, DropdownSeparator, DragHandle, Icon, KeyboardReorderIndicator },
     props: {
         page: Object,
         depth: Number,
@@ -97,6 +130,40 @@ export default {
         showSlugs: Boolean,
         editable: { type: Boolean, default: true },
         stat: Object,
+    },
+
+    // Moving it with the keyboard, as replicator sets do (see keyboard-item-reorder.js): ↑ and ↓ within its level, → to nest it under the
+    // page above, ← to move it out a level. The tree (PageTree.vue) knows the rules (max depth, the root page) and does the moving.
+    setup(props) {
+        const tree = inject('pageTreeKeyboard', null);
+        const canKeyboardMove = computed(() => !!tree && props.editable && !props.root);
+
+        const {
+            moving,
+            rootEl: reorderFocusEl,
+            status: reorderStatus,
+            startMoving,
+        } = useKeyboardItemReorder({
+            index: () => tree?.indexOf(props.stat) ?? 0,
+            total: () => tree?.siblingsOf(props.stat).length ?? 0,
+            canMoveUp: () => !!tree?.canMoveUp(props.stat),
+            canMoveDown: () => !!tree?.canMoveDown(props.stat),
+            canIndent: () => !!tree?.canIndent(props.stat),
+            canOutdent: () => !!tree?.canOutdent(props.stat),
+            onMove: (from, to) => tree?.move(props.stat, to > from ? 'down' : 'up'),
+            onIndent: () => tree?.move(props.stat, 'in'),
+            onOutdent: () => tree?.move(props.stat, 'out'),
+            positionKey: () => (tree ? tree.positionKey(props.stat) : ''),
+            positionMessage: () =>
+                __('messages.keyboard_tree_reorder_position', {
+                    level: props.stat.level,
+                    current: (tree?.indexOf(props.stat) ?? 0) + 1,
+                    total: tree?.siblingsOf(props.stat).length ?? 0,
+                }),
+            instructions: () => __('messages.keyboard_tree_reorder_instructions'),
+        });
+
+        return { canKeyboardMove, moving, reorderFocusEl, reorderStatus, startMoving };
     },
 
     data() {

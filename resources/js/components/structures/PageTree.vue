@@ -124,6 +124,25 @@ export default {
         blueprints: { type: Array },
     },
 
+    // Moving a page with the keyboard (see Branch.vue): each branch asks the tree what it can do and has it do the moving, so the same rules
+    // apply as for dragging. Only an editable tree offers it.
+    provide() {
+        if (!this.editable) return {};
+
+        return {
+            pageTreeKeyboard: {
+                siblingsOf: (stat) => this.siblingsOf(stat),
+                indexOf: (stat) => this.siblingsOf(stat).indexOf(stat),
+                canMoveUp: (stat) => this.canKeyboardMove(stat, 'up'),
+                canMoveDown: (stat) => this.canKeyboardMove(stat, 'down'),
+                canIndent: (stat) => this.canKeyboardMove(stat, 'in'),
+                canOutdent: (stat) => this.canKeyboardMove(stat, 'out'),
+                move: (stat, direction) => this.keyboardMove(stat, direction),
+                positionKey: (stat) => `${stat.parent?.data.id ?? ''}|${this.siblingsOf(stat).indexOf(stat)}|${stat.level}`,
+            },
+        };
+    },
+
     data() {
         return {
             loading: false,
@@ -398,6 +417,67 @@ export default {
 
         nodeClosed(node) {
             this.collapsedState.push(node.data.id);
+        },
+
+        // The pages beside this one, at its level: its parent's children, or the top level
+        siblingsOf(stat) {
+            return stat.parent ? stat.parent.children : (this.$refs.tree?.stats ?? []);
+        },
+
+        // How many levels this page and its children take up, counting itself as one
+        heightOf(stat) {
+            return 1 + Math.max(0, ...stat.children.map((child) => this.heightOf(child)));
+        },
+
+        // Whether a page can move up or down past the page beside it, in under the page above it, or out a level. The same rules as
+        // dragging: nothing goes above, or into, the root page, and nothing nests deeper than the structure's max depth.
+        canKeyboardMove(stat, direction) {
+            if (this.isRoot(stat)) return false;
+
+            const siblings = this.siblingsOf(stat);
+            const index = siblings.indexOf(stat);
+            const firstMovable = this.expectsRoot && !stat.parent ? 1 : 0;
+
+            switch (direction) {
+                case 'up':
+                    return index > firstMovable;
+                case 'down':
+                    return index > -1 && index < siblings.length - 1;
+                case 'in': {
+                    const above = siblings[index - 1];
+                    if (!above || this.isRoot(above)) return false;
+                    return stat.level + this.heightOf(stat) <= this.maxDepth;
+                }
+                case 'out':
+                    return !!stat.parent;
+            }
+
+            return false;
+        },
+
+        keyboardMove(stat, direction) {
+            if (!this.canKeyboardMove(stat, direction)) return;
+
+            const tree = this.$refs.tree;
+            const siblings = this.siblingsOf(stat);
+            const index = siblings.indexOf(stat);
+
+            if (direction === 'up' || direction === 'down') {
+                tree.move(stat, stat.parent || null, direction === 'up' ? index - 1 : index + 1);
+            } else if (direction === 'in') {
+                // Into the page above, as its last child, opening it so you can see where it went
+                const above = siblings[index - 1];
+                above.open = true;
+                const collapsed = this.collapsedState.indexOf(above.data.id);
+                if (collapsed > -1) this.collapsedState.splice(collapsed, 1);
+                tree.move(stat, above, above.children.length);
+            } else if (direction === 'out') {
+                // Out of its parent, to just after it
+                const parent = stat.parent;
+                tree.move(stat, parent.parent || null, this.siblingsOf(parent).indexOf(parent) + 1);
+            }
+
+            this.treeUpdated();
         },
 
         statHandler(stat) {
