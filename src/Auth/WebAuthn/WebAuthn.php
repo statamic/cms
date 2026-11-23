@@ -55,6 +55,10 @@ class WebAuthn
             $user->id()
         );
 
+        if (! $passkey->user()?->passkeys()->has($passkey->id())) {
+            throw new Exception(__('No matching passkey found'));
+        }
+
         $passkey
             ->setCredential($publicKeyCredentialSource)
             ->setLastLogin(now())

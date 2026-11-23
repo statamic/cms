@@ -222,11 +222,16 @@ class WebAuthnTest extends TestCase
         $mockPasskey->shouldReceive('setCredential')->andReturnSelf();
         $mockPasskey->shouldReceive('setLastLogin')->andReturnSelf();
         $mockPasskey->shouldReceive('save')->once();
+        $mockPasskey->shouldReceive('id')->andReturn('test-passkey');
 
         // Mock user passkeys
         $mockUser = Mockery::mock($user);
         $mockUser->shouldReceive('id')->andReturn('test-user');
         $mockUser->shouldReceive('passkeys->first')->andReturn($mockPasskey);
+
+        $currentUser = Mockery::mock($user);
+        $currentUser->shouldReceive('passkeys->has')->with('test-passkey')->andReturnTrue();
+        $mockPasskey->shouldReceive('user')->andReturn($currentUser);
 
         $updatedCredentialSource = Mockery::mock(PublicKeyCredentialSource::class);
 
@@ -273,6 +278,51 @@ class WebAuthnTest extends TestCase
             ->shouldReceive('deserialize')
             ->once()
             ->andReturn($publicKeyCredential);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No matching passkey found');
+
+        $this->webauthn->validateAssertion($mockUser, $credentials);
+    }
+
+    #[Test]
+    public function it_throws_exception_when_the_passkey_was_removed_during_validation()
+    {
+        $user = \Statamic\Facades\User::make()->id('test-user')->email('test@example.com');
+        $user->save();
+
+        $credentials = ['id' => 'credential-id', 'rawId' => 'raw-id', 'response' => [], 'type' => 'public-key'];
+        session()->put('webauthn.challenge', base64_encode(random_bytes(32)));
+
+        $publicKeyCredential = new PublicKeyCredential(
+            'public-key',
+            'test-raw-id',
+            new AuthenticatorAssertionResponse(
+                Mockery::mock(CollectedClientData::class),
+                Mockery::mock(AuthenticatorData::class),
+                'signature',
+                'test-user'
+            )
+        );
+
+        $mockPasskeyCredential = Mockery::mock(PublicKeyCredentialSource::class);
+        $mockPasskeyCredential->publicKeyCredentialId = 'test-raw-id';
+
+        $mockPasskey = Mockery::mock(Passkey::class);
+        $mockPasskey->shouldReceive('credential')->andReturn($mockPasskeyCredential);
+        $mockPasskey->shouldReceive('id')->andReturn('test-passkey');
+        $mockPasskey->shouldNotReceive('save');
+
+        $mockUser = Mockery::mock($user);
+        $mockUser->shouldReceive('id')->andReturn('test-user');
+        $mockUser->shouldReceive('passkeys->first')->andReturn($mockPasskey);
+
+        $currentUser = Mockery::mock($user);
+        $currentUser->shouldReceive('passkeys->has')->with('test-passkey')->andReturnFalse();
+        $mockPasskey->shouldReceive('user')->andReturn($currentUser);
+
+        $this->mockSerializer->shouldReceive('deserialize')->once()->andReturn($publicKeyCredential);
+        $this->mockAssertionValidator->shouldReceive('check')->once()->andReturn(Mockery::mock(PublicKeyCredentialSource::class));
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No matching passkey found');
