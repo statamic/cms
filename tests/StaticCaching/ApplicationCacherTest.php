@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Console\Commands\StaticWarmJob;
+use Statamic\Events\StaticCacheFileDeleting;
+use Statamic\Events\StaticCacheFileWriting;
+use Statamic\Events\StaticCacheFileWritten;
 use Statamic\Events\UrlInvalidated;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
@@ -91,6 +94,28 @@ class ApplicationCacherTest extends TestCase
         $this->assertEquals(['/about'], $cacher->getUrls()->values()->all());
         $this->assertTrue($cacher->hasCachedPage($request));
         $this->assertEquals($content, $cacher->getCachedPage($request)->content);
+    }
+
+    #[Test]
+    public function it_does_not_dispatch_static_cache_file_events()
+    {
+        Event::fake([StaticCacheFileWriting::class, StaticCacheFileWritten::class, StaticCacheFileDeleting::class]);
+
+        $cache = app(Repository::class);
+        $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
+        $request = Request::create('http://example.com/about', 'GET');
+        $response = response('<html>about</html>');
+
+        $cacher->cachePage($request, $response);
+        event(new ResponsePrepared($request, $response));
+        $this->assertTrue($cacher->hasCachedPage($request));
+
+        $cacher->invalidateUrl('/about');
+        $cacher->flush();
+
+        Event::assertNotDispatched(StaticCacheFileWriting::class);
+        Event::assertNotDispatched(StaticCacheFileWritten::class);
+        Event::assertNotDispatched(StaticCacheFileDeleting::class);
     }
 
     #[Test]
