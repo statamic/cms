@@ -9,6 +9,16 @@ class StarRating extends Fieldtype
 {
     protected $selectable = false;
 
+    public function rules(): array
+    {
+        return [
+            'numeric',
+            'min:'.$this->config('min', 1),
+            'max:'.$this->config('max_stars', 5),
+            'multiple_of:'.$this->config('step', 1),
+        ];
+    }
+
     public function previewValue(): mixed
     {
         $min = $this->field()->get('min');

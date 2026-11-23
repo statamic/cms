@@ -70,7 +70,8 @@ class Dropdown extends FormFieldtype
             'placeholder' => $this->config('placeholder'),
             'multiple' => $this->config('multiple'),
             'max_items' => $this->config('max_selections', $this->config('max_items')),
-            ...Arr::except($this->config(), ['type', 'options', 'placeholder', 'multiple', 'max_items', 'max_selections']),
+            'validate' => $this->validationRules(),
+            ...Arr::except($this->config(), ['type', 'options', 'placeholder', 'multiple', 'max_items', 'max_selections', 'validate']),
         ];
     }
 

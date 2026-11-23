@@ -43,7 +43,8 @@ class Checkboxes extends FormFieldtype
         return [
             'type' => 'checkboxes',
             'options' => $this->options(),
-            ...Arr::except($this->config(), ['type', 'options']),
+            'validate' => $this->validationRules(),
+            ...Arr::except($this->config(), ['type', 'options', 'validate']),
         ];
     }
 

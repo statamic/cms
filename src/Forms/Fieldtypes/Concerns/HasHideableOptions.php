@@ -3,7 +3,10 @@
 namespace Statamic\Forms\Fieldtypes\Concerns;
 
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
+use Statamic\Fields\Validator;
 use Statamic\Forms\Charts\ChartOption;
+use Statamic\Forms\Fields\FormValueType;
 use Statamic\Forms\Summary\FieldResponses;
 
 trait HasHideableOptions
@@ -33,6 +36,24 @@ trait HasHideableOptions
             ->map(fn ($option, $key) => (string) ($option['key'] ?? $key))
             ->values()
             ->all();
+    }
+
+    private function visibleOptionKeys(): array
+    {
+        return collect($this->config('options') ?? [])
+            ->reject(fn ($option) => is_array($option) && ($option['hidden'] ?? false) === true)
+            ->map(fn ($option, $key) => (string) (is_array($option) ? ($option['key'] ?? $key) : $key))
+            ->values()
+            ->all();
+    }
+
+    private function validationRules(): array
+    {
+        return [
+            ...Validator::explodeRules($this->config('validate')),
+            ...($this->valueType() === FormValueType::Choices ? ['array'] : []),
+            ...($this->config('taggable') ? [] : [(string) Rule::in($this->visibleOptionKeys())]),
+        ];
     }
 
     public function prepareFrontEndRenderable(array $data): array

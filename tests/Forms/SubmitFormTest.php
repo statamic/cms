@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
@@ -237,6 +238,110 @@ class SubmitFormTest extends TestCase
         $this->expectException(ValidationException::class);
 
         $this->action()->validate(['email' => 'not-an-email'], only: ['email']);
+    }
+
+    #[Test]
+    #[DataProvider('offeredAnswers')]
+    public function it_accepts_answers_the_field_offers(array $field, mixed $answer)
+    {
+        $this->answerAction($field)->validate(['answer' => $answer]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
+    #[DataProvider('unofferedAnswers')]
+    public function it_rejects_answers_the_field_does_not_offer(array $field, mixed $answer)
+    {
+        try {
+            $this->answerAction($field)->validate(['answer' => $answer]);
+
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('answer', $e->errors());
+        }
+    }
+
+    public static function offeredAnswers(): array
+    {
+        return [
+            'star rating' => [['type' => 'star_rating'], 5],
+            'star rating as a string' => [['type' => 'star_rating', 'max_stars' => 3], '3'],
+            'half star rating' => [['type' => 'star_rating', 'allow_half_stars' => true], 0.5],
+            'unanswered star rating' => [['type' => 'star_rating'], null],
+            'lowest opinion scale value' => [['type' => 'opinion_scale'], 0],
+            'highest opinion scale value' => [['type' => 'opinion_scale'], '10'],
+            'unanswered opinion scale' => [['type' => 'opinion_scale'], null],
+            'ranking' => [['type' => 'ranking', 'options' => self::choiceOptions()], ['blue', 'red']],
+            'unanswered ranking' => [['type' => 'ranking', 'options' => self::choiceOptions()], null],
+            'image choice' => [['type' => 'image_choice', 'options' => self::imageOptions()], 'cat'],
+            'multiple image choices' => [['type' => 'image_choice', 'multiple' => true, 'options' => self::imageOptions()], ['cat', 'dog']],
+            'unanswered image choice' => [['type' => 'image_choice', 'multiple' => true, 'options' => self::imageOptions()], null],
+            'checkboxes' => [['type' => 'checkboxes', 'options' => self::choiceOptions()], ['red', 'blue']],
+            'unanswered checkboxes' => [['type' => 'checkboxes', 'options' => self::choiceOptions()], []],
+            'dropdown' => [['type' => 'dropdown', 'options' => self::choiceOptions()], 'red'],
+            'multiple dropdown' => [['type' => 'dropdown', 'multiple' => true, 'options' => self::choiceOptions()], ['red', 'blue']],
+            'unanswered dropdown' => [['type' => 'dropdown', 'options' => self::choiceOptions()], null],
+            'custom value in a taggable dropdown' => [['type' => 'dropdown', 'taggable' => true, 'options' => self::choiceOptions()], 'purple'],
+            'dropdown with pipe-separated rules' => [['type' => 'dropdown', 'validate' => 'required|string', 'options' => self::choiceOptions()], 'red'],
+            'multiple choice' => [['type' => 'multi_choice', 'options' => self::choiceOptions()], 'blue'],
+        ];
+    }
+
+    public static function unofferedAnswers(): array
+    {
+        return [
+            'star rating above max stars' => [['type' => 'star_rating'], 500],
+            'star rating above configured max stars' => [['type' => 'star_rating', 'max_stars' => 3], 4],
+            'star rating below one star' => [['type' => 'star_rating'], 0],
+            'half star rating when not allowed' => [['type' => 'star_rating'], 2.5],
+            'star rating between half stars' => [['type' => 'star_rating', 'allow_half_stars' => true], 2.3],
+            'non numeric star rating' => [['type' => 'star_rating'], 'great'],
+            'opinion scale above max' => [['type' => 'opinion_scale'], 11],
+            'opinion scale below configured min' => [['type' => 'opinion_scale', 'min' => 1, 'max' => 5], 0],
+            'opinion scale above configured max' => [['type' => 'opinion_scale', 'min' => 1, 'max' => 5], 6],
+            'fractional opinion scale' => [['type' => 'opinion_scale'], 2.5],
+            'unknown ranking option' => [['type' => 'ranking', 'options' => self::choiceOptions()], ['red', 'purple']],
+            'hidden ranking option' => [['type' => 'ranking', 'options' => self::choiceOptions()], ['red', 'blue', 'green']],
+            'unknown image choice' => [['type' => 'image_choice', 'options' => self::imageOptions()], 'wolf'],
+            'hidden image choice' => [['type' => 'image_choice', 'options' => self::imageOptions()], 'fox'],
+            'several image choices when not multiple' => [['type' => 'image_choice', 'options' => self::imageOptions()], ['cat', 'dog']],
+            'unknown multiple image choice' => [['type' => 'image_choice', 'multiple' => true, 'options' => self::imageOptions()], ['cat', 'wolf']],
+            'unknown checkbox' => [['type' => 'checkboxes', 'options' => self::choiceOptions()], ['purple']],
+            'hidden checkbox' => [['type' => 'checkboxes', 'options' => self::choiceOptions()], ['red', 'green']],
+            'unknown dropdown option' => [['type' => 'dropdown', 'options' => self::choiceOptions()], 'purple'],
+            'hidden dropdown option' => [['type' => 'dropdown', 'options' => self::choiceOptions()], 'green'],
+            'hidden multiple dropdown option' => [['type' => 'dropdown', 'multiple' => true, 'options' => self::choiceOptions()], ['red', 'green']],
+            'unknown multiple choice option' => [['type' => 'multi_choice', 'options' => self::choiceOptions()], 'purple'],
+            'hidden multiple choice option' => [['type' => 'multi_choice', 'options' => self::choiceOptions()], 'green'],
+        ];
+    }
+
+    private static function choiceOptions(): array
+    {
+        return [
+            ['key' => 'red', 'value' => 'Red'],
+            ['key' => 'blue', 'value' => 'Blue'],
+            ['key' => 'green', 'value' => 'Green', 'hidden' => true],
+        ];
+    }
+
+    private static function imageOptions(): array
+    {
+        return [
+            ['key' => 'cat', 'label' => 'Cat', 'image' => 'https://example.com/cat.jpg'],
+            ['key' => 'dog', 'label' => 'Dog', 'image' => 'https://example.com/dog.jpg'],
+            ['key' => 'fox', 'label' => 'Fox', 'image' => 'https://example.com/fox.jpg', 'hidden' => true],
+        ];
+    }
+
+    private function answerAction(array $field): SubmitForm
+    {
+        $form = Form::make('survey')->formFields([
+            'pages' => [['id' => 'main', 'sections' => [['fields' => [['handle' => 'answer', 'field' => $field]]]]]],
+        ]);
+
+        return app(SubmitForm::class)->form($form);
     }
 
     #[Test]

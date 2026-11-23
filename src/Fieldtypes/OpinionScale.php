@@ -23,6 +23,15 @@ class OpinionScale extends Fieldtype
         ];
     }
 
+    public function rules(): array
+    {
+        return [
+            'integer',
+            'min:'.$this->config('min', 0),
+            'max:'.$this->config('max', 10),
+        ];
+    }
+
     private function scaleValues(): array
     {
         return range($this->config('min'), $this->config('max'));
