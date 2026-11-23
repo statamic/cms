@@ -59,6 +59,11 @@ class Session
         return $this->regions->mapWithKeys(fn ($key) => [$key => $this->region($key)]);
     }
 
+    public function regionKeys(): Collection
+    {
+        return $this->regions->values();
+    }
+
     public function region(string $key): Region
     {
         if ($region = $this->pendingRegion($key)) {
