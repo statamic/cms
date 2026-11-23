@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import PageTree from '@/components/structures/PageTree.vue';
 
 // The rules for moving a page with the keyboard (see Branch.vue), run against a made-up tree:
@@ -28,13 +28,15 @@ function tree({ expectsRoot = true, maxDepth = Infinity } = {}) {
         expectsRoot,
         maxDepth,
         treeData: top.map((stat) => stat.data),
-        $refs: { tree: { stats: top } },
+        $refs: { tree: { stats: top, move: vi.fn() } },
+        collapsedState: ['about', 'team'],
+        treeUpdated: vi.fn(),
     };
-    for (const method of ['isRoot', 'siblingsOf', 'heightOf', 'canKeyboardMove']) {
+    for (const method of ['isRoot', 'siblingsOf', 'heightOf', 'canKeyboardMove', 'keyboardMove']) {
         self[method] = PageTree.methods[method].bind(self);
     }
 
-    return { can: self.canKeyboardMove, home, about, team, jobs, contact };
+    return { can: self.canKeyboardMove, move: self.keyboardMove, self, home, about, team, jobs, contact };
 }
 
 test('the root page never moves, and nothing moves above it', () => {
@@ -86,4 +88,45 @@ test('a page brings its children with it, so they count towards the max depth to
 
     const shallow = tree({ expectsRoot: false, maxDepth: 3 });
     expect(shallow.can(shallow.about, 'in')).toBe(false);
+});
+
+test('moving up or down moves it to the next place at its level, and marks the tree as changed', () => {
+    const { move, self, about, contact } = tree();
+
+    move(contact, 'up');
+    expect(self.$refs.tree.move).toHaveBeenCalledWith(contact, null, 1);
+
+    move(about, 'down');
+    expect(self.$refs.tree.move).toHaveBeenLastCalledWith(about, null, 2);
+    expect(self.treeUpdated).toHaveBeenCalledTimes(2);
+});
+
+test('nesting puts it last under the page above, and opens that page', () => {
+    const { move, self, about, contact } = tree();
+
+    move(contact, 'in');
+
+    expect(self.$refs.tree.move).toHaveBeenCalledWith(contact, about, 1);
+    expect(about.open).toBe(true);
+    expect(self.collapsedState).toEqual(['team']);
+});
+
+test('moving out a level puts it just after its old parent', () => {
+    const { move, self, about, team, jobs } = tree();
+
+    move(jobs, 'out');
+    expect(self.$refs.tree.move).toHaveBeenCalledWith(jobs, about, 1);
+
+    move(team, 'out');
+    expect(self.$refs.tree.move).toHaveBeenLastCalledWith(team, null, 2);
+});
+
+test('a move it cannot make does nothing', () => {
+    const { move, self, home, about } = tree();
+
+    move(home, 'down');
+    move(about, 'up');
+
+    expect(self.$refs.tree.move).not.toHaveBeenCalled();
+    expect(self.treeUpdated).not.toHaveBeenCalled();
 });
