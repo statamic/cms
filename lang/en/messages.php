@@ -107,7 +107,6 @@ return [
     'expect_root_instructions' => 'Consider the first page in the tree a "root" or "home" page.',
     'field_conditions_always_save_instructions' => 'Always save the field value, even if the field is hidden.',
     'field_conditions_reserve_space_when_hidden_instructions' => 'When hidden, reserve the field\'s space in the layout.',
-    'field_conditions_reserve_space_when_hidden_instructions' => 'When hidden, reserve the field\'s space in the layout.',
     'field_desynced_from_origin' => 'Desynced from origin. Click to sync and revert to the origin\'s value.',
     'field_synced_with_origin' => 'Synced with origin. Click or edit the field to desync.',
     'field_validation_advanced_instructions' => 'Add more advanced validation to this field.',
