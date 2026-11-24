@@ -163,6 +163,17 @@ class EmailTest extends TestCase
             'array with a field reference to a missing field' => [['field:nonexistent', 'foo@bar.com'], [
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
+            'string with a field reference and an email' => ['field:email, baz@qux.com', [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'string with an email and a field reference' => ['baz@qux.com,field:email', [
+                ['address' => 'baz@qux.com', 'name' => null],
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'string with a field reference to a missing field' => ['field:nonexistent, foo@bar.com', [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
         ]);
     }
 

@@ -39,7 +39,18 @@ class Email extends Connector
     {
         $class = config('statamic.forms.send_email_job');
 
-        return new $class($submission, $submission->site(), $connection);
+        return new $class($submission, $submission->site(), static::stringifyAddresses($connection));
+    }
+
+    public static function stringifyAddresses(array $connection): array
+    {
+        foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
+            if (isset($connection[$handle]) && is_array($connection[$handle])) {
+                $connection[$handle] = implode(', ', $connection[$handle]);
+            }
+        }
+
+        return $connection;
     }
 
     public function render(): VueComponent

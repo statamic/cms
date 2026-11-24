@@ -171,6 +171,36 @@ class SendEmailsTest extends TestCase
         Mail::assertSent(Email::class, 1);
     }
 
+    #[Test]
+    public function it_passes_array_addresses_to_the_job_as_comma_separated_strings()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['email' => [
+            [
+                'id' => 'one',
+                'to' => ['field:email', 'first@example.com'],
+                'cc' => ['cc@example.com'],
+                'bcc' => ['bcc@example.com'],
+                'reply_to' => ['field:email'],
+            ],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission()->data(['email' => 'someone@example.com']));
+
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig() === [
+            'id' => 'one',
+            'to' => 'field:email, first@example.com',
+            'cc' => 'cc@example.com',
+            'bcc' => 'bcc@example.com',
+            'reply_to' => 'field:email',
+        ] && collect(tap($email)->build()->to)->pluck('address')->all() === ['someone@example.com', 'first@example.com']);
+    }
+
     public static function ccAndBccProvider()
     {
         return [

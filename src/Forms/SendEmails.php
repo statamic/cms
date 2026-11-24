@@ -9,6 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Fields\Field;
 use Statamic\Forms\Connectors\ConnectionLogic;
+use Statamic\Forms\Connectors\Email as EmailConnector;
 use Statamic\Sites\Site;
 
 /**
@@ -34,7 +35,7 @@ class SendEmails implements ShouldQueue
 
         $jobs = collect($emailConfigs)
             ->filter(fn (array $config) => ConnectionLogic::passes($config, $submission))
-            ->map(fn (array $config) => new $class($submission, $this->site, $config))
+            ->map(fn (array $config) => new $class($submission, $this->site, EmailConnector::stringifyAddresses($config)))
             ->values()
             ->all();
 
