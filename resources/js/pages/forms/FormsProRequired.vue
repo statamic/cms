@@ -28,7 +28,7 @@ defineProps({
             <div class="relative mb-4 h-16 w-14" aria-hidden="true">
                 <div class="absolute inset-0 translate-x-3 -translate-y-2 rounded-md border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-850"></div>
                 <div class="absolute inset-0 translate-x-1.5 -translate-y-1 rounded-md border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-850"></div>
-                <div class="absolute inset-0 flex flex-col gap-1.25 rounded-md border border-gray-300 bg-white p-2 shadow-sm dark:border-gray-600 dark:bg-gray-800">
+                <div class="absolute inset-0 flex flex-col gap-1.25 rounded-md border border-gray-300 bg-white p-2 shadow-ui-sm dark:border-gray-600 dark:bg-gray-800">
                     <div class="h-0.75 w-2/3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
                     <div class="h-2 rounded-sm border border-gray-200 dark:border-gray-600"></div>
                     <div class="h-2 rounded-sm border border-gray-200 dark:border-gray-600"></div>
