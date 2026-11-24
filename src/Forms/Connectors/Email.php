@@ -70,11 +70,54 @@ class Email extends Connector
     {
         foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
             if (isset($config[$handle]) && is_string($config[$handle])) {
-                $config[$handle] = array_map(trim(...), explode(',', $config[$handle]));
+                $config[$handle] = array_map(trim(...), $this->splitAddresses($config[$handle]));
             }
         }
 
         return $config;
+    }
+
+    private function splitAddresses(string $value): array
+    {
+        $parts = [];
+        $current = '';
+        $depth = 0;
+        $quote = null;
+
+        for ($i = 0; $i < strlen($value); $i++) {
+            $char = $value[$i];
+            $pair = substr($value, $i, 2);
+
+            if ($quote) {
+                if ($char === '\\') {
+                    $current .= $pair;
+                    $i++;
+
+                    continue;
+                }
+
+                if ($char === $quote) {
+                    $quote = null;
+                }
+            } elseif ($pair === '{{' || ($pair === '}}' && $depth > 0)) {
+                $depth += $pair === '{{' ? 1 : -1;
+                $current .= $pair;
+                $i++;
+
+                continue;
+            } elseif ($depth > 0 && ($char === '"' || $char === "'")) {
+                $quote = $char;
+            } elseif ($char === ',' && $depth === 0) {
+                $parts[] = $current;
+                $current = '';
+
+                continue;
+            }
+
+            $current .= $char;
+        }
+
+        return [...$parts, $current];
     }
 
     protected function connectionRules(): array

@@ -614,6 +614,22 @@ class EmailConnectorTest extends TestCase
     }
 
     #[Test]
+    public function it_doesnt_split_legacy_address_strings_inside_antlers()
+    {
+        $form = tap(Form::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => '{{ x ?? "a@example.com, b@example.com" }}, {{ partial:foo a=\'1,2\' }}, c@example.com'],
+        ]]))->save();
+
+        $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
+
+        $this->assertEquals([
+            '{{ x ?? "a@example.com, b@example.com" }}',
+            "{{ partial:foo a='1,2' }}",
+            'c@example.com',
+        ], $configs[0]['to']);
+    }
+
+    #[Test]
     public function legacy_address_strings_are_converted_before_meta_is_built()
     {
         $form = tap(Form::make('test'))->save();
