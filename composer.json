@@ -58,7 +58,8 @@
         "spatie/laravel-ray": "^1.43.6"
     },
     "conflict": {
-        "algolia/algoliasearch-client-php": "<4.32"
+        "algolia/algoliasearch-client-php": "<4.32",
+        "statamic/eloquent-driver": "<5.14.0"
     },
     "suggest": {
         "algolia/algoliasearch-client-php": "Required to use Algolia search driver (^4.32)"
