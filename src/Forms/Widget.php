@@ -4,7 +4,7 @@ namespace Statamic\Forms;
 
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Statamic\Widgets\VueComponent;
+use Statamic\Support\VueComponent;
 use Statamic\Widgets\Widget as BaseWidget;
 
 class Widget extends BaseWidget
@@ -21,7 +21,7 @@ class Widget extends BaseWidget
             ]);
         }
 
-        if (! User::current()->can('view', $form)) {
+        if (! User::current()->can('viewSubmissions', $form)) {
             return;
         }
 
@@ -30,7 +30,7 @@ class Widget extends BaseWidget
             'fields' => $this->config('fields', []),
             'title' => $this->config('title', $form->title()),
             'showTableHeader' => $this->config('show_table_header', false),
-            'submissionsUrl' => cp_route('forms.show', $form->handle()),
+            'submissionsUrl' => cp_route('forms.submissions.index', $form->handle()),
             'initialPerPage' => $this->config('limit', 5),
         ]);
     }

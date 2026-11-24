@@ -13,6 +13,7 @@ use Statamic\GraphQL\Types\CollectionType;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\FieldType;
+use Statamic\GraphQL\Types\FormPageType;
 use Statamic\GraphQL\Types\FormType;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -66,6 +67,7 @@ class TypeRegistrar
         GraphQL::addType(GlobalSetInterface::class);
         GraphQL::addType(FieldType::class);
         GraphQL::addType(SectionType::class);
+        GraphQL::addType(FormPageType::class);
         GraphQL::addType(LinkValueType::class);
 
         PageInterface::addTypes();

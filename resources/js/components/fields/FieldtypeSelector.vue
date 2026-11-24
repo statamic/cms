@@ -60,6 +60,10 @@ export default {
         Icon,
     },
 
+    inject: {
+        fieldtypeSelectorSource: { default: null },
+    },
+
     props: {
         allowTitle: {
             default: false,
@@ -74,7 +78,7 @@ export default {
 
     data: function () {
         return {
-            categories: {
+            categories: this.fieldtypeSelectorSource?.categories ?? {
                 text: {
                     title: __('Text & Rich Content'),
                     description: __('fieldtypes.picker.category.text.description'),
@@ -112,18 +116,11 @@ export default {
         fieldtypes() {
             if (!this.fieldtypesLoaded) return;
 
-            return loadedFieldtypes.value.data;
-        },
-
-        isFormBlueprint() {
-            return !!this.$config.get('isFormBlueprint');
+            return this.fieldtypeSelectorSource?.fieldtypes ?? loadedFieldtypes.value;
         },
 
         fieldtypesLoaded() {
-            // The cache is shared across every picker instance, but form and regular blueprints
-            // request different lists. Only treat it as loaded when the cached list matches the
-            // current blueprint mode, otherwise we'll refetch the correct one.
-            return Array.isArray(loadedFieldtypes.value?.data) && loadedFieldtypes.value.forms === this.isFormBlueprint;
+            return !!this.fieldtypeSelectorSource || Array.isArray(loadedFieldtypes.value);
         },
 
         allFieldtypes() {
@@ -174,7 +171,7 @@ export default {
 
                 this.allFieldtypes.forEach((fieldtype) => {
                     let categories = fieldtype.categories;
-                    if (categories.length === 0) categories = ['special'];
+                    if (categories.length === 0) categories = [this.fieldtypeSelectorSource?.defaultCategory ?? 'special'];
                     if (categories.includes(handle)) category.fieldtypes.push(fieldtype);
                 });
 
@@ -232,14 +229,8 @@ export default {
     created() {
         if (this.fieldtypesLoaded) return;
 
-        const forms = this.isFormBlueprint;
-
-        let url = cp_url('fields/fieldtypes?selectable=true');
-
-        if (forms) url += '&forms=true';
-
-        this.$axios.get(url)
-            .then((response) => (loadedFieldtypes.value = { forms, data: response.data }))
+        this.$axios.get(cp_url('fields/fieldtypes?selectable=true'))
+            .then((response) => (loadedFieldtypes.value = response.data))
             .catch((e) => {
                 this.$toast.error(e.response?.data?.message || __('Something went wrong'));
                 this.close();
@@ -283,6 +274,10 @@ export default {
 
         createField(handle) {
             const fieldtype = this.fieldtypes.find((f) => f.handle === handle);
+
+            if (this.fieldtypeSelectorSource?.createField) {
+                return this.fieldtypeSelectorSource.createField(fieldtype);
+            }
 
             // Build the initial empty field. The event listener will assign display, handle,
             // and id keys. This will be 'field_n' etc, where n would be the total root

@@ -15,7 +15,7 @@ class FormExportController extends CpController
 
     public function export(FilteredRequest $request, $form, $type)
     {
-        $this->authorize('view', $form);
+        $this->authorize('viewSubmissions', $form);
 
         if (! $exporter = $form->exporter($type)) {
             throw new NotFoundHttpException;
@@ -40,6 +40,10 @@ class FormExportController extends CpController
     protected function getScopedSubmissions(FilteredRequest $request, $form)
     {
         $query = $form->querySubmissions();
+
+        if (! isset($request->filters['submission_status'])) {
+            $query->whereStatus('finalized');
+        }
 
         $this->queryFilters($query, $request->filters, [
             'form' => $form->handle(),

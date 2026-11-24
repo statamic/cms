@@ -79,7 +79,8 @@
                         <tr>
                             <th class="grid-drag-handle-header" v-if="!isReadOnly"></th>
                             <th class="w-1/4">{{ keyHeader }}</th>
-                            <th class="">{{ valueHeader }}</th>
+                            <th :class="{ 'border-e-0!': canToggleVisibility }">{{ valueHeader }}</th>
+                            <th class="visibility-controls" v-if="canToggleVisibility"></th>
                             <th class="row-controls" v-if="!isReadOnly"></th>
                         </tr>
                     </thead>
@@ -106,6 +107,17 @@
                                         v-model="element.value"
                                         :readonly="isReadOnly"
                                         :input-attrs="{ dir: contentDirection }"
+                                    />
+                                </td>
+                                <td v-if="canToggleVisibility" class="visibility-controls">
+                                    <ui-button
+                                        :icon="element.hidden ? 'eye-closed' : 'eye'"
+                                        variant="subtle"
+                                        size="xs"
+                                        round
+                                        @click="toggleHidden(index)"
+                                        :aria-label="element.hidden ? __('Show Option') : __('Hide Option')"
+                                        v-tooltip="element.hidden ? __('Show Option') : __('Hide Option')"
                                     />
                                 </td>
                                 <td class="row-controls" v-if="!isReadOnly">
@@ -170,7 +182,7 @@ export default {
         const selectedKey = keys.length > 0 ? keys[0] : null;
 
         return {
-            data: this.objectToSortable(this.value || []),
+            data: this.valueToData(this.value || []),
             selectedKey,
             deleting: false,
             compactOpen: false,
@@ -181,13 +193,13 @@ export default {
         data: {
             deep: true,
             handler(data) {
-                this.updateDebounced(this.sortableToObject(data));
+                this.update(this.dataToValue(data));
             },
         },
 
         value(value) {
-            if (JSON.stringify(value) == JSON.stringify(this.sortableToObject(this.data))) return;
-            this.data = this.objectToSortable(value);
+            if (JSON.stringify(value) == JSON.stringify(this.dataToValue(this.data))) return;
+            this.data = this.valueToData(value);
         },
     },
 
@@ -258,6 +270,10 @@ export default {
             return __(this.config.value_header || 'Value');
         },
 
+        canToggleVisibility() {
+            return !this.isReadOnly && this.config.show_hide_toggle === true;
+        },
+
         compactFooterButtonClass() {
             if (!this.isCompact) return;
 
@@ -293,6 +309,35 @@ export default {
     },
 
     methods: {
+        valueToData(value) {
+            return Object.entries(clone(value)).map(([key, val]) => {
+                const item = this.newSortableValue(null, key);
+
+                if (val !== null && typeof val === 'object' && 'value' in val) {
+                    item.value = val.value;
+                    item.hidden = val.hidden ?? false;
+                } else {
+                    item.value = val;
+                }
+
+                return item;
+            });
+        },
+
+        dataToValue(data) {
+            let obj = {};
+
+            data.forEach((item) => {
+                if (this.config.show_hide_toggle && item.hidden === true) {
+                    obj[item.key] = { value: item.value, hidden: true };
+                } else {
+                    obj[item.key] = item.value;
+                }
+            });
+
+            return obj;
+        },
+
         setCompactOpen(open) {
             if (!open) {
                 this.data = this.data.filter((element) => element.key || element.value);
@@ -348,6 +393,10 @@ export default {
             this.deleting = false;
 
             this.data.splice(index, 1);
+        },
+
+        toggleHidden(index) {
+            this.data[index].hidden = !this.data[index].hidden;
         },
 
         deleteCancelled() {

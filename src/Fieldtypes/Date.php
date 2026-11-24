@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Carbon\Exceptions\InvalidFormatException;
+use Faker\Generator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -480,5 +481,15 @@ class Date extends Fieldtype
             'start' => Carbon::parse($value['start']),
             'end' => Carbon::parse($value['end']),
         ];
+    }
+
+    public function previewValue(): mixed
+    {
+        return now()->toDateString();
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->date('Y-m-d');
     }
 }

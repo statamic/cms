@@ -5,7 +5,7 @@
         :model-value="value"
         :meta="publishMeta"
         :errors="errors"
-        as-config
+        :as-config="publishContainer.asConfig"
         @update:model-value="update"
     >
         <FieldsProvider :fields="fields">
