@@ -1,6 +1,8 @@
 {
     "1 update|:count updates": "Une mise à jour|:count mises à jour",
     "2FA": "A2F",
+    "301 (Permanent)": "301 (Permanent)",
+    "302 (Temporary)": "302 (Temporaire)",
     "404": "404",
     ":count asset selected|:count assets selected": ":count ressource sélectionnée|:count ressources sélectionnées",
     ":count assets": ":count ressources",
@@ -313,6 +315,7 @@
     "Copied to clipboard": "Copié dans le presse-papiers",
     "Copy": "Copier",
     "Copy :handle to clipboard": "Copier :handle vers le presse-papier",
+    "Copy Data": "Copier les données",
     "Copy password reset email for this user?": "Copier l'e-mail de réinitialisation du mot de passe pour cet utilisateur ?",
     "Copy Password Reset Link": "Copier le lien de réinitialisation du mot de passe",
     "Copy to clipboard": "Copier vers le presse-papier",

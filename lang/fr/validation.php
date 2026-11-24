@@ -176,6 +176,7 @@ return [
     'asset_file_exists' => 'Un fichier portant ce nom existe déjà.',
     'asset_file_exists_same_content' => 'Un fichier existe déjà avec ce nom et a le même contenu. Vous souhaiterez peut-être supprimer ceci plutôt que le renommer.',
     'asset_file_exists_different_content' => 'Un fichier existe déjà avec ce nom mais son contenu est différent. Vous pouvez remplacer l’autre fichier par celui-ci.',
+    'asset_replace_same' => 'Une ressource ne peut pas être remplacée par elle-même. Utilisez « Téléverser de nouveau » pour en importer une nouvelle version.',
     'invalid_two_factor_code' => 'Le code d’authentification à deux facteurs fourni n’est pas valide.',
     'invalid_two_factor_recovery_code' => 'Le code de récupération à deux facteurs fourni n’est pas valide.',
     'bard_container_required_by_button' => 'Ce champ est requis par un bouton de la barre d’outils.',
