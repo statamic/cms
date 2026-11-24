@@ -5,6 +5,7 @@ namespace Statamic\Forms\JsDrivers;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Forms\Form;
+use Statamic\Forms\OldInput;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Parameters;
@@ -152,7 +153,7 @@ abstract class AbstractJsDriver implements JsDriver
             ->fields()
             ->addValues([
                 ...$values,
-                ...(session('errors')?->hasBag('form.'.$this->form->handle()) ? (old() ?? []) : []),
+                ...(OldInput::shouldFill('form.'.$this->form->handle()) ? (old() ?? []) : []),
             ])
             ->preProcess()
             ->values()
