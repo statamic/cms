@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\MarkAsNotSpam;
 use Statamic\Events\FormSubmitted;
@@ -1171,6 +1172,46 @@ class SubmitFormTest extends TestCase
         }
 
         $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    #[DataProvider('fileSizeRuleFieldtypeProvider')]
+    public function it_submits_when_an_optional_upload_field_with_file_size_rules_is_left_empty($field)
+    {
+        Storage::fake('avatars');
+        AssetContainer::make('avatars')->disk('avatars')->save();
+
+        $form = tap(Form::make('uploads')->formFields([
+            'pages' => [
+                [
+                    'id' => 'main',
+                    'sections' => [
+                        ['fields' => [
+                            ['handle' => 'email', 'field' => ['type' => 'email']],
+                            ['handle' => 'document', 'field' => array_merge($field, ['validate' => ['max_filesize:1024', 'min_filesize:1']])],
+                        ]],
+                    ],
+                ],
+            ],
+        ]))->save();
+
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->page('main')
+            ->submit(data: ['email' => 'test@example.com']);
+
+        $this->assertTrue($result->isFinalized());
+
+        $form->querySubmissions()->get()->each->delete();
+    }
+
+    public static function fileSizeRuleFieldtypeProvider()
+    {
+        return [
+            'files' => [['type' => 'files']],
+            'assets' => [['type' => 'assets', 'container' => 'avatars', 'max_files' => 1]],
+            'upload' => [['type' => 'upload', 'store' => true, 'container' => 'avatars', 'max_files' => 1]],
+        ];
     }
 
     #[Test]

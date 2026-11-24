@@ -368,7 +368,7 @@ class SubmitForm
                 }
 
                 $rules[$handle] = collect($rules[$handle])
-                    ->reject(fn ($rule) => $rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:'))
+                    ->reject(fn ($rule) => is_string($rule) && ($rule === 'array' || str_starts_with($rule, 'max:') || str_starts_with($rule, 'min:')))
                     ->values()
                     ->all();
 
