@@ -112,7 +112,7 @@ const previewParts = computed<SummaryPart[]>(() =>
             <template v-for="(part, index) in previewParts" :key="index">
                 <Badge
                     v-if="part.type === PartType.Operator || part.type === PartType.Join"
-                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                    class="inline-block min-h-0 px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                 >
                     {{ part.text }}
                 </Badge>
