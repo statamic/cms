@@ -61,6 +61,46 @@ class EmailConnectorTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('sendEmailJobProvider')]
+    public function it_passes_addresses_to_the_job_as_comma_separated_strings(string $class)
+    {
+        config(['statamic.forms.send_email_job' => $class]);
+
+        $form = tap(Form::make('test')->connections(['email' => [
+            [
+                'id' => 'one',
+                'to' => ['field:email', 'first@example.com'],
+                'cc' => ['cc@example.com'],
+                'bcc' => ['{{ x ?? "a@example.com, b@example.com" }}', 'bcc@example.com'],
+                'reply_to' => ['field:email'],
+                'from' => 'sender@example.com',
+            ],
+            ['id' => 'two', 'to' => 'legacy@example.com, other@example.com'],
+        ]]))->save();
+
+        $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission());
+
+        $this->assertContainsOnlyInstancesOf($class, $jobs);
+        $this->assertSame([
+            'id' => 'one',
+            'to' => 'field:email, first@example.com',
+            'cc' => 'cc@example.com',
+            'bcc' => '{{ x ?? "a@example.com, b@example.com" }}, bcc@example.com',
+            'reply_to' => 'field:email',
+            'from' => 'sender@example.com',
+        ], $jobs[0]->config);
+        $this->assertSame(['id' => 'two', 'to' => 'legacy@example.com, other@example.com'], $jobs[1]->config);
+    }
+
+    public static function sendEmailJobProvider(): array
+    {
+        return [
+            'core job' => [SendEmail::class],
+            'custom job' => [CustomSendEmail::class],
+        ];
+    }
+
+    #[Test]
     public function it_filters_emails_using_conditions_when_finalized()
     {
         $form = tap(Form::make('test')->formFields([
@@ -571,6 +611,22 @@ class EmailConnectorTest extends TestCase
         $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
 
         $this->assertEquals(['first@example.com', 'second@example.com'], $configs[0][$handle]);
+    }
+
+    #[Test]
+    public function it_doesnt_split_legacy_address_strings_inside_antlers()
+    {
+        $form = tap(Form::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => '{{ x ?? "a@example.com, b@example.com" }}, {{ partial:foo a=\'1,2\' }}, c@example.com'],
+        ]]))->save();
+
+        $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
+
+        $this->assertEquals([
+            '{{ x ?? "a@example.com, b@example.com" }}',
+            "{{ partial:foo a='1,2' }}",
+            'c@example.com',
+        ], $configs[0]['to']);
     }
 
     #[Test]

@@ -319,6 +319,8 @@ class Email extends Mailable
         }
 
         return collect(Arr::wrap($addresses))
+            ->flatMap(fn ($address) => is_scalar($address) ? explode(',', (string) $address) : [])
+            ->map(fn ($address) => trim($address))
             ->flatMap(fn ($address) => Str::startsWith($address, 'field:')
                 ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
                 : [$address])
