@@ -442,6 +442,9 @@ abstract class Store
 
     public function warm()
     {
+        // A query outside a warm, such as an index built on first use, leaves its collection here.
+        $this->fileItems = null;
+
         $this->shouldCacheFileItems = true;
 
         $this->resolveIndexes()->each->update();
