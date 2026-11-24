@@ -42,6 +42,7 @@ class Email extends Connector
         return new $class($submission, $submission->site(), static::stringifyAddresses($connection));
     }
 
+    /** @internal */
     public static function stringifyAddresses(array $connection): array
     {
         foreach (['to', 'cc', 'bcc', 'reply_to'] as $handle) {
