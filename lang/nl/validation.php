@@ -182,7 +182,7 @@ return [
     'date_fieldtype_time_required' => 'Tijd is verplicht.',
     'duplicate_field_handle' => 'Een veld met handle :handle bestaat al.',
     'duplicate_uri' => 'Dubbele URI :value.',
-    'elevated_session_resend_code_unavailable' => 'Herverzendings-code is alleen beschikbaar voor verificatiecode-methode.',
+    'elevated_session_resend_code_unavailable' => 'Je kunt een code alleen opnieuw verzenden als je verificatiecodes gebruikt.',
     'elevated_session_verification_code' => 'De verificatiecode is onjuist.',
     'email_available' => 'Een gebruiker met dit e-mailadres bestaat al.',
     'email_connection_template_syntax' => 'Alleen gebruikers die formulieren mogen configureren, kunnen templatesyntaxis gebruiken.',
