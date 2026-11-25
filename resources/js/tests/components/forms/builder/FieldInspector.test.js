@@ -154,22 +154,34 @@ test('settings edits on a linked field are tracked as overrides', async () => {
 });
 
 test('values a fieldtype normalizes back to the fieldset value are not tracked as overrides', async () => {
-    const field = referenceField();
+    const field = referenceField({ config_overrides: ['placeholder'] });
 
     setup({ field, originValues: { display: 'Company', placeholder: 'Acme' } });
     await flushPromises();
-
-    wrapper.vm.values.placeholder = 'Other';
-    await flushPromises();
-    wrapper.vm.values.placeholder = 'Acme';
-    await flushPromises();
-
-    expect(field.config_overrides).toEqual(['placeholder']);
 
     wrapper.vm.values.display = 'Company';
     await flushPromises();
 
     expect(field.config_overrides).toEqual(['placeholder']);
+});
+
+test('settings reverted to the fieldset value on a linked field are no longer tracked as overrides', async () => {
+    const field = referenceField({ config_overrides: ['display'] });
+
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme', width: 100 } });
+    await flushPromises();
+
+    wrapper.vm.values.width = 50;
+    wrapper.vm.values.placeholder = 'Other';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['display', 'placeholder', 'width']);
+
+    wrapper.vm.values.width = 100;
+    wrapper.vm.values.placeholder = 'Acme';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['display']);
 });
 
 test('validation edits on a linked field are tracked as overrides', async () => {
