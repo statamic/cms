@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue';
 import { normalizeLocale } from '../../FormattingLocale.js';
 import {
     DatePickerAnchor,
@@ -119,39 +119,47 @@ const isInvalid = computed(() => {
 
 const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
 
-// A narrow date and time field with the clear × needs the smaller sizes to fit
-const compactClear = computed(() => hasTime.value && props.clearable && !props.readOnly);
+// A date and time can be too long for a narrow field (25% and 33% columns), especially with seconds, a 12-hour clock, a long timezone or the
+// clear ×. Rather than guess from the locale and field width, try each size from largest to smallest and keep the first that fits. The
+// sizes live in the <style> block below, keyed off data-fit on the root. The date never goes below text-xs: if the smallest step still
+// doesn't fit, the field scrolls, as it always has.
+const fitSteps = ['', 'date-sm', 'compact', 'compact tight'];
+const root = useTemplateRef('root');
+const box = useTemplateRef('box');
 
-// Seconds, a timezone with minutes (GMT+5:30, GMT+13:45) and the clear × each make the value longer, so under 16rem each one takes the
-// text down a step: 13.2px with none of them, 11.2px with one, 10px with two or more
-const lengtheners = computed(
-    () => [props.granularity === 'second', timeZoneLabel.value?.includes(':') ?? false, compactClear.value].filter(Boolean).length,
-);
+function fit() {
+    const el = root.value;
+    const row = box.value?.$el ?? box.value;
+    if (!el || !row) return;
 
-// A date and time field sizes its text to its own width, so its root is a container. A container's content stops counting towards its
-// width, so where the column is sized by its content (a Grid table), this stands in for the width of the full-size value: 16.75rem for
-// a date and time with the clear ×, 1.25rem less without it, and 1.5rem more each for seconds and a timezone with minutes.
-const intrinsicWidth = computed(() => {
-    let rem = props.clearable && !props.readOnly ? 16.75 : 15.5;
-    if (props.granularity === 'second') rem += 1.5;
-    if (timeZoneLabel.value?.includes(':')) rem += 1.5;
-    return `${rem}rem`;
+    if (!hasTime.value || props.inline) return el.removeAttribute('data-fit');
+
+    // Setting the attribute and reading the width both happen before the next paint, so the steps in between never show
+    for (const step of fitSteps) {
+        el.setAttribute('data-fit', step);
+        if (row.scrollWidth <= row.clientWidth) return;
+    }
+
+    // Nothing fits, so it scrolls. Tight only helps when it makes the value fit, so go back to compact, which matches the fields that do.
+    el.setAttribute('data-fit', 'compact');
+}
+
+// Refit when the field's width changes, and once the web font has loaded, since the fallback font measures narrower
+let resizeObserver;
+onMounted(() => {
+    if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(() => fit());
+        resizeObserver.observe(root.value);
+    }
+    document.fonts?.addEventListener('loadingdone', fit);
+    document.fonts?.ready.then(fit);
+    fit();
 });
-
-// The longest value (seconds and a timezone with minutes) beside the clear × only fits with everything around it tightened too
-const longestClear = computed(() => lengtheners.value === 3);
-
-const compactDateClass = computed(() => {
-    if (!hasTime.value) return null;
-    // The longest value beside the × needs the compact layout up to 18.5rem, and a smaller date up to 20rem (a 33% column)
-    if (longestClear.value) return '@max-[18.5rem]:text-[0.625rem] @max-[20rem]:text-sm';
-    return ['@max-[16rem]:text-xs', '@max-[16rem]:text-2xs', '@max-[16rem]:text-[0.625rem]'][Math.min(lengtheners.value, 2)];
+onBeforeUnmount(() => {
+    resizeObserver?.disconnect();
+    document.fonts?.removeEventListener('loadingdone', fit);
 });
-const compactTimeZoneClass = computed(() => {
-    if (!hasTime.value) return null;
-    if (longestClear.value) return '@max-[18.5rem]:text-[0.5625rem]';
-    return [null, '@max-[16rem]:text-[0.625rem]', '@max-[16rem]:text-[0.5625rem]'][Math.min(lengtheners.value, 2)];
-});
+watch(() => [props.modelValue?.toString(), timeZoneLabel.value, props.granularity, props.clearable, props.readOnly, props.inline], () => nextTick(fit));
 
 const getInputLabel = (part) => {
     switch (part) {
@@ -176,12 +184,7 @@ const getInputLabel = (part) => {
 </script>
 
 <template>
-    <div
-        class="group/input relative block w-full"
-        :class="{ '@container': hasTime && !inline }"
-        :style="hasTime && !inline ? { containIntrinsicInlineSize: intrinsicWidth } : null"
-        data-ui-input
-    >
+    <div ref="root" class="group/input relative block w-full" data-ui-input>
         <DatePickerRoot
             :modelValue="modelValue"
             :granularity="granularity"
@@ -204,25 +207,25 @@ const getInputLabel = (part) => {
                             'border border-gray-300 dark:border-gray-700',
                             'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
-                            // Date and time only just fits a narrow field, so under 16rem the text shrinks and the gaps tighten
-                            hasTime ? (longestClear ? '@max-[18.5rem]:px-1.5' : '@max-[16rem]:px-1.5') : '',
                             'data-invalid:border-red-500',
                             'disabled:shadow-none disabled:opacity-50',
                             readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500 dark:read-only-field:**:text-gray-500' : '',
                         ]"
+                        ref="box"
+                        data-date-picker-box
                         :aria-invalid="isInvalid"
                         role="textbox"
                         :aria-label="__('Select date')"
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime && !longestClear, '@max-[18.5rem]:ms-0 @max-[18.5rem]:me-1 @max-[18.5rem]:p-0': longestClear }"
+                            data-date-picker-trigger
                             class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
-                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime && !longestClear, '@max-[18.5rem]:size-2.5': longestClear }" />
+                            <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
-                        <div class="flex flex-1 items-center" :class="compactDateClass">
+                        <div class="flex flex-1 items-center" data-date-picker-date>
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
@@ -256,7 +259,7 @@ const getInputLabel = (part) => {
                             :show-seconds="granularity === 'second'"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime && !longestClear, '@max-[18.5rem]:ms-0.5': longestClear, 'me-1': readOnly }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="{ 'me-1': readOnly }" size="xs" :text="timeZoneLabel" data-date-picker-timezone />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
@@ -265,10 +268,7 @@ const getInputLabel = (part) => {
                             size="sm"
                             icon="x"
                             class="-my-1.25 -me-2"
-                            :class="{
-                                '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:[&_svg]:size-3 @max-[16rem]:size-6.5': compactClear && !longestClear,
-                                '@max-[18.5rem]:my-0 @max-[18.5rem]:-me-1 @max-[18.5rem]:[&_svg]:size-3 @max-[18.5rem]:size-5.5': longestClear,
-                            }"
+                            data-date-picker-clear
                             :disabled="disabled"
                             v-tooltip="__('Clear date')"
                         />
@@ -293,3 +293,58 @@ const getInputLabel = (part) => {
         </DatePickerRoot>
     </div>
 </template>
+
+<style>
+    /* Steps a date and time down until it fits its field (see fit()). Each step keeps the one before it and changes a little more:
+       a 14px date; then compact (13.2px date, 12px icon, 26px ×, tighter gaps); then tight (no padding round the 12px icon, 22px ×). The icon never goes below 12px. */
+    [data-ui-input][data-fit~='date-sm'] [data-date-picker-date] {
+        font-size: var(--text-sm);
+    }
+
+    [data-ui-input][data-fit~='compact'] {
+        [data-date-picker-box] {
+            padding-inline: 0.375rem;
+        }
+        [data-date-picker-trigger] {
+            margin-inline-start: 0;
+            padding: 0.25rem;
+
+            svg {
+                width: 0.75rem;
+                height: 0.75rem;
+            }
+        }
+        [data-date-picker-date] {
+            font-size: var(--text-xs);
+        }
+        [data-date-picker-timezone] {
+            margin-inline-start: 0.25rem;
+        }
+        [data-date-picker-clear] {
+            width: 1.625rem;
+            height: 1.625rem;
+            margin-block: 0;
+            margin-inline-end: -0.25rem;
+
+            svg {
+                width: 0.75rem;
+                height: 0.75rem;
+            }
+        }
+    }
+
+    [data-ui-input][data-fit~='tight'] {
+        [data-date-picker-trigger] {
+            padding: 0;
+            margin-inline-end: 0.25rem;
+        }
+        [data-date-picker-timezone] {
+            margin-inline-start: 0.125rem;
+        }
+        [data-date-picker-clear] {
+            width: 1.375rem;
+            height: 1.375rem;
+        }
+    }
+</style>
+
