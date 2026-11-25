@@ -117,6 +117,20 @@ class FormFieldsTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_single_page_when_forms_pro_is_not_installed()
+    {
+        $formFields = new FormFields([
+            'pages' => [
+                ['id' => 'page_one', 'button_label' => 'Send', 'sections' => [['fields' => []]]],
+            ],
+        ]);
+
+        $this->assertEquals([
+            ['id' => 'page_one', 'button_label' => 'Send', 'sections' => [['fields' => []]]],
+        ], $formFields->pages()->all());
+    }
+
+    #[Test]
     public function it_returns_single_page_when_using_sections()
     {
         $formFields = new FormFields([
