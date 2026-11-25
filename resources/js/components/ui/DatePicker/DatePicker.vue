@@ -291,10 +291,28 @@ const getInputLabel = (part) => {
                 padding-inline: 0.375rem;
             }
             [data-date-picker-trigger] {
+                position: relative;
+                isolation: isolate;
                 width: 1.25rem;
                 height: 1.25rem;
                 margin-inline-start: 0;
                 padding: 0.25rem;
+                background-color: transparent;
+
+                /* The hover and focus background is a 16px square round the 12px icon, rather than filling the whole button */
+                &::before {
+                    content: '';
+                    position: absolute;
+                    z-index: -1;
+                    inset: 0.125rem;
+                    border-radius: 0.25rem;
+                }
+                &:is(:hover, :focus)::before {
+                    background-color: var(--color-gray-100);
+                }
+                :root.dark &:is(:hover, :focus)::before {
+                    background-color: var(--color-gray-900);
+                }
 
                 svg {
                     width: 0.75rem;
@@ -330,6 +348,10 @@ const getInputLabel = (part) => {
                 height: 1.5rem;
                 padding: 0;
                 margin-inline: -0.375rem -0.125rem;
+
+                &::before {
+                    inset: 0.25rem;
+                }
 
                 &:focus-visible {
                     outline: 2px solid var(--color-blue-500);
