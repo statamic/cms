@@ -17,9 +17,9 @@ class Recaptcha extends SiteverifyCaptcha
         return 'https://www.google.com/recaptcha/api/siteverify';
     }
 
-    public function widget(): string
+    protected function markup(): string
     {
         return '<div class="g-recaptcha" data-captcha data-sitekey="'.$this->attr($this->siteKey()).'"></div>'
-            .'<script src="https://www.google.com/recaptcha/api.js" async defer></script>';
+            .'<script'.$this->nonce().' src="https://www.google.com/recaptcha/api.js" async defer></script>';
     }
 }

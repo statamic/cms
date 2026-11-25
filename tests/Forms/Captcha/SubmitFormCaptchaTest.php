@@ -53,7 +53,7 @@ class SubmitFormCaptchaTest extends TestCase
 
     public function tearDown(): void
     {
-        Form::all()->each(fn ($form) => $form->submissions()->each->delete());
+        Form::all()->each(fn ($form) => $form->querySubmissions()->get()->each->delete());
 
         parent::tearDown();
     }
@@ -109,7 +109,7 @@ class SubmitFormCaptchaTest extends TestCase
 
         $this->assertCaptchaError(fn () => $this->action()->submit(['email' => 'test@example.com', 'cf-turnstile-response' => 'bad']));
 
-        $this->assertCount(0, $this->form->submissions());
+        $this->assertCount(0, $this->form->querySubmissions()->get());
         Event::assertNotDispatched(FormSubmitted::class);
     }
 
@@ -150,7 +150,7 @@ class SubmitFormCaptchaTest extends TestCase
             // Expected
         }
 
-        $submission = $this->form->submissions()->first();
+        $submission = $this->form->querySubmissions()->get()->first();
 
         $this->assertNotNull($submission);
         $this->assertTrue($submission->isSpam());
@@ -170,7 +170,7 @@ class SubmitFormCaptchaTest extends TestCase
 
         $this->assertCaptchaError(fn () => $this->action()->submit(['email' => 'test@example.com', 'cf-turnstile-response' => 'bad']));
 
-        $this->assertCount(0, $this->form->submissions());
+        $this->assertCount(0, $this->form->querySubmissions()->get());
     }
 
     #[Test]
@@ -216,11 +216,25 @@ class SubmitFormCaptchaTest extends TestCase
     }
 
     #[Test]
-    public function it_doesnt_check_the_captcha_when_captchas_arent_set_up()
+    public function it_refuses_submissions_when_the_keys_arent_set()
     {
         Http::fake();
 
         config(['statamic.forms.captcha.secret_key' => null]);
+
+        $this->assertCaptchaError(fn () => $this->action()->submit(['email' => 'test@example.com', 'cf-turnstile-response' => 'token']));
+
+        $this->assertCount(0, $this->form->querySubmissions()->get());
+
+        Http::assertNothingSent();
+    }
+
+    #[Test]
+    public function it_doesnt_check_the_captcha_with_the_null_driver()
+    {
+        Http::fake();
+
+        config(['statamic.forms.captcha.driver' => 'null']);
 
         $this->assertTrue($this->action()->submit(['email' => 'test@example.com'])->isFinalized());
 

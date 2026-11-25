@@ -141,10 +141,28 @@ class CaptchaManagerTest extends TestCase
     }
 
     #[Test]
-    public function it_doesnt_get_a_captcha_for_a_form_when_captchas_arent_set_up()
+    public function it_still_gets_a_captcha_for_a_form_when_the_keys_arent_set()
     {
         config(['statamic.forms.captcha' => ['driver' => 'turnstile', 'site_key' => null, 'secret_key' => null]]);
 
+        $captcha = Captcha::forForm(Form::make('contact')->data(['captcha' => true]));
+
+        $this->assertInstanceOf(Turnstile::class, $captcha);
+        $this->assertFalse($captcha->verify('token'));
+        $this->assertStringStartsWith('<!-- Captcha: set STATAMIC_CAPTCHA_SITE_KEY', $captcha->widget());
+    }
+
+    #[Test]
+    public function it_doesnt_get_a_captcha_for_a_form_with_the_null_driver()
+    {
+        config(['statamic.forms.captcha' => ['driver' => 'null', 'site_key' => 'site', 'secret_key' => 'secret']]);
+
         $this->assertNull(Captcha::forForm(Form::make('contact')->data(['captcha' => true])));
+    }
+
+    #[Test]
+    public function it_doesnt_get_a_captcha_for_a_form_that_hasnt_turned_it_on()
+    {
+        $this->assertNull(Captcha::forForm(Form::make('contact')->data(['captcha' => false])));
     }
 }

@@ -164,7 +164,7 @@ class Tags extends BaseTags
 
         // Templates can place the captcha themselves with {{ form_captcha }} or {{ form:captcha }}.
         // When they haven't, it goes at the end of the form so it can't be forgotten.
-        if ($data['form_captcha'] && ! str_contains($contents, 'data-captcha')) {
+        if ($data['form_captcha'] && ! str_contains($contents, 'data-captcha') && ! str_contains($contents, $data['form_captcha'])) {
             $html .= $data['form_captcha'];
         }
 

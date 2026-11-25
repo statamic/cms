@@ -14,9 +14,9 @@ class Turnstile extends SiteverifyCaptcha
         return 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
     }
 
-    public function widget(): string
+    protected function markup(): string
     {
         return '<div class="cf-turnstile" data-captcha data-sitekey="'.$this->attr($this->siteKey()).'"></div>'
-            .'<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
+            .'<script'.$this->nonce().' src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>';
     }
 }

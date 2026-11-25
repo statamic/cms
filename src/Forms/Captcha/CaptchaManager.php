@@ -29,9 +29,9 @@ class CaptchaManager extends Manager
     }
 
     /**
-     * Whether a captcha has been set up. The built in drivers need both keys,
-     * so they stay off until both are set. Custom drivers decide for themselves
-     * what they need, so they're on as soon as they're the configured driver.
+     * Whether a captcha has been set up. The built in drivers need both keys.
+     * Custom drivers decide for themselves what they need, so they're set up
+     * as soon as they're the configured driver.
      */
     public function enabled(): bool
     {
@@ -52,10 +52,14 @@ class CaptchaManager extends Manager
 
     /**
      * The captcha a form should use, or null when it shouldn't use one.
+     *
+     * A form that has a captcha turned on gets one even when the keys are
+     * missing, so it refuses submissions rather than quietly going without.
+     * The null driver is the way to turn captchas off, such as locally.
      */
     public function forForm(Form $form): ?Captcha
     {
-        if (! $form->get('captcha') || ! $this->enabled()) {
+        if (! $form->get('captcha') || $this->getDefaultDriver() === 'null') {
             return null;
         }
 

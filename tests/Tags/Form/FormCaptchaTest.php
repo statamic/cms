@@ -34,7 +34,7 @@ class FormCaptchaTest extends FormTestCase
     #[Test]
     public function it_doesnt_add_the_widget_when_the_template_places_it()
     {
-        $output = $this->tag('{{ form:contact }}{{ captcha }}<button>Send</button>{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact }}{{ form_captcha }}<button>Send</button>{{ /form:contact }}');
 
         $this->assertEquals(1, substr_count($output, 'data-captcha'));
         $this->assertStringContainsString(self::WIDGET.'<button>Send</button></form>', $output);
@@ -60,19 +60,20 @@ class FormCaptchaTest extends FormTestCase
     {
         Form::find('contact')->data(['captcha' => false]);
 
-        $output = $this->tag('{{ form:contact }}{{ captcha }}{{ form:captcha }}<button>Send</button>{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact }}{{ form_captcha }}{{ form:captcha }}<button>Send</button>{{ /form:contact }}');
 
         $this->assertStringNotContainsString('data-captcha', $output);
     }
 
     #[Test]
-    public function it_doesnt_render_anything_when_captchas_arent_set_up()
+    public function it_renders_a_reminder_instead_of_the_widget_when_the_keys_arent_set()
     {
         config(['statamic.forms.captcha.site_key' => null]);
 
-        $output = $this->tag('{{ form:contact }}<button>Send</button>{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact }}{{ form_captcha }}<button>Send</button>{{ /form:contact }}');
 
         $this->assertStringNotContainsString('data-captcha', $output);
+        $this->assertEquals(1, substr_count($output, '<!-- Captcha: set STATAMIC_CAPTCHA_SITE_KEY and STATAMIC_CAPTCHA_SECRET_KEY to show it.'));
     }
 
     #[Test]
@@ -91,7 +92,7 @@ class FormCaptchaTest extends FormTestCase
     #[Test]
     public function it_includes_the_widget_in_blade_component_data()
     {
-        $output = $this->blade('<s:form:contact>{!! $captcha !!}</s:form:contact>');
+        $output = $this->blade('<s:form:contact>{!! $form_captcha !!}</s:form:contact>');
 
         $this->assertEquals(1, substr_count($output, 'data-captcha'));
     }

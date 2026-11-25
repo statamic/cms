@@ -10,15 +10,33 @@ namespace Statamic\Forms\Captcha;
  */
 class RecaptchaV3 extends Recaptcha
 {
-    public function widget(): string
+    protected function markup(): string
     {
-        $key = $this->attr($this->siteKey());
+        $src = 'https://www.google.com/recaptcha/api.js?render='.rawurlencode($this->siteKey());
 
-        // Asks Google for a token as the form is submitted, then submits it again. The ready()
-        // stub is Google's documented way to queue the call until the async script has loaded.
+        // Gets a token from Google as the form is submitted, then submits it again. The listener is on
+        // the document, in the capture phase, so it runs before any other submit handlers, such as one
+        // sending the form with fetch(), and they only see the submission that carries the token. Each
+        // token is used once, as Google only accepts it once. If Google can't be reached, the form is
+        // still submitted, so the visitor sees the error instead of a button that does nothing. The
+        // ready() stub is Google's documented way to queue the call until the async script has loaded.
         return '<input type="hidden" name="g-recaptcha-response" value="" data-captcha data-captcha-recaptcha>'
-            .'<script src="https://www.google.com/recaptcha/api.js?render='.$key.'" async defer></script>'
-            .'<script>(function(){if(typeof grecaptcha==="undefined"){grecaptcha={}}grecaptcha.ready=grecaptcha.ready||function(cb){var c="___grecaptcha_cfg";window[c]=window[c]||{};(window[c].fns=window[c].fns||[]).push(cb)};document.querySelectorAll("[data-captcha-recaptcha]").forEach(function(input){var form=input.form;if(!form||form.dataset.captchaRecaptcha)return;form.dataset.captchaRecaptcha=1;form.addEventListener("submit",function(event){if(input.value)return;event.preventDefault();grecaptcha.ready(function(){grecaptcha.execute('.$this->js($this->siteKey()).',{action:'.$this->js($this->action()).'}).then(function(token){input.value=token;form.requestSubmit?form.requestSubmit():form.submit()})})})})})();</script>';
+            .'<script'.$this->nonce().' src="'.$this->attr($src).'" async defer></script>'
+            .'<script'.$this->nonce().'>(function(){'
+            .'if(window.statamicRecaptchaV3)return;window.statamicRecaptchaV3=1;'
+            .'if(typeof grecaptcha==="undefined"){grecaptcha={}}'
+            .'grecaptcha.ready=grecaptcha.ready||function(cb){var c="___grecaptcha_cfg";window[c]=window[c]||{};(window[c].fns=window[c].fns||[]).push(cb)};'
+            .'document.addEventListener("submit",function(event){'
+            .'var form=event.target,input=form.querySelector&&form.querySelector("[data-captcha-recaptcha]");'
+            .'if(!input)return;'
+            .'var minted=Number(input.dataset.captchaMinted||0);delete input.dataset.captchaMinted;'
+            .'if(Date.now()-minted<90000)return;'
+            .'event.preventDefault();event.stopImmediatePropagation();'
+            .'var submitter=event.submitter;'
+            .'function send(token){input.value=token;input.dataset.captchaMinted=Date.now();form.requestSubmit?form.requestSubmit(submitter&&submitter.form===form?submitter:undefined):form.submit()}'
+            .'grecaptcha.ready(function(){grecaptcha.execute('.$this->js($this->siteKey()).',{action:'.$this->js($this->action()).'}).then(send,function(){send("")})})'
+            .'},true)'
+            .'})();</script>';
     }
 
     public function action(): string

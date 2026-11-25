@@ -3,6 +3,7 @@
 namespace Statamic\Forms\Captcha;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Vite;
 use Statamic\Contracts\Forms\Captcha;
 use Throwable;
 
@@ -25,8 +26,26 @@ abstract class SiteverifyCaptcha implements Captcha
 
     abstract protected function endpoint(): string;
 
+    /**
+     * The widget's HTML, once the keys are set.
+     */
+    abstract protected function markup(): string;
+
+    public function widget(): string
+    {
+        if (! $this->configured()) {
+            return '<!-- Captcha: set STATAMIC_CAPTCHA_SITE_KEY and STATAMIC_CAPTCHA_SECRET_KEY to show it. Until then, this form refuses submissions. -->';
+        }
+
+        return $this->markup();
+    }
+
     public function verify(?string $token, ?string $ip = null): bool
     {
+        if (! $this->configured()) {
+            return false;
+        }
+
         if ($token === null || $token === '' || strlen($token) > static::MAX_TOKEN_LENGTH) {
             return false;
         }
@@ -59,6 +78,19 @@ abstract class SiteverifyCaptcha implements Captcha
     protected function passed(array $result): bool
     {
         return ($result['success'] ?? false) === true;
+    }
+
+    protected function configured(): bool
+    {
+        return $this->siteKey() !== '' && $this->secretKey() !== '';
+    }
+
+    /**
+     * A nonce attribute for script tags, when the site sends a Content Security Policy.
+     */
+    protected function nonce(): string
+    {
+        return ($nonce = Vite::cspNonce()) ? ' nonce="'.$this->attr($nonce).'"' : '';
     }
 
     protected function siteKey(): string

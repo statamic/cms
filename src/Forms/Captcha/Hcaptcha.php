@@ -19,9 +19,9 @@ class Hcaptcha extends SiteverifyCaptcha
         return parent::payload($token, $ip) + ['sitekey' => $this->siteKey()];
     }
 
-    public function widget(): string
+    protected function markup(): string
     {
         return '<div class="h-captcha" data-captcha data-sitekey="'.$this->attr($this->siteKey()).'"></div>'
-            .'<script src="https://js.hcaptcha.com/1/api.js" async defer></script>';
+            .'<script'.$this->nonce().' src="https://js.hcaptcha.com/1/api.js" async defer></script>';
     }
 }

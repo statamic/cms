@@ -93,7 +93,8 @@ return [
     |
     | A captcha can be added to any form from its settings. Supported drivers
     | are "turnstile", "hcaptcha", "recaptcha" (v2 checkbox), "recaptcha_v3"
-    | and "null". Captchas stay off until both of the keys have been set.
+    | and "null". A form with a captcha turned on refuses submissions until
+    | both of the keys have been set. Use the "null" driver to turn them off.
     |
     | The score and action only apply to reCAPTCHA v3. Visits scoring under
     | the score are refused. The timeout is in seconds, and a provider that

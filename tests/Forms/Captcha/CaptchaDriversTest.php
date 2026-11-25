@@ -5,6 +5,7 @@ namespace Tests\Forms\Captcha;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Vite;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Forms\Captcha\Hcaptcha;
@@ -163,7 +164,7 @@ class CaptchaDriversTest extends TestCase
     #[Test]
     public function it_escapes_the_site_key_in_the_widget()
     {
-        $widget = (new Turnstile(['site_key' => '"><script>alert(1)</script>']))->widget();
+        $widget = (new Turnstile(['site_key' => '"><script>alert(1)</script>', 'secret_key' => 'secret']))->widget();
 
         $this->assertStringNotContainsString('<script>alert(1)</script>', $widget);
         $this->assertStringContainsString('data-sitekey="&quot;&gt;&lt;script&gt;', $widget);
@@ -232,7 +233,7 @@ class CaptchaDriversTest extends TestCase
     #[Test]
     public function recaptcha_v3_renders_a_script_safe_widget()
     {
-        $widget = (new RecaptchaV3(['site_key' => "</script><script>alert('x')</script>"]))->widget();
+        $widget = (new RecaptchaV3(['site_key' => "</script><script>alert('x')</script>", 'secret_key' => 'secret']))->widget();
 
         $this->assertStringContainsString('<input type="hidden" name="g-recaptcha-response" value="" data-captcha data-captcha-recaptcha>', $widget);
         $this->assertStringNotContainsString("<script>alert('x')</script>", $widget);
@@ -246,7 +247,30 @@ class CaptchaDriversTest extends TestCase
     {
         $widget = (new RecaptchaV3(self::CONFIG))->widget();
 
-        $this->assertStringContainsString('if(input.value)return;event.preventDefault();grecaptcha.ready(', $widget);
+        $this->assertStringContainsString('event.preventDefault();event.stopImmediatePropagation();', $widget);
         $this->assertStringContainsString('grecaptcha.ready=grecaptcha.ready||function(cb)', $widget);
+        $this->assertStringContainsString('grecaptcha.ready(function(){grecaptcha.execute(', $widget);
+    }
+
+    #[Test]
+    #[DataProvider('widgetProvider')]
+    public function the_widget_scripts_carry_the_csp_nonce($class)
+    {
+        Vite::useCspNonce('the-nonce');
+
+        $widget = (new $class(self::CONFIG))->widget();
+
+        $this->assertEquals(substr_count($widget, '<script'), substr_count($widget, '<script nonce="the-nonce"'));
+        $this->assertGreaterThan(0, substr_count($widget, '<script'));
+    }
+
+    public static function widgetProvider()
+    {
+        return [
+            'turnstile' => [Turnstile::class],
+            'hcaptcha' => [Hcaptcha::class],
+            'recaptcha' => [Recaptcha::class],
+            'recaptcha_v3' => [RecaptchaV3::class],
+        ];
     }
 }
