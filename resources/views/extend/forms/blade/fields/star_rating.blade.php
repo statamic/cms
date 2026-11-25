@@ -4,31 +4,33 @@
     $isUnrated = $ratingValue == 0;
 @endphp
 
-<input
-    id="{{ $id }}"
-    type="range"
-    @if ($isUnrated) data-name="{{ $name }}" @else name="{{ $name }}" @endif
-    class="star-rating-input"
-    data-star-rating
-    @if ($isUnrated) data-unrated @endif
-    min="{{ $min }}"
-    max="{{ $max_stars ?? 5 }}"
-    step="{{ $step ?? 1 }}"
-    value="{{ $isUnrated ? $min : $ratingValue }}"
-    style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-min: {{ $min }}; --star-rating-step: {{ $step ?? 1 }};"
-    @if (isset($js_driver)) {!! $js_attributes !!} @endif
-    @required(in_array('required', $validate ?? []))
-    @if (! empty($display)) aria-label="{{ $display }}" @endif
-    @if ($error)
-        aria-invalid="true" aria-describedby="{{ $id }}-error"
-    @elseif ($instructions)
-        aria-describedby="{{ $id }}-instructions"
-    @endif
->
+<span class="star-rating" style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-min: {{ $min }}; --star-rating-step: {{ $step ?? 1 }};">
+    <input
+        id="{{ $id }}"
+        type="range"
+        @if ($isUnrated) data-name="{{ $name }}" @else name="{{ $name }}" @endif
+        class="star-rating-input"
+        data-star-rating
+        @if ($isUnrated) data-unrated @endif
+        min="{{ $min }}"
+        max="{{ $max_stars ?? 5 }}"
+        step="{{ $step ?? 1 }}"
+        value="{{ $isUnrated ? $min : $ratingValue }}"
+        @if (isset($js_driver)) {!! $js_attributes !!} @endif
+        @required(in_array('required', $validate ?? []))
+        @if (! empty($display)) aria-label="{{ $display }}" @endif
+        @if ($error)
+            aria-invalid="true" aria-describedby="{{ $id }}-error"
+        @elseif ($instructions)
+            aria-describedby="{{ $id }}-instructions"
+        @endif
+    >
+    <span class="star-rating-outline" aria-hidden="true"></span>
+</span>
 
 @once
     <style>
-        .star-rating-input {
+        .star-rating {
             --s: 1.5rem;
             --star-rating-gap: 0.4rem;
             --star-rating-max: 5;
@@ -45,6 +47,13 @@
 
             position: relative;
             display: block;
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        .star-rating-input {
+            display: block;
+            margin: 0;
             width: calc(var(--_cell) * var(--star-rating-max)) !important;
             max-width: 100%;
             height: var(--s);
@@ -60,18 +69,23 @@
             mask-repeat: repeat;
         }
 
-        .star-rating-input::before {
-            content: '';
+        /* Safari and Firefox don't render pseudo-elements on inputs, so the empty stars need an element of their own. */
+        .star-rating-outline {
             position: absolute;
             inset: 0;
-            background-color: var(--_empty);
             pointer-events: none;
-            mask-image: var(--_star-stroke-mask);
+            background-color: var(--_empty);
+            mask-image: var(--_star-stroke-mask), var(--_star-fill-mask);
             mask-size: var(--_cell) var(--s);
             mask-repeat: repeat;
+            mask-composite: intersect;
         }
 
-        :where(.dark) .star-rating-input {
+        .star-rating-input:disabled + .star-rating-outline {
+            opacity: 0.6;
+        }
+
+        :where(.dark) .star-rating {
             --_empty: var(--color-gray-500, #71717a);
         }
 
