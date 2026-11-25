@@ -30,7 +30,7 @@ const mountDatePicker = async (width, props = {}) => {
                     ...props,
                 }),
         },
-        { attachTo: host, global: { mocks: { __: (key) => key, $date: { locale: 'en-GB' } } } },
+        { attachTo: host, global: { mocks: { __: (key) => key, $date: { locale: 'en-GB' } }, directives: { tooltip: {} } } },
     );
 
     await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -58,7 +58,7 @@ test('a 33% width date and time has a 14px date', async () => {
 test('a 25% width read-only date and time is compact', async () => {
     const root = await mountDatePicker('220px', { readOnly: true });
 
-    expect(dateSize(root)).not.toBe('16px');
+    expect(dateSize(root)).toBe('13.2px');
     expect(triggerWidth(root)).toBe(20);
 });
 

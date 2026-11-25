@@ -339,4 +339,3 @@ const getInputLabel = (part) => {
         }
     }
 </style>
-
