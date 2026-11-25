@@ -65,7 +65,7 @@ test('a 25% width read-only date and time is compact', async () => {
 test('a 25% width date and time with the clear button is tight', async () => {
     const root = await mountDatePicker('220px');
 
-    expect(triggerWidth(root)).toBe(12);
+    expect(triggerWidth(root)).toBe(24);
 });
 
 test('it changes size as it is resized', async () => {
@@ -73,7 +73,7 @@ test('it changes size as it is resized', async () => {
 
     host.style.width = '220px';
     await new Promise((resolve) => requestAnimationFrame(resolve));
-    expect(triggerWidth(root)).toBe(12);
+    expect(triggerWidth(root)).toBe(24);
 
     host.style.width = '480px';
     await new Promise((resolve) => requestAnimationFrame(resolve));

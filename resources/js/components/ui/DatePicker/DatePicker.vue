@@ -273,7 +273,7 @@ const getInputLabel = (part) => {
 
 <style>
     /* A date and time steps down as its field narrows: a 14px date under 20rem; then compact (13.2px date, 12px icon, 26px ×, tighter gaps)
-       under 17rem; then, with the ×, tight (no padding round the icon, 22px ×) under 15rem. The date never goes below 13.2px or the icon
+       under 17rem; then, with the ×, tight (a 24px button with no padding round the icon, 22px ×) under 15rem. The date never goes below 13.2px or the icon
        below 12px; anything still too long scrolls. */
     [data-date-picker-fits-width] {
         container-type: inline-size;
@@ -323,11 +323,18 @@ const getInputLabel = (part) => {
 
     @container (max-width: 15rem) {
         [data-date-picker-fits-width]:has([data-date-picker-clear]) {
+            /* A 24px target round the 12px icon, pulled back over the padding so the field gets no wider, and a ring when it's
+               focused, since a background this small doesn't show */
             [data-date-picker-trigger] {
-                width: 0.75rem;
-                height: 0.75rem;
+                width: 1.5rem;
+                height: 1.5rem;
                 padding: 0;
-                margin-inline-end: 0.25rem;
+                margin-inline: -0.375rem -0.125rem;
+
+                &:focus-visible {
+                    outline: 2px solid var(--color-blue-500);
+                    outline-offset: -2px;
+                }
             }
             [data-date-picker-timezone] {
                 margin-inline-start: 0.125rem;
