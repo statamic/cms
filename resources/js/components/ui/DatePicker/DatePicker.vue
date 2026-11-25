@@ -125,10 +125,10 @@ const hasTime = computed(() => props.granularity != null && props.granularity !=
 const fitsWidth = computed(() => hasTime.value && !props.inline);
 
 // The root is a container, which stops its content counting towards its width. Where a column is sized by its content (a Grid table),
-// this stands in for the width of the full-size value: 16.75rem with the clear ×, 15.5rem without, and 1.5rem more each for seconds and
-// a timezone with minutes.
+// this stands in for the width of the full-size value: 17.25rem with the clear ×, 16rem without, and 1.5rem more each for seconds and a
+// timezone with minutes. Starting just above the 17rem compact step keeps a squeezed Grid column at a 14px date.
 const intrinsicWidth = computed(() => {
-    let rem = props.clearable && !props.readOnly ? 16.75 : 15.5;
+    let rem = props.clearable && !props.readOnly ? 17.25 : 16;
     if (props.granularity === 'second') rem += 1.5;
     if (timeZoneLabel.value?.includes(':')) rem += 1.5;
     return `${rem}rem`;
