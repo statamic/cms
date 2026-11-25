@@ -552,6 +552,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Configure')],
                 icon: 'cog',
+                when: () => this.canEdit,
                 url: this.editUrl,
             });
 
@@ -559,6 +560,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Edit Blueprints')],
                 icon: 'blueprint-edit',
+                when: () => this.canEditBlueprints,
                 url: this.blueprintsUrl,
             });
 
@@ -566,6 +568,7 @@ export default {
                 category: Statamic.$commandPalette.category.Actions,
                 text: [__('Collection'), __('Scaffold Views')],
                 icon: 'scaffold',
+                when: () => this.canEdit,
                 url: this.scaffoldUrl,
             });
 
