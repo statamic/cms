@@ -130,6 +130,9 @@ const longValue = computed(() => props.granularity === 'second' || (timeZoneLabe
 // width, so where the column is sized by its content (a Grid table), contain-intrinsic-inline-size stands in for a full-size value.
 
 // Under 16rem the date and timezone shrink, and shrink a step further for a long value
+// The longest value (seconds and a timezone with minutes) beside the clear × only fits with everything around it tightened too
+const longestClear = computed(() => compactClear.value && props.granularity === 'second' && (timeZoneLabel.value?.includes(':') ?? false));
+
 const compactDateClass = computed(() => {
     if (!hasTime.value) return null;
     return longValue.value ? '@max-[16rem]:text-[0.625rem]' : '@max-[16rem]:text-2xs';
@@ -201,11 +204,11 @@ const getInputLabel = (part) => {
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime }"
+                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime && !longestClear, '@max-[16rem]:ms-0 @max-[16rem]:me-1 @max-[16rem]:p-0': longestClear }"
                             class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 me-0.5 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
-                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime }" />
+                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime && !longestClear, '@max-[16rem]:size-2.5': longestClear }" />
                         </DatePickerTrigger>
                         <div class="flex flex-1 items-center" :class="compactDateClass">
                             <template v-for="item in segments" :key="item.part">
@@ -241,7 +244,7 @@ const getInputLabel = (part) => {
                             :show-seconds="granularity === 'second'"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime && !longestClear, '@max-[16rem]:ms-0.5': longestClear, 'me-1': readOnly }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
@@ -250,7 +253,11 @@ const getInputLabel = (part) => {
                             size="sm"
                             icon="x"
                             class="-my-1.25 -me-2"
-                            :class="{ '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:size-6.5 @max-[16rem]:[&_svg]:size-3': compactClear }"
+                            :class="{
+                                '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:[&_svg]:size-3': compactClear,
+                                '@max-[16rem]:size-6.5': compactClear && !longestClear,
+                                '@max-[16rem]:size-5.5': longestClear,
+                            }"
                             :disabled="disabled"
                             v-tooltip="__('Clear date')"
                         />
