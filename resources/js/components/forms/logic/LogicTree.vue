@@ -253,7 +253,7 @@ onUnmounted(() => {
                                     }"
                                 >
                                     <Icon name="page" class="size-4 shrink-0 -ms-1.5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
-                                    <span class="line-clamp-1">{{ pageTitle(page, pageIndex) }}</span>
+                                    <span class="truncate">{{ pageTitle(page, pageIndex) }}</span>
                                 </div>
                             </div>
                         </div>

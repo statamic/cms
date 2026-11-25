@@ -14,8 +14,7 @@ const label = computed(() => showFieldNumbers.value ? __('Hide field numbers') :
         <ToggleItem
             value="on"
             icon="mail-sign-hashtag"
-            :aria-label="label"
-            v-tooltip="label"
+            :tooltip="label"
             @click.prevent="toggle"
         />
     </ToggleGroup>

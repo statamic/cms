@@ -43,7 +43,7 @@ class DuplicateForm extends Action
 
     public function visibleTo($item)
     {
-        return $item instanceof Form && Statamic::pro();
+        return $item instanceof Form && (Statamic::pro() || Statamic::formsProInstalled());
     }
 
     public function run($items, $values)

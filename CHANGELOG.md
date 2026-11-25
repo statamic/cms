@@ -1,5 +1,15 @@
 # Release Notes
 
+## 6.44.0 (2026-11-24)
+
+### What's new
+- Forms 2 [#15039](https://github.com/statamic/cms/issues/15039) by @jasonvarga
+
+### What's fixed
+- Conflict with eloquent-driver versions without Forms 2 support [#16021](https://github.com/statamic/cms/issues/16021) by @jasonvarga
+
+
+
 ## 6.43.2 (2026-11-23)
 
 ### What's fixed
