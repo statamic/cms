@@ -126,6 +126,9 @@ const compactClear = computed(() => hasTime.value && props.clearable && !props.r
 // smaller step
 const longValue = computed(() => props.granularity === 'second' || (timeZoneLabel.value?.includes(':') ?? false));
 
+// A date and time field sizes its text to its own width, so its root is a container. A container's content stops counting towards its
+// width, so where the column is sized by its content (a Grid table), contain-intrinsic-inline-size stands in for a full-size value.
+
 // Under 16rem the date and timezone shrink, and shrink a step further for a long value
 const compactDateClass = computed(() => {
     if (!hasTime.value) return null;
@@ -159,7 +162,11 @@ const getInputLabel = (part) => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full @container" data-ui-input>
+    <div
+        class="group/input relative block w-full"
+        :class="{ '@container [contain-intrinsic-inline-size:18.5rem]': hasTime && !inline }"
+        data-ui-input
+    >
         <DatePickerRoot
             :modelValue="modelValue"
             :granularity="granularity"
