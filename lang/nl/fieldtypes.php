@@ -11,6 +11,7 @@ return [
     'array.title' => 'Array',
     'asset_folders.config.container' => 'Kies welke asset-container je voor dit veld wilt gebruiken.',
     'assets.config.allow_uploads' => 'Nieuwe file-uploads toestaan',
+    'assets.config.aspect_ratio' => 'De beeldverhouding van het voorbeeld in het controlepaneel. Dit heeft geen invloed op de originele asset of de voorkant van je site.',
     'assets.config.container' => 'Kies welke asset-container je voor dit veld wilt gebruiken.',
     'assets.config.dynamic' => 'Activa worden in een submap geplaatst op basis van de waarde van dit veld.',
     'assets.config.folder' => 'De map waarin de gebruiker begint met bladeren.',
