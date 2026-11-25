@@ -205,7 +205,7 @@ const getInputLabel = (part) => {
                             class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 me-0.5 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
-                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': compactClear }" />
+                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime }" />
                         </DatePickerTrigger>
                         <div class="flex flex-1 items-center" :class="compactDateClass">
                             <template v-for="item in segments" :key="item.part">
