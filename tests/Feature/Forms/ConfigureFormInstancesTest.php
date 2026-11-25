@@ -160,7 +160,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function an_editor_with_form_permission_saves_the_incoming_config()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => self::STORED,
             'feedback' => ['submission_limit' => 99],
         ]);
@@ -179,7 +179,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function a_form_without_overrides_survives_a_save()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], null);
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], null);
 
         $this->save($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => []]]);
 
@@ -195,7 +195,7 @@ class ConfigureFormInstancesTest extends TestCase
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
         Blink::forget('forms-pro-installed');
 
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => self::STORED,
             'feedback' => ['submission_limit' => 99],
         ]);
@@ -208,7 +208,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function an_editor_with_form_permission_cant_save_an_invalid_connection_override()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], ['contact' => self::STORED]);
 
         $this->update($user, $entry, ['forms' => ['contact'], 'config' => [
             'contact' => ['connections' => ['email' => [['to' => 'admin@example.com', 'html' => 'statamic::auth.login']]]],
@@ -219,9 +219,27 @@ class ConfigureFormInstancesTest extends TestCase
     }
 
     #[Test]
-    public function an_editor_with_form_permission_cant_save_an_invalid_access_override()
+    public function an_editor_who_cant_view_submissions_cant_change_the_connections_override()
     {
         [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+
+        $this->save($user, $entry, ['forms' => ['contact'], 'config' => [
+            'contact' => [
+                'submission_limit' => 10,
+                'connections' => ['webhook' => [['id' => 'abc', 'url' => 'https://attacker.example.com/hook']]],
+            ],
+        ]]);
+
+        $this->assertEquals(
+            ['contact' => [...self::STORED, 'submission_limit' => 10]],
+            Entry::find($entry->id())->get('form_instances')
+        );
+    }
+
+    #[Test]
+    public function an_editor_with_form_permission_cant_save_an_invalid_access_override()
+    {
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], ['contact' => self::STORED]);
 
         $this->update($user, $entry, ['forms' => ['contact'], 'config' => [
             'contact' => ['submission_limit' => 'lots'],
@@ -249,7 +267,7 @@ class ConfigureFormInstancesTest extends TestCase
     {
         $stored = ['connections' => ['email' => [self::DRIFTED]]];
 
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => $stored]);
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], ['contact' => $stored]);
 
         $this->save($user, $entry, $this->posted($user, $entry));
 
@@ -260,7 +278,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function a_changed_drifted_connection_override_is_still_validated()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => ['connections' => ['email' => [self::DRIFTED]]],
         ]);
 
@@ -273,7 +291,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function a_new_invalid_connection_next_to_an_unchanged_drifted_one_is_validated()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => ['connections' => ['email' => [self::DRIFTED]]],
         ]);
 
@@ -286,7 +304,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function a_changed_connection_next_to_an_unchanged_drifted_one_can_be_saved()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => ['connections' => ['email' => [self::DRIFTED, ['id' => 'ok', 'to' => ['admin@example.com']]]]],
         ]);
 
@@ -304,7 +322,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function an_unchanged_invalid_access_override_doesnt_block_a_save()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => ['submission_limit' => 'lots'],
         ]);
 
@@ -316,7 +334,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function a_changed_invalid_access_override_is_still_validated()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], [
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], [
             'contact' => ['submission_limit' => 'lots'],
         ]);
 
@@ -361,7 +379,7 @@ class ConfigureFormInstancesTest extends TestCase
     #[Test]
     public function an_invalid_date_override_error_lands_on_the_field()
     {
-        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form'], ['contact' => self::STORED]);
+        [$user, $entry] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'edit contact form', 'view contact form submissions'], ['contact' => self::STORED]);
 
         $this->update($user, $entry, ['forms' => ['contact'], 'config' => ['contact' => ['close_date' => 'bad-date']]])
             ->assertUnprocessable()
@@ -425,7 +443,7 @@ class ConfigureFormInstancesTest extends TestCase
             'fr' => ['locale' => 'fr', 'url' => '/fr/'],
         ]);
 
-        [$user, $origin] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'access fr site', 'edit contact form'], $formInstances);
+        [$user, $origin] = $this->seedEntry(['access cp', 'edit test entries', 'access en site', 'access fr site', 'edit contact form', 'view contact form submissions'], $formInstances);
         $origin->collection()->sites(['en', 'fr'])->save();
 
         $localization = EntryFactory::collection($origin->collection())->locale('fr')->origin($origin)->slug('a')->data(['title' => 'A'])->create();

@@ -130,13 +130,19 @@ class FormInstances extends FormFieldtype
 
         // Only desynced fields are submitted, so a key's presence means it's an
         // override. Falsy values count; an override is only "empty" when blank.
-        return $this->overrideFields($form)
+        $processed = $this->overrideFields($form)
             ->addValues($config)
             ->process()
             ->values()
             ->only(array_keys($config))
             ->reject(fn ($value) => $value === null || $value === '')
             ->all();
+
+        if (! $this->canEditConnections($form) && array_key_exists('connections', $stored)) {
+            $processed['connections'] = $stored['connections'];
+        }
+
+        return $processed;
     }
 
     private function storedValue(): array
@@ -280,6 +286,11 @@ class FormInstances extends FormFieldtype
         }
 
         return $form;
+    }
+
+    private function canEditConnections(FormContract $form): bool
+    {
+        return ! ($user = User::current()) || $user->can('editConnections', $form);
     }
 
     private static function toMap($value): array
@@ -455,7 +466,7 @@ class FormInstances extends FormFieldtype
         return Facades\Blueprint::make()->setContents([
             'tabs' => ['main' => ['sections' => [
                 $this->toBlueprintSection($access),
-                $this->toBlueprintSection($connections),
+                ...($this->canEditConnections($form) ? [$this->toBlueprintSection($connections)] : []),
             ]]],
         ]);
     }

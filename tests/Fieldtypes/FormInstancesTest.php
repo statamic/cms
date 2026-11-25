@@ -187,6 +187,56 @@ class FormInstancesTest extends TestCase
     }
 
     #[Test]
+    public function it_keeps_the_stored_connections_for_users_who_cant_edit_connections()
+    {
+        $this->setTestRoles(['editor' => ['access cp', 'edit contact form', 'edit feedback form']]);
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+
+        $entry = $this->entry(['form_instances' => [
+            'contact' => ['submission_limit' => 5, 'connections' => ['webhook' => [['id' => 'abc', 'url' => 'https://example.com/webhook']]]],
+            'feedback' => [],
+        ]]);
+
+        $value = $this->field()->setParent($entry)->fieldtype()->process([
+            'forms' => ['contact', 'feedback'],
+            'config' => [
+                'contact' => ['submission_limit' => 10, 'connections' => ['webhook' => [['id' => 'abc', 'url' => 'https://attacker.com']]]],
+                'feedback' => ['connections' => ['webhook' => [['id' => 'def', 'url' => 'https://attacker.com']]]],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'contact' => ['submission_limit' => 10, 'connections' => ['webhook' => [['id' => 'abc', 'url' => 'https://example.com/webhook']]]],
+            'feedback' => [],
+        ], $value);
+    }
+
+    #[Test]
+    public function it_only_offers_the_connections_override_to_users_who_can_edit_connections()
+    {
+        $this->setTestRoles([
+            'editor' => ['access cp', 'edit contact form'],
+            'manager' => ['access cp', 'edit contact form', 'view contact form submissions'],
+        ]);
+
+        $handles = function () {
+            $sections = $this->field()
+                ->setParent($this->entry())
+                ->setValue(['forms' => ['contact'], 'config' => []])
+                ->fieldtype()
+                ->preload()['configureMeta']['contact']['blueprint']['tabs'][0]['sections'];
+
+            return collect($sections)->flatMap(fn ($section) => collect($section['fields'])->pluck('handle'));
+        };
+
+        $this->actingAs(tap(User::make()->assignRole('editor'))->save());
+        $this->assertNotContains('connections', $handles());
+
+        $this->actingAs(tap(User::make()->assignRole('manager'))->save());
+        $this->assertContains('connections', $handles());
+    }
+
+    #[Test]
     public function it_ignores_incoming_config_for_users_who_cant_edit_the_form_without_a_parent_entry()
     {
         $this->setTestRoles(['editor' => ['access cp', 'view contact form submissions']]);

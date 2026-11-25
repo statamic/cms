@@ -37,7 +37,7 @@ class ConnectorEditorTest extends TestCase
     #[Test]
     public function it_builds_the_editor_from_the_posted_connections_rather_than_the_forms()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test')->connections([
             'grid_test' => [['id' => 'global', 'rows' => [['id' => 'form-row', 'label' => 'Form']]]],
@@ -77,7 +77,7 @@ class ConnectorEditorTest extends TestCase
     #[DataProvider('malformedConnectionsProvider')]
     public function it_rejects_structurally_malformed_connections($connections, $errorKey)
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -104,7 +104,7 @@ class ConnectorEditorTest extends TestCase
     #[Test]
     public function it_opens_connections_that_fail_the_connectors_own_rules()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
         $connections = [['id' => 'a', 'rows' => [['label' => 'Too long']]]];
@@ -123,7 +123,7 @@ class ConnectorEditorTest extends TestCase
     #[Test]
     public function it_opens_connections_with_numeric_ids()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -137,7 +137,7 @@ class ConnectorEditorTest extends TestCase
     #[Test]
     public function it_404s_if_the_connector_doesnt_exist()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -151,6 +151,19 @@ class ConnectorEditorTest extends TestCase
     public function it_denies_access_if_you_cant_edit_the_form()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.editor', [$form->handle(), 'grid_test']), [])
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_denies_access_if_you_cant_view_submissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 

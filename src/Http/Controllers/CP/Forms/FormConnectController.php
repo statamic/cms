@@ -75,7 +75,7 @@ class FormConnectController extends CpController
 
     public function validateConnections(Request $request, $form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         [$connector, $connections] = $this->validatedConnections($request, $form, $handle);
 
@@ -84,7 +84,7 @@ class FormConnectController extends CpController
 
     public function editor(Request $request, $form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         throw_unless($connector = FormConnector::find($handle)?->setForm($form), NotFoundHttpException::class);
 

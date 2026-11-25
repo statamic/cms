@@ -24,7 +24,7 @@ class ValidateConnectorTest extends TestCase
     #[Test]
     public function it_returns_the_pre_processed_values_without_saving()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test')->connections([
             'email' => [['id' => 'abc', 'to' => ['old@example.com']]],
@@ -58,7 +58,7 @@ class ValidateConnectorTest extends TestCase
     #[Test]
     public function it_rejects_an_invalid_payload()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -72,7 +72,7 @@ class ValidateConnectorTest extends TestCase
     #[Test]
     public function it_404s_if_the_connector_doesnt_exist()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
@@ -86,6 +86,19 @@ class ValidateConnectorTest extends TestCase
     public function it_denies_access_if_you_cant_edit_the_form()
     {
         $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.validate', [$form->handle(), 'email']), [['id' => 'abc', 'to' => ['new@example.com']]])
+            ->assertForbidden();
+    }
+
+    #[Test]
+    public function it_denies_access_if_you_cant_view_submissions()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
         $user = tap(User::make()->assignRole('test'))->save();
         $form = tap(Form::make('test'))->save();
 
