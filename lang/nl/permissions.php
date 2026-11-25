@@ -2,7 +2,7 @@
 
 return [
     'super' => 'Superuser',
-    'super_desc' => 'Geeft volledige controle over het controlepaneel. Ken deze rol zorgvuldig toe.',
+    'super_desc' => 'Geeft volledige controle over het controlepaneel. Wijs deze rol zorgvuldig toe.',
     'group_cp' => 'Controlepaneel',
     'access_cp' => 'Toegang tot het controlepaneel',
     'access_cp_desc' => 'Geeft toegang tot het controlepaneel. Andere rechten bepalen wat je daar kunt doen.',
@@ -83,8 +83,8 @@ return [
     'change_passwords' => 'Wachtwoorden wijzigen',
     'edit_user_groups' => 'Groepen wijzigen',
     'edit_roles' => 'Rollen wijzigen',
-    'assign_user_groups' => 'Groepen toekennen aan gebruikers',
-    'assign_roles' => 'Rollen toekennen aan gebruikers',
+    'assign_user_groups' => 'Groepen aan gebruikers toewijzen',
+    'assign_roles' => 'Rollen aan gebruikers toewijzen',
     'impersonate_users' => 'Gebruikers imiteren',
     'impersonate_users_desc' => 'Hiermee kun je inloggen als elke gebruiker, ook als superbeheerder. Ken dit recht zorgvuldig toe.',
     'group_updates' => 'Updates',

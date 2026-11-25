@@ -338,7 +338,7 @@ return [
     'uploader_overwrite_existing' => 'Bestaand bestand overschrijven',
     'user_activation_email_not_sent_error' => 'De activatiemail kon niet worden verzonden. Controleer je e-mailconfiguratie en probeer het opnieuw.',
     'user_groups_intro' => 'Met gebruikersgroepen kun je gebruikers groeperen en rechten in één keer toepassen.',
-    'user_groups_role_instructions' => 'Wijs rollen toe om gebruikers in deze groep alle bijbehorende rechten te geven.',
+    'user_groups_role_instructions' => 'Wijs rollen toe om gebruikers in deze groep alle bijbehorende rechten toe te kennen.',
     'user_groups_title_instructions' => 'Meestal een meervoudig zelfstandig naamwoord, zoals Redacteuren of Fotografen.',
     'user_wizard_account_created' => 'Het gebruikersaccount is aangemaakt.',
     'user_wizard_intro' => 'Gebruikers kunnen rollen toegewezen krijgen die hun rechten, toegang en mogelijkheden in het controlepaneel aanpassen.',
