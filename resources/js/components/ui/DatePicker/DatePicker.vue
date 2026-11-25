@@ -127,7 +127,14 @@ const compactClear = computed(() => hasTime.value && props.clearable && !props.r
 const longValue = computed(() => props.granularity === 'second' || (timeZoneLabel.value?.includes(':') ?? false));
 
 // A date and time field sizes its text to its own width, so its root is a container. A container's content stops counting towards its
-// width, so where the column is sized by its content (a Grid table), contain-intrinsic-inline-size stands in for a full-size value.
+// width, so where the column is sized by its content (a Grid table), this stands in for the width of the full-size value: 16.75rem for
+// a date and time with the clear ×, 1.25rem less without it, and 1.5rem more each for seconds and a timezone with minutes.
+const intrinsicWidth = computed(() => {
+    let rem = props.clearable && !props.readOnly ? 16.75 : 15.5;
+    if (props.granularity === 'second') rem += 1.5;
+    if (timeZoneLabel.value?.includes(':')) rem += 1.5;
+    return `${rem}rem`;
+});
 
 // Under 16rem the date and timezone shrink, and shrink a step further for a long value
 // The longest value (seconds and a timezone with minutes) beside the clear × only fits with everything around it tightened too
@@ -167,7 +174,8 @@ const getInputLabel = (part) => {
 <template>
     <div
         class="group/input relative block w-full"
-        :class="{ '@container [contain-intrinsic-inline-size:18.5rem]': hasTime && !inline }"
+        :class="{ '@container': hasTime && !inline }"
+        :style="hasTime && !inline ? { containIntrinsicInlineSize: intrinsicWidth } : null"
         data-ui-input
     >
         <DatePickerRoot
