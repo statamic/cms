@@ -609,6 +609,26 @@ class SubmitFormTest extends TestCase
     }
 
     #[Test]
+    public function it_submits_without_a_file_when_an_optional_upload_field_has_file_rules()
+    {
+        $form = tap(Form::make('resume')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'email']],
+                ['handle' => 'resume', 'field' => ['type' => 'upload', 'max_files' => 1, 'validate' => ['mimes:pdf']]],
+            ],
+        ]))->save();
+
+        // A single file input left empty arrives as null, and isn't in the files array.
+        $result = app(SubmitForm::class)
+            ->form($form)
+            ->submit(data: ['email' => 'test@example.com', 'resume' => null]);
+
+        $this->assertNull($result->submission->get('resume'));
+
+        $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
     public function it_uploads_files_via_files_fieldtype()
     {
         Storage::fake('local');
