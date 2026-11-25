@@ -80,6 +80,8 @@ onUnmounted(() => {
                 :data-max-width-enabled="isMaxWidthEnabled"
                 scroll-region
             >
+                <!-- Fills any gaps Safari hasn't painted yet during a fast scroll. See .main-content-backing in app.css. -->
+                <div class="main-content-backing" aria-hidden="true"></div>
                 <div id="content-card" tabindex="-1" class="focus:outline-none relative grid sm:py-2 min-h-full mx-auto">
                     <div class="content-card">
                         <div

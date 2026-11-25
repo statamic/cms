@@ -5,12 +5,16 @@ namespace Statamic\Http\Controllers\CP\Forms;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Forms\Fields\FormFields;
 use Statamic\Forms\Fields\FormFieldTransformer;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\Fields\ManagesFields;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -68,6 +72,26 @@ trait ManagesFormFields
         return ! FieldtypeRepository::hasBeenMadeSelectableInForms($handle);
     }
 
+    private function formsProRequired(Form $form): bool
+    {
+        return count($form->formFields()->contents()['pages'] ?? []) > 1 && ! Statamic::formsProInstalled();
+    }
+
+    private function formsProRequiredPage(Form $form): Response
+    {
+        return Inertia::render('forms/FormsProRequired', [
+            'form' => $form,
+            'can' => $this->formAbilities($form),
+        ]);
+    }
+
+    private function ensureFormsProIsNotRequired(Form $form): void
+    {
+        if ($this->formsProRequired($form)) {
+            throw ValidationException::withMessages(['pages' => __('statamic::messages.form_forms_pro_required')]);
+        }
+    }
+
     private function toVueObject(FormFields $formFields): array
     {
         return [
@@ -102,9 +126,8 @@ trait ManagesFormFields
 
     private function sectionToVue(array $section): array
     {
-        return Arr::removeNullValues([
-            'display' => $section['display'] ?? __('Section'),
-        ]) + [
+        return [
+            ...Arr::except($section, 'fields'),
             'fields' => collect($section['fields'] ?? [])->map(function (array $field) {
                 return array_merge(FormFieldTransformer::toVue($field), ['_id' => Str::random()]);
             })->values()->all(),
@@ -138,6 +161,7 @@ trait ManagesFormFields
                 'sections' => collect($page['sections'])->map(function (array $section) {
                     return Arr::removeNullValues([
                         'display' => $section['display'] ?? null,
+                        ...Arr::except($section, ['_id', 'collapsed', 'display', 'fields']),
                         'fields' => collect($section['fields'])
                             ->reject(fn (array $field) => $field['type'] === 'link_fields')
                             ->map(fn (array $field) => FormFieldTransformer::fromVue($field))

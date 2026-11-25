@@ -267,12 +267,11 @@ defineExpose({ refresh: fetchSummary });
         <div class="flex w-full items-center gap-2 mb-3">
             <FieldNumberingToggle />
             <ToggleGroup v-model="metric" size="xs">
-                <ToggleItem :value="ChartMetric.Percent" label="%" :aria-label="__('Percentage')" v-tooltip="__('Percentage')" />
+                <ToggleItem :value="ChartMetric.Percent" label="%" :tooltip="__('Percentage')" />
                 <ToggleItem
                     :value="ChartMetric.Count"
                     icon="layout-list-small"
-                    :aria-label="__('Response count')"
-                    v-tooltip="__('Response count')"
+                    :tooltip="__('Response count')"
                 />
             </ToggleGroup>
             <p v-if="summary" class="ms-1 text-sm text-gray-500 dark:text-gray-500">

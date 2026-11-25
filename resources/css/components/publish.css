@@ -146,6 +146,11 @@
         overflow: clip;
         /* We need to increase the clip margin here vs regular collapsible sections because we have things appearing outside the section such as the logic indicator icon. */
         overflow-clip-margin: 2.5rem;
+        /* As of 2026-11-10 Safari doesn't support overflow-clip-margin, so pad the clip box out instead or it cuts off the card's ring and shadow. */
+        @supports not (overflow-clip-margin: 1px) {
+            padding: 0.25rem;
+            margin: -0.25rem;
+        }
     }
 }
 

@@ -18,9 +18,11 @@ use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\File;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 use Statamic\Forms\Connectors\Webhooks\SendWebhook;
 use Statamic\Forms\CreateAssetsFromFileUploads;
 use Statamic\Forms\DeleteTemporaryFiles;
@@ -137,6 +139,17 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
+    public function get_returns_the_fallback_for_null_values()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => null])->set('_site', null);
+
+        $this->assertEquals('fallback', $submission->get('name', 'fallback'));
+        $this->assertEquals('fallback', $submission->get('_site', 'fallback'));
+    }
+
+    #[Test]
     public function it_gets_values_without_internal_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
@@ -148,17 +161,18 @@ class SubmissionTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $submission->values());
         $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->values()->all());
+        $this->assertEquals(['name' => 'Olaf', 'email' => 'olaf@example.com'], $submission->data()->all());
         $this->assertEquals([
             'name' => 'Olaf',
             'email' => 'olaf@example.com',
             '_fake' => true,
             '_partial' => true,
             '_site' => 'en',
-        ], $submission->data()->all());
+        ], $submission->fileData());
     }
 
     #[Test]
-    public function data_remains_the_live_collection_including_internal_keys()
+    public function data_remains_the_live_collection_without_internal_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
@@ -166,7 +180,36 @@ class SubmissionTest extends TestCase
         $submission->data()->put('name', 'Olaf');
 
         $this->assertEquals(['name' => 'Olaf'], $submission->values()->all());
-        $this->assertEquals(['_partial' => true, 'name' => 'Olaf'], $submission->data()->all());
+        $this->assertEquals(['name' => 'Olaf'], $submission->data()->all());
+        $this->assertEquals(['name' => 'Olaf', '_partial' => true], $submission->fileData());
+        $this->assertTrue($submission->get('_partial'));
+        $this->assertTrue($submission->has('_partial'));
+    }
+
+    #[Test]
+    public function internal_keys_are_stored_but_kept_out_of_the_data_listeners_see()
+    {
+        $form = tap(Form::make('contact_us'))->save();
+
+        $seen = null;
+        Event::listen(SubmissionSaved::class, function ($event) use (&$seen) {
+            $seen = $event->submission->data()->all();
+        });
+
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial()->site('en')->markAsSpam())->save();
+
+        $this->assertEquals(['name' => 'Olaf'], $seen);
+
+        $stored = YAML::parse(File::get($submission->path()));
+        $this->assertEquals('Olaf', $stored['name']);
+        $this->assertTrue($stored['_partial']);
+        $this->assertEquals('en', $stored['_site']);
+        $this->assertArrayHasKey('_marked_spam_at', $stored);
+
+        $fresh = $form->submission($submission->id());
+        $this->assertEquals(['name' => 'Olaf'], $fresh->data()->all());
+        $this->assertTrue($fresh->isSpam());
+        $this->assertEquals('en', $fresh->site()->handle());
     }
 
     #[Test]
@@ -598,7 +641,7 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function saving_a_partial_submission_dispatches_the_same_events_as_any_other()
+    public function saving_a_partial_submission_doesnt_dispatch_the_creation_events()
     {
         Event::fake();
 
@@ -607,9 +650,9 @@ class SubmissionTest extends TestCase
         $submission = $form->makeSubmission()->asPartial();
         $submission->save();
 
-        // A partial submission is still saved and created, so its events are never withheld.
-        Event::assertDispatched(SubmissionCreating::class);
-        Event::assertDispatched(SubmissionCreated::class);
+        // The creation events mean a complete submission arrived, so they wait for finalize.
+        Event::assertNotDispatched(SubmissionCreating::class);
+        Event::assertNotDispatched(SubmissionCreated::class);
         Event::assertDispatched(SubmissionSaving::class);
         Event::assertDispatched(SubmissionSaved::class);
     }
@@ -624,8 +667,8 @@ class SubmissionTest extends TestCase
 
         Event::fake();
 
-        // The created event already fired when the partial was first saved. Removing the
-        // partial key and saving again won't re-dispatch it, because the record exists.
+        // The created event only fires on finalize. Removing the partial key and
+        // saving again isn't finalizing, and the record exists, so it doesn't fire.
         $submission->remove('_partial');
         $submission->save();
 
@@ -784,11 +827,28 @@ class SubmissionTest extends TestCase
 
         $this->assertFalse($submission->isPartial());
 
-        // The created event fired once, when the partial was first saved. Finalizing an
-        // existing submission won't dispatch it again, but it does finalize and email.
+        // Saving the partial didn't fire the created event, so finalizing it fires it once.
         Event::assertDispatched(SubmissionCreated::class, 1);
         Event::assertDispatched(SubmissionFinalized::class, 1);
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
+    }
+
+    #[Test]
+    public function saving_or_finalizing_an_already_finalized_submission_doesnt_dispatch_the_created_event_again()
+    {
+        Bus::fake();
+
+        $form = tap(Form::make('contact_us'))->save();
+        $submission = tap($form->makeSubmission()->asPartial())->save();
+        $submission->finalize();
+
+        Event::fake([SubmissionCreated::class]);
+
+        $submission->save();
+        $submission->finalize();
+        $submission->save();
+
+        Event::assertNotDispatched(SubmissionCreated::class);
     }
 
     #[Test]

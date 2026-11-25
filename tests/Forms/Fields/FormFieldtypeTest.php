@@ -9,8 +9,13 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\Text;
 use Statamic\Forms\Fields\FormFieldtype;
+use Statamic\Forms\Fieldtypes\Banner;
 use Statamic\Forms\Fieldtypes\Dropdown;
+use Statamic\Forms\Fieldtypes\Group;
+use Statamic\Forms\Fieldtypes\Heading;
+use Statamic\Forms\Fieldtypes\Paragraph;
 use Statamic\Forms\Fieldtypes\ShortAnswer;
+use Statamic\Forms\Fieldtypes\Spacer;
 use Tests\TestCase;
 
 class FormFieldtypeTest extends TestCase
@@ -126,14 +131,31 @@ class FormFieldtypeTest extends TestCase
 
     #[Test]
     #[DataProvider('collectsValueProvider')]
-    public function it_determines_whether_it_collects_a_value($categories, $collectsValue)
+    public function it_determines_whether_it_collects_a_value($class, $collectsValue)
     {
-        $formFieldtype = new class($categories) extends FormFieldtype
+        $this->assertSame($collectsValue, (new $class)->collectsValue());
+        $this->assertSame($collectsValue, (new $class)->toArray()['collects_value']);
+    }
+
+    public static function collectsValueProvider()
+    {
+        return [
+            'short answer' => [ShortAnswer::class, true],
+            'dropdown' => [Dropdown::class, true],
+            'group' => [Group::class, true],
+            'banner' => [Banner::class, false],
+            'heading' => [Heading::class, false],
+            'paragraph' => [Paragraph::class, false],
+            'spacer' => [Spacer::class, false],
+        ];
+    }
+
+    #[Test]
+    public function collecting_a_value_does_not_depend_on_the_category()
+    {
+        $formFieldtype = new class extends FormFieldtype
         {
-            public function __construct(array $categories)
-            {
-                $this->categories = $categories;
-            }
+            protected $categories = ['information'];
 
             public function toFieldArray(): array
             {
@@ -141,19 +163,7 @@ class FormFieldtypeTest extends TestCase
             }
         };
 
-        $this->assertEquals($collectsValue, $formFieldtype->collectsValue());
-    }
-
-    public static function collectsValueProvider()
-    {
-        return [
-            'text' => [['text'], true],
-            'contact' => [['contact'], true],
-            'information' => [['information'], false],
-            'structure' => [['structure'], false],
-            'information alongside another category' => [['text', 'information'], false],
-            'no categories' => [[], true],
-        ];
+        $this->assertTrue($formFieldtype->collectsValue());
     }
 
     #[Test]
@@ -274,5 +284,33 @@ class FormFieldtypeTest extends TestCase
         };
 
         $this->assertNull($formFieldtype->valueType());
+    }
+
+    #[Test]
+    public function config_fields_include_extras_from_a_wrapped_fieldtype_overriding_extra_config_field_items_as_protected()
+    {
+        app('statamic.fieldtypes')->put('protected_extras', FieldtypeWithProtectedExtraConfigFieldItems::class);
+
+        $formFieldtype = new class extends FormFieldtype
+        {
+            protected static $fieldtype = 'protected_extras';
+
+            public function toFieldArray(): array
+            {
+                return [];
+            }
+        };
+
+        $this->assertEquals('toggle', $formFieldtype->configFields()->get('overridden_extra')->type());
+    }
+}
+
+class FieldtypeWithProtectedExtraConfigFieldItems extends Fieldtype
+{
+    protected static $handle = 'protected_extras';
+
+    protected function extraConfigFieldItems(): array
+    {
+        return ['overridden_extra' => ['type' => 'toggle']];
     }
 }

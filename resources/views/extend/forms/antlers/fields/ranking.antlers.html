@@ -46,12 +46,12 @@
     {{ /if }}
 >
     {{ if value }}
-        {{ value }}
+        {{ foreach:value as="ranked_option" }}
             <li draggable="true">
-                {{ options[value] ?? value }}
-                <input type="hidden" name="{{ name }}[]" value="{{ value }}">
+                {{ options[ranked_option] ?? ranked_option }}
+                <input type="hidden" name="{{ name }}[]" value="{{ ranked_option }}">
             </li>
-        {{ /value }}
+        {{ /foreach:value }}
     {{ else }}
         {{ foreach:options as="option|label" }}
             <li draggable="true">

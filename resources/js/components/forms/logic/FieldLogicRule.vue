@@ -125,7 +125,7 @@ const onConditionsUpdated = (conditions) => emit('update:conditions', conditions
                                 <span v-if="part.type === 'field'" class="text-gray-700 dark:text-gray-300">{{ part.text }}</span>
                                 <Badge
                                     v-else-if="part.type === 'operator'"
-                                    class="inline-block px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                    class="inline-block min-h-0 px-1 py-1.5 font-medium st-text-trim-ex-alphabetic lowercase bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
                                 >
                                     {{ part.text }}
                                 </Badge>

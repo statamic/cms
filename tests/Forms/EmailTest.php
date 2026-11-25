@@ -98,6 +98,9 @@ class EmailTest extends TestCase
             'single email' => ['foo@bar.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
+            'internationalized email' => ['user@bücher.de', [
+                ['address' => 'user@bücher.de', 'name' => null],
+            ]],
             'single email with name' => ['Foo Bar <foo@bar.com>', [
                 ['address' => 'foo@bar.com', 'name' => 'Foo Bar'],
             ]],
@@ -160,6 +163,17 @@ class EmailTest extends TestCase
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
             'array with a field reference to a missing field' => [['field:nonexistent', 'foo@bar.com'], [
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'string with a field reference and an email' => ['field:email, baz@qux.com', [
+                ['address' => 'foo@bar.com', 'name' => null],
+                ['address' => 'baz@qux.com', 'name' => null],
+            ]],
+            'string with an email and a field reference' => ['baz@qux.com,field:email', [
+                ['address' => 'baz@qux.com', 'name' => null],
+                ['address' => 'foo@bar.com', 'name' => null],
+            ]],
+            'string with a field reference to a missing field' => ['field:nonexistent, foo@bar.com', [
                 ['address' => 'foo@bar.com', 'name' => null],
             ]],
         ]);
@@ -256,6 +270,34 @@ class EmailTest extends TestCase
         $this->assertEquals(['message'], collect($sections[2]['fields'])->pluck('handle')->all());
     }
 
+    #[Test]
+    public function submitted_values_win_over_the_sections_and_pages_view_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'sections', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'pages', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $email = $this->makeEmailWithSubmission($form->makeSubmission()->data([
+            'sections' => 'submitted sections',
+            'pages' => 'submitted pages',
+        ]));
+
+        $this->assertEquals('submitted sections', (string) $email->viewData['sections']);
+        $this->assertEquals('submitted pages', (string) $email->viewData['pages']);
+    }
+
+    #[Test]
+    public function it_adds_the_rendered_subject_to_the_email_config_view_data()
+    {
+        $email = $this->makeEmailWithConfig(['subject' => 'Thanks {{ name }} via [[ email ]]']);
+
+        $this->assertEquals('Thanks Foo Bar via foo@bar.com', $email->subject);
+        $this->assertEquals('Thanks Foo Bar via foo@bar.com', $email->viewData['email_config']['subject']);
+    }
+
     private function makeEmailForMultiPageForm(): Email
     {
         Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
@@ -305,7 +347,7 @@ class EmailTest extends TestCase
     }
 
     #[Test]
-    public function it_excludes_informational_and_structural_fields_from_the_fields_data()
+    public function it_excludes_spacers_and_display_only_form_fieldtypes_from_the_fields_data()
     {
         $form = tap(Form::make('test')->formFields([
             'fields' => [
@@ -313,6 +355,10 @@ class EmailTest extends TestCase
                 ['handle' => 'intro', 'field' => ['type' => 'heading']],
                 ['handle' => 'gap', 'field' => ['type' => 'spacer']],
                 ['handle' => 'blurb', 'field' => ['type' => 'paragraph']],
+                ['handle' => 'notice', 'field' => ['type' => 'banner', 'display' => 'Notice']],
+                ['handle' => 'details', 'field' => ['type' => 'section', 'display' => 'Details']],
+                ['handle' => 'markup', 'field' => ['type' => 'html', 'html' => '<p>Hi</p>']],
+                ['handle' => 'tip', 'field' => ['type' => 'info']],
             ],
         ]))->save();
 
@@ -320,7 +366,29 @@ class EmailTest extends TestCase
 
         $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
 
-        $this->assertEquals(['name'], collect($email->viewData['fields'])->pluck('handle')->all());
+        $this->assertEquals(
+            ['name', 'details', 'markup', 'tip'],
+            collect($email->viewData['fields'])->pluck('handle')->all()
+        );
+    }
+
+    #[Test]
+    public function it_includes_group_fields_in_the_fields_data()
+    {
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                ['handle' => 'address', 'field' => ['type' => 'group', 'fields' => [
+                    ['handle' => 'street', 'field' => ['type' => 'text']],
+                ]]],
+            ],
+        ]))->save();
+
+        $submission = $form->makeSubmission()->data(['name' => 'Foo Bar', 'address' => ['street' => '1 Main St']]);
+
+        $email = tap(new Email($submission, ['to' => 'test@test.com'], Site::default()))->build();
+
+        $this->assertEquals(['name', 'address'], collect($email->viewData['fields'])->pluck('handle')->all());
     }
 
     #[Test]
@@ -550,6 +618,39 @@ class EmailTest extends TestCase
 
         $this->assertEquals('Hi <b>A</b> &amp; {{ x }}', $makeSubject('<b>A</b> &amp; {{ x }}'));
         $this->assertEquals('Hi line one line two', $makeSubject("line one\r\n\r\nline two"));
+    }
+
+    #[Test]
+    public function unknown_mentions_cannot_join_template_syntax_in_the_subject()
+    {
+        config(['app.name' => 'Secret App']);
+        putenv('B1_SUBJECT_PROBE=leaked');
+
+        $email = $this->makeEmailWithConfig(['subject' => 'Hi {[[ nope ]]{ config:app.name }} {[[ nope ]]env:B1_SUBJECT_PROBE}']);
+
+        putenv('B1_SUBJECT_PROBE');
+
+        $this->assertEquals('Hi {{ config:app.name }} {env:B1_SUBJECT_PROBE}', $email->subject);
+    }
+
+    #[Test]
+    public function submitted_values_cannot_complete_template_syntax_in_the_subject()
+    {
+        config(['app.name' => 'Secret App']);
+
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+
+        $email = tap(new Email(
+            $form->makeSubmission()->data(['name' => '{ config:app.name }}']),
+            ['to' => 'test@test.com', 'subject' => 'Hi {[[ name ]]'],
+            Site::default()
+        ))->build();
+
+        $this->assertEquals('Hi {{ config:app.name }}', $email->subject);
     }
 
     #[Test]

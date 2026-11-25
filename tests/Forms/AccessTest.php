@@ -296,7 +296,7 @@ class AccessTest extends TestCase
             ->assertSessionHasErrors(['*'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -318,7 +318,7 @@ class AccessTest extends TestCase
             ->post('/!/forms/contact', ['email' => 'foo@bar.com'])
             ->assertNoContent();
 
-        $this->assertCount(0, $form->submissions());
+        $this->assertCount(0, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -330,7 +330,7 @@ class AccessTest extends TestCase
 
         $this->post('/!/forms/contact', ['email' => 'foo@bar.com'])->assertLocation('/');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -340,7 +340,7 @@ class AccessTest extends TestCase
 
         $this->post('/!/forms/contact', ['email' => 'foo@bar.com'])->assertLocation('/');
 
-        $this->assertCount(1, $form->submissions());
+        $this->assertCount(1, $form->querySubmissions()->get());
     }
 
     #[Test]
@@ -349,7 +349,7 @@ class AccessTest extends TestCase
         $this->makeSubmittableForm(['require_login' => true]);
 
         $output = (string) Parse::template(
-            '{{ form:contact }}{{ if restricted }}is-restricted{{ /if }} status:{{ status }} msg:{{ restriction_message }}{{ /form:contact }}',
+            '{{ form:contact }}{{ if form_restricted }}is-restricted{{ /if }} status:{{ form_status }} msg:{{ form_restriction_message }}{{ /form:contact }}',
             [],
             trusted: true
         );
@@ -365,7 +365,7 @@ class AccessTest extends TestCase
         $this->makeSubmittableForm();
 
         $output = (string) Parse::template(
-            '{{ form:contact }}{{ if restricted }}is-restricted{{ /if }} status:{{ status }}{{ /form:contact }}',
+            '{{ form:contact }}{{ if form_restricted }}is-restricted{{ /if }} status:{{ form_status }}{{ /form:contact }}',
             [],
             trusted: true
         );

@@ -24,10 +24,11 @@ class EntryActionController extends ActionController
 
         $blueprint = $entry->blueprint();
 
-        [$values] = $this->extractFromFields($entry, $blueprint);
+        [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         return array_merge((new EntryResource($entry))->resolve()['data'], [
             'values' => $values,
+            'meta' => $meta,
             'itemActions' => Action::for($entry, $context),
         ]);
     }

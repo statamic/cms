@@ -6,6 +6,18 @@ use Statamic\Facades\User;
 
 class FormSubmissionPolicy
 {
+    /**
+     * @deprecated FormPolicy::before() already covers super users and the "configure forms" permission.
+     */
+    public function before($user, $ability)
+    {
+        $user = User::fromUser($user);
+
+        if ($user->isSuper() || $user->hasPermission('configure forms')) {
+            return true;
+        }
+    }
+
     public function view($user, $submission)
     {
         return User::fromUser($user)->can('viewSubmissions', $submission->form());

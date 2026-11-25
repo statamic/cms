@@ -98,6 +98,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'group' => Fieldtypes\Group::class,
         'form_connections' => Fieldtypes\FormConnections::class,
         'form_fields' => Fieldtypes\FormFields::class,
+        'form_group_fields' => Fieldtypes\FormGroupFields::class,
         'form_heading' => Fieldtypes\FormHeading::class,
         'form_instances' => Fieldtypes\FormInstances::class,
         'form_paragraph' => Fieldtypes\FormParagraph::class,

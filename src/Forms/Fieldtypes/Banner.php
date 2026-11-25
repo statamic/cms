@@ -15,6 +15,7 @@ class Banner extends FormFieldtype
     protected $description = 'A banner to highlight important information in your form.';
     protected $icon = 'banner';
     protected $categories = ['information'];
+    protected $collectsValue = false;
 
     protected function configFieldItems(): array
     {

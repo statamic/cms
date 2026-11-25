@@ -17,10 +17,14 @@ use Statamic\Facades\Parse;
 use Statamic\Fieldtypes\AutocompleteEditor;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\Fieldtypes\Banner;
+use Statamic\Forms\Fieldtypes\Heading;
+use Statamic\Forms\Fieldtypes\Paragraph;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\View\Cascade;
+use Symfony\Component\Mime\Address;
 
 use function Statamic\trans as __;
 
@@ -60,13 +64,15 @@ class Email extends Mailable
 
     public function hasRecipients(): bool
     {
-        if (blank($to = Arr::get($this->config, 'to'))) {
+        $recipients = array_filter(Arr::only($this->config, ['to', 'cc', 'bcc']), fn ($value) => filled($value));
+
+        if (empty($recipients)) {
             return false;
         }
 
         $this->submissionData = $this->submission->toAugmentedArray();
 
-        return filled($this->addresses($this->parseConfig(['to' => $to])->get('to')));
+        return $this->parseConfig($recipients)->contains(fn ($value) => filled($this->addresses($value)));
     }
 
     public function build()
@@ -96,7 +102,9 @@ class Email extends Mailable
 
     protected function renderSubject(string $subject): string
     {
-        $subject = Mentions::replace($subject, $this->mentionValues, using: fn ($text) => $this->parseConfigValue($text));
+        $values = [...array_fill_keys(Mentions::handles($subject), ''), ...$this->mentionValues];
+
+        $subject = Mentions::replace($subject, $values, using: fn ($text) => $this->parseConfigValue($text));
 
         return trim(preg_replace('/\s+/', ' ', $subject)) ?: __('Form Submission');
     }
@@ -214,19 +222,20 @@ class Email extends Mailable
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
-        $emailConfig = $this->config;
+        $emailConfig = $this->config->merge(['subject' => $this->subject]);
 
         if (filled($body = $emailConfig->get('body'))) {
             $emailConfig = $emailConfig->merge(['body' => AutocompleteEditor::renderHtml($body, $this->mentionValues)]);
         }
 
-        $data = array_merge($augmented, $this->getGlobalsData(), [
+        $data = array_merge([
+            'sections' => $sections->all(),
+            'pages' => $pages,
+        ], $augmented, $this->getGlobalsData(), [
             'form_config' => $formConfig,
             'email_config' => $emailConfig,
             'config' => Cascade::config(),
             'fields' => $fields,
-            'sections' => $sections->all(),
-            'pages' => $pages,
             'site_url' => Config::getSiteUrl(),
             'date' => now(),
             'now' => now(),
@@ -240,12 +249,14 @@ class Email extends Mailable
 
     private function getRenderablePageData($form, array $augmented): array
     {
-        $excludedFields = $form->formFields()->fields()
-            ->reject(fn (FormField $field) => $field->fieldtype()->collectsValue())
+        $displayOnly = $form->formFields()->fields()
+            ->filter(fn (FormField $field) => $field->fieldtype() instanceof Banner
+                || $field->fieldtype() instanceof Heading
+                || $field->fieldtype() instanceof Paragraph)
             ->keys();
 
         $fields = $this->getRenderableFieldData(Arr::except($augmented, $this->nonFieldKeys()))
-            ->reject(fn ($field) => $excludedFields->contains($field['handle']))
+            ->reject(fn ($field) => $field['fieldtype'] === 'spacer' || $displayOnly->contains($field['handle']))
             ->when(Arr::has($this->config, 'attachments'), function ($fields) {
                 return $fields->reject(fn ($field) => in_array($field['fieldtype'], ['assets', 'files', 'form_upload']));
             });
@@ -319,6 +330,8 @@ class Email extends Mailable
         }
 
         return collect(Arr::wrap($addresses))
+            ->flatMap(fn ($address) => is_scalar($address) ? explode(',', (string) $address) : [])
+            ->map(fn ($address) => trim($address))
             ->flatMap(fn ($address) => Str::startsWith($address, 'field:')
                 ? Arr::wrap($this->submission->get(Str::after($address, 'field:')))
                 : [$address])
@@ -338,9 +351,20 @@ class Email extends Mailable
                     'name' => $name,
                 ];
             })
-            ->filter(fn (array $address) => filter_var($address['email'], FILTER_VALIDATE_EMAIL))
+            ->filter(fn (array $address) => $this->isValidAddress($address['email']))
             ->values()
             ->all();
+    }
+
+    private function isValidAddress(string $email): bool
+    {
+        try {
+            new Address($email);
+        } catch (\InvalidArgumentException) {
+            return false;
+        }
+
+        return true;
     }
 
     private function sanitize(string $value): string

@@ -105,7 +105,7 @@
 
             <footer class="flex shrink-0 items-center justify-between border-t dark:border-gray-900 bg-gray-100 dark:bg-gray-800 p-4 rounded-es-xl">
                 <ui-badge
-                    v-text="
+                    :text="
                         hasMaxSelections
                             ? __n(':count/:max selected', selections, { max: maxSelections })
                             : __n(':count item selected|:count items selected', selections)
@@ -177,10 +177,6 @@ export default {
         site: String,
         type: String, // todo: this controls the extra column that is commented out in the new table at the moment.
         name: String,
-        initialColumns: {
-            type: Array,
-            default: () => [],
-        },
         tree: Object,
     },
 
@@ -190,7 +186,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             selections: clone(this.initialSelections),
-            columns: this.initialColumns,
             view: 'list',
         };
     },

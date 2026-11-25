@@ -3,9 +3,11 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Statamic\Routing\ResolveRedirect;
+use Illuminate\Support\Facades\Validator;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Data\Localization;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Fields\ArrayableString;
@@ -44,6 +46,39 @@ class LinkTest extends TestCase
         $this->assertInstanceOf(ArrayableString::class, $augmented);
         $this->assertEquals('/foo', $augmented->value());
         $this->assertEquals(['url' => '/foo'], $augmented->toArray());
+    }
+
+    #[Test]
+    #[DataProvider('selfReferenceProvider')]
+    public function it_doesnt_allow_an_entry_to_link_to_itself($value, $passes)
+    {
+        $field = new Field('redirect', ['type' => 'link']);
+        $field->setParent((new Entry)->id('abc'));
+
+        $validator = Validator::make(['redirect' => $value], $field->rules());
+
+        $this->assertSame($passes, $validator->passes());
+    }
+
+    public static function selfReferenceProvider()
+    {
+        return [
+            'itself' => ['entry::abc', false],
+            'another entry' => ['entry::def', true],
+            'url' => ['/abc', true],
+            'child' => ['@child', true],
+        ];
+    }
+
+    #[Test]
+    public function it_allows_an_entry_to_link_to_itself_in_a_non_redirect_field()
+    {
+        $field = new Field('cta', ['type' => 'link']);
+        $field->setParent((new Entry)->id('abc'));
+
+        $validator = Validator::make(['cta' => 'entry::abc'], $field->rules());
+
+        $this->assertTrue($validator->passes());
     }
 
     #[Test]
@@ -149,6 +184,45 @@ class LinkTest extends TestCase
         Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
 
         $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'entry', 'url' => '/the-entry-url', 'icon' => 'collections'],
+            $fieldtype->preProcessIndex('entry::entry-id')
+        );
+    }
+
+    #[Test]
+    public function it_pre_processes_entry_on_another_site_with_absolute_url_for_index()
+    {
+        $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $entry->shouldReceive('locale')->andReturn('fr');
+        $entry->shouldReceive('absoluteUrl')->once()->andReturn('http://example.fr/the-entry-url');
+        $entry->shouldNotReceive('url');
+
+        Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
+
+        $fieldtype = (new Link)->setField(new Field('test', ['type' => 'link']));
+
+        $this->assertEquals(
+            ['type' => 'entry', 'url' => 'http://example.fr/the-entry-url', 'icon' => 'collections'],
+            $fieldtype->preProcessIndex('entry::entry-id')
+        );
+    }
+
+    #[Test]
+    public function it_pre_processes_entry_on_the_parents_site_with_relative_url_for_index()
+    {
+        $entry = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $entry->shouldReceive('locale')->andReturn('fr');
+        $entry->shouldReceive('url')->once()->andReturn('/the-entry-url');
+        $entry->shouldNotReceive('absoluteUrl');
+
+        $parent = Mockery::mock(\Statamic\Contracts\Entries\Entry::class, Localization::class);
+        $parent->shouldReceive('locale')->andReturn('fr');
+
+        Facades\Entry::shouldReceive('find')->with('entry-id')->once()->andReturn($entry);
+
+        $fieldtype = (new Link)->setField((new Field('test', ['type' => 'link']))->setParent($parent));
 
         $this->assertEquals(
             ['type' => 'entry', 'url' => '/the-entry-url', 'icon' => 'collections'],

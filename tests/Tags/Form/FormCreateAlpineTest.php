@@ -182,6 +182,23 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_does_not_render_old_data_in_x_data_for_a_different_form()
+    {
+        $this->createForm(handle: 'newsletter');
+
+        $this
+            ->post('/!/forms/contact', [
+                'name' => 'Frodo Braggins',
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:newsletter js="alpine" }}{{ /form:newsletter }}');
+
+        $this->assertStringNotContainsString('Frodo Braggins', $output);
+        $this->assertStringContainsString('&quot;name&quot;:null', $output);
+    }
+
+    #[Test]
     public function it_renders_scoped_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');
@@ -948,7 +965,7 @@ EOT
     #[Test]
     public function it_wont_submit_form_when_precognition_validate_only_header_is_spoofed()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->withHeaders(['Precognition-Validate-Only' => 'foo'])
@@ -956,7 +973,7 @@ EOT
             ->assertSessionHasErrors(['email'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
     }
 
     private function jsonEncode($data)

@@ -107,6 +107,57 @@ class StoreTest extends TestCase
         $this->assertEquals($expected, $store->paths());
         $this->assertEquals(2, $cacheHits);
     }
+
+    #[Test]
+    public function index_usage_cached_by_another_process_is_kept()
+    {
+        // Two instances of the same store stand in for two processes warming
+        // the Stache in parallel. Each memoizes its own usage list, so the
+        // second write must merge with the cache instead of replacing it.
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+        $other = new TestStore;
+
+        $this->store->cacheIndexUsage('path');
+        $other->cacheIndexUsage('path');
+
+        $this->store->cacheIndexUsage('site');
+        $other->cacheIndexUsage('uri');
+
+        $this->assertEquals(['path', 'site', 'uri'], Cache::get($cacheKey));
+    }
+
+    #[Test]
+    public function clearing_keeps_which_indexes_are_used_so_the_next_warm_builds_them()
+    {
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+
+        $this->store->cacheIndexUsage('title');
+
+        $this->store->clear();
+
+        $this->assertEquals(['title'], Cache::get($cacheKey));
+        $this->assertTrue($this->store->indexes()->has('title'));
+
+        // A process that starts after the clear, as the one that warms usually is.
+        $this->assertTrue((new TestStore)->indexes()->has('title'));
+    }
+
+    #[Test]
+    public function an_index_used_again_after_clearing_is_still_recorded()
+    {
+        // Asset containers are cleared on every request when the watcher is on, and use
+        // their path index straight after. See https://github.com/statamic/cms/issues/3476
+        $cacheKey = "stache::indexes::{$this->store->key()}::_indexes";
+
+        $this->store->cacheIndexUsage('path');
+
+        $this->store->clear();
+
+        $this->store->cacheIndexUsage('path');
+
+        $this->assertEquals(['path'], Cache::get($cacheKey));
+        $this->assertTrue((new TestStore)->indexes()->has('path'));
+    }
 }
 
 class TestStore extends Store

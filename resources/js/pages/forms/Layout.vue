@@ -12,7 +12,7 @@ const navItems = computed(() =>
     [
         can('editFields') && { label: __('Edit'), href: cp_url(`forms/${form.value.handle}/builder`) },
         can('editFields') && { label: __('Logic'), href: cp_url(`forms/${form.value.handle}/logic`) },
-        can('edit') && { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
+        can('editConnections') && { label: __('Connect'), href: cp_url(`forms/${form.value.handle}/connect`) },
         can('viewSubmissions') && { label: __('Results'), href: cp_url(`forms/${form.value.handle}/submissions`) },
         can('edit') && { label: __('Configure'), href: cp_url(`forms/${form.value.handle}/edit`) },
     ].filter(Boolean),
@@ -59,7 +59,7 @@ const closeMobileNavPopover = () => {
                 </nav>
             </div>
 
-            <nav v-if="navItems.length > 1" class="global-header-nav hidden lg:block" :aria-label="__('form_navigation')">
+            <nav v-if="navItems.length > 1" class="global-header-nav hidden lg:block" :aria-label="__('messages.form_navigation')">
                 <ul>
                     <li v-for="navItem in navItems" :key="navItem.href">
                         <Link

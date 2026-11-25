@@ -103,7 +103,7 @@ class FormFieldTransformer extends FieldTransformer
         $mergedConfig['hidden'] = $mergedConfig['hidden'] ?? false;
 
         $formField = new FormField($field['handle'], $mergedConfig);
-        $formFieldtype = FormFieldtypeRepository::find($mergedConfig['type'])->setField($formField);
+        $formFieldtype = $formField->fieldtype();
 
         return [
             'handle' => $field['handle'],
@@ -111,7 +111,7 @@ class FormFieldTransformer extends FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $mergedConfig['type'],
+            'fieldtype' => $formField->type(),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];
@@ -126,13 +126,13 @@ class FormFieldTransformer extends FieldTransformer
         $config = static::normalizeVisibility($config);
 
         $formField = new FormField($field['handle'], $config);
-        $formFieldtype = FormFieldtypeRepository::find($config['type'])->setField($formField);
+        $formFieldtype = $formField->fieldtype();
 
         return [
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
-            'fieldtype' => $config['type'] ?? 'short_answer',
+            'fieldtype' => $formField->type(),
             'icon' => $formFieldtype->icon(),
             'preview' => static::fieldtypePreview($formFieldtype),
         ];

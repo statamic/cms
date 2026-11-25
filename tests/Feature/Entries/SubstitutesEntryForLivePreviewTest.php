@@ -6,6 +6,7 @@ use Facades\Statamic\CP\LivePreview;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Token;
 use Statamic\View\View;
@@ -67,6 +68,25 @@ EOT;
                 'Charlie',
                 'Charlie foo',
             ])
+            ->assertHeader('X-Statamic-Live-Preview', true);
+    }
+
+    #[Test]
+    public function it_substitutes_an_entry_that_has_not_been_saved_yet()
+    {
+        Collection::make('test')->routes('/test/{slug}')->template('entry')->save();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('entry', '{{ title }} {{ foo }}');
+
+        $substitute = EntryFactory::collection('test')->slug('delta')->data(['title' => 'New title', 'foo' => 'New foo'])->make();
+        LivePreview::tokenize('test-token', $substitute);
+
+        $this->assertNull($substitute->id());
+
+        $this->get('/test/delta?token=test-token')
+            ->assertOk()
+            ->assertSee('New title')
+            ->assertSee('New foo')
             ->assertHeader('X-Statamic-Live-Preview', true);
     }
 

@@ -175,6 +175,30 @@ class DuplicatesTest extends TestCase
     }
 
     #[Test]
+    public function a_duplicate_found_again_after_clearing_is_saved_again()
+    {
+        // As `stache:refresh` does: clear, then warm, in one process.
+        Cache::forever('stache::duplicates', ['test-store' => ['123' => ['path/to/duplicate.md']]]);
+
+        $store = $this->mock(Store::class);
+        $store->shouldReceive('key')->andReturn('test-store');
+
+        $stache = $this->mock(Stache::class);
+        $stache->shouldReceive('cacheStore')->andReturn(Cache::store());
+
+        $duplicates = (new Duplicates($stache))->load();
+
+        $duplicates->clear();
+
+        $this->assertSame([], $duplicates->getItems());
+
+        $duplicates->track($store, '123', 'path/to/duplicate.md');
+        $duplicates->cache();
+
+        $this->assertEquals(['test-store' => ['123' => ['path/to/duplicate.md']]], Cache::get('stache::duplicates'));
+    }
+
+    #[Test]
     public function it_finds_all_the_duplicates()
     {
         $store1 = $this->mock(Store::class);

@@ -127,6 +127,11 @@ class Site implements Augmentable, QueryableValue
 
         $value = Parse::config($value);
 
+        // A value that was only config, as a site's name and URL usually are, has nothing left for Antlers.
+        if (! Str::contains($value, ['{', '@', '<'])) {
+            return StringUtilities::sanitizePhp($value);
+        }
+
         $isEvaluatingUserData = GlobalRuntimeState::$isEvaluatingUserData;
         GlobalRuntimeState::$isEvaluatingUserData = true;
 

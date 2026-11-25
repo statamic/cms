@@ -13,6 +13,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
+use Statamic\Facades\URL;
 use Statamic\Fields\Tab;
 use Statamic\Fieldtypes\FormInstances;
 use Statamic\Forms\JsDrivers\AbstractJsDriver;
@@ -84,9 +85,9 @@ class Tags extends BaseTags
             ? Blueprint::makeFromTabs($configFields)->fields()->addValues($form->data()->all())->augment()->values()->all()
             : [];
 
-        $data['pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
+        $data['form_pages'] = $this->getPages($this->sessionHandle(), $jsDriver);
 
-        $data['page'] = Arr::except(collect($data['pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
+        $data['form_page'] = Arr::except(collect($data['form_pages'])->firstWhere('id', Arr::get($this->currentPage(), 'id')), 'sections');
 
         $data['sections'] = $this->getSections($this->sessionHandle(), $jsDriver);
 
@@ -94,25 +95,25 @@ class Tags extends BaseTags
 
         $data['honeypot'] = $form->honeypot();
 
-        $data['button_label'] = Arr::get($data['page'], 'button_label');
+        $data['form_button_label'] = Arr::get($data['form_page'], 'button_label');
 
         if (! $this->isFirstPage()) {
-            $data['previous_page_label'] = Arr::get($data['page'], 'previous_page_label');
-            $data['previous_page_url'] = $this->previousPageUrl();
+            $data['form_previous_page_label'] = Arr::get($data['form_page'], 'previous_page_label');
+            $data['form_previous_page_url'] = $this->previousPageUrl();
         }
 
         $entry = $this->submittableEntry($form);
 
         if ($form->hasUniqueInstances() && ! $entry) {
-            $data['restricted'] = true;
-            $data['restriction_message'] = __('statamic::validation.form_must_be_submitted_from_an_entry');
-            $data['status'] = 'closed';
+            $data['form_restricted'] = true;
+            $data['form_restriction_message'] = __('statamic::validation.form_must_be_submitted_from_an_entry');
+            $data['form_status'] = 'closed';
         } else {
             $instance = $form->instance($entry);
 
-            $data['restricted'] = $instance->restricted();
-            $data['restriction_message'] = $instance->restrictionMessage();
-            $data['status'] = $instance->status();
+            $data['form_restricted'] = $instance->restricted();
+            $data['form_restriction_message'] = $instance->restrictionMessage();
+            $data['form_status'] = $instance->status();
         }
 
         if ($jsDriver) {
@@ -450,6 +451,10 @@ class Tags extends BaseTags
                 return $this->getRenderableField($field, $sessionHandle, function ($data, $field) use ($jsDriver) {
                     $data['is_informative'] = in_array('information', $field->formField()?->fieldtype()?->categories() ?? []);
 
+                    if ($formFieldtype = $field->formField()?->fieldtype()) {
+                        $data = $formFieldtype->prepareFrontEndRenderable($data);
+                    }
+
                     return $jsDriver
                         ? $this->mergeJsDataWithRenderableFieldData($data, $field, $jsDriver)
                         : $data;
@@ -618,6 +623,16 @@ class Tags extends BaseTags
         return $page;
     }
 
+    /**
+     * @deprecated
+     */
+    public function eventUrl($url, $relative = true)
+    {
+        return URL::prependSiteUrl(
+            config('statamic.routes.action').'/form/'.$url
+        );
+    }
+
     private function getPartialSubmission(): ?Submission
     {
         $id = session()->get(SubmitForm::partialSubmissionSessionKey($this->form(), $this->submittableEntry($this->form())));
@@ -625,6 +640,10 @@ class Tags extends BaseTags
 
         if ($submission && ! $submission->isPartial()) {
             return null;
+        }
+
+        if ($submission) {
+            request()->attributes->set('statamic.static_caching.uncacheable', true);
         }
 
         return $submission;

@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Http;
 use Statamic\Licensing\Outpost;
+use Statamic\Statamic;
 
 class ReportThemeUsage implements ShouldQueue
 {
@@ -34,7 +35,7 @@ class ReportThemeUsage implements ShouldQueue
             return;
         }
 
-        Http::post('https://outpost.statamic.com/v3/theme', ['theme' => $newThemeId]);
+        Http::withUserAgent('Statamic/'.Statamic::version())->post('https://outpost.statamic.com/v3/theme', ['theme' => $newThemeId]);
     }
 
     private function themeId($theme)

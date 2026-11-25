@@ -6,12 +6,15 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Addons\Addon as AddonInstance;
 use Statamic\Addons\Manifest;
@@ -72,6 +75,18 @@ class OutpostTest extends TestCase
         ], $response);
         $this->assertExpiresBetween(now()->addMinutes(50), now()->addMinutes(59), $response);
         $this->assertCachedUntilExpiry($response);
+    }
+
+    #[Test]
+    public function it_sends_the_statamic_user_agent()
+    {
+        $history = [];
+        $handler = HandlerStack::create(new MockHandler([new Response(200, [], '{}')]));
+        $handler->push(Middleware::history($history));
+
+        $this->outpost(new Client(['handler' => $handler]))->response();
+
+        $this->assertEquals('Statamic/3.0.0-testing', $history[0]['request']->getHeaderLine('User-Agent'));
     }
 
     #[Test]
@@ -302,6 +317,33 @@ class OutpostTest extends TestCase
         ], $response);
         $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
         $this->assertCachedUntilExpiry($response);
+    }
+
+    #[Test]
+    #[DataProvider('invalidResponseBodyProvider')]
+    public function it_caches_an_invalid_response_body_as_an_error_for_5_to_10_minutes($body)
+    {
+        $outpost = $this->outpostWithResponse(new Response(200, [], $body));
+
+        $response = $outpost->response();
+
+        $this->assertEquals([
+            'error' => 500,
+            'expiry' => $response['expiry'],
+            'payload' => $outpost->payload(),
+        ], $response);
+        $this->assertExpiresBetween(now()->addMinutes(5), now()->addMinutes(10), $response);
+        $this->assertCachedUntilExpiry($response);
+    }
+
+    public static function invalidResponseBodyProvider()
+    {
+        return [
+            'string' => ['ok'],
+            'empty' => [''],
+            'json string' => ['"ok"'],
+            'html' => ['<html></html>'],
+        ];
     }
 
     #[Test]

@@ -20,6 +20,7 @@ use Statamic\Facades;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use UnexpectedValueException;
 
 class Outpost
 {
@@ -65,6 +66,8 @@ class Outpost
             return $this->handleRequestException($e);
         } catch (LockTimeoutException $e) {
             return $this->cacheAndReturnErrorResponse($e);
+        } catch (UnexpectedValueException $e) {
+            return $this->cacheAndReturnErrorResponse($e);
         } finally {
             $lock->release();
         }
@@ -82,12 +85,21 @@ class Outpost
         }
 
         $response = $this->client->request('POST', self::ENDPOINT, [
-            'headers' => ['accept' => 'application/json'],
+            'headers' => [
+                'accept' => 'application/json',
+                'user-agent' => 'Statamic/'.Statamic::version(),
+            ],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
         ]);
 
-        return json_decode($response->getBody()->getContents(), true);
+        $json = json_decode($response->getBody()->getContents(), true);
+
+        if (! is_array($json)) {
+            throw new UnexpectedValueException('Invalid response body', 500);
+        }
+
+        return $json;
     }
 
     private function licenseKeyFileResponse()

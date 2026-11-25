@@ -113,6 +113,14 @@ class FileCacher extends AbstractCacher
         return File::exists($this->getFilePath($url));
     }
 
+    public function getGeneratedAt(string $url): ?int
+    {
+        $site = Site::findByUrl($url)?->handle();
+        $timestamp = @File::lastModified($this->getFilePath($url, $site));
+
+        return $timestamp === false ? null : $timestamp;
+    }
+
     /**
      * Flush out the entire static cache.
      *
@@ -120,11 +128,15 @@ class FileCacher extends AbstractCacher
      */
     public function flush()
     {
+        // Wipe the store before the files, so any page written while the
+        // files are being deleted keeps the nocache regions it just stored.
+        $this->flushUrls();
+
+        $this->flushDedicatedStore();
+
         foreach ($this->getCachePaths() as $path) {
             $this->writer->flush($path);
         }
-
-        $this->flushUrls();
     }
 
     /**
@@ -145,8 +157,10 @@ class FileCacher extends AbstractCacher
                 $this->forgetUrl($key, $domain);
             });
 
+        $filePath = $this->getFilePath($domain.$url, $site);
+
         $this->getFiles($site)
-            ->filter(fn ($file) => str_starts_with($file, $url.'_'))
+            ->filter(fn ($file, $path) => $path === $filePath || str_starts_with($file, $url.'_'))
             ->each(function ($file, $path) {
                 $this->writer->delete($path);
             });
@@ -253,7 +267,7 @@ class FileCacher extends AbstractCacher
 
         $default = <<<EOT
 (function() {
-    fetch('/!/csrf', {
+    window.statamicCsrfRequest = fetch('/!/csrf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
     })
@@ -327,14 +341,18 @@ EOT;
 
     var map = createMap();
 
-    fetch('{$nocacheUrl}', {
+    // Wait for the csrf request, so both requests share one session and the
+    // csrf token in the page matches the session cookie the browser keeps.
+    Promise.resolve(window.statamicCsrfRequest)
+    .catch(() => {})
+    .then(() => fetch('{$nocacheUrl}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             url: window.location.href.split('#')[0],
             sections: Object.keys(map)
         })
-    })
+    }))
     .then((response) => response.json())
     .then((data) => {
         map = createMap();

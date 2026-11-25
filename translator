@@ -68,6 +68,7 @@ $additionalKeys = [
     'fieldtypes' => [
         'array.title',
         'assets.title',
+        'autocomplete_editor.title',
         'bard.title',
         'button_group.title',
         'checkboxes.title',

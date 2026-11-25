@@ -7,7 +7,7 @@
 <input
     id="{{ $id }}"
     type="range"
-    name="{{ $name }}"
+    @if ($isUnrated) data-name="{{ $name }}" @else name="{{ $name }}" @endif
     class="star-rating-input"
     data-star-rating
     @if ($isUnrated) data-unrated @endif
@@ -131,6 +131,11 @@
         (function () {
             function clearUnrated(input) {
                 input.removeAttribute('data-unrated');
+
+                if (input.dataset.name) {
+                    input.name = input.dataset.name;
+                    input.removeAttribute('data-name');
+                }
             }
 
             // Clicking the first star leaves the value at min, so input never fires.

@@ -150,7 +150,10 @@ abstract class AbstractJsDriver implements JsDriver
         return $this->form
             ->blueprint()
             ->fields()
-            ->addValues([...$values, ...old() ?? []])
+            ->addValues([
+                ...$values,
+                ...(session('errors')?->hasBag('form.'.$this->form->handle()) ? (old() ?? []) : []),
+            ])
             ->preProcess()
             ->values()
             ->when($this->form->honeypot(), fn ($fields, $honeypot) => $fields->merge([$honeypot => null]))

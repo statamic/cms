@@ -27,6 +27,10 @@ class FormBuilderController extends CpController
     {
         $this->authorize('editFields', $form);
 
+        if ($this->formsProRequired($form)) {
+            return $this->formsProRequiredPage($form);
+        }
+
         return Inertia::render('forms/Builder', [
             ...$this->fieldProps(),
             'form' => $form,
@@ -45,6 +49,8 @@ class FormBuilderController extends CpController
     public function update(Request $request, $form)
     {
         $this->authorize('editFields', $form);
+
+        $this->ensureFormsProIsNotRequired($form);
 
         $request->validate([
             'pages' => ['required', 'array', 'min:1'],

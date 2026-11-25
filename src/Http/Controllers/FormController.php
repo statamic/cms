@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers;
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
@@ -112,7 +111,7 @@ class FormController extends Controller
     /**
      * The steps for a failed form submission.
      *
-     * @return Response|RedirectResponse
+     * @return Response
      */
     private function formFailure(array $params, array $errors, string $form)
     {
@@ -133,11 +132,9 @@ class FormController extends Controller
 
         $redirect = Arr::get($params, '_error_redirect');
 
-        $response = $redirect && ! URL::isExternalToApplication($redirect)
-            ? redirect($redirect)
-            : back();
-
-        return $response->withInput()->withErrors($errors, 'form.'.$form);
+        throw ValidationException::withMessages($errors)
+            ->errorBag('form.'.$form)
+            ->redirectTo($redirect && ! URL::isExternalToApplication($redirect) ? $redirect : url()->previous());
     }
 
     /**

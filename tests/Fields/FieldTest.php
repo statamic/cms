@@ -5,6 +5,7 @@ namespace Tests\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\Field as Fields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
@@ -747,5 +748,23 @@ class FieldTest extends TestCase
 
         $this->assertEquals($field, $return);
         $this->assertEquals($form, $field->form());
+    }
+
+    #[Test]
+    public function set_form_can_be_overridden_without_a_return_type()
+    {
+        $field = new FieldOverridingSetForm('test', ['type' => 'text']);
+
+        $field->setForm($form = new Form);
+
+        $this->assertEquals($form, $field->form());
+    }
+}
+
+class FieldOverridingSetForm extends Field
+{
+    public function setForm(FormContract $form)
+    {
+        return parent::setForm($form);
     }
 }

@@ -420,7 +420,7 @@ function request() {
             signal: source.signal,
         })
         .then((response) => {
-            setColumns(response.data.meta.columns);
+            if (response.data.meta.columns) setColumns(response.data.meta.columns);
             activeFilterBadges.value = { ...response.data.meta.activeFilterBadges };
             items.value = Object.values(response.data.data);
             meta.value = response.data.meta;
@@ -747,7 +747,7 @@ watch(
             activeFilters.value = props.filtersForReordering ? props.filtersForReordering() : {};
             searchQuery.value = null;
             sortColumn.value = 'order';
-            sortDirection.value = 'asc';
+            sortDirection.value = props.sortDirection;
             currentPage.value = 1;
         } else {
             if (stateBeforeReordering.value) {

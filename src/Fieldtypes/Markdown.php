@@ -2,9 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\SampleValue;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
 
@@ -53,8 +55,9 @@ class Markdown extends Fieldtype
                 'fields' => [
                     'buttons' => [
                         'display' => __('Buttons'),
-                        'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
+                        'instructions' => __('statamic::fieldtypes.markdown.config.buttons'),
                         'type' => 'markdown_buttons_setting',
+                        'full_width_setting' => true,
                         'default' => [
                             'bold',
                             'italic',
@@ -65,7 +68,6 @@ class Markdown extends Fieldtype
                             'image',
                             'table',
                         ],
-                        'width' => 66,
                     ],
                     'toolbar_mode' => [
                         'display' => __('Toolbar Mode'),
@@ -265,5 +267,15 @@ class Markdown extends Fieldtype
         }
 
         return $this->replaceStatamicUrls($data, $newValue, $oldValue);
+    }
+
+    public function previewValue(): mixed
+    {
+        return SampleValue::paragraph();
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $faker->paragraph(2);
     }
 }

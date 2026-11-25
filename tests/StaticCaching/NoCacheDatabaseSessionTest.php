@@ -37,6 +37,7 @@ class NoCacheDatabaseSessionTest extends TestCase
         $session = new DatabaseSession('http://localhost/test');
 
         $region = $session->pushRegion('the contents', ['foo' => 'bar'], '.html');
+        $session->write();
 
         $stored = DatabaseRegion::where('key', $region->key())->first()->region;
 

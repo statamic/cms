@@ -92,6 +92,31 @@ class TraverserTest extends TestCase
     }
 
     #[Test]
+    public function files_with_the_same_timestamp_are_ordered_by_path()
+    {
+        mkdir($this->tempDir.'/nested');
+        touch($this->tempDir.'/c.txt', 1234567891);
+        touch($this->tempDir.'/nested/b.txt', 1234567891);
+        touch($this->tempDir.'/a.txt', 1234567891);
+        touch($this->tempDir.'/later.txt', 1234567892);
+        touch($this->tempDir.'/earlier.txt', 1234567890);
+
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir);
+
+        $files = $this->traverser->traverse($store);
+
+        $dir = Path::tidy($this->tempDir);
+        $this->assertSame([
+            $dir.'/earlier.txt' => 1234567890,
+            $dir.'/a.txt' => 1234567891,
+            $dir.'/c.txt' => 1234567891,
+            $dir.'/nested/b.txt' => 1234567891,
+            $dir.'/later.txt' => 1234567892,
+        ], $files->all());
+    }
+
+    #[Test]
     public function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567891);
@@ -168,5 +193,29 @@ class TraverserTest extends TestCase
         StacheFacade::registerStore((new EntriesStore)->directory($this->tempDir));
 
         $this->assertCount(3, StacheFacade::store('entries')->store('blog')->paths());
+    }
+
+    #[Test]
+    public function it_skips_a_file_removed_after_it_was_listed()
+    {
+        touch($this->tempDir.'/one.txt', 1234567891);
+        touch($this->tempDir.'/two.txt', 1234567892);
+
+        $store = Mockery::mock();
+        $store->shouldReceive('directory')->andReturn($this->tempDir);
+
+        // Removing the file as the filter sees it is the same as a concurrent delete landing
+        // between the Finder listing it and the traverser reading its modified time.
+        $this->traverser = $this->traverser->filter(function ($file) {
+            if ($file->getFilename() === 'one.txt') {
+                unlink($file->getPathname());
+            }
+
+            return true;
+        });
+
+        $files = $this->traverser->traverse($store);
+
+        $this->assertSame([Path::tidy($this->tempDir.'/two.txt')], $files->keys()->all());
     }
 }

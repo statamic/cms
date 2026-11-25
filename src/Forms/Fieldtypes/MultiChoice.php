@@ -3,10 +3,10 @@
 namespace Statamic\Forms\Fieldtypes;
 
 use Illuminate\Support\Collection;
-use Statamic\Forms\Charts\ChartOption;
 use Statamic\Forms\Charts\Pie;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fields\FormValueType;
+use Statamic\Forms\Fieldtypes\Concerns\HasHideableOptions;
 use Statamic\Forms\Summary\FieldResponses;
 use Statamic\Support\Arr;
 
@@ -14,6 +14,8 @@ use function Statamic\trans as __;
 
 class MultiChoice extends FormFieldtype
 {
+    use HasHideableOptions;
+
     protected static $fieldtype = 'radio';
     protected $description = 'A question with a range of answer options. Respondents can only choose one answer.';
     protected $icon = 'fieldtype-radio';
@@ -41,19 +43,9 @@ class MultiChoice extends FormFieldtype
     {
         return [
             'type' => 'radio',
-            'options' => $this->enabledOptions(),
+            'options' => $this->options(),
             ...Arr::except($this->config(), ['type', 'options']),
         ];
-    }
-
-    private function enabledOptions(): array
-    {
-        return collect($this->config('options'))
-            ->reject(fn ($option): bool => is_array($option) && ($option['hidden'] ?? false) === true)
-            ->mapWithKeys(fn ($option, $key): array => [
-                is_array($option) ? $option['key'] : $key => is_array($option) ? $option['value'] : $option,
-            ])
-            ->all();
     }
 
     public function valueType(): ?FormValueType
@@ -68,9 +60,7 @@ class MultiChoice extends FormFieldtype
 
     public function chartOptions(FieldResponses $responses): ?Collection
     {
-        return collect($this->enabledOptions())
-            ->map(fn ($label, $key) => new ChartOption($key, $label))
-            ->values();
+        return $this->hideableChartOptions($responses);
     }
 
     public function example(): ?array

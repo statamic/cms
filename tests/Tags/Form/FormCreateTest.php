@@ -3,12 +3,15 @@
 namespace Tests\Tags\Form;
 
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\FormBlueprintFound;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -119,7 +122,7 @@ class FormCreateTest extends FormTestCase
 
         $this->makeEntry('event-1', ['another_form' => []]);
 
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}', ['id' => 'event-1']);
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}|{{ form_restriction_message }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
         $this->assertStringNotContainsString('name="_entry"', $output);
@@ -138,7 +141,7 @@ class FormCreateTest extends FormTestCase
 
         (new EntryFactory)->collection('events')->id('event-1')->slug('event-1')->data(['rsvp_form' => 'contact'])->create();
 
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('1|closed', $output);
         $this->assertStringNotContainsString('name="_entry"', $output);
@@ -151,7 +154,7 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->set('unique_instances', true)->set('unique_instances_collections', ['events']);
 
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}|{{ restriction_message }}{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}|{{ form_restriction_message }}{{ /form:contact }}');
 
         $this->assertStringContainsString('1|closed|'.__('statamic::validation.form_must_be_submitted_from_an_entry'), $output);
         $this->assertStringNotContainsString('name="_entry"', $output);
@@ -160,7 +163,7 @@ class FormCreateTest extends FormTestCase
     #[Test]
     public function it_doesnt_render_the_closed_state_when_unique_instances_is_disabled()
     {
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}');
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}{{ /form:contact }}');
 
         $this->assertStringNotContainsString('closed', $output);
     }
@@ -174,7 +177,7 @@ class FormCreateTest extends FormTestCase
 
         $this->makeEntry('event-1', ['contact' => ['close_date' => '2000-01-01']]);
 
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1']);
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}{{ /form:contact }}', ['id' => 'event-1']);
 
         $this->assertStringContainsString('|closed', $output);
     }
@@ -204,7 +207,7 @@ class FormCreateTest extends FormTestCase
 
         Form::find('contact')->makeSubmission()->data(['_entry' => 'event-1'])->save();
 
-        $output = $this->tag('{{ form:contact }}{{ restricted }}|{{ status }}{{ /form:contact }}', ['id' => 'event-1-fr']);
+        $output = $this->tag('{{ form:contact }}{{ form_restricted }}|{{ form_status }}{{ /form:contact }}', ['id' => 'event-1-fr']);
 
         $this->assertStringContainsString('1|limit_reached', $output);
     }
@@ -274,7 +277,7 @@ class FormCreateTest extends FormTestCase
         $this->assertEquals('event-1', $submission->get('_entry'));
         $this->assertEquals('Olaf', $submission->get('name'));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function makeLocalizedEntry(string $id, array $formInstances): void
@@ -301,8 +304,11 @@ class FormCreateTest extends FormTestCase
     }
 
     #[Test]
-    public function it_dynamically_renders_fields()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ form:fields }}
@@ -322,8 +328,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_scope_param()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_scope_param($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ form:fields scope="field" }}
@@ -487,8 +496,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_using_legacy_array()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_using_legacy_array($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:contact }}
     {{ fields }}
@@ -568,8 +580,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_form_handle()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_form_handle($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
             $this->createForm(handle: $handle);
             $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form }}'));
@@ -581,8 +596,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_fields_with_form_handle_using_legacy_array_syntax()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_fields_with_form_handle_using_legacy_array_syntax($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         foreach (['contact', 'contact-form', 'kontakt_formular'] as $handle) {
             $this->createForm(handle: $handle);
             $output = $this->normalizeHtml($this->tag('{{ form in="'.$handle.'" }}{{ fields }}{{ field }}{{ /fields }}{{ /form }}'));
@@ -594,8 +612,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_text_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_text_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-favourite-animal-field" type="text" name="favourite_animal" value="">',
         ], [
@@ -618,8 +639,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_text_field_with_custom_input_type()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_text_field_with_custom_input_type($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-age-field" type="number" name="age" value="">',
         ], [
@@ -644,8 +668,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_textarea_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_textarea_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<textarea id="[[form-handle]]-form-comment-field" name="comment" rows="5"></textarea>',
         ], [
@@ -668,8 +695,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_checkboxes_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_checkboxes_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<br>',
@@ -710,8 +740,50 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_inline_checkboxes_field()
+    #[DataProvider('hiddenOptionsProvider')]
+    public function it_does_not_render_hidden_options($language, $type, $visible)
     {
+        config(['statamic.templates.language' => $language]);
+
+        $this->createForm(['fields' => [[
+            'handle' => 'answer',
+            'field' => [
+                'type' => $type,
+                'options' => [
+                    ['key' => 0, 'value' => 'No'],
+                    ['key' => 1, 'value' => 'Maybe', 'hidden' => true],
+                    ['key' => 2, 'value' => 'Yes'],
+                ],
+            ],
+        ]]], 'hidden_options');
+
+        $output = $this->normalizeHtml(
+            $this->tag('{{ form:hidden_options }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:hidden_options }}')
+        );
+
+        foreach ($visible as $html) {
+            $this->assertStringContainsString($html, $output);
+        }
+
+        $this->assertStringNotContainsString('Maybe', $output);
+        $this->assertStringNotContainsString('value="1"', $output);
+    }
+
+    public static function hiddenOptionsProvider()
+    {
+        return collect(['antlers', 'blade'])->flatMap(fn ($language) => [
+            "checkboxes ({$language})" => [$language, 'checkboxes', ['value="0">No</label>', 'value="2">Yes</label>']],
+            "multi choice ({$language})" => [$language, 'multi_choice', ['value="0"', '>No</label>', 'value="2">Yes</label>']],
+            "dropdown ({$language})" => [$language, 'dropdown', ['<option value="0"', '>No</option>', '<option value="2">Yes</option>']],
+        ])->all();
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_inline_checkboxes_field($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
             '<label><input id="[[form-handle]]-form-favourite-animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
@@ -750,8 +822,83 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_radio_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_checkboxes_field_with_a_single_option($language)
     {
+        config(['statamic.templates.language' => $language]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-cat-option" type="checkbox" name="favourite_animals[]" value="cat">Cat</label>',
+            '<br>',
+            '<label><input id="[[form-handle]]-form-favourite-animals-field-armadillo-option" type="checkbox" name="favourite_animals[]" value="armadillo">Armadillo</label>',
+        ], [
+            'handle' => 'favourite_animals',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'cat' => 'Cat',
+                    'armadillo' => 'Armadillo',
+                ],
+            ],
+        ]);
+
+        $this->assertFieldRendersHtml([
+            '<label><input id="[[form-handle]]-form-terms-field-yes-option" type="checkbox" name="terms[]" value="yes" required>I agree</label>',
+        ], [
+            'handle' => 'terms',
+            'field' => [
+                'type' => 'checkboxes',
+                'validate' => ['required'],
+                'options' => [
+                    'yes' => 'I agree',
+                ],
+            ],
+        ]);
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_only_renders_required_attribute_on_multiple_image_choice_field_with_a_single_option($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
+        $requiredCount = function (array $field) {
+            $handle = 'image_choice_'.str_shuffle('abcdefgh');
+
+            $this->createForm(['fields' => [['handle' => 'choice', 'field' => array_merge(['type' => 'image_choice', 'validate' => ['required']], $field)]]], $handle);
+
+            $html = $this->normalizeHtml($this->tag("{{ form:{$handle} }}{{ form:fields }}{{ field }}{{ /form:fields }}{{ /form:{$handle} }}"));
+
+            preg_match_all('/<input[^>]*name="choice(\[\])?"[^>]*>/', $html, $inputs);
+
+            return collect($inputs[0])->filter(fn ($input) => preg_match('/\srequired[\s>]/', $input))->count();
+        };
+
+        $options = [
+            ['key' => 'cat', 'label' => 'Cat', 'image' => '/cat.jpg'],
+            ['key' => 'dog', 'label' => 'Dog', 'image' => '/dog.jpg'],
+        ];
+
+        $this->assertEquals(0, $requiredCount(['multiple' => true, 'options' => $options]));
+        $this->assertEquals(1, $requiredCount(['multiple' => true, 'options' => [$options[0]]]));
+        $this->assertEquals(2, $requiredCount(['multiple' => false, 'options' => $options]));
+    }
+
+    public static function templateLanguageProvider()
+    {
+        return [
+            'antlers' => ['antlers'],
+            'blade' => ['blade'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_radio_field($language)
+    {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<br>',
@@ -792,8 +939,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_inline_radio_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_inline_radio_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<label><input id="[[form-handle]]-form-favourite-animal-field-cat-option" type="radio" name="favourite_animal" value="cat">Cat</label>',
             '<label><input id="[[form-handle]]-form-favourite-animal-field-armadillo-option" type="radio" name="favourite_animal" value="armadillo">Armadillo</label>',
@@ -832,8 +982,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_select_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_select_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<select id="[[form-handle]]-form-favourite-animal-field" name="favourite_animal">',
             '<option value>Please select...</option>',
@@ -876,8 +1029,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_select_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_multiple_select_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<select id="[[form-handle]]-form-favourite-animals-field" name="favourite_animals[]" multiple>',
             '<option value="cat">Cat</option>',
@@ -920,8 +1076,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_upload_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_upload_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfie-field" type="file" name="cat_selfie">',
         ], [
@@ -935,8 +1094,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_multiple_upload_field()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_multiple_upload_field($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-cat-selfies-field" type="file" name="cat_selfies[]" multiple>',
         ], [
@@ -949,8 +1111,11 @@ EOT
     }
 
     #[Test]
-    public function it_dynamically_renders_field_with_fallback_to_default_partial()
+    #[DataProvider('templateLanguageProvider')]
+    public function it_dynamically_renders_field_with_fallback_to_default_partial($language)
     {
+        config(['statamic.templates.language' => $language]);
+
         $this->assertFieldRendersHtml([
             '<input id="[[form-handle]]-form-custom-field" type="text" name="custom" value="">',
         ], [
@@ -1000,9 +1165,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }} - {{ display }}{{ if instructions }} ({{ instructions }}){{ /if }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -1038,9 +1203,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
 {{ /form:survey }}
 EOT
         ));
@@ -1064,9 +1229,9 @@ EOT
 
         $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ form:survey }}
-    {{ pages }}
+    {{ form_pages }}
         <div class="page">{{ id }}{{ if previous_page_label }} - back:{{ previous_page_label }}{{ /if }} - button:{{ button_label }} - {{ sections }}[{{ display }}:{{ fields }}{{ handle }},{{ /fields }}]{{ /sections }}</div>
-    {{ /pages }}
+    {{ /form_pages }}
     <div class="all-sections">{{ sections }}{{ display }},{{ /sections }}</div>
 {{ /form:survey }}
 EOT
@@ -1103,7 +1268,7 @@ EOT
 
         $template = <<<'EOT'
 {{ form:survey }}
-    <div class="page">{{ page:id }} - {{ page:display }}{{ if page:instructions }} ({{ page:instructions }}){{ /if }}{{ if page:previous_page_label }} - back:{{ page:previous_page_label }}{{ /if }} - button:{{ page:button_label }}</div>
+    <div class="page">{{ form_page:id }} - {{ form_page:display }}{{ if form_page:instructions }} ({{ form_page:instructions }}){{ /if }}{{ if form_page:previous_page_label }} - back:{{ form_page:previous_page_label }}{{ /if }} - button:{{ form_page:button_label }}</div>
 {{ /form:survey }}
 EOT;
 
@@ -1115,6 +1280,56 @@ EOT;
         request()->merge(['page' => 'page_two']);
         $output = $this->normalizeHtml($this->tag($template));
         $this->assertStringContainsString('<div class="page">page_two - Page Two - back:Back - button:Submit</div>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_page_and_status_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ page:url }}|{{ status }}|{{ form_page:id }}|{{ form_status }}</p>{{ /form:survey }}',
+            ['page' => ['url' => '/contact-us'], 'status' => 'published'],
+        );
+
+        $this->assertStringContainsString('<p>/contact-us|published|page_one|open</p>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_pages_and_restriction_variables()
+    {
+        $this->createMultiPageForm();
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ pages }}{{ title }},{{ /pages }}|{{ restricted }}|{{ restriction_message }}|{{ form_pages }}{{ id }},{{ /form_pages }}|{{ if form_restricted }}yes{{ else }}no{{ /if }}|{{ form_restriction_message ?? "none" }}</p>{{ /form:survey }}',
+            ['pages' => [['title' => 'Home'], ['title' => 'About']], 'restricted' => 'cascade-restricted', 'restriction_message' => 'cascade-message'],
+        );
+
+        $this->assertStringContainsString('<p>Home,About,|cascade-restricted|cascade-message|page_one,page_two,|no|none</p>', $output);
+    }
+
+    #[Test]
+    public function it_does_not_shadow_the_button_and_previous_page_variables()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->createForm([
+            'pages' => [
+                ['id' => 'page_one', 'sections' => [['fields' => [['handle' => 'name', 'field' => ['type' => 'text']]]]]],
+                ['id' => 'page_two', 'previous_page_label' => 'Back', 'sections' => [['fields' => [['handle' => 'email', 'field' => ['type' => 'text']]]]]],
+            ],
+        ], 'survey');
+
+        request()->merge(['page' => 'page_two']);
+
+        $output = $this->tag(
+            '{{ form:survey }}<p>{{ button_label }}|{{ previous_page_label }}|{{ previous_page_url }}|{{ form_button_label }}|{{ form_previous_page_label }}|{{ form_previous_page_url }}</p>{{ /form:survey }}',
+            ['button_label' => 'cascade-button', 'previous_page_label' => 'cascade-previous', 'previous_page_url' => '/cascade-url'],
+        );
+
+        $this->assertStringContainsString('<p>cascade-button|cascade-previous|/cascade-url|Submit|Back|http://localhost?page=page_one</p>', $output);
     }
 
     #[Test]
@@ -1243,9 +1458,88 @@ EOT
     }
 
     #[Test]
+    public function it_does_not_flash_password_fields_back_to_the_session_when_validation_fails()
+    {
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'password_confirmation', 'field' => ['type' => 'text']],
+            ['handle' => 'current_password', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->post('/!/forms/login', [
+                'email' => '',
+                'password' => 'secret',
+                'password_confirmation' => 'secret',
+                'current_password' => 'old-secret',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.password_confirmation')
+            ->assertSessionMissing('_old_input.current_password');
+    }
+
+    #[Test]
+    public function it_does_not_flash_custom_dont_flash_fields_back_to_the_session_when_validation_fails()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        $this->createForm(['fields' => [
+            ['handle' => 'email', 'field' => ['type' => 'text', 'validate' => ['required']]],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'email' => '',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['email'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.secret');
+    }
+
+    #[Test]
+    public function it_does_not_flash_dont_flash_fields_when_a_form_submitted_listener_throws_a_validation_exception()
+    {
+        app(ExceptionHandler::class)->dontFlash('secret');
+
+        Event::listen(function (\Statamic\Events\FormSubmitted $event) {
+            throw ValidationException::withMessages(['custom' => 'This is a custom message']);
+        });
+
+        $this->createForm(['fields' => [
+            ['handle' => 'password', 'field' => ['type' => 'text']],
+            ['handle' => 'secret', 'field' => ['type' => 'text']],
+            ['handle' => 'name', 'field' => ['type' => 'text']],
+        ]], 'login');
+
+        $this
+            ->from('/login')
+            ->post('/!/forms/login', [
+                'password' => 'pass',
+                'secret' => 'shh',
+                'name' => 'Jack',
+            ])
+            ->assertSessionHasErrors(['custom'], null, 'form.login')
+            ->assertLocation('/login')
+            ->assertSessionHasInput('name', 'Jack')
+            ->assertSessionMissing('_old_input.password')
+            ->assertSessionMissing('_old_input.secret');
+    }
+
+    #[Test]
     public function it_wont_submit_form_and_renders_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1256,7 +1550,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1284,9 +1578,61 @@ EOT
     }
 
     #[Test]
+    public function it_keeps_parameterized_email_and_url_rules_from_a_legacy_blueprint()
+    {
+        Blueprint::make()->setHandle('legacy')->setNamespace('forms')->setContents([
+            'tabs' => [
+                'main' => [
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'email', 'field' => ['type' => 'text', 'input_type' => 'email', 'validate' => ['required', 'email:filter']]],
+                                ['handle' => 'website', 'field' => ['type' => 'text', 'input_type' => 'url', 'validate' => ['required', 'url:https']]],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $form = Form::make('legacy');
+        Form::shouldReceive('find')->with('legacy')->andReturn($form);
+
+        $this
+            ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
+            ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
+
+        $form->save();
+
+        $this->assertNull(Blueprint::find('forms.legacy'));
+
+        $this
+            ->post('/!/forms/legacy', ['email' => 'x@localhost', 'website' => 'http://example.com'])
+            ->assertSessionHasErrors(['email', 'website'], null, 'form.legacy');
+
+        $this->assertEmpty($form->querySubmissions()->get());
+    }
+
+    #[Test]
+    public function it_only_renders_old_input_for_the_submitted_form()
+    {
+        $this->createForm(handle: 'newsletter');
+
+        $this
+            ->post('/!/forms/contact', ['email' => 'not-an-email'])
+            ->assertSessionHasErrors(['email'], null, 'form.contact');
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:contact }}');
+        $this->assertStringContainsString('[email=not-an-email]', $output);
+
+        $output = $this->tag('{{ form:newsletter }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:newsletter }}');
+        $this->assertStringContainsString('[email=]', $output);
+    }
+
+    #[Test]
     public function it_will_submit_form_and_render_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1296,7 +1642,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1313,6 +1659,28 @@ EOT
 
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Submission successful.'], $success[1]);
+    }
+
+    #[Test]
+    public function it_renders_and_submits_fields_added_by_a_form_blueprint_found_listener()
+    {
+        Event::listen(function (FormBlueprintFound $event) {
+            $event->blueprint->ensureField('source', ['type' => 'text', 'display' => 'Source']);
+        });
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}<label>{{ display }}</label>{{ /fields }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('<label>Source</label>', $output);
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'source' => 'newsletter',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertEquals('newsletter', Form::find('contact')->submissions()->first()->get('source'));
     }
 
     #[Test]
@@ -1343,7 +1711,7 @@ EOT;
         preg_match_all('/<p class="success">(.+)<\/p>/U', $this->tag($template), $success);
         $this->assertEquals(['Submission successful.'], $success[1]);
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1359,7 +1727,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertRedirectContains('page=page_three');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1389,11 +1757,11 @@ EOT;
             ->assertRedirectContains('page=page_one');
 
         // The submission wasn't finalized; it's still partial.
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
         $this->assertCount(1, $submissions);
         $this->assertTrue($submissions->first()->isPartial());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1411,7 +1779,7 @@ EOT;
         $this->assertStringNotContainsString('evil.example', $response->headers->get('Location'));
         $response->assertRedirectContains('page=page_two');
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1428,13 +1796,13 @@ EOT;
 
         request()->merge(['page' => 'page_three']);
 
-        $output = $this->tag('{{ form:survey }}{{ previous_page_url }}{{ /form:survey }}');
+        $output = $this->tag('{{ form:survey }}{{ form_previous_page_url }}{{ /form:survey }}');
 
         // "Back" returns to page one — the page actually visited — not page two.
         $this->assertStringContainsString('page=page_one', $output);
         $this->assertStringNotContainsString('page=page_two', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     private function createMultiPageFormWithLogic($handle = 'survey')
@@ -1467,7 +1835,7 @@ EOT;
     #[Test]
     public function it_will_submit_form_and_follow_custom_redirect_with_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1478,7 +1846,7 @@ EOT;
             ->assertSessionHasNoErrors()
             ->assertLocation('/submission-successful');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1504,7 +1872,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_redirect_on_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->from('/contact')
@@ -1516,13 +1884,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/contact');
 
-        $this->assertCount(1, Form::find('contact')->submissions());
+        $this->assertCount(1, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1533,7 +1901,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1570,7 +1938,7 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $submissions = Form::find('contact')->submissions();
+        $submissions = Form::find('contact')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
@@ -1593,12 +1961,12 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertSessionMissing('form.survey.partial_submission');
 
-        $submissions = Form::find('survey')->submissions();
+        $submissions = Form::find('survey')->querySubmissions()->get();
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
 
-        Form::find('survey')->submissions()->each->delete();
+        Form::find('survey')->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -1616,13 +1984,13 @@ EOT
             ->assertSessionHasNoErrors()
             ->assertLocation('/');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
     public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1634,7 +2002,7 @@ EOT
             ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
             ->assertLocation('/submission-error');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1661,7 +2029,7 @@ EOT
     #[Test]
     public function it_does_not_follow_external_error_redirect()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         Event::listen(function (\Statamic\Events\FormSubmitted $event) {
             throw ValidationException::withMessages(['custom' => 'This is a custom message']);
@@ -1678,7 +2046,7 @@ EOT
             ->assertSessionHasErrors(['custom'], null, 'form.contact')
             ->assertLocation('/contact');
 
-        $this->assertCount(0, Form::find('contact')->submissions());
+        $this->assertCount(0, Form::find('contact')->querySubmissions()->get());
     }
 
     #[Test]
@@ -1703,7 +2071,7 @@ EOT
     #[Test]
     public function it_can_render_an_inline_error_when_multiple_rules_fail()
     {
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->post('/!/forms/contact', [
@@ -1714,7 +2082,7 @@ EOT
             ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
             ->assertLocation('/');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $output = $this->tag(<<<'EOT'
 {{ form:contact }}
@@ -1998,7 +2366,7 @@ EOT
         $pageTwo = $this->normalizeHtml($this->tag('{{ form:survey }}{{ fields }}{{ handle }}={{ value }},{{ /fields }}{{ /form:survey }}'));
         $this->assertStringContainsString('email=olaf@example.com,', $pageTwo);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2018,7 +2386,7 @@ EOT
         $this->assertStringContainsString('name=Olaf,', $this->normalizeHtml($this->tag($template, ['id' => 'event-a'])));
         $this->assertStringContainsString('name=,', $this->normalizeHtml($this->tag($template, ['id' => 'event-b'])));
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2034,7 +2402,7 @@ EOT
         $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-a', 'name' => 'Olaf']);
         $this->post('/!/forms/survey', ['_page' => 'page_one', '_entry' => 'event-b', 'name' => 'Sven']);
 
-        $this->assertCount(2, $form->submissions());
+        $this->assertCount(2, $form->querySubmissions()->get());
         $idA = session('form.survey.event-a.partial_submission');
         $idB = session('form.survey.event-b.partial_submission');
         $this->assertNotEquals($idA, $idB);
@@ -2054,7 +2422,7 @@ EOT
         $this->assertEquals('Olaf', $finalized->get('name'));
         $this->assertTrue($form->submission($idB)->isPartial());
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2074,7 +2442,7 @@ EOT
         // The submission is no longer partial, so its values aren't loaded back in.
         $this->assertStringContainsString('name=,', $output);
 
-        $form->submissions()->each->delete();
+        $form->querySubmissions()->get()->each->delete();
     }
 
     #[Test]
@@ -2153,7 +2521,7 @@ EOT
     {
         Bus::fake();
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
 
         $this
             ->withPrecognition()
@@ -2162,7 +2530,7 @@ EOT
             ->assertNoContent()
             ->assertHeader('Precognition-Success', 'true');
 
-        $this->assertEmpty(Form::find('contact')->submissions());
+        $this->assertEmpty(Form::find('contact')->querySubmissions()->get());
         Bus::assertNotDispatched(SendEmail::class);
     }
 

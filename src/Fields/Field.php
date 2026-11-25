@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Lang;
 use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Contracts\Forms\Form;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Field as FieldFacade;
 use Statamic\Facades\GraphQL;
 use Statamic\Forms\Fields\FormField;
@@ -448,8 +449,12 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($fieldtype->config());
 
+        $defaults = Blink::once('common-field-option-defaults', function () {
+            return self::commonFieldOptions()->all()->map->defaultValue()->all();
+        });
+
         return array_merge(
-            self::commonFieldOptions()->all()->map->defaultValue()->all(),
+            $defaults,
             $this->config,
             $fields->preProcess()->values()->all(),
             [
@@ -487,7 +492,7 @@ class Field implements Arrayable
         return $this->fieldtype()->isRelationship();
     }
 
-    public function setForm(Form $form): self
+    public function setForm(Form $form)
     {
         $this->form = $form;
 
@@ -499,7 +504,7 @@ class Field implements Arrayable
         return $this->form;
     }
 
-    public function setFormField(FormField $formField): self
+    public function setFormField(?FormField $formField): self
     {
         $this->formField = $formField;
 

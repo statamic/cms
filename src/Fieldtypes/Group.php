@@ -2,8 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use Faker\Generator;
+use Illuminate\Support\Collection;
 use Statamic\Data\NestedFieldUpdater;
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Values;
@@ -176,7 +179,7 @@ class Group extends Fieldtype
         $field = $this->field();
 
         $formFields = new FormFields([
-            'sections' => [['fields' => $this->config('fields')]],
+            'sections' => [['fields' => $field->formField()?->config()['fields'] ?? $this->config('fields')]],
         ]);
 
         $data['fields'] = collect($this->fields()->all())
@@ -223,5 +226,24 @@ class Group extends Fieldtype
         }
 
         $updater->update(new Fields($fieldsConfig));
+    }
+
+    public function previewValue(): mixed
+    {
+        return $this->sampleFields()
+            ->map(fn (Field $field) => $field->fieldtype()->previewValue())
+            ->all();
+    }
+
+    public function fakeValue(Generator $faker): mixed
+    {
+        return $this->sampleFields()
+            ->map(fn (Field $field) => $field->fieldtype()->fakeValue($faker))
+            ->all();
+    }
+
+    private function sampleFields(): Collection
+    {
+        return $this->fields()->all();
     }
 }

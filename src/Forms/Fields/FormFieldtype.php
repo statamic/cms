@@ -31,6 +31,7 @@ abstract class FormFieldtype implements Arrayable
 
     protected $field;
     protected $selectable = true;
+    protected $collectsValue = true;
     protected $description;
     protected $categories = [];
     protected $keywords = [];
@@ -87,7 +88,7 @@ abstract class FormFieldtype implements Arrayable
 
     public function collectsValue(): bool
     {
-        return ! array_intersect($this->categories(), ['information', 'structure']);
+        return $this->collectsValue;
     }
 
     public function keywords(): array
@@ -111,9 +112,11 @@ abstract class FormFieldtype implements Arrayable
             return $fallback;
         }
 
-        $config = $this->configFields()->all()
-            ->map->defaultValue()
-            ->merge($this->field->config());
+        $defaults = Blink::once('form-config-field-defaults-'.$this->handle(), function () {
+            return $this->configFields()->all()->map->defaultValue()->all();
+        });
+
+        $config = collect($defaults)->merge($this->field->config());
 
         return $key
             ? ($config->get($key) ?? $fallback)
@@ -164,7 +167,7 @@ abstract class FormFieldtype implements Arrayable
             return [];
         }
 
-        return app($class)->extraConfigFieldItems();
+        return (fn () => $this->extraConfigFieldItems())->call(app($class));
     }
 
     public static function appendConfigFields(array $config): void
@@ -239,6 +242,11 @@ abstract class FormFieldtype implements Arrayable
         return [];
     }
 
+    public function prepareFrontEndRenderable(array $data): array
+    {
+        return $data;
+    }
+
     public function view(): string
     {
         $handle = $this->handle();
@@ -287,6 +295,7 @@ abstract class FormFieldtype implements Arrayable
             'title' => $this->title(),
             'description' => $this->description(),
             'categories' => $this->categories(),
+            'collects_value' => $this->collectsValue(),
             'keywords' => $this->keywords(),
             'icon' => $this->icon(),
             'order' => $this->order(),

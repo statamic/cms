@@ -28,28 +28,24 @@ const meta = {
             description: 'Event handler called when the selected option changes.',
             table: {
                 category: 'events',
-                type: { summary: '(value: string | string[]) => void' },
             },
         },
         search: {
             description: 'Event handler called when the search query changes.',
             table: {
                 category: 'events',
-                type: { summary: '(query: string) => void' },
             },
         },
         selected: {
             description: 'Event handler called when an option is selected.',
             table: {
                 category: 'events',
-                type: { summary: '(value: string) => void' },
             },
         },
         added: {
             description: 'Event handler called when a taggable option is added.',
             table: {
                 category: 'events',
-                type: { summary: '(value: string) => void' },
             },
         },
     },
@@ -1026,6 +1022,28 @@ export const TestTaggableSingleCanAddOption: Story = {
         expect(args.onAdded).toHaveBeenCalledWith('new-tag');
 
         await waitFor(() => expect(document.querySelector('[data-ui-combobox-content]')).toBeFalsy());
+    },
+};
+
+export const TestTaggableHideInputWhenClosed: Story = {
+    tags: ['!dev', 'test'],
+    render: () => ({
+        components: { Combobox },
+        setup() {
+            const value = ref<string | null>('fm_84');
+            return { value, options: defaultOptions };
+        },
+        template: `<Combobox v-model="value" :options="options" taggable hide-input-when-closed />`,
+    }),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        expect(canvasElement.querySelector('input')).toBeNull();
+        expect(canvas.getByText('FM-84')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('combobox'));
+
+        await waitFor(() => expect(canvasElement.querySelector('input')).toBeTruthy());
     },
 };
 

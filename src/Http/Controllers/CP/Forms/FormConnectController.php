@@ -20,7 +20,7 @@ class FormConnectController extends CpController
 
     public function index($form)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         return Inertia::render('forms/connect/Index', [
             'form' => $form,
@@ -40,7 +40,7 @@ class FormConnectController extends CpController
 
     public function edit($form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
@@ -64,7 +64,7 @@ class FormConnectController extends CpController
 
     public function update(Request $request, $form, string $handle)
     {
-        $this->authorize('edit', $form);
+        $this->authorize('editConnections', $form);
 
         [$connector, $connections] = $this->validatedConnections($request, $form, $handle);
 
@@ -109,9 +109,12 @@ class FormConnectController extends CpController
     {
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
-        Validator::make($request->all(), $connector->rules())->validate();
+        $connections = $request->all();
 
-        return [$connector, $connector->process($request->all())];
+        Validator::make(['connections' => $connections], ['connections' => ['list']])->validate();
+        Validator::make($connections, $connector->rules())->validate();
+
+        return [$connector, $connector->process($connections)];
     }
 
     private function suggestableFields($form): array

@@ -3,6 +3,7 @@
 namespace Statamic\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Forms\Form as FormContract;
@@ -25,6 +26,7 @@ use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Tab;
 use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Exporters\Exporter;
 use Statamic\Forms\Fields\FormFields;
@@ -125,103 +127,112 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return collect($tab['sections'] ?? [])->map(function (array $section): array {
                 return [
                     ...$section,
-                    'fields' => collect($section['fields'] ?? [])->map(function (array $field): array {
-                        $validate = Arr::get($field, 'field.validate');
-                        $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
-
-                        $isEmailRule = fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:'));
-
-                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isEmailRule)) {
-                            Arr::set($field, 'field.type', 'email');
-                            Arr::pull($field, 'field.input_type');
-
-                            $remainingValidationRules = collect($validateRules)
-                                ->reject($isEmailRule)
-                                ->values();
-
-                            if ($remainingValidationRules->isEmpty()) {
-                                unset($field['field']['validate']);
-                            } else {
-                                $field['field']['validate'] = $remainingValidationRules->all();
-                            }
-                        }
-
-                        $isUrlRule = fn ($rule) => is_string($rule) && ($rule === 'url' || str_starts_with($rule, 'url:'));
-
-                        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isUrlRule)) {
-                            Arr::set($field, 'field.type', 'website');
-                            Arr::pull($field, 'field.input_type');
-
-                            $remainingValidationRules = collect($validateRules)
-                                ->reject($isUrlRule)
-                                ->values();
-
-                            if ($remainingValidationRules->isEmpty()) {
-                                unset($field['field']['validate']);
-                            } else {
-                                $field['field']['validate'] = $remainingValidationRules->all();
-                            }
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'text' && Arr::get($field, 'field.input_type') === 'tel') {
-                            Arr::set($field, 'field.type', 'phone');
-                            Arr::pull($field, 'field.input_type');
-                        }
-
-                        if (
-                            Arr::get($field, 'field.type') === 'text'
-                            && (! Arr::has($field, 'field.input_type') || Arr::get($field, 'field.input_type') === 'text')
-                        ) {
-                            Arr::set($field, 'field.type', 'short_answer');
-                            Arr::pull($field, 'field.input_type');
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'textarea') {
-                            Arr::set($field, 'field.type', 'long_answer');
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'time') {
-                            Arr::set($field, 'field.type', 'time_picker');
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'integer') {
-                            Arr::set($field, 'field.type', 'number');
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'radio') {
-                            Arr::set($field, 'field.type', 'multi_choice');
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'select') {
-                            Arr::set($field, 'field.type', 'dropdown');
-
-                            if (Arr::get($field, 'field.multiple') === true) {
-                                if ($maxItems = Arr::pull($field, 'field.max_items')) {
-                                    Arr::set($field, 'field.max_selections', $maxItems);
-                                }
-                            } else {
-                                Arr::pull($field, 'field.multiple');
-                                Arr::pull($field, 'field.max_items');
-                            }
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'assets') {
-                            Arr::set($field, 'field.type', 'upload');
-                            Arr::set($field, 'field.store', true);
-                        }
-
-                        if (Arr::get($field, 'field.type') === 'files') {
-                            Arr::set($field, 'field.type', 'upload');
-                            Arr::set($field, 'field.store', false);
-                        }
-
-                        return $field;
-                    })->all(),
+                    'fields' => collect($section['fields'] ?? [])->map(fn (array $field): array => $this->convertLegacyField($field))->all(),
                 ];
             })->all();
         })->all();
 
         return ['sections' => $sections];
+    }
+
+    private function convertLegacyField(array $field, bool $nested = false): array
+    {
+        if (Arr::get($field, 'field.type') === 'group' && is_array($children = Arr::get($field, 'field.fields'))) {
+            $field['field']['fields'] = collect($children)
+                ->map(fn ($child) => is_array($child) ? $this->convertLegacyField($child, nested: true) : $child)
+                ->all();
+        }
+
+        $validate = Arr::get($field, 'field.validate');
+        $validateRules = is_string($validate) ? explode('|', $validate) : ($validate ?? []);
+
+        $isEmailRule = fn ($rule) => is_string($rule) && ($rule === 'email' || str_starts_with($rule, 'email:'));
+
+        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isEmailRule)) {
+            Arr::set($field, 'field.type', 'email');
+            Arr::pull($field, 'field.input_type');
+
+            $remainingValidationRules = collect($validateRules)
+                ->reject(fn ($rule) => $rule === 'email')
+                ->values();
+
+            if ($remainingValidationRules->isEmpty()) {
+                unset($field['field']['validate']);
+            } else {
+                $field['field']['validate'] = $remainingValidationRules->all();
+            }
+        }
+
+        $isUrlRule = fn ($rule) => is_string($rule) && ($rule === 'url' || str_starts_with($rule, 'url:'));
+
+        if (Arr::get($field, 'field.type') === 'text' && collect($validateRules)->contains($isUrlRule)) {
+            Arr::set($field, 'field.type', 'website');
+            Arr::pull($field, 'field.input_type');
+
+            $remainingValidationRules = collect($validateRules)
+                ->reject(fn ($rule) => $rule === 'url')
+                ->values();
+
+            if ($remainingValidationRules->isEmpty()) {
+                unset($field['field']['validate']);
+            } else {
+                $field['field']['validate'] = $remainingValidationRules->all();
+            }
+        }
+
+        if (Arr::get($field, 'field.type') === 'text' && Arr::get($field, 'field.input_type') === 'tel') {
+            Arr::set($field, 'field.type', 'phone');
+            Arr::pull($field, 'field.input_type');
+        }
+
+        if (
+            Arr::get($field, 'field.type') === 'text'
+            && (! Arr::has($field, 'field.input_type') || Arr::get($field, 'field.input_type') === 'text')
+        ) {
+            Arr::set($field, 'field.type', 'short_answer');
+            Arr::pull($field, 'field.input_type');
+        }
+
+        if (Arr::get($field, 'field.type') === 'textarea') {
+            Arr::set($field, 'field.type', 'long_answer');
+        }
+
+        if (Arr::get($field, 'field.type') === 'time') {
+            Arr::set($field, 'field.type', 'time_picker');
+        }
+
+        if (Arr::get($field, 'field.type') === 'integer') {
+            Arr::set($field, 'field.type', 'number');
+        }
+
+        if (Arr::get($field, 'field.type') === 'radio') {
+            Arr::set($field, 'field.type', 'multi_choice');
+        }
+
+        if (Arr::get($field, 'field.type') === 'select') {
+            Arr::set($field, 'field.type', 'dropdown');
+
+            if (Arr::get($field, 'field.multiple') === true) {
+                if ($maxItems = Arr::pull($field, 'field.max_items')) {
+                    Arr::set($field, 'field.max_selections', $maxItems);
+                }
+            } else {
+                Arr::pull($field, 'field.multiple');
+                Arr::pull($field, 'field.max_items');
+            }
+        }
+
+        if (! $nested && Arr::get($field, 'field.type') === 'assets') {
+            Arr::set($field, 'field.type', 'upload');
+            Arr::set($field, 'field.store', true);
+        }
+
+        if (! $nested && Arr::get($field, 'field.type') === 'files') {
+            Arr::set($field, 'field.type', 'upload');
+            Arr::set($field, 'field.store', false);
+        }
+
+        return $field;
     }
 
     public function hasMultiplePages(): bool
@@ -375,6 +386,21 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return $this->blueprint()->fields()->all();
     }
 
+    public function sections(): Collection
+    {
+        return $this->pages()->flatMap(fn (Tab $page) => $page->expandedSections());
+    }
+
+    public function pages(): Collection
+    {
+        $pages = $this->formFields()->pages()->keyBy('id');
+
+        return $this->blueprint()->tabs()->values()->map(fn (Tab $tab) => (new Tab($tab->handle()))->setContents([
+            ...$tab->contents(),
+            'display' => $pages->has($tab->handle()) ? ($pages->get($tab->handle())['display'] ?? null) : $tab->display(),
+        ]));
+    }
+
     /**
      * Get path.
      *
@@ -438,10 +464,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             $data['charts'] = [];
         }
 
-        if ($this->get('generate_fake_submissions') === false) {
-            $data['generate_fake_submissions'] = false;
-        }
-
         File::put($this->path(), YAML::dump($data));
 
         if ($blueprint = Facades\Blueprint::find("forms.{$this->handle()}")) {
@@ -488,7 +510,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
             return false;
         }
 
-        $this->submissions()->each->delete();
+        $this->querySubmissions()->get()->each->delete();
 
         File::delete($this->path());
 
@@ -544,7 +566,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
      */
     public function submissions()
     {
-        return FormSubmission::whereForm($this->handle());
+        return $this->querySubmissions()->whereStatus('finalized')->get();
     }
 
     public function querySubmissions(): SubmissionQueryBuilder
@@ -570,6 +592,16 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function restrictionMessage(): ?string
     {
         return $this->instance()->restrictionMessage();
+    }
+
+    public function closedMessage(): string
+    {
+        return ($msg = $this->get('closed_message')) ? __($msg) : __('statamic::messages.form_closed_message');
+    }
+
+    public function requireLoginMessage(): string
+    {
+        return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
     }
 
     /**
@@ -641,6 +673,17 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function editBlueprintUrl()
     {
         return cp_route('forms.show', $this->handle());
+    }
+
+    /**
+     * @deprecated
+     */
+    public function blueprintCommandPaletteLink()
+    {
+        return $this->blueprint()?->commandPaletteLink(
+            type: 'Forms',
+            url: $this->editBlueprintUrl(),
+        );
     }
 
     public function hasFiles()

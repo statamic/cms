@@ -20,7 +20,6 @@
         :form-component-props="formComponentProps"
         :form-stack-size="formStackSize"
         :status-icons="statusIcons"
-        :columns="columns"
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
@@ -58,10 +57,6 @@ export default {
             }
 
             return Infinity;
-        },
-
-        columns() {
-            return this.meta.columns;
         },
 
         itemComponent() {

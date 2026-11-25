@@ -75,7 +75,7 @@ class URL
     {
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
-        if (parse_url($url)['path'] === '/') {
+        if (($this->parse($url)['path'] ?? null) === '/') {
             return null;
         }
 
@@ -87,7 +87,7 @@ class URL
      */
     public function replaceSlug(?string $url, string $slug): string
     {
-        if (parse_url(Str::ensureRight($url, '/'))['path'] === '/') {
+        if (($this->parse(Str::ensureRight($url, '/'))['path'] ?? null) === '/') {
             return self::tidy($url);
         }
 
@@ -118,7 +118,7 @@ class URL
 
         $url = Str::ensureRight(self::removeQueryAndFragment($url), '/');
 
-        if (parse_url($url)['path'] !== '/') {
+        if (($this->parse($url)['path'] ?? null) !== '/') {
             $url = preg_replace('/[^\/]*\/$/', '', $url);
         }
 
@@ -177,7 +177,7 @@ class URL
         // Normalize duplicate leading slashes before parsing to avoid protocol-relative URL interpretation.
         $url = preg_replace('#^/+#', '/', (string) $url);
 
-        $parsed = parse_url($url);
+        $parsed = $this->parse($url);
 
         $url = $parsed['path'] ?? '/';
 
@@ -413,7 +413,7 @@ class URL
 
         $withTrailingSlash ??= self::$enforceTrailingSlashes;
 
-        $isFile = Str::contains(basename(parse_url($url)['path'] ?? ''), '.');
+        $isFile = Str::contains(basename($this->parse($url)['path'] ?? ''), '.');
 
         if (in_array($url, ['', '/'])) {
             $url = '/';
@@ -424,6 +424,19 @@ class URL
         }
 
         return $url.$queryAndFragments;
+    }
+
+    private function parse(string $url): array
+    {
+        // A dummy scheme prevents path segments ending in :digits from being parsed as host:port.
+        if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
+            $parts = parse_url('url:'.$url) ?: [];
+            unset($parts['scheme']);
+
+            return $parts;
+        }
+
+        return parse_url($url) ?: [];
     }
 
     /**

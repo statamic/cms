@@ -11,6 +11,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\FormConnector;
 use Statamic\Facades\User;
 use Statamic\Forms\Connectors\Email;
+use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Forms\SendEmail;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -57,6 +58,46 @@ class EmailConnectorTest extends TestCase
         $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission());
 
         $this->assertContainsOnlyInstancesOf(CustomSendEmail::class, $jobs);
+    }
+
+    #[Test]
+    #[DataProvider('sendEmailJobProvider')]
+    public function it_passes_addresses_to_the_job_as_comma_separated_strings(string $class)
+    {
+        config(['statamic.forms.send_email_job' => $class]);
+
+        $form = tap(Form::make('test')->connections(['email' => [
+            [
+                'id' => 'one',
+                'to' => ['field:email', 'first@example.com'],
+                'cc' => ['cc@example.com'],
+                'bcc' => ['{{ x ?? "a@example.com, b@example.com" }}', 'bcc@example.com'],
+                'reply_to' => ['field:email'],
+                'from' => 'sender@example.com',
+            ],
+            ['id' => 'two', 'to' => 'legacy@example.com, other@example.com'],
+        ]]))->save();
+
+        $jobs = (new Email)->forForm($form)->finalized($form->makeSubmission());
+
+        $this->assertContainsOnlyInstancesOf($class, $jobs);
+        $this->assertSame([
+            'id' => 'one',
+            'to' => 'field:email, first@example.com',
+            'cc' => 'cc@example.com',
+            'bcc' => '{{ x ?? "a@example.com, b@example.com" }}, bcc@example.com',
+            'reply_to' => 'field:email',
+            'from' => 'sender@example.com',
+        ], $jobs[0]->config);
+        $this->assertSame(['id' => 'two', 'to' => 'legacy@example.com, other@example.com'], $jobs[1]->config);
+    }
+
+    public static function sendEmailJobProvider(): array
+    {
+        return [
+            'core job' => [SendEmail::class],
+            'custom job' => [CustomSendEmail::class],
+        ];
     }
 
     #[Test]
@@ -124,7 +165,7 @@ class EmailConnectorTest extends TestCase
         $this->assertNotNull($route);
         $this->assertEquals('forms/{form}/connect/email/preview', $route->uri());
         $this->assertContains('POST', $route->methods());
-        $this->assertContains('can:edit,form', $route->middleware());
+        $this->assertContains('can:editConnections,form', $route->middleware());
     }
 
     #[Test]
@@ -133,13 +174,13 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $response = $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['field:email', 'Team <team@example.com>'],
                 'from' => ['sender@example.com'],
                 'reply_to' => ['field:email'],
-                'subject' => 'Hello {{ name }}',
+                'subject' => 'Hello [[name]]',
             ])
             ->assertOk()
             ->assertJson([
@@ -150,14 +191,34 @@ class EmailConnectorTest extends TestCase
                 'sample' => true,
             ]);
 
-        $this->assertStringStartsWith('Hello ', $response->json('subject'));
-        $this->assertNotEquals('Hello ', $response->json('subject'));
-        $this->assertNotFalse(filter_var($response->json('to.0'), FILTER_VALIDATE_EMAIL));
-        $this->assertEquals('Team <team@example.com>', $response->json('to.1'));
-        $this->assertEquals($response->json('to.0'), $response->json('reply_to.0'));
+        $this->assertEquals('Hello Jane Doe', $response->json('subject'));
+        $this->assertEquals(['name@example.com', 'Team <team@example.com>'], $response->json('to'));
+        $this->assertEquals(['name@example.com'], $response->json('reply_to'));
         $this->assertStringContainsString('<b>Name:</b>', $response->json('body'));
         $this->assertStringContainsString('<b>Email:</b>', $response->json('body'));
         $this->assertEquals(0, $form->querySubmissions()->count());
+    }
+
+    #[Test]
+    public function it_previews_a_sample_submission_without_the_fake_submission_generator()
+    {
+        $this->app->bind(FakeSubmissionGenerator::class, fn () => throw new \Exception('The fake submission generator should not be used.'));
+
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithConnectionPermissions())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                'subject' => 'Hello [[name]]',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'subject' => 'Hello Jane Doe',
+                'to' => ['name@example.com'],
+                'sample' => true,
+            ]);
     }
 
     #[Test]
@@ -176,7 +237,7 @@ class EmailConnectorTest extends TestCase
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['field:email'],
-                'subject' => 'Hello {{ name }}',
+                'subject' => 'Hello [[name]]',
             ])
             ->assertOk()
             ->assertJson([
@@ -187,23 +248,111 @@ class EmailConnectorTest extends TestCase
     }
 
     #[Test]
-    public function it_previews_using_sample_data_when_the_user_cannot_view_submissions()
+    #[DataProvider('editOnlyPermissionsProvider')]
+    public function it_denies_the_preview_to_users_who_cannot_view_submissions(array $permissions)
     {
         $form = $this->makeForm();
         $this->makeSubmission($form, ['name' => 'Latest', 'email' => 'latest@example.com'], '2026-02-01 10:00');
 
-        $response = $this
-            ->actingAs($this->userWithEditPermission())
+        $this->setTestRoles(['test' => ['access cp', ...$permissions]]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['field:email'],
-                'subject' => 'Hello {{ name }}',
+                'subject' => 'Hello [[name]]',
+            ])
+            ->assertForbidden();
+    }
+
+    public static function editOnlyPermissionsProvider(): array
+    {
+        return [
+            'edit forms' => [['edit forms']],
+            'edit test form' => [['edit test form']],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('templateSyntaxProvider')]
+    public function it_rejects_template_syntax_in_the_preview_from_untrusted_users(string $key, mixed $value)
+    {
+        config(['database.connections.secret' => ['password' => 'hunter2']]);
+
+        $form = $this->makeForm();
+
+        $this
+            ->actingAs($this->userWithConnectionPermissions())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                $key => $value,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(["0.{$key}"])
+            ->assertDontSee('hunter2');
+    }
+
+    public static function templateSyntaxProvider(): array
+    {
+        return [
+            'antlers in the subject' => ['subject', 'Hi {{ config:database.connections.secret.password }}'],
+            'env in the subject' => ['subject', 'Hi {env:APP_KEY}'],
+            'antlers in a recipient' => ['to', ['field:email', '{{ users }}{{ email }},{{ /users }}']],
+            'antlers in the sender' => ['from', '{{ config:database.connections.secret.password }}@example.com'],
+            'antlers in the reply to' => ['reply_to', ['{{ config:app.name }}']],
+            'antlers in the cc' => ['cc', ['{{ config:app.name }}']],
+            'antlers in the bcc' => ['bcc', ['{{ config:app.name }}']],
+            'antlers in the html view' => ['html', '{{ config:app.name }}'],
+            'antlers in the text view' => ['text', '{{ config:app.name }}'],
+            'antlers in the mailer' => ['mailer', '{{ config:app.name }}'],
+            'antlers joined by an unknown mention' => ['subject', 'Hi {[[nope]]{ config:database.connections.secret.password }}'],
+            'env joined by an unknown mention' => ['subject', 'Hi {[[nope]]env:APP_KEY}'],
+            'antlers joined by an escaped mention' => ['subject', 'Hi {[[ nope ]]{[[ nope ]] config:app.name }[[nope]]}'],
+        ];
+    }
+
+    #[Test]
+    public function it_allows_template_syntax_in_the_preview_from_users_who_can_configure_forms()
+    {
+        config(['app.name' => 'Acme']);
+
+        $form = $this->makeForm();
+
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email'],
+                'subject' => 'Hello {{ config:app.name }}',
             ])
             ->assertOk()
-            ->assertJson(['sample' => true]);
+            ->assertJson(['subject' => 'Hello Acme']);
+    }
 
-        $this->assertNotEquals('Hello Latest', $response->json('subject'));
-        $this->assertNotEquals(['latest@example.com'], $response->json('to'));
+    #[Test]
+    public function it_allows_unchanged_stored_template_syntax_in_the_preview_from_untrusted_users()
+    {
+        config(['app.name' => 'Acme']);
+
+        $form = tap($this->makeForm()->connections([
+            'email' => [['id' => 'abc', 'to' => ['field:email', '{{ config:mail.from.address }}'], 'subject' => 'Hello {{ config:app.name }}']],
+        ]))->save();
+
+        $this
+            ->actingAs($this->userWithConnectionPermissions())
+            ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
+                'id' => 'abc',
+                'to' => ['field:email', '{{ config:mail.from.address }}', 'new@example.com'],
+                'subject' => 'Hello {{ config:app.name }}',
+            ])
+            ->assertOk()
+            ->assertJson(['subject' => 'Hello Acme']);
     }
 
     #[Test]
@@ -212,7 +361,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -227,7 +376,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $response = $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -245,7 +394,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $response = $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -264,7 +413,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $response = $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -283,7 +432,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm($fields);
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -310,7 +459,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -326,7 +475,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'subject' => 'Hello',
@@ -335,7 +484,7 @@ class EmailConnectorTest extends TestCase
             ->assertJsonValidationErrors(['0.to']);
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['not-an-email'],
@@ -354,7 +503,7 @@ class EmailConnectorTest extends TestCase
 
         foreach (['html', 'text'] as $key) {
             $this
-                ->actingAs($this->userWithEditPermission())
+                ->actingAs($this->userWithConnectionPermissions())
                 ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                     'id' => 'abc',
                     'to' => ['recipient@example.com'],
@@ -383,7 +532,7 @@ class EmailConnectorTest extends TestCase
         $form = $this->makeForm();
 
         $this
-            ->actingAs($this->userWithEditPermission())
+            ->actingAs($this->userWithConnectionPermissions())
             ->postJson(cp_route('forms.connect.email.preview', $form->handle()), [
                 'id' => 'abc',
                 'to' => ['recipient@example.com'],
@@ -462,6 +611,22 @@ class EmailConnectorTest extends TestCase
         $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
 
         $this->assertEquals(['first@example.com', 'second@example.com'], $configs[0][$handle]);
+    }
+
+    #[Test]
+    public function it_doesnt_split_legacy_address_strings_inside_antlers()
+    {
+        $form = tap(Form::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => '{{ x ?? "a@example.com, b@example.com" }}, {{ partial:foo a=\'1,2\' }}, c@example.com'],
+        ]]))->save();
+
+        $configs = (new Email)->setForm($form)->preProcess($form->connections()->get('email'));
+
+        $this->assertEquals([
+            '{{ x ?? "a@example.com, b@example.com" }}',
+            "{{ partial:foo a='1,2' }}",
+            'c@example.com',
+        ], $configs[0]['to']);
     }
 
     #[Test]
@@ -635,6 +800,7 @@ class EmailConnectorTest extends TestCase
             $this->assertEquals([
                 ['value' => 'field:full_name', 'label' => 'Full Name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
                 ['value' => 'field:email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
+                ['value' => 'field:address', 'label' => 'Address', 'icon' => 'fieldtype-group', 'category' => 'structure'],
             ], $meta->get($handle)['options']);
         }
     }
@@ -661,9 +827,9 @@ class EmailConnectorTest extends TestCase
         return tap($submission)->save();
     }
 
-    private function userWithEditPermission()
+    private function userWithConnectionPermissions()
     {
-        $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
+        $this->setTestRoles(['test' => ['access cp', 'edit forms', 'view form submissions']]);
 
         return tap(User::make()->assignRole('test'))->save();
     }

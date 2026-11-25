@@ -172,6 +172,9 @@
     --shadow-ui-xl: 0px 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
 
     --animate-wiggle: wiggle 200ms ease-in-out infinite;
+    --animate-folder-open: folder-open 370ms both;
+    --animate-folder-close: folder-close 300ms both;
+    --animate-folder-file: folder-file 370ms both;
 
     @keyframes wiggle {
         0%,
@@ -180,6 +183,63 @@
         }
         50% {
             transform: rotate(3deg);
+        }
+    }
+
+    /* The front of the folder flicks open past its resting angle and holds there until it's told to close. */
+    @keyframes folder-open {
+        0% {
+            transform: scale(1, 1);
+            animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+        23% {
+            transform: scale(1.05, 0.54);
+            animation-timing-function: cubic-bezier(0.4, 0, 0.4, 1);
+        }
+        42%,
+        100% {
+            transform: scale(1.04, 0.62);
+        }
+    }
+
+    /* Slams shut from the open angle, then rebounds. */
+    @keyframes folder-close {
+        0% {
+            transform: scale(1.04, 0.62);
+            animation-timing-function: cubic-bezier(0.7, 0, 1, 0.5);
+        }
+        30% {
+            transform: scale(1, 1);
+            animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+        }
+        56% {
+            transform: scale(0.99, 1.05);
+            animation-timing-function: cubic-bezier(0.4, 0, 0.4, 1);
+        }
+        100% {
+            transform: scale(1, 1);
+        }
+    }
+
+    /* Lengths are in the folder SVG's user units. The file lifts slightly, then falls in with gravity. */
+    @keyframes folder-file {
+        0% {
+            transform: translateY(-32px) rotate(-8deg);
+            opacity: 0;
+            animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+        }
+        22% {
+            transform: translateY(-37px) rotate(-4deg);
+            opacity: 1;
+            animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+        }
+        82% {
+            transform: translateY(2px) rotate(1deg);
+            animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+        }
+        100% {
+            transform: translateY(0) rotate(0);
+            opacity: 1;
         }
     }
 }

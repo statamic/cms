@@ -15,7 +15,7 @@ use function Statamic\trans as __;
 
 class Currency extends FormFieldtype
 {
-    protected static $fieldtype = 'integer';
+    protected static $fieldtype = 'float';
     protected $description = 'Collects a monetary amount.';
     protected $icon = 'currency';
     protected $categories = ['number'];
@@ -37,14 +37,24 @@ class Currency extends FormFieldtype
 
     public function toFieldArray(): array
     {
-        $currency = Dictionary::find('currencies')->get($this->config('currency'));
+        $extra = $this->currencyExtra();
 
         return [
-            'type' => 'integer',
-            'prepend' => $symbol = Arr::get($currency->extra(), 'symbol'),
+            'type' => 'float',
+            'prepend' => $symbol = Arr::get($extra, 'symbol'),
             'currency_symbol' => $symbol,
+            'step' => 1 / (10 ** Arr::get($extra, 'decimals', 2)),
             ...Arr::except($this->config(), ['type', 'currency']),
         ];
+    }
+
+    private function currencyExtra(): array
+    {
+        if (! $currency = $this->config('currency')) {
+            return [];
+        }
+
+        return Dictionary::find('currencies')?->get($currency)?->extra() ?? [];
     }
 
     public function valueType(): ?FormValueType
@@ -64,7 +74,7 @@ class Currency extends FormFieldtype
 
     public function insightConfig(Insight $insight): array
     {
-        $extra = Dictionary::find('currencies')?->get($this->config('currency'))?->extra() ?? [];
+        $extra = $this->currencyExtra();
 
         return [
             'prefix' => Arr::get($extra, 'symbol'),

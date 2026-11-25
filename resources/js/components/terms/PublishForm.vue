@@ -55,6 +55,7 @@
         <PublishContainer
             v-if="fieldset"
             ref="container"
+            :key="site"
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
@@ -146,6 +147,7 @@ import {
     StatusIndicator,
 } from '@ui';
 import resetValuesFromResponse from '@/util/resetValuesFromResponse.js';
+import resetMetaFromResponse from '@/util/resetMetaFromResponse.js';
 import { ref, computed } from 'vue';
 import { Pipeline, Request, BeforeSaveHooks, AfterSaveHooks, PipelineStopped } from '@ui/Publish/SavePipeline.js';
 import ItemActions from '@/components/actions/ItemActions.vue';
@@ -317,7 +319,7 @@ export default {
         },
 
         afterSaveOption() {
-            return this.getPreference('after_save') ?? 'listing';
+            return this.getPreference('after_save') ?? this.$config.get('afterSave');
         },
 
         direction() {
@@ -432,7 +434,7 @@ export default {
         switchToLocalization(localization) {
             this.localizing = localization.handle;
 
-            if (localization.exists) {
+            if (localization.exists || this.isCreating) {
                 this.editLocalization(localization);
             } else {
                 this.createLocalization(localization);
@@ -484,6 +486,7 @@ export default {
                 this.title = response.data.title;
                 this.permalink = response.data.permalink;
                 this.values = resetValuesFromResponse(response.data.values, this.$refs.container);
+                this.meta = resetMetaFromResponse(response.data.meta, this.$refs.container);
             }
         },
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-import createContext from '@/util/createContext';
+export { injectBuilderContext, provideBuilderContext, builderContextKey } from '@/components/forms/builder/context';
 
 export enum InspectorType {
     Page = 'page',
@@ -15,11 +15,10 @@ export enum FieldView {
     Expanded = 'expanded',
     Collapsed = 'collapsed',
 }
-
-export const [injectBuilderContext, provideBuilderContext] = createContext('FormBuilder');
 </script>
 
 <script setup lang="ts">
+import { provideBuilderContext } from '@/components/forms/builder/context';
 import { Button, Header, Icon, ToggleGroup, ToggleItem } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
@@ -123,7 +122,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
             sectionsForNewPage.push({
                 _id: uniqid(),
                 collapsed: false,
-                display: __('Section'),
+                display: null,
                 fields: remainingFields,
             });
         }
@@ -137,7 +136,7 @@ const addPageAt = (pageId: string, sectionIndex: number, fieldIndex: number | nu
         sectionsForNewPage.push({
             _id: uniqid(),
             collapsed: false,
-            display: __('Section'),
+            display: null,
             fields: [],
         });
     }
@@ -163,7 +162,7 @@ const addSection = (pageId: string, atIndex: number, fields = []) => {
     const section = {
         _id: uniqid(),
         collapsed: false,
-        display: __('Section'),
+        display: null,
         fields,
     };
 
@@ -287,9 +286,13 @@ useFieldtypeDraggable({
 const avoidTrackingDirtyState = ref(false);
 const trackingDirtyState = computed(() => !avoidTrackingDirtyState.value);
 const isDirty = computed(() => Statamic.$dirty.has('form-builder'));
+let changeCount = 0;
 
 function dirty() {
-    if (trackingDirtyState.value) Statamic.$dirty.add('form-builder');
+    if (!trackingDirtyState.value) return;
+
+    changeCount++;
+    Statamic.$dirty.add('form-builder');
 }
 
 function clearDirtyState() {
@@ -303,11 +306,23 @@ function withoutDirtying(callback: () => void) {
     nextTick(() => avoidTrackingDirtyState.value = previous);
 }
 
-const save = () => {
+const beforeSaveCallbacks = new Set<() => Promise<void> | void>();
+
+const onBeforeSave = (callback: () => Promise<void> | void) => {
+    beforeSaveCallbacks.add(callback);
+
+    return () => beforeSaveCallbacks.delete(callback);
+};
+
+const save = async () => {
     if (saving.value) return;
 
     errors.value = {};
     saving.value = true;
+
+    const changeCountAtSave = changeCount;
+
+    await Promise.allSettled([...beforeSaveCallbacks].map((callback) => callback()));
 
     axios.patch(props.action, formFields.value)
         .then((response) => {
@@ -316,7 +331,7 @@ const save = () => {
                 .flatMap((section) => section.fields)
                 .forEach((field) => delete field.isNew);
 
-            clearDirtyState();
+            if (changeCount === changeCountAtSave) clearDirtyState();
             Statamic.$toast.success(__('Saved'));
         })
         .catch((e) => {
@@ -348,7 +363,7 @@ const fieldNumbers = computed(() => {
 
                 return (fieldset?.fields || [])
                     .filter((f) => f.type !== 'import')
-                    .map((f) => [`${field._id}:${f.handle}`]);
+                    .map((f) => [`${field._id}:${f.handle}`, `${field.prefix ?? ''}${f.handle}`]);
             }
 
             let isInformational = props.fieldtypes.find((fieldtype) => fieldtype.handle === field.fieldtype)?.categories?.[0] === 'information';
@@ -382,6 +397,7 @@ provideBuilderContext({
     isDirty,
     isLeftPanelOpen,
     isRightPanelOpen,
+    onBeforeSave,
     pages,
     showFieldDirection: true,
     toggleLeftPanel,
@@ -410,7 +426,7 @@ onMounted(() => {
 
     document.addEventListener('keydown', onEscape);
 
-    saveBinding.value = keys.bindGlobal(['return', 'mod+s'], (e) => {
+    saveBinding.value = keys.bindGlobal(['mod+s'], (e) => {
         e.preventDefault();
         save();
     });

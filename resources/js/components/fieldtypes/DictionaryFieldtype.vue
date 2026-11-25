@@ -18,7 +18,7 @@
             This slot is *basically* exactly the same as the default selected-options slot in Combobox. We're just looping
             through the Dictionary Fieldtype's selectedOptions state, rather than the one maintained by the Combobox component.
         -->
-        <template #selected-options="{ disabled, readOnly, getOptionLabel, getOptionValue, labelHtml, deselect }">
+        <template #selected-options="{ disabled, readOnly, getOptionLabel, getOptionPlainLabel, getOptionValue, labelHtml, deselect }">
             <sortable-list
                 v-if="multiple"
                 item-class="sortable-item"
@@ -35,7 +35,7 @@
                         :key="getOptionValue(option)"
                         class="sortable-item cursor-grab active:cursor-grabbing"
                     >
-                        <Badge size="lg" color="white">
+                        <Badge size="lg" color="white" class="[&>*:not(svg)]:st-text-trim-optical">
                             <Icon v-if="option.icon" :name="option.icon" />
                             <div v-if="labelHtml" v-html="getOptionLabel(option)"></div>
                             <div v-else>{{ __(getOptionLabel(option)) }}</div>
@@ -44,7 +44,7 @@
                                 v-if="!disabled && !readOnly"
                                 type="button"
                                 class="-mx-3 cursor-pointer px-3 text-gray-400 hover:text-gray-700"
-                                :aria-label="__('Remove :label', { label: getOptionLabel(option) })"
+                                :aria-label="__('Remove :label', { label: getOptionPlainLabel(option) })"
                                 @click="deselect(getOptionValue(option))"
                             >
                                 <span>&times;</span>

@@ -3,7 +3,9 @@
 namespace Tests\Feature\Entries;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Events\EntryDeleting;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -136,11 +138,60 @@ class DeleteEntryTest extends TestCase
         // ], $updatedTree);
     }
 
-    public function deleteEntries($ids)
+    #[Test]
+    public function it_redirects_after_deleting_an_entry_from_the_publish_form()
+    {
+        $user = tap(User::make('test')->makeSuper())->save();
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+
+        $this
+            ->actingAs($user)
+            ->deleteEntries(['1'], ['view' => 'form'])
+            ->assertOk()
+            ->assertJson(['redirect' => cp_route('collections.show', 'test')]);
+
+        $this->assertCount(0, Entry::all());
+    }
+
+    #[Test]
+    public function it_reports_a_cancelled_delete_from_the_publish_form_without_redirecting()
+    {
+        $user = tap(User::make('test')->makeSuper())->save();
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        Event::listen(EntryDeleting::class, fn () => false);
+
+        $this
+            ->actingAs($user)
+            ->deleteEntries(['1'], ['view' => 'form'])
+            ->assertOk()
+            ->assertJson(['success' => false, 'message' => 'Item could not be deleted'])
+            ->assertJsonMissingPath('redirect');
+
+        $this->assertCount(1, Entry::all());
+    }
+
+    #[Test]
+    public function it_reports_partially_cancelled_deletes_from_the_listing()
+    {
+        $user = tap(User::make('test')->makeSuper())->save();
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        Event::listen(EntryDeleting::class, fn ($event) => $event->entry->id() !== '2');
+
+        $this
+            ->actingAs($user)
+            ->deleteEntries(['1', '2'])
+            ->assertOk()
+            ->assertJson(['success' => false, 'message' => '1/2 items were deleted']);
+
+        $this->assertEquals(['2'], Entry::all()->map->id()->values()->all());
+    }
+
+    public function deleteEntries($ids, $context = [])
     {
         return $this->postJson('/cp/collections/test/entries/actions', [
             'action' => 'delete',
-            'context' => ['collection' => 'test'],
+            'context' => ['collection' => 'test', ...$context],
             'selections' => $ids,
             'values' => [],
         ]);

@@ -227,10 +227,40 @@ class FrontendTest extends TestCase
     }
 
     #[Test]
+    public function unknown_path_containing_colon_and_digits_does_not_display_home_page()
+    {
+        $this->withStandardBlueprints();
+        $this->withStandardFakeErrorViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '{{ content }}');
+
+        $collection = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => true]))->save();
+        $this->createPage('home', ['with' => ['content' => 'Home']]);
+        $this->createPage('blog', ['with' => ['content' => 'Blog']]);
+        $collection->structure()->in('en')->tree([
+            ['entry' => 'home'],
+            ['entry' => 'blog'],
+        ])->save();
+
+        $this->get('/')->assertOk()->assertSee('Home');
+        $this->get('/blog')->assertOk()->assertSee('Blog');
+        $this->get('/blog/page:2')->assertNotFound();
+    }
+
+    #[Test]
     public function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
         $this->createPage('about')->published(false)->save();
+
+        $this->get('/about')->assertStatus(404);
+    }
+
+    #[Test]
+    public function an_entry_redirecting_to_itself_is_not_found()
+    {
+        $this->withStandardFakeErrorViews();
+        $this->createPage('about', ['with' => ['redirect' => 'entry::about']]);
 
         $this->get('/about')->assertStatus(404);
     }

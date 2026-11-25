@@ -4,6 +4,7 @@ namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades;
+use Statamic\Support\Arr;
 
 use function Statamic\trans as __;
 
@@ -49,6 +50,10 @@ class ReplaceAsset extends Action
 
         $newAsset = Facades\Asset::find($this->context['container'].'::'.$values['new_asset']);
 
+        if ($values['copy_data'] ?? false) {
+            $newAsset->merge($originalAsset->data()->all())->save();
+        }
+
         $newAsset->replace($originalAsset, $values['delete_original']);
 
         return [
@@ -58,6 +63,8 @@ class ReplaceAsset extends Action
 
     protected function fieldItems()
     {
+        abort_unless($asset = $this->items->first(), 404);
+
         return [
             'new_asset' => [
                 'display' => __('New Asset'),
@@ -65,11 +72,24 @@ class ReplaceAsset extends Action
                 'container' => $this->context['container'],
                 'folder' => $this->context['folder'] ?? null,
                 'max_files' => 1,
-                'validate' => 'required',
+                'validate' => [
+                    'required',
+                    function ($attribute, $value, $fail) use ($asset) {
+                        if (in_array($asset->id(), Arr::wrap($value))) {
+                            $fail('statamic::validation.asset_replace_same')->translate();
+                        }
+                    },
+                ],
                 'mode' => 'list',
                 'restrict' => true,
                 'allow_uploads' => true,
                 'show_filename' => true,
+            ],
+            'copy_data' => [
+                'display' => __('Copy Data'),
+                'instructions' => __('statamic::messages.asset_replace_copy_data_instructions'),
+                'type' => 'toggle',
+                'default' => true,
             ],
             'delete_original' => [
                 'display' => __('Delete Original Asset'),

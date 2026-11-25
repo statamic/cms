@@ -62,6 +62,11 @@ class AssetUploader extends Uploader
 
     protected function getNewExtension()
     {
+        // GIFs, and files the preset couldn't be applied to, are stored as they were uploaded.
+        if (! $this->processedSourceFile) {
+            return null;
+        }
+
         if (! $preset = $this->asset->container()->sourcePreset()) {
             return null;
         }

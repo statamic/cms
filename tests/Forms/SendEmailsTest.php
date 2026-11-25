@@ -2,11 +2,14 @@
 
 namespace Tests\Forms;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form as FacadesForm;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -149,7 +152,77 @@ class SendEmailsTest extends TestCase
             'field was filled in' => ['someone@example.com', true],
             'field was left blank' => [null, false],
             'field contains junk' => ['not an email', false],
+            'field contains an internationalized address' => ['user@bücher.de', true],
         ];
+    }
+
+    #[Test]
+    #[DataProvider('ccAndBccProvider')]
+    public function it_sends_emails_without_a_to_address_when_cc_or_bcc_resolves($key)
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => '', $key => 'someone@example.com'],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission());
+
+        Mail::assertSent(Email::class, 1);
+    }
+
+    #[Test]
+    public function it_passes_array_addresses_to_the_job_as_comma_separated_strings()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'email', 'field' => ['type' => 'text']],
+            ],
+        ])->connections(['email' => [
+            [
+                'id' => 'one',
+                'to' => ['field:email', 'first@example.com'],
+                'cc' => ['cc@example.com'],
+                'bcc' => ['bcc@example.com'],
+                'reply_to' => ['field:email'],
+            ],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission()->data(['email' => 'someone@example.com']));
+
+        Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig() === [
+            'id' => 'one',
+            'to' => 'field:email, first@example.com',
+            'cc' => 'cc@example.com',
+            'bcc' => 'bcc@example.com',
+            'reply_to' => 'field:email',
+        ] && collect(tap($email)->build()->to)->pluck('address')->all() === ['someone@example.com', 'first@example.com']);
+    }
+
+    public static function ccAndBccProvider()
+    {
+        return [
+            'cc' => ['cc'],
+            'bcc' => ['bcc'],
+        ];
+    }
+
+    #[Test]
+    public function it_logs_a_warning_when_an_email_is_skipped()
+    {
+        Mail::fake();
+        Log::spy();
+
+        $form = tap(FacadesForm::make('test')->connections(['email' => [
+            ['id' => 'one', 'to' => 'not an email'],
+        ]]))->save();
+
+        $this->sendEmails($form->makeSubmission());
+
+        Mail::assertNothingSent();
+        Log::shouldHaveReceived('warning')->once();
     }
 
     #[Test]
@@ -281,6 +354,51 @@ class SendEmailsTest extends TestCase
 
         Mail::assertSent(Email::class, 1);
         Mail::assertSent(Email::class, fn (Email $email) => $email->getConfig()['to'] === 'override@recipient.com');
+    }
+
+    #[Test]
+    public function it_sends_emails_when_handled_directly_outside_the_bus()
+    {
+        Mail::fake();
+
+        $form = tap(FacadesForm::make('test')->email([
+            ['to' => 'first@recipient.com'],
+            ['to' => 'second@recipient.com'],
+        ]))->save();
+
+        (new SendEmails($form->makeSubmission(), Site::default()))->handle();
+
+        Mail::assertSent(Email::class, 2);
+    }
+
+    #[Test]
+    #[DataProvider('temporaryAttachmentsProvider')]
+    public function subclasses_can_still_check_whether_temporary_attachments_should_be_deleted($fields, $expected)
+    {
+        $blueprint = Blueprint::makeFromFields($fields)->setHandle('contact')->setNamespace('forms');
+        BlueprintRepository::partialMock();
+        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+
+        $form = tap(FacadesForm::make('contact'))->save();
+
+        $sendEmails = new class($form->makeSubmission(), Site::default()) extends SendEmails
+        {
+            public function check(): bool
+            {
+                return $this->shouldDeleteTemporaryAttachments();
+            }
+        };
+
+        $this->assertSame($expected, $sendEmails->check());
+    }
+
+    public static function temporaryAttachmentsProvider()
+    {
+        return [
+            'files field' => [['attachments' => ['type' => 'files']], true],
+            'assets field' => [['attachments' => ['type' => 'assets', 'container' => 'uploads']], false],
+            'no upload fields' => [['name' => ['type' => 'text']], false],
+        ];
     }
 
     private function sendEmails(Submission $submission): void

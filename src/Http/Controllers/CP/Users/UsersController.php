@@ -48,6 +48,7 @@ class UsersController extends CpController
         }
 
         return Inertia::render('users/Index', [
+            'columns' => Users::listingColumns(),
             'filters' => Scope::filters('users', $context = [
                 'blueprints' => ['user'],
             ]),
@@ -347,13 +348,14 @@ class UsersController extends CpController
 
         $save = $user->save();
 
-        [$values] = $this->extractFromFields($user, $user->blueprint());
+        [$values, $meta] = $this->extractFromFields($user, $user->blueprint());
 
         return [
             'title' => $user->title(),
             'saved' => is_bool($save) ? $save : true,
             'data' => [
                 'values' => $values,
+                'meta' => $meta,
             ],
         ];
     }

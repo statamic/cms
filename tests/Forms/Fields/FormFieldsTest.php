@@ -41,28 +41,27 @@ class FormFieldsTest extends TestCase
     }
 
     #[Test]
-    public function it_flattens_pages_to_sections_when_forms_pro_is_not_installed()
+    public function it_keeps_pages_in_contents_when_forms_pro_is_not_installed()
     {
-        $formFields = new FormFields([
+        $contents = [
             'pages' => [
                 [
+                    'id' => 'page_one',
+                    'display' => 'Page One',
                     'sections' => [
                         ['display' => 'Section A', 'fields' => [['handle' => 'name', 'field' => ['type' => 'short_answer']]]],
                     ],
                 ],
                 [
+                    'id' => 'page_two',
                     'sections' => [
                         ['display' => 'Section B', 'fields' => [['handle' => 'email', 'field' => ['type' => 'email']]]],
                     ],
                 ],
             ],
-        ]);
+        ];
 
-        $this->assertArrayNotHasKey('pages', $formFields->contents());
-        $this->assertArrayHasKey('sections', $formFields->contents());
-        $this->assertCount(2, $formFields->contents()['sections']);
-        $this->assertEquals('Section A', $formFields->contents()['sections'][0]['display']);
-        $this->assertEquals('Section B', $formFields->contents()['sections'][1]['display']);
+        $this->assertSame($contents, (new FormFields($contents))->contents());
     }
 
     #[Test]
@@ -555,5 +554,39 @@ class FormFieldsTest extends TestCase
         $this->assertCount(2, $fields);
         $this->assertEquals('name', $fields[0]['handle']);
         $this->assertEquals('message', $fields[1]['handle']);
+    }
+
+    #[Test]
+    public function it_excludes_hidden_linked_fields_from_blueprint()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'company', 'field' => ['type' => 'text', 'display' => 'Company']],
+                ['handle' => 'secret', 'field' => ['type' => 'text', 'display' => 'Secret', 'hidden' => true]],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('details')
+            ->andReturn($fieldset);
+
+        $formFields = new FormFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Name']],
+                        ['handle' => 'company', 'field' => 'details.company'],
+                        ['handle' => 'hidden_company', 'field' => 'details.company', 'config' => ['hidden' => true]],
+                        ['handle' => 'secret', 'field' => 'details.secret'],
+                        ['handle' => 'unhidden_secret', 'field' => 'details.secret', 'config' => ['hidden' => false]],
+                        ['handle' => 'email', 'field' => ['type' => 'email', 'display' => 'Email', 'hidden' => true]],
+                    ],
+                ],
+            ],
+        ]);
+
+        $fields = $formFields->toBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['name', 'company', 'unhidden_secret'], array_column($fields, 'handle'));
     }
 }

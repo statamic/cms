@@ -1,14 +1,13 @@
-const LOGIC_KEYS = ['hidden', 'if', 'unless', 'if_any', 'unless_any', 'always_save'];
+import { KEYS } from '@/components/field-conditions/Constants.js';
+
+export const LOGIC_KEYS = ['hidden', ...KEYS, 'always_save'];
 
 export function writeFieldConditions(field, conditions) {
     const config = { ...field.config };
 
     const merged = {
         hidden: conditions.hidden ?? config.hidden ?? false,
-        if: conditions.if || null,
-        unless: conditions.unless || null,
-        if_any: conditions.if_any || null,
-        unless_any: conditions.unless_any || null,
+        ...Object.fromEntries(KEYS.map((key) => [key, conditions[key] || null])),
         always_save: conditions.always_save ?? config.always_save ?? false,
     };
 
