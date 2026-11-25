@@ -122,9 +122,11 @@ const hasTime = computed(() => props.granularity != null && props.granularity !=
 // A narrow date and time field with the clear × needs the smaller sizes to fit
 const compactClear = computed(() => hasTime.value && props.clearable && !props.readOnly);
 
-// Seconds or a timezone with minutes (GMT+5:30, GMT+13:45) make the value too long for the compact sizes, so they get an even
-// smaller step
-const longValue = computed(() => props.granularity === 'second' || (timeZoneLabel.value?.includes(':') ?? false));
+// Seconds, a timezone with minutes (GMT+5:30, GMT+13:45) and the clear × each make the value longer, so under 16rem each one takes the
+// text down a step: 13.2px with none of them, 11.2px with one, 10px with two or more
+const lengtheners = computed(
+    () => [props.granularity === 'second', timeZoneLabel.value?.includes(':') ?? false, compactClear.value].filter(Boolean).length,
+);
 
 // A date and time field sizes its text to its own width, so its root is a container. A container's content stops counting towards its
 // width, so where the column is sized by its content (a Grid table), this stands in for the width of the full-size value: 16.75rem for
@@ -136,17 +138,16 @@ const intrinsicWidth = computed(() => {
     return `${rem}rem`;
 });
 
-// Under 16rem the date and timezone shrink, and shrink a step further for a long value
 // The longest value (seconds and a timezone with minutes) beside the clear × only fits with everything around it tightened too
-const longestClear = computed(() => compactClear.value && props.granularity === 'second' && (timeZoneLabel.value?.includes(':') ?? false));
+const longestClear = computed(() => lengtheners.value === 3);
 
 const compactDateClass = computed(() => {
     if (!hasTime.value) return null;
-    return longValue.value ? '@max-[16rem]:text-[0.625rem]' : '@max-[16rem]:text-2xs';
+    return ['@max-[16rem]:text-xs', '@max-[16rem]:text-2xs', '@max-[16rem]:text-[0.625rem]'][Math.min(lengtheners.value, 2)];
 });
 const compactTimeZoneClass = computed(() => {
     if (!hasTime.value) return null;
-    return longValue.value ? '@max-[16rem]:text-[0.5625rem]' : '@max-[16rem]:text-[0.625rem]';
+    return [null, '@max-[16rem]:text-[0.625rem]', '@max-[16rem]:text-[0.5625rem]'][Math.min(lengtheners.value, 2)];
 });
 
 const getInputLabel = (part) => {
