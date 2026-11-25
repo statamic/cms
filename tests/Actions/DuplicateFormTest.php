@@ -2,6 +2,8 @@
 
 namespace Tests\Actions;
 
+use Facades\Statamic\Console\Processes\Composer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateForm;
 use Statamic\Facades\Form;
@@ -53,6 +55,25 @@ class DuplicateFormTest extends TestCase
             'c' => ['title' => 'Original C', 'honeypot' => 'c', 'fields' => $this->fields('message')],
             'd' => ['title' => 'Duplicate of B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
         ], $this->formData());
+    }
+
+    #[Test]
+    #[DataProvider('visibilityProvider')]
+    public function it_is_only_visible_with_statamic_pro_or_forms_pro(bool $pro, bool $formsPro, bool $visible)
+    {
+        config(['statamic.editions.pro' => $pro]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn($formsPro);
+
+        $this->assertEquals($visible, (new DuplicateForm)->visibleTo(Form::make('a')));
+    }
+
+    public static function visibilityProvider()
+    {
+        return [
+            'statamic pro' => [true, false, true],
+            'forms pro' => [false, true, true],
+            'neither' => [false, false, false],
+        ];
     }
 
     #[Test]
