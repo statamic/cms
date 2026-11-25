@@ -3,7 +3,6 @@
 namespace Tests\Actions;
 
 use Facades\Statamic\Console\Processes\Composer;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateForm;
 use Statamic\Facades\Form;
@@ -58,22 +57,30 @@ class DuplicateFormTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('visibilityProvider')]
-    public function it_is_only_visible_with_statamic_pro_or_forms_pro(bool $pro, bool $formsPro, bool $visible)
+    public function it_is_visible_with_statamic_pro()
     {
-        config(['statamic.editions.pro' => $pro]);
-        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn($formsPro);
+        config(['statamic.editions.pro' => true]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
 
-        $this->assertEquals($visible, (new DuplicateForm)->visibleTo(Form::make('a')));
+        $this->assertTrue((new DuplicateForm)->visibleTo(Form::make('a')));
     }
 
-    public static function visibilityProvider()
+    #[Test]
+    public function it_is_visible_with_forms_pro()
     {
-        return [
-            'statamic pro' => [true, false, true],
-            'forms pro' => [false, true, true],
-            'neither' => [false, false, false],
-        ];
+        config(['statamic.editions.pro' => false]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->assertTrue((new DuplicateForm)->visibleTo(Form::make('a')));
+    }
+
+    #[Test]
+    public function it_is_not_visible_without_statamic_pro_or_forms_pro()
+    {
+        config(['statamic.editions.pro' => false]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->assertFalse((new DuplicateForm)->visibleTo(Form::make('a')));
     }
 
     #[Test]
