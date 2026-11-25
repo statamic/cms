@@ -1,6 +1,6 @@
 <script setup>
 import { config } from '@api';
-import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue';
+import { computed } from 'vue';
 import { normalizeLocale } from '../../FormattingLocale.js';
 import {
     DatePickerAnchor,
@@ -119,47 +119,20 @@ const isInvalid = computed(() => {
 
 const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
 
-// A date and time can be too long for a narrow field (25% and 33% columns), especially with seconds, a 12-hour clock, a long timezone or the
-// clear ×. Rather than guess from the locale and field width, try each size from largest to smallest and keep the first that fits. The
-// sizes live in the <style> block below, keyed off data-fit on the root. The date never goes below text-xs: if the smallest step still
-// doesn't fit, the field scrolls, as it always has.
-const fitSteps = ['', 'date-sm', 'compact', 'compact tight'];
-const root = useTemplateRef('root');
-const box = useTemplateRef('box');
+// A date and time can be too long for a narrow field (25% and 33% columns), so it steps down by its own width (see the style block below).
+// The steps are an approximation; when a long value (seconds, a 12-hour clock, a long timezone) still doesn't fit, the field scrolls, as
+// it always has.
+const fitsWidth = computed(() => hasTime.value && !props.inline);
 
-function fit() {
-    const el = root.value;
-    const row = box.value?.$el ?? box.value;
-    if (!el || !row) return;
-
-    if (!hasTime.value || props.inline) return el.removeAttribute('data-fit');
-
-    // Setting the attribute and reading the width both happen before the next paint, so the steps in between never show
-    for (const step of fitSteps) {
-        el.setAttribute('data-fit', step);
-        if (row.scrollWidth <= row.clientWidth) return;
-    }
-
-    // Nothing fits, so it scrolls. Tight only helps when it makes the value fit, so go back to compact, which matches the fields that do.
-    el.setAttribute('data-fit', 'compact');
-}
-
-// Refit when the field's width changes, and once the web font has loaded, since the fallback font measures narrower
-let resizeObserver;
-onMounted(() => {
-    if (typeof ResizeObserver !== 'undefined') {
-        resizeObserver = new ResizeObserver(() => fit());
-        resizeObserver.observe(root.value);
-    }
-    document.fonts?.addEventListener('loadingdone', fit);
-    document.fonts?.ready.then(fit);
-    fit();
+// The root is a container, which stops its content counting towards its width. Where a column is sized by its content (a Grid table),
+// this stands in for the width of the full-size value: 16.75rem with the clear ×, 15.5rem without, and 1.5rem more each for seconds and
+// a timezone with minutes.
+const intrinsicWidth = computed(() => {
+    let rem = props.clearable && !props.readOnly ? 16.75 : 15.5;
+    if (props.granularity === 'second') rem += 1.5;
+    if (timeZoneLabel.value?.includes(':')) rem += 1.5;
+    return `${rem}rem`;
 });
-onBeforeUnmount(() => {
-    resizeObserver?.disconnect();
-    document.fonts?.removeEventListener('loadingdone', fit);
-});
-watch(() => [props.modelValue?.toString(), timeZoneLabel.value, props.granularity, props.clearable, props.readOnly, props.inline], () => nextTick(fit));
 
 const getInputLabel = (part) => {
     switch (part) {
@@ -184,7 +157,12 @@ const getInputLabel = (part) => {
 </script>
 
 <template>
-    <div ref="root" class="group/input relative block w-full" data-ui-input>
+    <div
+        class="group/input relative block w-full"
+        :style="fitsWidth ? { containIntrinsicInlineSize: intrinsicWidth } : null"
+        :data-date-picker-fits-width="fitsWidth || null"
+        data-ui-input
+    >
         <DatePickerRoot
             :modelValue="modelValue"
             :granularity="granularity"
@@ -211,7 +189,6 @@ const getInputLabel = (part) => {
                             'disabled:shadow-none disabled:opacity-50',
                             readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500 dark:read-only-field:**:text-gray-500' : '',
                         ]"
-                        ref="box"
                         data-date-picker-box
                         :aria-invalid="isInvalid"
                         role="textbox"
@@ -295,60 +272,70 @@ const getInputLabel = (part) => {
 </template>
 
 <style>
-    /* Steps a date and time down until it fits its field (see fit()). Each step keeps the one before it and changes a little more:
-       a 14px date; then compact (13.2px date, 12px icon, 26px ×, tighter gaps); then tight (no padding round the 12px icon, 22px ×). The icon never goes below 12px. */
-    [data-ui-input][data-fit~='date-sm'] [data-date-picker-date] {
-        font-size: var(--text-sm);
+    /* A date and time steps down as its field narrows: a 14px date under 20rem; then compact (13.2px date, 12px icon, 26px ×, tighter gaps)
+       under 17rem; then, with the ×, tight (no padding round the icon, 22px ×) under 15rem. The date never goes below 13.2px or the icon
+       below 12px; anything still too long scrolls. */
+    [data-date-picker-fits-width] {
+        container-type: inline-size;
     }
 
-    [data-ui-input][data-fit~='compact'] {
-        [data-date-picker-box] {
-            padding-inline: 0.375rem;
-        }
-        /* A fixed size, so fit() measures the same width before the icon's SVG has loaded */
-        [data-date-picker-trigger] {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-inline-start: 0;
-            padding: 0.25rem;
-
-            svg {
-                width: 0.75rem;
-                height: 0.75rem;
-            }
-        }
-        [data-date-picker-date] {
-            font-size: var(--text-xs);
-        }
-        [data-date-picker-timezone] {
-            margin-inline-start: 0.25rem;
-        }
-        [data-date-picker-clear] {
-            width: 1.625rem;
-            height: 1.625rem;
-            margin-block: 0;
-            margin-inline-end: -0.25rem;
-
-            svg {
-                width: 0.75rem;
-                height: 0.75rem;
-            }
+    @container (max-width: 20rem) {
+        [data-date-picker-fits-width] [data-date-picker-date] {
+            font-size: var(--text-sm);
         }
     }
 
-    [data-ui-input][data-fit~='tight'] {
-        [data-date-picker-trigger] {
-            width: 0.75rem;
-            height: 0.75rem;
-            padding: 0;
-            margin-inline-end: 0.25rem;
+    @container (max-width: 17rem) {
+        [data-date-picker-fits-width] {
+            [data-date-picker-box] {
+                padding-inline: 0.375rem;
+            }
+            [data-date-picker-trigger] {
+                width: 1.25rem;
+                height: 1.25rem;
+                margin-inline-start: 0;
+                padding: 0.25rem;
+
+                svg {
+                    width: 0.75rem;
+                    height: 0.75rem;
+                }
+            }
+            [data-date-picker-date] {
+                font-size: var(--text-xs);
+            }
+            [data-date-picker-timezone] {
+                margin-inline-start: 0.25rem;
+            }
+            [data-date-picker-clear] {
+                width: 1.625rem;
+                height: 1.625rem;
+                margin-block: 0;
+                margin-inline-end: -0.25rem;
+
+                svg {
+                    width: 0.75rem;
+                    height: 0.75rem;
+                }
+            }
         }
-        [data-date-picker-timezone] {
-            margin-inline-start: 0.125rem;
-        }
-        [data-date-picker-clear] {
-            width: 1.375rem;
-            height: 1.375rem;
+    }
+
+    @container (max-width: 15rem) {
+        [data-date-picker-fits-width]:has([data-date-picker-clear]) {
+            [data-date-picker-trigger] {
+                width: 0.75rem;
+                height: 0.75rem;
+                padding: 0;
+                margin-inline-end: 0.25rem;
+            }
+            [data-date-picker-timezone] {
+                margin-inline-start: 0.125rem;
+            }
+            [data-date-picker-clear] {
+                width: 1.375rem;
+                height: 1.375rem;
+            }
         }
     }
 </style>
