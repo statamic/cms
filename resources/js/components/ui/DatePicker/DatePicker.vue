@@ -119,6 +119,21 @@ const isInvalid = computed(() => {
 
 const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
 
+// A date and time can be too long for a narrow field (25% and 33% columns), so it steps down by its own width (see the style block below).
+// The steps are an approximation; when a long value (seconds, a 12-hour clock, a long timezone) still doesn't fit, the field scrolls, as
+// it always has.
+const fitsWidth = computed(() => hasTime.value && !props.inline);
+
+// The root is a container, which stops its content counting towards its width. Where a column is sized by its content (a Grid table),
+// this stands in for the width of the full-size value: 17.25rem with the clear ×, 16rem without, and 1.5rem more each for seconds and a
+// timezone with minutes. Starting just above the 17rem compact step keeps a squeezed Grid column at a 14px date.
+const intrinsicWidth = computed(() => {
+    let rem = props.clearable && !props.readOnly ? 17.25 : 16;
+    if (props.granularity === 'second') rem += 1.5;
+    if (timeZoneLabel.value?.includes(':')) rem += 1.5;
+    return `${rem}rem`;
+});
+
 const getInputLabel = (part) => {
     switch (part) {
         case 'day':
@@ -142,7 +157,12 @@ const getInputLabel = (part) => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full" data-ui-input>
+    <div
+        class="group/input relative block w-full"
+        :style="fitsWidth ? { containIntrinsicInlineSize: intrinsicWidth } : null"
+        :data-date-picker-fits-width="fitsWidth || null"
+        data-ui-input
+    >
         <DatePickerRoot
             :modelValue="modelValue"
             :granularity="granularity"
@@ -169,18 +189,20 @@ const getInputLabel = (part) => {
                             'disabled:shadow-none disabled:opacity-50',
                             readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500 dark:read-only-field:**:text-gray-500' : '',
                         ]"
+                        data-date-picker-box
                         :aria-invalid="isInvalid"
                         role="textbox"
                         :aria-label="__('Select date')"
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            data-date-picker-trigger
+                            class="flex size-8 shrink-0 items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
                             <Icon name="calendar" class="size-4" />
                         </DatePickerTrigger>
-                        <div class="flex flex-1 items-center" :class="{ '@max-xs:text-xs': hasTime }">
+                        <div class="flex flex-1 items-center" data-date-picker-date>
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
@@ -214,7 +236,7 @@ const getInputLabel = (part) => {
                             :show-seconds="granularity === 'second'"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="{ 'me-1': readOnly }" size="xs" :text="timeZoneLabel" data-date-picker-timezone />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
@@ -223,6 +245,7 @@ const getInputLabel = (part) => {
                             size="sm"
                             icon="x"
                             class="-my-1.25 -me-2"
+                            data-date-picker-clear
                             :disabled="disabled"
                             v-tooltip="__('Clear date')"
                         />
@@ -247,3 +270,101 @@ const getInputLabel = (part) => {
         </DatePickerRoot>
     </div>
 </template>
+
+<style>
+    /* A date and time steps down as its field narrows: a 14px date under 20rem; then compact (13.2px date, 12px icon, 26px ×, tighter gaps)
+       under 17rem; then, with the ×, tight (a 24px button with no padding round the icon, 22px ×) under 15rem. The date never goes below 13.2px or the icon
+       below 12px; anything still too long scrolls. */
+    [data-date-picker-fits-width] {
+        container-type: inline-size;
+    }
+
+    @container (max-width: 20rem) {
+        [data-date-picker-fits-width] [data-date-picker-date] {
+            font-size: var(--text-sm);
+        }
+    }
+
+    @container (max-width: 17rem) {
+        [data-date-picker-fits-width] {
+            [data-date-picker-box] {
+                padding-inline: 0.375rem;
+            }
+            [data-date-picker-trigger] {
+                position: relative;
+                isolation: isolate;
+                width: 1.25rem;
+                height: 1.25rem;
+                margin-inline-start: 0;
+                padding: 0.25rem;
+                background-color: transparent;
+
+                /* The hover and focus background is a 16px square round the 12px icon, rather than filling the whole button */
+                &::before {
+                    content: '';
+                    position: absolute;
+                    z-index: -1;
+                    inset: 0.125rem;
+                    border-radius: 0.25rem;
+                }
+                &:is(:hover, :focus)::before {
+                    background-color: var(--color-gray-100);
+                }
+                :root.dark &:is(:hover, :focus)::before {
+                    background-color: var(--color-gray-900);
+                }
+
+                svg {
+                    width: 0.75rem;
+                    height: 0.75rem;
+                }
+            }
+            [data-date-picker-date] {
+                font-size: var(--text-xs);
+            }
+            [data-date-picker-timezone] {
+                margin-inline-start: 0.25rem;
+            }
+            [data-date-picker-clear] {
+                width: 1.625rem;
+                height: 1.625rem;
+                margin-block: 0;
+                margin-inline-end: -0.25rem;
+
+                svg {
+                    width: 0.75rem;
+                    height: 0.75rem;
+                }
+            }
+        }
+    }
+
+    @container (max-width: 15rem) {
+        [data-date-picker-fits-width]:has([data-date-picker-clear]) {
+            /* A 24px target round the 12px icon, pulled back over the padding so the field gets no wider, and a ring when it's
+               focused, since a background this small doesn't show */
+            [data-date-picker-trigger] {
+                width: 1.5rem;
+                height: 1.5rem;
+                padding: 0;
+                margin-inline: -0.375rem -0.125rem;
+
+                &::before {
+                    inset: 0.25rem;
+                }
+
+                &:focus-visible {
+                    outline: 2px solid var(--color-blue-500);
+                    outline-offset: -2px;
+                }
+            }
+            [data-date-picker-timezone] {
+                margin-inline-start: 0.125rem;
+            }
+            [data-date-picker-clear] {
+                width: 1.375rem;
+                height: 1.375rem;
+            }
+        }
+    }
+</style>
