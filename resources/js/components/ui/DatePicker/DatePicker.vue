@@ -220,7 +220,7 @@ const getInputLabel = (part) => {
                         <DatePickerTrigger
                             v-if="!inline"
                             data-date-picker-trigger
-                            class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            class="flex size-8 shrink-0 items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
                             <Icon name="calendar" class="size-4" />
@@ -305,7 +305,10 @@ const getInputLabel = (part) => {
         [data-date-picker-box] {
             padding-inline: 0.375rem;
         }
+        /* A fixed size, so fit() measures the same width before the icon's SVG has loaded */
         [data-date-picker-trigger] {
+            width: 1.25rem;
+            height: 1.25rem;
             margin-inline-start: 0;
             padding: 0.25rem;
 
@@ -335,6 +338,8 @@ const getInputLabel = (part) => {
 
     [data-ui-input][data-fit~='tight'] {
         [data-date-picker-trigger] {
+            width: 0.75rem;
+            height: 0.75rem;
             padding: 0;
             margin-inline-end: 0.25rem;
         }
