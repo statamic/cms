@@ -33,9 +33,9 @@ class FormFieldsTest extends TestCase
         $options = $this->fieldtype(['form' => 'contact'])->preload()['options'];
 
         $this->assertEquals([
-            ['value' => 'full_name', 'label' => 'Full Name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
-            ['value' => 'email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
-            ['value' => 'message', 'label' => 'Message', 'icon' => 'text-long', 'category' => 'text'],
+            ['value' => 'full_name', 'label' => 'Full Name', 'handle' => 'full_name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
+            ['value' => 'email_address', 'label' => 'Email Address', 'handle' => 'email_address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
+            ['value' => 'message', 'label' => 'Message', 'handle' => 'message', 'icon' => 'text-long', 'category' => 'text'],
         ], $options);
     }
 
@@ -53,6 +53,7 @@ class FormFieldsTest extends TestCase
         $options = $this->fieldtype(['form' => 'contact', 'prefix' => 'field:'])->preload()['options'];
 
         $this->assertEquals(['field:full_name', 'field:email_address', 'field:message'], array_column($options, 'value'));
+        $this->assertEquals(['full_name', 'email_address', 'message'], array_column($options, 'handle'));
     }
 
     #[Test]

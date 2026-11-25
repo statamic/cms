@@ -10,6 +10,12 @@ const { isReadOnly, update } = Fieldtype.use(emit, props);
 
 const options = computed(() => props.meta.options ?? []);
 
+const updateValue = (value) => {
+    const values = [value].flat().map((item) => options.value.find((option) => option.handle === item)?.value ?? item);
+
+    update(Array.isArray(value) ? values : values[0]);
+};
+
 const category = (handle) => categories[handle] ?? categories.other;
 const categoryTitle = (handle) => category(handle).title;
 const iconClasses = (handle) =>
@@ -30,7 +36,7 @@ const iconClasses = (handle) =>
         :searchable="(config.searchable ?? true) || config.taggable"
         :taggable="config.taggable"
         :close-on-select="(config.taggable && !options.length) || !config.multiple"
-        @update:modelValue="update"
+        @update:modelValue="updateValue"
     >
         <template #option="option">
             <span class="flex w-full items-center gap-2">

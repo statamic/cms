@@ -116,6 +116,7 @@ class FormFields extends Fieldtype
             ->map(fn (FormField $field) => [
                 'value' => $prefix.$field->handle(),
                 'label' => $field->display(),
+                'handle' => $field->handle(),
                 'icon' => $field->fieldtype()->icon(),
                 'category' => $this->category($field),
             ])

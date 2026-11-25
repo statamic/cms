@@ -798,9 +798,9 @@ class EmailConnectorTest extends TestCase
 
         foreach (['to', 'cc', 'bcc', 'from', 'reply_to'] as $handle) {
             $this->assertEquals([
-                ['value' => 'field:full_name', 'label' => 'Full Name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
-                ['value' => 'field:email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
-                ['value' => 'field:address', 'label' => 'Address', 'icon' => 'fieldtype-group', 'category' => 'structure'],
+                ['value' => 'field:full_name', 'label' => 'Full Name', 'handle' => 'full_name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
+                ['value' => 'field:email_address', 'label' => 'Email Address', 'handle' => 'email_address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
+                ['value' => 'field:address', 'label' => 'Address', 'handle' => 'address', 'icon' => 'fieldtype-group', 'category' => 'structure'],
             ], $meta->get($handle)['options']);
         }
     }
