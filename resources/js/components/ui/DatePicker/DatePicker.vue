@@ -122,19 +122,18 @@ const hasTime = computed(() => props.granularity != null && props.granularity !=
 // A narrow date and time field with the clear × needs the smaller sizes to fit
 const compactClear = computed(() => hasTime.value && props.clearable && !props.readOnly);
 
-// A timezone with minutes (GMT+5:30, GMT+13:45) is too long for the compact sizes, so it gets an even smaller step
-const longTimeZone = computed(() => timeZoneLabel.value?.includes(':') ?? false);
+// Seconds or a timezone with minutes (GMT+5:30, GMT+13:45) make the value too long for the compact sizes, so they get an even
+// smaller step
+const longValue = computed(() => props.granularity === 'second' || (timeZoneLabel.value?.includes(':') ?? false));
 
-// Under 16rem the date and timezone shrink: further with the clear × beside them, and further again for a long timezone
+// Under 16rem the date and timezone shrink, and shrink a step further for a long value
 const compactDateClass = computed(() => {
     if (!hasTime.value) return null;
-    if (compactClear.value) return longTimeZone.value ? '@max-[16rem]:text-[0.625rem]' : '@max-[16rem]:text-2xs';
-    return longTimeZone.value ? '@max-[16rem]:text-[0.75rem]' : '@max-[16rem]:text-xs';
+    return longValue.value ? '@max-[16rem]:text-[0.625rem]' : '@max-[16rem]:text-2xs';
 });
 const compactTimeZoneClass = computed(() => {
     if (!hasTime.value) return null;
-    if (compactClear.value) return longTimeZone.value ? '@max-[16rem]:text-[0.5625rem]' : '@max-[16rem]:text-[0.625rem]';
-    return longTimeZone.value ? '@max-[16rem]:text-[0.6rem]' : null;
+    return longValue.value ? '@max-[16rem]:text-[0.5625rem]' : '@max-[16rem]:text-[0.625rem]';
 });
 
 const getInputLabel = (part) => {
