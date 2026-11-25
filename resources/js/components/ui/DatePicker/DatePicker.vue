@@ -143,10 +143,13 @@ const longestClear = computed(() => lengtheners.value === 3);
 
 const compactDateClass = computed(() => {
     if (!hasTime.value) return null;
+    // The longest value beside the × needs the compact layout up to 18.5rem, and a smaller date up to 20rem (a 33% column)
+    if (longestClear.value) return '@max-[18.5rem]:text-[0.625rem] @max-[20rem]:text-sm';
     return ['@max-[16rem]:text-xs', '@max-[16rem]:text-2xs', '@max-[16rem]:text-[0.625rem]'][Math.min(lengtheners.value, 2)];
 });
 const compactTimeZoneClass = computed(() => {
     if (!hasTime.value) return null;
+    if (longestClear.value) return '@max-[18.5rem]:text-[0.5625rem]';
     return [null, '@max-[16rem]:text-[0.625rem]', '@max-[16rem]:text-[0.5625rem]'][Math.min(lengtheners.value, 2)];
 });
 
@@ -202,7 +205,7 @@ const getInputLabel = (part) => {
                             'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
                             // Date and time only just fits a narrow field, so under 16rem the text shrinks and the gaps tighten
-                            hasTime ? '@max-[16rem]:px-1.5' : '',
+                            hasTime ? (longestClear ? '@max-[18.5rem]:px-1.5' : '@max-[16rem]:px-1.5') : '',
                             'data-invalid:border-red-500',
                             'disabled:shadow-none disabled:opacity-50',
                             readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500 dark:read-only-field:**:text-gray-500' : '',
@@ -213,11 +216,11 @@ const getInputLabel = (part) => {
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime && !longestClear, '@max-[16rem]:ms-0 @max-[16rem]:me-1 @max-[16rem]:p-0': longestClear }"
+                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime && !longestClear, '@max-[18.5rem]:ms-0 @max-[18.5rem]:me-1 @max-[18.5rem]:p-0': longestClear }"
                             class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
-                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime && !longestClear, '@max-[16rem]:size-2.5': longestClear }" />
+                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': hasTime && !longestClear, '@max-[18.5rem]:size-2.5': longestClear }" />
                         </DatePickerTrigger>
                         <div class="flex flex-1 items-center" :class="compactDateClass">
                             <template v-for="item in segments" :key="item.part">
@@ -253,7 +256,7 @@ const getInputLabel = (part) => {
                             :show-seconds="granularity === 'second'"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime && !longestClear, '@max-[16rem]:ms-0.5': longestClear, 'me-1': readOnly }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime && !longestClear, '@max-[18.5rem]:ms-0.5': longestClear, 'me-1': readOnly }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
@@ -263,9 +266,8 @@ const getInputLabel = (part) => {
                             icon="x"
                             class="-my-1.25 -me-2"
                             :class="{
-                                '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:[&_svg]:size-3': compactClear,
-                                '@max-[16rem]:size-6.5': compactClear && !longestClear,
-                                '@max-[16rem]:size-5.5': longestClear,
+                                '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:[&_svg]:size-3 @max-[16rem]:size-6.5': compactClear && !longestClear,
+                                '@max-[18.5rem]:my-0 @max-[18.5rem]:-me-1 @max-[18.5rem]:[&_svg]:size-3 @max-[18.5rem]:size-5.5': longestClear,
                             }"
                             :disabled="disabled"
                             v-tooltip="__('Clear date')"
