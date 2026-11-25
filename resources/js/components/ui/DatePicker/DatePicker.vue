@@ -119,6 +119,24 @@ const isInvalid = computed(() => {
 
 const hasTime = computed(() => props.granularity != null && props.granularity !== 'day');
 
+// A narrow date and time field with the clear × needs the smaller sizes to fit
+const compactClear = computed(() => hasTime.value && props.clearable && !props.readOnly);
+
+// A timezone with minutes (GMT+5:30, GMT+13:45) is too long for the compact sizes, so it gets an even smaller step
+const longTimeZone = computed(() => timeZoneLabel.value?.includes(':') ?? false);
+
+// Under 16rem the date and timezone shrink: further with the clear × beside them, and further again for a long timezone
+const compactDateClass = computed(() => {
+    if (!hasTime.value) return null;
+    if (compactClear.value) return longTimeZone.value ? '@max-[16rem]:text-[0.625rem]' : '@max-[16rem]:text-2xs';
+    return longTimeZone.value ? '@max-[16rem]:text-[0.75rem]' : '@max-[16rem]:text-xs';
+});
+const compactTimeZoneClass = computed(() => {
+    if (!hasTime.value) return null;
+    if (compactClear.value) return longTimeZone.value ? '@max-[16rem]:text-[0.5625rem]' : '@max-[16rem]:text-[0.625rem]';
+    return longTimeZone.value ? '@max-[16rem]:text-[0.6rem]' : null;
+});
+
 const getInputLabel = (part) => {
     switch (part) {
         case 'day':
@@ -142,7 +160,7 @@ const getInputLabel = (part) => {
 </script>
 
 <template>
-    <div class="group/input relative block w-full" data-ui-input>
+    <div class="group/input relative block w-full @container" data-ui-input>
         <DatePickerRoot
             :modelValue="modelValue"
             :granularity="granularity"
@@ -165,6 +183,8 @@ const getInputLabel = (part) => {
                             'border border-gray-300 dark:border-gray-700',
                             'leading-[1.375rem] text-gray-600 dark:text-gray-300',
                             'shadow-ui-sm not-prose h-10 rounded-lg px-2 disabled:shadow-none',
+                            // Date and time only just fits a narrow field, so under 16rem the text shrinks and the gaps tighten
+                            hasTime ? '@max-[16rem]:px-1.5' : '',
                             'data-invalid:border-red-500',
                             'disabled:shadow-none disabled:opacity-50',
                             readOnly ? 'border-dashed read-only-field:not-dark:bg-gray-100 read-only-field:text-gray-600 read-only-field:not-dark:shadow-none dark:read-only-field:text-gray-500 dark:read-only-field:**:text-gray-500' : '',
@@ -175,12 +195,13 @@ const getInputLabel = (part) => {
                     >
                         <DatePickerTrigger
                             v-if="!inline"
-                            class="flex items-center justify-center rounded-lg p-2 -ms-1 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
+                            :class="{ '@max-[16rem]:ms-0 @max-[16rem]:p-1': hasTime }"
+                            class="flex items-center justify-center rounded-lg cursor-pointer p-2 -ms-1 me-0.5 text-gray-500 dark:text-gray-400 outline-hidden hover:bg-gray-100 focus:bg-gray-100 dark:hover:bg-gray-900 dark:focus:bg-gray-900"
                             :aria-label="__('Open calendar')"
                         >
-                            <Icon name="calendar" class="size-4" />
+                            <Icon name="calendar" class="size-4" :class="{ '@max-[16rem]:size-3': compactClear }" />
                         </DatePickerTrigger>
-                        <div class="flex flex-1 items-center" :class="{ '@max-xs:text-xs': hasTime }">
+                        <div class="flex flex-1 items-center" :class="compactDateClass">
                             <template v-for="item in segments" :key="item.part">
                                 <div v-if="item.part === 'literal'">
                                     <DatePickerInput
@@ -214,7 +235,7 @@ const getInputLabel = (part) => {
                             :show-seconds="granularity === 'second'"
                             side="top"
                         >
-                            <Text class="text-gray-600! dark:text-gray-400! ms-2" size="xs" :text="timeZoneLabel" />
+                            <Text class="text-gray-600! dark:text-gray-400! ms-2" :class="[{ '@max-[16rem]:ms-1': hasTime }, compactTimeZoneClass]" size="xs" :text="timeZoneLabel" />
                         </TimezoneHoverCard>
                         <Button
                             v-if="clearable && !readOnly"
@@ -223,6 +244,7 @@ const getInputLabel = (part) => {
                             size="sm"
                             icon="x"
                             class="-my-1.25 -me-2"
+                            :class="{ '@max-[16rem]:my-0 @max-[16rem]:-me-1 @max-[16rem]:size-6.5 @max-[16rem]:[&_svg]:size-3': compactClear }"
                             :disabled="disabled"
                             v-tooltip="__('Clear date')"
                         />
