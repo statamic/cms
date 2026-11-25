@@ -800,7 +800,6 @@ class EmailConnectorTest extends TestCase
             $this->assertEquals([
                 ['value' => 'field:full_name', 'label' => 'Full Name', 'icon' => 'user-avatar-flush', 'category' => 'contact'],
                 ['value' => 'field:email_address', 'label' => 'Email Address', 'icon' => 'mail-sign-at', 'category' => 'contact'],
-                ['value' => 'field:address', 'label' => 'Address', 'icon' => 'fieldtype-group', 'category' => 'structure'],
             ], $meta->get($handle)['options']);
         }
     }
