@@ -1,6 +1,21 @@
 <?php
 
 return [
+    'checkboxes.title' => 'Selectievakjes',
+    'date_picker.title' => 'Datumkiezer',
+    'dropdown.title' => 'Keuzelijst',
+    'image_choice.title' => 'Afbeeldingskeuze',
+    'long_answer.title' => 'Lang antwoord',
+    'multi_choice.title' => 'Meerkeuze',
+    'number.title' => 'Getal',
+    'opinion_scale.title' => 'Beoordelingsschaal',
+    'paragraph.title' => 'Alinea',
+    'ranking.title' => 'Rangschikking',
+    'short_answer.title' => 'Kort antwoord',
+    'spacer.title' => 'Witruimte',
+    'star_rating.title' => 'Sterrenbeoordeling',
+    'time_picker.title' => 'Tijdkiezer',
+    'upload.title' => 'Bestand uploaden',
     'image_choice.config.aspect_ratio.instructions' => 'De beeldverhouding van de afbeelding bij elke optie.',
     'image_choice.config.columns.instructions' => 'Het aantal opties per rij.',
     'opinion_scale.config.high_label.instructions' => 'Wordt onder de hoogste waarde getoond.',
