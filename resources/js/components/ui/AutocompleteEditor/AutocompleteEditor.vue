@@ -50,6 +50,10 @@ const props = defineProps({
     trigger: { type: String, default: '@' },
     placeholder: { type: String, default: '' },
     readOnly: { type: Boolean, default: false },
+    /** Entry, asset and custom link types offered by the link button, alongside URLs, emails and phone numbers. */
+    linkTypes: { type: [Object, Array], default: () => ({}) },
+    /** Item data for the `statamic://` links in the content, keyed by reference, so the link button can show them. */
+    linkData: { type: Object, default: () => ({}) },
 });
 
 const emit = defineEmits(['update:modelValue', 'focus', 'blur']);
@@ -79,6 +83,12 @@ const buttonDefinitions = {
         svg: 'insert-link',
         component: EditorLinkButton,
         active: (editor) => editor.isActive('link'),
+        get linkTypes() {
+            return props.linkTypes;
+        },
+        get linkData() {
+            return props.linkData;
+        },
     },
     bulletlist: {
         name: 'bulletlist',

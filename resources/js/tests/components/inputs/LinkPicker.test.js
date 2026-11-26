@@ -1,5 +1,8 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
+// The UI components import the picker through the autocomplete editor, so
+// loading them first catches anything left undefined by that cycle.
+import '@/components/ui';
 import LinkPicker from '@/components/inputs/LinkPicker.vue';
 
 window.__ = (key) => key;
@@ -109,3 +112,11 @@ test.each([
     expect(wrapper.vm.canHaveTarget).toBe(expected);
 });
 
+test('renders its actions when loaded through the UI components', () => {
+    const wrapper = mount(LinkPicker, {
+        props: { linkAttrs: {} },
+        global: { stubs: { 'ui-select': true, 'ui-input': true, 'ui-separator': true, 'ui-switch': true, 'ui-description': true } },
+    });
+
+    expect(wrapper.find('[data-ui-stack-footer]').exists()).toBe(true);
+});

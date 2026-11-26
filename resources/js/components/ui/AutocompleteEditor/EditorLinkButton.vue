@@ -1,5 +1,5 @@
 <template>
-    <Popover v-model:open="open" class="w-80">
+    <Stack :title="__('Link')" size="narrow" inset :wrap-slot="false" v-model:open="open">
         <template #trigger>
             <Button
                 class="px-2!"
@@ -13,19 +13,24 @@
                 <ui-icon :name="button.svg" class="size-3.5!" />
             </Button>
         </template>
-        <form class="space-y-3" @submit.prevent="save">
-            <Input v-model="href" :aria-label="__('URL')" placeholder="https://" focus />
-            <div class="flex justify-end gap-2">
-                <Button v-if="active" size="sm" variant="ghost" :text="__('Remove Link')" @click="remove" />
-                <Button type="submit" size="sm" variant="primary" :text="__('Apply')" />
-            </div>
-        </form>
-    </Popover>
+        <LinkPicker
+            v-if="linkAttrs !== null"
+            :link-attrs
+            :link-types="button.linkTypes"
+            :link-data
+            :selected-text
+            markdown
+            @updated="setLink"
+            @canceled="open = false"
+            @item-loaded="(ref, item) => (loadedLinkData[ref] = item)"
+        />
+    </Stack>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { Button, Input, Popover } from '@/components/ui';
+import { computed, reactive, ref, watch } from 'vue';
+import { Button, Stack } from '@/components/ui';
+import LinkPicker from '@/components/inputs/LinkPicker.vue';
 
 const props = defineProps({
     button: { type: Object, required: true },
@@ -34,39 +39,51 @@ const props = defineProps({
 });
 
 const open = ref(false);
-const href = ref('');
+const linkAttrs = ref(null);
+const selection = ref(null);
+const selectedText = ref('');
+const loadedLinkData = reactive({});
 
-// Emails are read away from the site, so a link without a scheme, like
-// "example.com/brochure.pdf", is treated as a website rather than a relative path.
-function normalize(url) {
-    url = url.trim();
+const linkData = computed(() => ({ ...props.button.linkData, ...loadedLinkData }));
 
-    return !url || /^[a-z][a-z\d+.-]*:/i.test(url) ? url : `https://${url}`;
+// With nothing selected, the link needs some text. An entry or asset link would
+// otherwise show its statamic:// reference, so the item's title is used, or the
+// filename when there's no title, like for assets.
+function textFor(href, title) {
+    const reference = href.match(/^statamic:\/\/([^?#]*)/)?.[1];
+
+    if (title || !reference) return title || href;
+
+    return linkData.value[reference]?.title ?? reference.split(/::|\//).pop();
 }
 
-function save() {
-    const url = normalize(href.value);
+// Picking an entry or asset moves focus around, so the selection from when the
+// stack opened is restored before linking it.
+function setLink({ href, title }) {
+    const chain = props.editor.chain().focus().setTextSelection(selection.value).extendMarkRange('link');
 
-    if (!url) return remove();
-
-    const chain = props.editor.chain().focus().extendMarkRange('link');
-
-    if (props.editor.state.selection.empty && !props.active) {
-        chain.insertContent({ type: 'text', text: url, marks: [{ type: 'link', attrs: { href: url } }] });
+    if (!href) {
+        chain.unsetMark('link');
+    } else if (selection.value.from === selection.value.to && !linkAttrs.value.href) {
+        chain.insertContent({ type: 'text', text: textFor(href, title), marks: [{ type: 'link', attrs: { href, title } }] });
     } else {
-        chain.setLink({ ...props.editor.getAttributes('link'), href: url });
+        chain.setLink({ href, title });
     }
 
     chain.run();
     open.value = false;
 }
 
-function remove() {
-    props.editor.chain().focus().extendMarkRange('link').unsetMark('link').run();
-    open.value = false;
-}
-
 watch(open, (open) => {
-    if (open) href.value = props.editor.getAttributes('link').href ?? '';
+    if (open) {
+        const { from, to } = props.editor.state.selection;
+
+        selection.value = { from, to };
+        selectedText.value = props.editor.state.doc.textBetween(from, to, '');
+        linkAttrs.value = props.editor.getAttributes('link');
+    } else {
+        linkAttrs.value = null;
+        props.editor.commands.focus();
+    }
 });
 </script>

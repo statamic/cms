@@ -8,6 +8,8 @@
         :trigger="config.trigger"
         :placeholder="config.placeholder"
         :read-only="isReadOnly"
+        :link-types="meta.linkTypes"
+        :link-data="meta.linkData"
         @update:model-value="updateContent"
     />
 </template>

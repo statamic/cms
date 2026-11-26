@@ -77,6 +77,7 @@
 
             <!-- Rel attribute -->
             <ui-input
+                v-if="!markdown"
                 type="text"
                 ref="input"
                 v-model="rel"
@@ -84,7 +85,7 @@
                 :placeholder="__('noopener, noreferrer')"
             />
 
-            <div class="flex items-center gap-2">
+            <div v-if="!markdown" class="flex items-center gap-2">
                 <ui-switch
                     v-model="targetBlank"
                 />
@@ -119,13 +120,14 @@
 </template>
 
 <script>
-import { Icon, StackContent, StackFooter } from '@/components/ui';
+// Imported directly, since the UI index imports this component through the autocomplete editor.
+import StackContent from '@/components/ui/Stack/Content.vue';
+import StackFooter from '@/components/ui/Stack/Footer.vue';
 
 export default {
     emits: ['updated', 'canceled', 'item-loaded'],
 
     components: {
-        Icon,
         StackContent,
         StackFooter,
     },
@@ -143,6 +145,8 @@ export default {
         linkData: { type: Object, default: () => ({}) },
         /** The text being linked. An email address preselects the email link type. */
         selectedText: { type: String, default: '' },
+        /** Markdown links can't store a rel or target, so those options are hidden. */
+        markdown: { type: Boolean, default: false },
     },
 
     data() {

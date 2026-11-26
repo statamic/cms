@@ -1,6 +1,8 @@
 import { flushPromises, mount } from '@vue/test-utils';
 import { expect, test, vi } from 'vitest';
 import AutocompleteEditor from '@/components/ui/AutocompleteEditor/AutocompleteEditor.vue';
+import EditorLinkButton from '@/components/ui/AutocompleteEditor/EditorLinkButton.vue';
+import LinkPicker from '@/components/inputs/LinkPicker.vue';
 
 window.__ = (key) => key;
 
@@ -9,9 +11,10 @@ const sampleOptions = [
     { value: 'jesse', label: 'Jesse Leite' },
 ];
 
-async function mountEditor(props = {}) {
+async function mountEditor(props = {}, global = {}) {
     const wrapper = mount(AutocompleteEditor, {
         props: { modelValue: [], options: sampleOptions, ...props },
+        global,
     });
 
     // useEditor() initializes the tiptap instance asynchronously, so the
@@ -123,24 +126,28 @@ test('inserting a mention produces a node with value and label attrs', async () 
     ]);
 });
 
-async function linkSelection(wrapper, url) {
-    await wrapper.find('button[aria-label="Link"]').trigger('click');
+async function linkSelection(wrapper, link, { whilePicking = () => {} } = {}) {
+    const button = wrapper.findComponent(EditorLinkButton);
+
+    button.vm.open = true;
     await flushPromises();
 
-    const input = document.querySelector('[data-ui-popover-content] input');
-    input.value = url;
-    input.dispatchEvent(new Event('input'));
-    input.form.requestSubmit();
+    whilePicking();
+    button.findComponent(LinkPicker).vm.$emit('updated', link);
     await flushPromises();
 }
 
-test('the link button links the selected text, assuming a website when there is no scheme', async () => {
-    const wrapper = await mountEditor({ buttons: ['link'] });
+async function mountLinkableEditor(props = {}) {
+    return mountEditor({ buttons: ['link'], ...props }, { stubs: { Stack: { template: '<div><slot /></div>' }, LinkPicker: true } });
+}
+
+test('the link button links the selected text', async () => {
+    const wrapper = await mountLinkableEditor();
     const { editor } = wrapper.vm;
 
     editor.commands.insertContent('Get the brochure');
     editor.commands.setTextSelection({ from: 9, to: 17 });
-    await linkSelection(wrapper, ' example.com/brochure.pdf ');
+    await linkSelection(wrapper, { href: 'https://example.com/brochure.pdf', title: null });
 
     expect(editor.getJSON().content).toEqual([
         {
@@ -155,12 +162,47 @@ test('the link button links the selected text, assuming a website when there is 
             ],
         },
     ]);
+});
 
-    wrapper.unmount();
+test('linking with nothing selected inserts the linked item title rather than its reference', async () => {
+    const wrapper = await mountLinkableEditor({ linkData: { 'entry::123': { id: '123', title: 'Pricing' } } });
+    const { editor } = wrapper.vm;
+    const link = { type: 'link', attrs: { href: 'statamic://entry::123#plans', title: null } };
+
+    editor.commands.insertContent('See ');
+    editor.commands.focus('end');
+    await linkSelection(wrapper, { href: 'statamic://entry::123#plans', title: null });
+
+    expect(editor.getJSON().content).toEqual([
+        { type: 'paragraph', content: [{ type: 'text', text: 'See ' }, { type: 'text', text: 'Pricing', marks: [link] }] },
+    ]);
+});
+
+test('linking with nothing selected inserts an asset at the original cursor, named after its file', async () => {
+    const wrapper = await mountLinkableEditor();
+    const { editor } = wrapper.vm;
+    const link = { type: 'link', attrs: { href: 'statamic://asset::assets::docs/brochure.pdf', title: null } };
+
+    editor.commands.insertContent('Get the  today');
+    editor.commands.setTextSelection(9);
+    await linkSelection(wrapper, { href: 'statamic://asset::assets::docs/brochure.pdf', title: null }, {
+        whilePicking: () => editor.commands.setTextSelection(1),
+    });
+
+    expect(editor.getJSON().content).toEqual([
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'Get the ' },
+                { type: 'text', text: 'brochure.pdf', marks: [link] },
+                { type: 'text', text: ' today' },
+            ],
+        },
+    ]);
 });
 
 test('linking a selection skips the mentions in it', async () => {
-    const wrapper = await mountEditor({ buttons: ['link'] });
+    const wrapper = await mountLinkableEditor();
     const { editor } = wrapper.vm;
     const link = { type: 'link', attrs: { href: 'mailto:hello@example.com', title: null } };
 
@@ -169,7 +211,7 @@ test('linking a selection skips the mentions in it', async () => {
         { type: 'mention', attrs: { value: 'jesse' } },
     ]);
     editor.commands.selectAll();
-    await linkSelection(wrapper, 'mailto:hello@example.com');
+    await linkSelection(wrapper, { href: 'mailto:hello@example.com', title: null });
 
     expect(editor.getJSON().content).toEqual([
         {
@@ -180,8 +222,6 @@ test('linking a selection skips the mentions in it', async () => {
             ],
         },
     ]);
-
-    wrapper.unmount();
 });
 
 function mentionBadge(wrapper) {
