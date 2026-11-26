@@ -2,6 +2,7 @@
 
 namespace Statamic\Forms;
 
+use Illuminate\Support\Collection;
 use Statamic\Data\AbstractAugmented;
 use Statamic\Fields\Section;
 use Statamic\Fields\Tab;
@@ -18,6 +19,11 @@ class AugmentedForm extends AbstractAugmented
         }
 
         return $keys;
+    }
+
+    public function blueprintFields(): Collection
+    {
+        return collect();
     }
 
     public function sections(): array
