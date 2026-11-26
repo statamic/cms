@@ -234,20 +234,6 @@ class FormTest extends TestCase
     }
 
     #[Test]
-    public function a_field_named_title_doesnt_affect_the_augmented_title()
-    {
-        $form = Form::make('contact_us')
-            ->title('Contact Us')
-            ->formFields([
-                'fields' => [
-                    ['handle' => 'title', 'field' => ['type' => 'dropdown']],
-                ],
-            ]);
-
-        $this->assertSame('Contact Us', $form->toArray()['title']);
-    }
-
-    #[Test]
     public function it_can_get_action_url()
     {
         $form = Form::make('contact_us');

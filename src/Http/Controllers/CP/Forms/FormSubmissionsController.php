@@ -8,6 +8,7 @@ use Statamic\Facades\Scope;
 use Statamic\Forms\FakeSubmissionGenerator;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormProps;
 use Statamic\Http\Controllers\CP\Forms\Concerns\QueriesFormSubmissionSearch;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
@@ -19,7 +20,7 @@ use function Statamic\trans as __;
 
 class FormSubmissionsController extends CpController
 {
-    use ProvidesFormAbilities, QueriesFilters, QueriesFormSubmissionSearch;
+    use ProvidesFormAbilities, ProvidesFormProps, QueriesFilters, QueriesFormSubmissionSearch;
 
     public function index(FilteredRequest $request, $form)
     {
@@ -42,9 +43,7 @@ class FormSubmissionsController extends CpController
 
         return Inertia::render('forms/submissions/Index', [
             'form' => [
-                'title' => __($form->title()),
-                'handle' => $form->handle(),
-                'status' => $form->status(),
+                ...$this->formProps($form),
                 'editUrl' => $form->editUrl(),
                 'deleteUrl' => $form->deleteUrl(),
                 'canGenerateFakeSubmissions' => FakeSubmissionGenerator::enabled() && $can['generateFakeSubmissions'],
@@ -122,7 +121,7 @@ class FormSubmissionsController extends CpController
         $fields = $blueprint->fields()->addValues($submission->data()->all())->preProcess();
 
         return Inertia::render('forms/submissions/Show', [
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
             'id' => $submission->id(),
             'formTitle' => __($form->title()),

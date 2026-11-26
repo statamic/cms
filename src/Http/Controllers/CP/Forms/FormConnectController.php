@@ -11,18 +11,19 @@ use Statamic\Forms\Connectors\Connector;
 use Statamic\Forms\Fields\FormField;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormProps;
 use Statamic\Support\Arr;
 
 class FormConnectController extends CpController
 {
-    use ProvidesFormAbilities;
+    use ProvidesFormAbilities, ProvidesFormProps;
 
     public function index($form)
     {
         $this->authorize('editConnections', $form);
 
         return Inertia::render('forms/connect/Index', [
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
             'connectors' => FormConnector::all()->map(fn (Connector $connector): array => [
                 'handle' => $connector->handle(),
@@ -43,7 +44,7 @@ class FormConnectController extends CpController
         throw_unless($connector = FormConnector::find($handle)?->forForm($form), NotFoundHttpException::class);
 
         return Inertia::render('forms/connect/Edit', [
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
             'connector' => [
                 'handle' => $connector->handle(),
