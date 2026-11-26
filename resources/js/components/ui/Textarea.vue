@@ -70,6 +70,8 @@ const classes = cva({
 const textarea = useTemplateRef('textarea');
 let resizeObserver;
 
+const updateHeight = () => autosize.update(textarea.value);
+
 onMounted(() => {
     if (props.elastic) {
         autosize(textarea.value);
@@ -77,19 +79,21 @@ onMounted(() => {
         resizeObserver = new ResizeObserver(([entry]) => {
             if (entry.contentRect.width === width) return;
             width = entry.contentRect.width;
-            requestAnimationFrame(() => autosize.update(textarea.value));
+            requestAnimationFrame(updateHeight);
         });
         resizeObserver.observe(textarea.value);
+        document.fonts.addEventListener('loadingdone', updateHeight);
     }
 });
 
 if (props.elastic) {
-    watch(() => props.modelValue, () => autosize.update(textarea.value), { flush: 'post' });
+    watch(() => props.modelValue, updateHeight, { flush: 'post' });
 }
 
 onBeforeUnmount(() => {
     if (props.elastic) {
         autosize.destroy(textarea.value);
+        document.fonts.removeEventListener('loadingdone', updateHeight);
     }
     resizeObserver?.disconnect();
 });

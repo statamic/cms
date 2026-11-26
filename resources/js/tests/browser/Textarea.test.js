@@ -2,6 +2,7 @@ import { afterEach, expect, test } from 'vitest';
 import { mount } from '@vue/test-utils';
 import Textarea from '@/components/ui/Textarea.vue';
 import wait from '@/util/wait.js';
+import interUrl from '../../../fonts/inter/intervariable.woff2?url';
 import '../../../css/app.css';
 
 let wrapper;
@@ -44,6 +45,18 @@ test('an elastic textarea grows when it gets narrower', async () => {
 
     host.style.width = '300px';
     await wait(100);
+
+    expect(textarea.scrollHeight).toBeLessThanOrEqual(textarea.clientHeight);
+});
+
+test('an elastic textarea grows when its font finishes loading', async () => {
+    const font = new FontFace('Late Inter', `url(${interUrl})`, { sizeAdjust: '150%' });
+    document.fonts.add(font);
+
+    const textarea = render(text);
+    textarea.style.fontFamily = "'Late Inter', sans-serif";
+    await font.load();
+    await wait(50);
 
     expect(textarea.scrollHeight).toBeLessThanOrEqual(textarea.clientHeight);
 });
