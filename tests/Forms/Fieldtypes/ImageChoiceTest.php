@@ -220,14 +220,15 @@ class ImageChoiceTest extends TestCase
     }
 
     #[Test]
-    public function the_options_image_field_ignores_a_configured_container_that_does_not_exist()
+    public function the_options_image_field_falls_back_to_the_first_container_when_the_configured_container_does_not_exist()
     {
         AssetContainer::make('images')->disk('local')->save();
+        AssetContainer::make('photos')->disk('local')->save();
         config(['statamic.assets.image_choice_images' => ['container' => 'assets', 'folder' => 'choices']]);
 
         $image = $this->optionsImageField();
 
-        $this->assertNull($image->get('container'));
+        $this->assertEquals('images', $image->get('container'));
         $this->assertNull($image->get('folder'));
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -236,14 +237,15 @@ class ImageChoiceTest extends TestCase
     }
 
     #[Test]
-    public function the_options_image_field_has_no_container_when_none_is_configured()
+    public function the_options_image_field_falls_back_to_the_first_container_when_none_is_configured()
     {
         AssetContainer::make('images')->disk('local')->save();
-        config(['statamic.assets.image_choice_images' => ['container' => null, 'folder' => null]]);
+        AssetContainer::make('photos')->disk('local')->save();
+        config(['statamic.assets.image_choice_images' => ['container' => null, 'folder' => 'choices']]);
 
         $image = $this->optionsImageField();
 
-        $this->assertNull($image->get('container'));
+        $this->assertEquals('images', $image->get('container'));
         $this->assertNull($image->get('folder'));
     }
 

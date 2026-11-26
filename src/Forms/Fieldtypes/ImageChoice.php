@@ -26,7 +26,7 @@ class ImageChoice extends FormFieldtype
         $container = config('statamic.assets.image_choice_images.container');
 
         if (! $container || ! AssetContainer::find($container)) {
-            return ['container' => null, 'folder' => null];
+            return ['container' => AssetContainer::all()->first()?->handle(), 'folder' => null];
         }
 
         return ['container' => $container, 'folder' => config('statamic.assets.image_choice_images.folder')];
