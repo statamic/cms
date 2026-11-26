@@ -76,9 +76,9 @@
                     >
                         <Badge
                             size="lg"
-                            class="*:st-text-trim-optical max-w-full whitespace-normal! h-auto! py-3 rounded-md! border-transparent! bg-gray-200/70! dark:bg-gray-700!"
+                            class="*:st-text-trim-optical max-w-full whitespace-normal! h-auto! py-2.5 rounded-2xl!"
                         >
-                            <span class="min-w-0 break-all font-mono text-2xs">{{ rule }}</span>
+                            <span class="min-w-0 break-all leading-[1.125rem]">{{ rule }}</span>
 
                             <button
                                 type="button"
