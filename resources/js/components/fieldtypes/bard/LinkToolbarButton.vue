@@ -20,34 +20,37 @@
                 <div class="flex items-center" v-html="button.html" v-if="button.html" />
             </Button>
         </template>
-        <link-toolbar
+        <LinkPicker
             v-if="linkAttrs !== null"
-            ref="toolbar"
             :link-attrs="linkAttrs"
             :config="config"
-            :bard="bard"
+            :link-types="bard.meta.linkTypes"
+            :link-data="bard.meta.linkData"
+            :selected-text="selectedText"
             @updated="setLink"
             @canceled="close"
+            @item-loaded="putItemDataIntoMeta"
         />
     </Stack>
 </template>
 
 <script>
 import { Stack } from '@/components/ui';
-import LinkToolbar from './LinkToolbar.vue';
+import LinkPicker from '@/components/inputs/LinkPicker.vue';
 import BardToolbarButton from './ToolbarButton.vue';
 
 export default {
     mixins: [BardToolbarButton],
 
     components: {
-        LinkToolbar,
+        LinkPicker,
         Stack,
     },
 
     data() {
         return {
             linkAttrs: null,
+            selectedText: '',
             showingToolbar: false,
         };
     },
@@ -55,6 +58,12 @@ export default {
     methods: {
         close() {
             this.showingToolbar = false;
+        },
+
+        putItemDataIntoMeta(ref, item) {
+            let meta = this.bard.meta;
+            meta.linkData[ref] = item;
+            this.bard.updateMeta(meta);
         },
 
         setLink(attributes) {
@@ -67,6 +76,9 @@ export default {
     watch: {
         showingToolbar(showingToolbar) {
             if (showingToolbar) {
+                const { from, to } = this.editor.state.selection;
+
+                this.selectedText = this.editor.state.doc.textBetween(from, to, '');
                 this.linkAttrs = this.editor.getAttributes('link');
             } else {
                 this.editor.commands.focus();
@@ -77,10 +89,14 @@ export default {
 
     created() {
         this.bard.events.on('open-link-toolbar', () => this.showingToolbar = true);
+        this.bard.events.on('link-selected', (attrs) => {
+            if (this.linkAttrs !== null) this.linkAttrs = attrs;
+        });
     },
 
     beforeUnmount() {
         this.bard.events.off('open-link-toolbar');
+        this.bard.events.off('link-selected');
     },
 
 };
