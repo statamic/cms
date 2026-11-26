@@ -206,8 +206,9 @@ main.nav-closed {
 =================================================== */
 .global-header-slot {
     position: relative;
-    background: var(--color-gray-950);
-    @apply rounded-lg dark:bg-gray-925;
+    /* A shade darker than the header, whatever colour the theme gives it. The grey scale can be tinted differently (Peak's greys are blue-ish slate), so it's not used here */
+    background: color-mix(in oklab, var(--theme-color-global-header-bg), black 35%);
+    @apply rounded-lg;
 
     /* When .global-header-slot has stuff */
     header:has(&:not(:empty)) {
@@ -239,7 +240,11 @@ main.nav-closed {
     }
     a {
         position: relative;
-        color: var(--color-gray-400);
+        /* Mixed from the header colour rather than taken from the grey scale, so the links suit any header (a theme's greys can be tinted, like Peak's slate) */
+        color: color-mix(in oklab, var(--theme-color-global-header-bg), white 65%);
+        &:is(:hover, :focus-visible) {
+            color: color-mix(in oklab, var(--theme-color-global-header-bg), white 85%);
+        }
         &.active {
             color: white;
             anchor-name: --active;
@@ -261,7 +266,7 @@ main.nav-closed {
                 height: calc(anchor-size(height) + var(--height-increase));
                 background: var(--theme-color-global-header-bg);
                 border-radius: 5px;
-                border-block-start: 1px solid var(--color-gray-600);
+                border-block-start: 1px solid rgb(255 255 255 / 0.15);
                 position-anchor: --active;
                 left: calc(anchor(left) - var(--item-padding) * 1.5 / 2);
                 top: calc(anchor(top) - var(--height-increase) / 2);
