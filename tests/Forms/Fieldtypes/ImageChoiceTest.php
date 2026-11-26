@@ -2,6 +2,8 @@
 
 namespace Tests\Forms\Fieldtypes;
 
+use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
@@ -167,6 +169,45 @@ class ImageChoiceTest extends TestCase
     }
 
     #[Test]
+    public function it_resolves_option_images_from_the_configured_container()
+    {
+        $this->makeContainerWithImage('aardvark');
+        $this->makeContainerWithImage('images');
+        config(['statamic.assets.image_choice_images.container' => 'images']);
+
+        $this->assertEquals('/images/choices/cat.jpg', $this->resolvedImage('choices/cat.jpg'));
+    }
+
+    #[Test]
+    public function it_does_not_look_in_other_containers_when_the_option_image_is_not_in_the_configured_container()
+    {
+        $this->makeContainerWithImage('others');
+        $this->makeContainer('images');
+        config(['statamic.assets.image_choice_images.container' => 'images']);
+
+        $this->assertNull($this->resolvedImage('choices/cat.jpg'));
+    }
+
+    #[Test]
+    #[DataProvider('missingContainerProvider')]
+    public function it_looks_in_every_container_when_the_configured_container_is_missing(?string $configuredContainer)
+    {
+        $this->makeContainer('aardvark');
+        $this->makeContainerWithImage('images');
+        config(['statamic.assets.image_choice_images.container' => $configuredContainer]);
+
+        $this->assertEquals('/images/choices/cat.jpg', $this->resolvedImage('choices/cat.jpg'));
+    }
+
+    public static function missingContainerProvider(): array
+    {
+        return [
+            'not configured' => [null],
+            'does not exist' => ['assets'],
+        ];
+    }
+
+    #[Test]
     public function the_options_image_field_uses_the_configured_container()
     {
         AssetContainer::make('images')->disk('local')->save();
@@ -179,14 +220,15 @@ class ImageChoiceTest extends TestCase
     }
 
     #[Test]
-    public function the_options_image_field_ignores_a_configured_container_that_does_not_exist()
+    public function the_options_image_field_falls_back_to_the_first_container_when_the_configured_container_does_not_exist()
     {
         AssetContainer::make('images')->disk('local')->save();
+        AssetContainer::make('photos')->disk('local')->save();
         config(['statamic.assets.image_choice_images' => ['container' => 'assets', 'folder' => 'choices']]);
 
         $image = $this->optionsImageField();
 
-        $this->assertNull($image->get('container'));
+        $this->assertEquals('images', $image->get('container'));
         $this->assertNull($image->get('folder'));
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -195,15 +237,40 @@ class ImageChoiceTest extends TestCase
     }
 
     #[Test]
-    public function the_options_image_field_has_no_container_when_none_is_configured()
+    public function the_options_image_field_falls_back_to_the_first_container_when_none_is_configured()
     {
         AssetContainer::make('images')->disk('local')->save();
-        config(['statamic.assets.image_choice_images' => ['container' => null, 'folder' => null]]);
+        AssetContainer::make('photos')->disk('local')->save();
+        config(['statamic.assets.image_choice_images' => ['container' => null, 'folder' => 'choices']]);
 
         $image = $this->optionsImageField();
 
-        $this->assertNull($image->get('container'));
+        $this->assertEquals('images', $image->get('container'));
         $this->assertNull($image->get('folder'));
+    }
+
+    private function makeContainerWithImage(string $handle): void
+    {
+        $this->makeContainer($handle);
+
+        Storage::disk($handle)->put('choices/cat.jpg', '');
+    }
+
+    private function makeContainer(string $handle): void
+    {
+        Storage::fake($handle, ['url' => "/{$handle}"]);
+
+        AssetContainer::make($handle)->disk($handle)->save();
+    }
+
+    private function resolvedImage(string $image): ?string
+    {
+        $fieldtype = (new ImageChoiceFieldtype)->setField(new Field('animal', [
+            'type' => 'image_choice',
+            'options' => [['key' => 'cat', 'image' => $image]],
+        ]));
+
+        return $fieldtype->preload()['options'][0]['image'];
     }
 
     private function optionsImageField(): Field

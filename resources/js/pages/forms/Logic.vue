@@ -128,6 +128,14 @@ const deletePage = (pageId: string) => {
     dirty();
 };
 
+const beforeSaveCallbacks = new Set<() => Promise<void> | void>();
+
+const onBeforeSave = (callback: () => Promise<void> | void) => {
+    beforeSaveCallbacks.add(callback);
+
+    return () => beforeSaveCallbacks.delete(callback);
+};
+
 provideBuilderContext({
     deletePage,
     dirty,
@@ -135,16 +143,19 @@ provideBuilderContext({
     fieldtypes: props.fieldtypes,
     form: props.form,
     inspecting,
+    onBeforeSave,
     pages,
     showFieldDirection: false,
     withoutDirtying,
 });
 
-const save = () => {
+const save = async () => {
     if (saving.value) return;
 
     errors.value = {};
     saving.value = true;
+
+    await Promise.allSettled([...beforeSaveCallbacks].map((callback) => callback()));
 
     axios.patch(props.action, { pages: pages.value })
         .then((response) => {

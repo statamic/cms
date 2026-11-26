@@ -80,7 +80,7 @@ trait ManagesFormFields
     private function formsProRequiredPage(Form $form): Response
     {
         return Inertia::render('forms/FormsProRequired', [
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
         ]);
     }

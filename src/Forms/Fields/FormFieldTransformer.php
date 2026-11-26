@@ -159,7 +159,7 @@ class FormFieldTransformer extends FieldTransformer
     {
         try {
             $field = $fieldtype instanceof Fallback
-                ? new Field($fieldtype->toArray()['handle'], $fieldtype->field()->config())
+                ? new Field($fieldtype->field()->handle(), $fieldtype->field()->config())
                 : $fieldtype->toField();
 
             $field->setValue($field->defaultValue());

@@ -209,11 +209,11 @@ class SubmissionTest extends TestCase
     }
 
     #[Test]
-    public function setting_data_preserves_the_partial_spam_and_site_keys()
+    public function setting_data_preserves_the_partial_spam_site_and_fake_keys()
     {
         $form = tap(Form::make('contact_us'))->save();
 
-        $submission = $form->makeSubmission()->asPartial()->markAsSpam()->site('fr');
+        $submission = $form->makeSubmission()->asPartial()->markAsSpam()->site('fr')->set('_fake', true);
 
         $submission->data(['foo' => 'bar']);
 
@@ -221,6 +221,7 @@ class SubmissionTest extends TestCase
         $this->assertTrue($submission->get('_partial'));
         $this->assertTrue($submission->isSpam());
         $this->assertEquals('fr', $submission->get('_site'));
+        $this->assertTrue($submission->get('_fake'));
     }
 
     #[Test]

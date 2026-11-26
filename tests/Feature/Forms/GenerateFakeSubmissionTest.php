@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
+use Statamic\Events\SubmissionCreated;
+use Statamic\Events\SubmissionSaved;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Site;
@@ -103,10 +105,11 @@ class GenerateFakeSubmissionTest extends TestCase
     #[Test]
     public function cp_only_mode_does_not_dispatch_full_pipeline_side_effects()
     {
-        Event::fake([FormSubmitted::class]);
+        Event::fake([FormSubmitted::class, SubmissionCreated::class, SubmissionSaved::class]);
         Bus::fake();
 
         $form = $this->makeForm('contact');
+        $form->connections(['email' => [['to' => 'first@example.com']]])->save();
         $user = $this->userWithConfigureFormsPermission();
 
         $this
@@ -115,12 +118,14 @@ class GenerateFakeSubmissionTest extends TestCase
             ->assertOk();
 
         Event::assertNotDispatched(FormSubmitted::class);
+        Event::assertDispatched(SubmissionCreated::class);
+        Event::assertDispatched(SubmissionSaved::class);
         Bus::assertNotDispatched(SendEmail::class);
         $this->assertEquals(1, $form->querySubmissions()->count());
     }
 
     #[Test]
-    public function full_pipeline_mode_dispatches_frontend_side_effects()
+    public function full_pipeline_mode_dispatches_the_form_submitted_event_and_email_jobs()
     {
         Event::fake([FormSubmitted::class]);
         Bus::fake();
@@ -160,6 +165,25 @@ class GenerateFakeSubmissionTest extends TestCase
         Bus::assertDispatchedTimes(SendEmail::class, 1);
         Bus::assertDispatchedTimes(FakeSubmissionConnectorJob::class, 1);
         Bus::assertDispatched(FakeSubmissionConnectorJob::class, fn ($job) => $job->id === 'one');
+    }
+
+    #[Test]
+    public function full_pipeline_mode_keeps_submissions_marked_as_spam_by_a_listener()
+    {
+        Event::listen(FormSubmitted::class, fn ($event) => $event->submission->markAsSpam());
+
+        $form = $this->makeForm('contact');
+        $user = $this->userWithConfigureFormsPermission();
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.generate-fake', $form->handle()), ['mode' => 'full_pipeline'])
+            ->assertOk();
+
+        $submission = $form->querySubmissions()->first();
+
+        $this->assertTrue($submission->isSpam());
+        $this->assertTrue((bool) $submission->get('_fake'));
     }
 
     #[Test]

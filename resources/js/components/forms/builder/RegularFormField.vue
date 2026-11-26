@@ -132,7 +132,7 @@ const hasErrors = computed(() => {
                     :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
-                    :handle="field.handle"
+                    :handle="field.preview.config.handle"
                 />
             </div>
         </div>
@@ -181,7 +181,7 @@ const hasErrors = computed(() => {
                     :config="field.preview.config"
                     :value="field.preview.value"
                     :meta="field.preview.meta"
-                    :handle="field.handle"
+                    :handle="field.preview.config.handle"
                 />
             </div>
         </Field>

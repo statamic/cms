@@ -3,6 +3,7 @@ import { beforeEach, expect, test, vi } from 'vitest';
 import { defineComponent, h } from 'vue';
 import ConnectionList from '@/components/forms/connections/ConnectionList.vue';
 import ConnectionFields from '@/components/forms/connections/ConnectionFields.vue';
+import { connectionVisibleValuesKey } from '@/components/forms/connections/context';
 
 vi.mock('@ui', async () => {
     const { defineComponent, h } = await import('vue');
@@ -222,6 +223,20 @@ test('connection fields work without a connection list', () => {
         extraValues: { consent: true },
     });
     expect(wrapper.classes()).not.toContain('rounded-lg');
+});
+
+/** @see https://github.com/statamic/cms/issues/16073 */
+test('connection fields provide their visible values, keyed by connection', () => {
+    const visibleValues = {};
+
+    const wrapper = mount(ConnectionFields, {
+        props: { connection: { id: 'one', trigger: false, triggered: null }, blueprint },
+        global: { provide: { [connectionVisibleValuesKey]: visibleValues } },
+    });
+
+    wrapper.findComponent({ name: 'PublishContainer' }).vm.$emit('update:visibleValues', { id: 'one', trigger: false });
+
+    expect(visibleValues).toEqual({ one: { id: 'one', trigger: false } });
 });
 
 test('connection fields slots', () => {

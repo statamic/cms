@@ -14,6 +14,7 @@ use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Forms\Fieldtypes\Fallback;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormProps;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
@@ -21,7 +22,7 @@ use function Statamic\trans as __;
 
 class FormBuilderController extends CpController
 {
-    use ManagesFormFields, ProvidesFormAbilities;
+    use ManagesFormFields, ProvidesFormAbilities, ProvidesFormProps;
 
     public function edit($form)
     {
@@ -33,7 +34,7 @@ class FormBuilderController extends CpController
 
         return Inertia::render('forms/Builder', [
             ...$this->fieldProps(),
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
             'initialFormFields' => $this->toVueObject($form->formFields()),
             'formsProInstalled' => Statamic::formsProInstalled(),

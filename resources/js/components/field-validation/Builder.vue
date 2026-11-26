@@ -41,9 +41,9 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
+                    <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: option.value }) }}</span>
                     <template v-else>
-                        {{ option.display }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                        <span class="shrink-0 whitespace-nowrap">{{ option.display }}</span> <code class="min-w-0 truncate px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                     </template>
                 </template>
 
@@ -72,14 +72,17 @@
                     <div
                         v-for="rule in rules"
                         :key="rule"
-                        class="sortable-item"
+                        class="sortable-item min-w-0 max-w-full"
                     >
-                        <Badge pill size="lg" class="*:st-text-trim-optical">
-                            <span>{{ rule }}</span>
+                        <Badge
+                            size="lg"
+                            class="*:st-text-trim-optical max-w-full whitespace-normal! py-1.25 supports-[text-box:ex_alphabetic]:py-2.5 rounded-2xl!"
+                        >
+                            <span class="min-w-0 break-all font-mono text-[0.8125rem] leading-[1.125rem]">{{ rule }}</span>
 
                             <button
                                 type="button"
-                                class="opacity-75 hover:opacity-100 cursor-pointer"
+                                class="shrink-0 opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Remove :label', { label: rule })"
                                 @click="remove(rule)"
                             >

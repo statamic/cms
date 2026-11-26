@@ -32,7 +32,7 @@ class FormFields
             ? collect($this->contents['pages'])
             : collect([['sections' => $this->contents['sections'] ?? []]]);
 
-        if (isset($this->contents['pages']) && ! Statamic::formsProInstalled()) {
+        if ($pages->count() > 1 && ! Statamic::formsProInstalled()) {
             $pages = collect([['sections' => $pages->flatMap(fn (array $page): array => $page['sections'] ?? [])->all()]]);
         }
 

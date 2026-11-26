@@ -36,7 +36,7 @@ class OpinionScale extends FormFieldtype
                 'display' => __('Max Value'),
                 'type' => 'integer',
                 'min' => 1,
-                'max' => 11,
+                'max' => 10,
                 'width' => 50,
                 'placeholder' => 10,
             ],
@@ -98,6 +98,8 @@ class OpinionScale extends FormFieldtype
 
     public function example(): ?array
     {
+        [$min, $max] = $this->field ? $this->normalizedRange() : [0, 5];
+
         return [
             'config' => [
                 'display' => 'How likely are you to recommend us?',
@@ -106,7 +108,7 @@ class OpinionScale extends FormFieldtype
                 'low_label' => 'Not likely',
                 'high_label' => 'Very likely',
             ],
-            'value' => 8,
+            'value' => (int) round($min + ($max - $min) * 0.8),
         ];
     }
 

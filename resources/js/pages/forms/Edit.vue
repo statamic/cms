@@ -75,9 +75,7 @@ onUnmounted(() => saveKeyBinding.destroy());
         </Button>
     </Teleport>
 
-    <Header :title="__('Configure Form')" icon="cog">
-        <Button variant="primary" :text="__('Save')" @click="save" :disabled="saving" />
-    </Header>
+    <Header :title="__('Configure Form')" icon="cog" />
     <Container
         ref="container"
         :blueprint

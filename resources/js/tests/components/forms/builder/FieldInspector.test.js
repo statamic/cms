@@ -154,22 +154,34 @@ test('settings edits on a linked field are tracked as overrides', async () => {
 });
 
 test('values a fieldtype normalizes back to the fieldset value are not tracked as overrides', async () => {
-    const field = referenceField();
+    const field = referenceField({ config_overrides: ['placeholder'] });
 
-    setup({ field, originValues: { display: 'Company', placeholder: 'Acme' } });
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme', input_type: 'text' } });
     await flushPromises();
 
+    wrapper.vm.values.input_type = 'text';
+    await flushPromises();
+
+    expect(field.config_overrides).toEqual(['placeholder']);
+});
+
+test('settings reverted to the fieldset value on a linked field are no longer tracked as overrides', async () => {
+    const field = referenceField({ config_overrides: ['display'] });
+
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme', width: 100 } });
+    await flushPromises();
+
+    wrapper.vm.values.width = 50;
     wrapper.vm.values.placeholder = 'Other';
     await flushPromises();
+
+    expect(field.config_overrides).toEqual(['display', 'placeholder', 'width']);
+
+    wrapper.vm.values.width = 100;
     wrapper.vm.values.placeholder = 'Acme';
     await flushPromises();
 
-    expect(field.config_overrides).toEqual(['placeholder']);
-
-    wrapper.vm.values.display = 'Company';
-    await flushPromises();
-
-    expect(field.config_overrides).toEqual(['placeholder']);
+    expect(field.config_overrides).toEqual(['display']);
 });
 
 test('validation edits on a linked field are tracked as overrides', async () => {
@@ -260,6 +272,46 @@ test('an edit is applied to its field when another field is selected before the 
 
     expect(field.config.display).toBe('Mobile');
     expect(other.config.display).toBe('Email');
+});
+
+test('returning to a field shows its own conditions, not the last field\'s', async () => {
+    const method = { _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } };
+    // Ids of their own, so the inspector's module-level cache from earlier tests doesn't cover them
+    const field = textField({ _id: 'stale-phone-id', config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } } });
+    const other = textField({ _id: 'stale-email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+
+    const { inspecting } = setup({ field, fields: [method, other] });
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('if');
+
+    inspecting.value = other;
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('always');
+
+    // The first field's settings are cached now, so the inspector doesn't reload; the builder must still start afresh
+    inspecting.value = field;
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('if');
+    expect(field.config.if).toEqual({ method: 'equals phone' });
+});
+
+test('returning to a field gives it a fresh validation builder', async () => {
+    const field = textField({ _id: 'rules-phone-id', config: { type: 'text', display: 'Phone', validate: ['email'] } });
+    const other = textField({ _id: 'rules-email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+    const builder = () => wrapper.findComponent({ name: 'FieldValidationBuilder' });
+
+    const { inspecting } = setup({ field, fields: [other] });
+    await flushPromises();
+
+    inspecting.value = other;
+    await flushPromises();
+    const otherBuilder = builder().vm;
+
+    // The first field's settings are cached, so without a key the builder (which reads its rules once) would be reused
+    inspecting.value = field;
+    await flushPromises();
+    expect(builder().vm).not.toBe(otherBuilder);
+    expect(builder().props('config').validate).toEqual(['email']);
 });
 
 test('an edit is applied to its field when the inspector closes before the update returns', async () => {
