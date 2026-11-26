@@ -19,6 +19,7 @@ const optionClasses = [
 
 const min = computed(() => props.config.min ?? 0);
 const max = computed(() => props.config.max ?? 10);
+const selectedValue = computed(() => (props.value === null || props.value === undefined || props.value === '' ? null : Number(props.value)));
 const isDisabled = computed(() => props.config.disabled || isReadOnly.value);
 const ariaLabel = computed(() => __(props.config.display ?? 'Opinion scale'));
 const hasLabels = computed(() => Boolean(props.config.low_label || props.config.middle_label || props.config.high_label));
@@ -41,7 +42,7 @@ const hasLabels = computed(() => Boolean(props.config.low_label || props.config.
                     class="peer sr-only"
                     :name="name"
                     :value="scaleValue"
-                    :checked="value === scaleValue"
+                    :checked="selectedValue === scaleValue"
                     :disabled="isDisabled"
                     @change="update(scaleValue)"
                 >
