@@ -15,6 +15,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormProps;
 use Statamic\Rules\Handle;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -23,7 +24,7 @@ use function Statamic\trans as __;
 
 class FormsController extends CpController
 {
-    use ProvidesFormAbilities;
+    use ProvidesFormAbilities, ProvidesFormProps;
 
     public function index(Request $request)
     {
@@ -146,7 +147,7 @@ class FormsController extends CpController
             ->preProcess();
 
         return Inertia::render('forms/Edit', [
-            'form' => $form,
+            'form' => $this->formProps($form),
             'blueprint' => $blueprint->toPublishArray(),
             'initialValues' => $fields->values(),
             'initialMeta' => $fields->meta(),

@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormAbilities;
+use Statamic\Http\Controllers\CP\Forms\Concerns\ProvidesFormProps;
 
 class FormLogicController extends CpController
 {
-    use ManagesFormFields, ProvidesFormAbilities;
+    use ManagesFormFields, ProvidesFormAbilities, ProvidesFormProps;
 
     public function edit($form)
     {
@@ -21,7 +22,7 @@ class FormLogicController extends CpController
 
         return Inertia::render('forms/Logic', [
             ...$this->fieldProps(),
-            'form' => $form,
+            'form' => $this->formProps($form),
             'can' => $this->formAbilities($form),
             'formFields' => $this->toVueObject($form->formFields()),
             'action' => cp_route('forms.logic.update', $form->handle()),
