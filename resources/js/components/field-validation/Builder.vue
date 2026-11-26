@@ -72,14 +72,17 @@
                     <div
                         v-for="rule in rules"
                         :key="rule"
-                        class="sortable-item"
+                        class="sortable-item min-w-0 max-w-full"
                     >
-                        <Badge pill size="lg" class="*:st-text-trim-optical">
-                            <span>{{ rule }}</span>
+                        <Badge
+                            size="lg"
+                            class="*:st-text-trim-optical max-w-full whitespace-normal! h-auto! py-3 rounded-md! border-transparent! bg-gray-200/70! dark:bg-gray-700!"
+                        >
+                            <span class="min-w-0 break-all font-mono text-2xs">{{ rule }}</span>
 
                             <button
                                 type="button"
-                                class="opacity-75 hover:opacity-100 cursor-pointer"
+                                class="shrink-0 opacity-75 hover:opacity-100 cursor-pointer"
                                 :aria-label="__('Remove :label', { label: rule })"
                                 @click="remove(rule)"
                             >
