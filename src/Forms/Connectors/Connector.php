@@ -212,6 +212,7 @@ abstract class Connector
         return Arr::only($fields->validator()->withContext(['prefix' => '*.'])->rules(), $fields->all()->keys()->all());
     }
 
+    // The CP editor endpoint only checks the shape of id, enabled and conditions, so connection values may not pass rules().
     public function process(array $connections): array
     {
         return collect(static::normalizeConnections($connections))

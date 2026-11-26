@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Forms;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,6 +29,13 @@ class ViewConnectorsTest extends TestCase
         $app['config']['statamic.forms.forms'] = $this->fakeStacheDirectory.'/forms';
 
         $app->booting(fn () => AcmeConnector::register());
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false)->byDefault();
     }
 
     #[Test]

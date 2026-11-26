@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
@@ -25,7 +24,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\FormSubmission;
-use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Tab;
@@ -36,8 +34,6 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-
-use function Statamic\trans as __;
 
 class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContract
 {
@@ -246,6 +242,24 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         }
 
         return $this->formFields()->pages()->count() > 1;
+    }
+
+    public function hasUniqueInstances(): bool
+    {
+        if (! Statamic::formsProInstalled()) {
+            return false;
+        }
+
+        return (bool) $this->get('unique_instances');
+    }
+
+    public function uniqueInstancesCollections(): array
+    {
+        if (! $this->hasUniqueInstances()) {
+            return [];
+        }
+
+        return Arr::wrap($this->get('unique_instances_collections'));
     }
 
     /**
@@ -560,31 +574,24 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
         return FormSubmission::query()->where('form', $this->handle());
     }
 
+    public function instance(?string $entry = null): Instance
+    {
+        return new Instance($this, $entry && $this->hasUniqueInstances() ? $entry : null);
+    }
+
     public function status(): string
     {
-        return Blink::once('form-status-'.$this->handle(), fn () => match (true) {
-            $this->closingDateHasPassed() => 'closed',
-            $this->submissionLimitReached() => 'limit_reached',
-            default => 'open',
-        });
+        return $this->instance()->status();
     }
 
     public function restricted(): bool
     {
-        return $this->restrictionMessage() !== null;
+        return $this->instance()->restricted();
     }
 
     public function restrictionMessage(): ?string
     {
-        if ($this->closingDateHasPassed() || $this->submissionLimitReached()) {
-            return $this->closedMessage();
-        }
-
-        if ($this->get('require_login') && ! User::current()) {
-            return $this->requireLoginMessage();
-        }
-
-        return null;
+        return $this->instance()->restrictionMessage();
     }
 
     public function closedMessage(): string
@@ -595,45 +602,6 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
     public function requireLoginMessage(): string
     {
         return ($msg = $this->get('require_login_message')) ? __($msg) : __('statamic::messages.form_require_login_message');
-    }
-
-    private function closingDateHasPassed(): bool
-    {
-        if (! $date = $this->get('close_date')) {
-            return false;
-        }
-
-        return Carbon::parse($date, config('app.timezone'))->isPast();
-    }
-
-    private function submissionLimitReached(): bool
-    {
-        if (! $limit = (int) $this->get('submission_limit')) {
-            return false;
-        }
-
-        return $this->submissionCount() >= $limit;
-    }
-
-    private function submissionCount(): int
-    {
-        $query = $this->querySubmissions()->whereStatus('finalized');
-
-        if ($start = $this->submissionLimitPeriodStart()) {
-            $query->where('date', '>=', $start);
-        }
-
-        return $query->count();
-    }
-
-    private function submissionLimitPeriodStart(): ?Carbon
-    {
-        return match ($this->get('submission_limit_period', 'total')) {
-            'day' => now()->startOfDay(),
-            'week' => now()->startOfWeek(),
-            'month' => now()->startOfMonth(),
-            default => null,
-        };
     }
 
     /**

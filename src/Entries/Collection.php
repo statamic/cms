@@ -28,6 +28,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fieldtypes\FormInstances;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
@@ -412,6 +413,15 @@ class Collection implements Arrayable, ArrayAccess, AugmentableContract, Contain
                 'type' => 'terms',
                 'taxonomies' => [$taxonomy->handle()],
                 'display' => $taxonomy->title(),
+                'mode' => 'select',
+            ], 'sidebar');
+        }
+
+        if (FormInstances::formsForCollection($this->handle())->isNotEmpty() && ! $blueprint->hasField('form_instances')) {
+            $blueprint->ensureField('form_instances', [
+                'type' => 'form_instances',
+                'display' => 'Forms',
+                'collection' => $this->handle(),
                 'mode' => 'select',
             ], 'sidebar');
         }

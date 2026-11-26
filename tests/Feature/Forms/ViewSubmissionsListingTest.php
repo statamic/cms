@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormSubmission;
 use Statamic\Facades\User;
+use Tests\Factories\EntryFactory;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -86,5 +87,106 @@ class ViewSubmissionsListingTest extends TestCase
             ->assertSuccessful()
             ->assertJsonCount(1, 'data')
             ->assertJsonMissingPath('data.0.actions');
+    }
+
+    #[Test]
+    public function it_includes_the_entry_column_when_unique_instances_is_enabled()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $entry = (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['title' => 'Event One'])->create();
+
+        $user = tap(User::make()->makeSuper())->save();
+        $form = tap(Form::make('test')->set('unique_instances', true))->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-1'])->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.index', $form->handle()))
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.entry.0.id', 'event-1')
+            ->assertJsonPath('data.0.entry.0.title', 'Event One')
+            ->assertJsonPath('data.0.entry.0.status', 'published')
+            ->assertJsonPath('data.0.entry.0.edit_url', $entry->editUrl());
+
+        $this->assertContains('entry', collect($response->json('meta.columns'))->pluck('field')->all());
+    }
+
+    #[Test]
+    public function it_shows_the_attached_entry_in_the_entry_column_when_unique_instances_is_enabled_and_the_form_has_an_entry_field()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->data(['title' => 'Event One'])->create();
+
+        $user = tap(User::make()->makeSuper())->save();
+        $form = tap(Form::make('test')->set('unique_instances', true)->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+        FormSubmission::make()->form($form)->data(['entry' => 'Raffle ticket', '_entry' => 'event-1'])->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.index', $form->handle()))
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.entry.0.id', 'event-1');
+    }
+
+    #[Test]
+    public function it_shows_the_entry_field_value_when_unique_instances_is_disabled()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $form = tap(Form::make('test')->formFields([
+            'fields' => [
+                ['handle' => 'entry', 'field' => ['type' => 'short_answer']],
+            ],
+        ]))->save();
+        FormSubmission::make()->form($form)->data(['entry' => 'Raffle ticket', '_entry' => 'event-1'])->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.index', $form->handle()))
+            ->assertSuccessful()
+            ->assertJsonPath('data.0.entry', 'Raffle ticket');
+    }
+
+    #[Test]
+    public function it_doesnt_include_the_entry_column_when_unique_instances_is_disabled()
+    {
+        $user = tap(User::make()->makeSuper())->save();
+        $form = tap(Form::make('test'))->save();
+        FormSubmission::make()->form($form)->data(['foo' => 'bar'])->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.index', $form->handle()))
+            ->assertSuccessful();
+
+        $this->assertNotContains('entry', collect($response->json('meta.columns'))->pluck('field')->all());
+    }
+
+    #[Test]
+    public function it_filters_submissions_by_entry()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        (new EntryFactory)->collection('events')->id('event-1')->slug('event-one')->create();
+        (new EntryFactory)->collection('events')->id('event-2')->slug('event-two')->create();
+
+        $user = tap(User::make()->makeSuper())->save();
+        $form = tap(Form::make('test')->set('unique_instances', true))->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-1'])->save();
+        FormSubmission::make()->form($form)->data(['_entry' => 'event-2'])->save();
+
+        $filters = base64_encode(json_encode(['submission_entry' => ['entry' => 'event-2']]));
+
+        $this
+            ->actingAs($user)
+            ->getJson(cp_route('forms.submissions.index', $form->handle()).'?filters='.$filters)
+            ->assertSuccessful()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.entry.0.id', 'event-2');
     }
 }
