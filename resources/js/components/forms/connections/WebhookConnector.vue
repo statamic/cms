@@ -40,7 +40,7 @@ const showExamplePayload = ref<boolean>(props.modelValue.length === 0);
         <template #header="{ item: webhook, collapsed }">
             <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                 <Icon name="globe-setting" class="size-3.5 me-1 opacity-100! text-purple-600 dark:text-purple-400" aria-hidden="true" />
-                {{ webhook.url || __('New Webhook') }}
+                <span class="st-text-trim-optical-cap">{{ webhook.url || __('New Webhook') }}</span>
             </Badge>
             <ConnectionSummary
                 v-show="collapsed"

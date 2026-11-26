@@ -129,7 +129,7 @@ const shouldBeIndented = (index) => {
                                     @update:model-value="updateConditionJoin(index, $event)"
                                 >
                                     <template #selected-option="{ option }">
-                                        <span class="block truncate">{{ option.short_label }}</span>
+                                        <span class="block st-text-trim-truncate">{{ option.short_label }}</span>
                                     </template>
                                 </Combobox>
                             </div>

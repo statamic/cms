@@ -125,7 +125,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                             :class="firstFieldConfig.iconClass"
                             aria-hidden="true"
                         />
-                        {{ firstFieldConfig.display }}
+                        <span class="st-text-trim-optical-cap">{{ firstFieldConfig.display }}</span>
                     </Badge>
                     <Subheading v-show="collapsed" class="overflow-hidden text-ellipsis whitespace-nowrap text-xs flex items-center gap-1">
                         <template v-if="collapsedSummary">
@@ -167,7 +167,7 @@ const toggleCollapsedState = () => props.collapsed ? emit('expanded') : emit('co
                             :class="firstFieldConfig.iconClass"
                             aria-hidden="true"
                         />
-                        {{ firstFieldConfig.display }}
+                        <span class="st-text-trim-optical-cap">{{ firstFieldConfig.display }}</span>
                     </Badge>
                 </button>
                 <Dropdown align="end">

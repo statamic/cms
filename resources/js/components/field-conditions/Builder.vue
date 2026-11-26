@@ -213,7 +213,7 @@ onMounted(() => {
                                     adaptive-width
                                 >
                                     <template #selected-option="{ option }">
-                                        <span class="block truncate">{{ option.short_label }}</span>
+                                        <span class="block st-text-trim-truncate">{{ option.short_label }}</span>
                                     </template>
                                 </Combobox>
                             </div>
