@@ -77,6 +77,28 @@ class DeleteFakeSubmissionsActionTest extends TestCase
     }
 
     #[Test]
+    public function it_does_not_delete_real_submissions()
+    {
+        $form = $this->makeForm('contact');
+        $user = $this->userWithConfigureFormsPermission();
+
+        $real = $this->makeSubmission($form, ['name' => 'Real', '_fake' => false]);
+        $this->makeSubmission($form, ['name' => 'Fake', '_fake' => true]);
+
+        $this
+            ->actingAs($user)
+            ->post(cp_route('forms.submissions.actions.run', $form->handle()), [
+                'action' => 'delete_fake_submissions',
+                'selections' => [$real->id()],
+                'context' => ['form' => $form->handle()],
+                'values' => [],
+            ])
+            ->assertOk();
+
+        $this->assertEquals(['Real'], $form->querySubmissions()->get()->map->get('name')->all());
+    }
+
+    #[Test]
     public function it_does_not_delete_fake_submissions_without_delete_permission()
     {
         $form = $this->makeForm('contact');
