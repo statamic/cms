@@ -1,4 +1,11 @@
-<span class="star-rating" style="--star-rating-max: {{ max_stars }}; --star-rating-min: {{ min ?? 1 }}; --star-rating-step: {{ step ?? 1 }};">
+<span
+    class="star-rating"
+    style="
+        --star-rating-max: {{ max_stars }};
+        --star-rating-min: {{ min ?? 1 }};
+        --star-rating-step: {{ step ?? 1 }};
+    "
+>
     <input
         id="{{ id }}"
         type="range"

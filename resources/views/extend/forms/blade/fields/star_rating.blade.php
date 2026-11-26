@@ -4,7 +4,14 @@
     $isUnrated = $ratingValue == 0;
 @endphp
 
-<span class="star-rating" style="--star-rating-max: {{ $max_stars ?? 5 }}; --star-rating-min: {{ $min }}; --star-rating-step: {{ $step ?? 1 }};">
+<span
+    class="star-rating"
+    style="
+        --star-rating-max: {{ $max_stars ?? 5 }};
+        --star-rating-min: {{ $min }};
+        --star-rating-step: {{ $step ?? 1 }};
+    "
+>
     <input
         id="{{ $id }}"
         type="range"
