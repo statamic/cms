@@ -64,7 +64,7 @@ return [
     'configure_forms' => 'Formulare konfigurieren',
     'configure_forms_desc' => 'Gewährt volle Berechtigungen rund um Formulare.',
     'edit_forms' => 'Formulare bearbeiten',
-    'edit_forms_desc' => 'Gewährt Zugriff auf alle Formulare, außer auf deren Antworten.',
+    'edit_forms_desc' => 'Gewährt Zugriff auf alle Formulare, nicht aber auf ihre Antworten.',
     'create_forms' => 'Formulare erstellen',
     'delete_forms' => 'Formulare löschen',
     'view_form_submissions' => 'Antworten anzeigen',
