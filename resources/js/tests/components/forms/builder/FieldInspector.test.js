@@ -262,6 +262,26 @@ test('an edit is applied to its field when another field is selected before the 
     expect(other.config.display).toBe('Email');
 });
 
+test('returning to a field shows its own conditions, not the last field\'s', async () => {
+    const method = { _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } };
+    const field = textField({ config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } } });
+    const other = textField({ _id: 'email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+
+    const { inspecting } = setup({ field, fields: [method, other] });
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('if');
+
+    inspecting.value = other;
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('always');
+
+    // The first field's settings are cached now, so the inspector doesn't reload; the builder must still start afresh
+    inspecting.value = field;
+    await flushPromises();
+    expect(wrapper.findComponent(FieldConditionsBuilder).vm.when).toBe('if');
+    expect(field.config.if).toEqual({ method: 'equals phone' });
+});
+
 test('an edit is applied to its field when the inspector closes before the update returns', async () => {
     const field = textField();
     const response = deferred();

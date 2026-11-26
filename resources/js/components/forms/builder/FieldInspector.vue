@@ -378,6 +378,7 @@ onBeforeUnmount(() => {
                     </div>
 
                     <FieldConditionsBuilder
+                        :key="field._id"
                         :config="field.config"
                         :suggestable-fields="suggestableConditionFields"
                         :allow-custom-conditions="false"
@@ -426,7 +427,7 @@ onBeforeUnmount(() => {
                         </a>
                     </div>
 
-                    <FieldValidationBuilder :config="values" @updated="values.validate = $event" />
+                    <FieldValidationBuilder :key="field._id" :config="values" @updated="values.validate = $event" />
                 </div>
             </TabContent>
         </Tabs>
