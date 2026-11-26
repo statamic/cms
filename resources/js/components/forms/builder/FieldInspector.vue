@@ -10,7 +10,7 @@ import FieldConditionsBuilder from '@/components/field-conditions/Builder.vue';
 import FieldNumber from '@/components/forms/FieldNumber.vue';
 import { categories, categoryColorClasses, collectsValue } from './categories';
 import { LOGIC_KEYS, writeFieldConditions } from '@/composables/forms/field-conditions';
-import { addConfigOverrides } from '@/composables/forms/config-overrides';
+import { addConfigOverrides, removeConfigOverrides } from '@/composables/forms/config-overrides';
 import { expandImportedFields } from '@/composables/forms/suggestable-fields';
 import { KEYS as FIELD_CONDITIONS_KEYS } from '@/components/field-conditions/Constants.js';
 import debounce from '@/util/debounce';
@@ -279,10 +279,10 @@ watch(values, () => {
 
     if (!valuesField) return;
 
-    addConfigOverrides(
-        valuesField,
-        changed.filter((key) => key !== 'handle' && !LOGIC_KEYS.includes(key) && differsFromOrigin(key))
-    );
+    const settings = changed.filter((key) => key !== 'handle' && !LOGIC_KEYS.includes(key));
+
+    addConfigOverrides(valuesField, settings.filter((key) => differsFromOrigin(key)));
+    removeConfigOverrides(valuesField, settings.filter((key) => !differsFromOrigin(key)));
 
     pendingUpdate = { field: valuesField, values: clone(values.value) };
     updatePreview();
