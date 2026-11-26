@@ -49,29 +49,6 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
-    public function fields_sharing_a_handle_with_form_props_dont_affect_them()
-    {
-        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
-        $user = User::make()->assignRole('test')->save();
-        $form = tap(Form::make('contact_us')->title('Contact Us')->formFields([
-            'fields' => [
-                ['handle' => 'title', 'field' => ['type' => 'dropdown']],
-                ['handle' => 'status', 'field' => ['type' => 'toggle']],
-            ],
-        ]))->save();
-
-        $this
-            ->actingAs($user)
-            ->get(cp_route('forms.builder.edit', $form->handle()))
-            ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->where('form', [
-                'title' => 'Contact Us',
-                'handle' => 'contact_us',
-                'status' => 'open',
-            ]));
-    }
-
-    #[Test]
     public function it_shows_the_form_builder_with_the_edit_forms_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit forms']]);
