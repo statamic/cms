@@ -99,7 +99,7 @@ const shouldBeIndented = (index) => {
                                 @update:model-value="whenChanged($event)"
                             >
                                 <template #selected-option="{ option }">
-                                    <span class="block overflow-x-clip text-ellipsis whitespace-nowrap st-text-trim-optical">{{ option.value === 'if' ? __('If') : option.label }}</span>
+                                    <span class="block st-text-trim-truncate">{{ option.value === 'if' ? __('If') : option.label }}</span>
                                 </template>
                             </Combobox>
                         </div>
@@ -140,7 +140,7 @@ const shouldBeIndented = (index) => {
                                 @update:model-value="whenChanged($event)"
                             >
                                 <template #selected-option="{ option }">
-                                    <span class="block overflow-x-clip text-ellipsis whitespace-nowrap st-text-trim-optical">{{ option.value === 'if' ? __('If') : option.label }}</span>
+                                    <span class="block st-text-trim-truncate">{{ option.value === 'if' ? __('If') : option.label }}</span>
                                 </template>
                             </Combobox>
                         </div>
@@ -158,7 +158,7 @@ const shouldBeIndented = (index) => {
                                 @update:model-value="updateConditionJoin(index, $event)"
                             >
                                 <template #selected-option="{ option }">
-                                    <span class="block overflow-x-clip text-ellipsis whitespace-nowrap st-text-trim-optical">{{ option.short_label }}</span>
+                                    <span class="block st-text-trim-truncate">{{ option.short_label }}</span>
                                 </template>
                             </Combobox>
                         </div>
