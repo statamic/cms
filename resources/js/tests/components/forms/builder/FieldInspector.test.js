@@ -283,6 +283,25 @@ test('returning to a field shows its own conditions, not the last field\'s', asy
     expect(field.config.if).toEqual({ method: 'equals phone' });
 });
 
+test('returning to a field gives it a fresh validation builder', async () => {
+    const field = textField({ _id: 'rules-phone-id', config: { type: 'text', display: 'Phone', validate: ['email'] } });
+    const other = textField({ _id: 'rules-email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+    const builder = () => wrapper.findComponent({ name: 'FieldValidationBuilder' });
+
+    const { inspecting } = setup({ field, fields: [other] });
+    await flushPromises();
+
+    inspecting.value = other;
+    await flushPromises();
+    const otherBuilder = builder().vm;
+
+    // The first field's settings are cached, so without a key the builder (which reads its rules once) would be reused
+    inspecting.value = field;
+    await flushPromises();
+    expect(builder().vm).not.toBe(otherBuilder);
+    expect(builder().props('config').validate).toEqual(['email']);
+});
+
 test('an edit is applied to its field when the inspector closes before the update returns', async () => {
     const field = textField();
     const response = deferred();
