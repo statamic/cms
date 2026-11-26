@@ -156,10 +156,10 @@ test('settings edits on a linked field are tracked as overrides', async () => {
 test('values a fieldtype normalizes back to the fieldset value are not tracked as overrides', async () => {
     const field = referenceField({ config_overrides: ['placeholder'] });
 
-    setup({ field, originValues: { display: 'Company', placeholder: 'Acme' } });
+    setup({ field, originValues: { display: 'Company', placeholder: 'Acme', input_type: 'text' } });
     await flushPromises();
 
-    wrapper.vm.values.display = 'Company';
+    wrapper.vm.values.input_type = 'text';
     await flushPromises();
 
     expect(field.config_overrides).toEqual(['placeholder']);
