@@ -9,3 +9,5 @@ export type ConnectionContext = {
 };
 
 export const connectionContextKey: InjectionKey<ComputedRef<ConnectionContext>> = Symbol('connection');
+
+export const connectionVisibleValuesKey: InjectionKey<Record<string, Record<string, unknown>>> = Symbol('connectionVisibleValues');

@@ -4,7 +4,7 @@
 // render two of these for the same connection. Use the default slot and pick() instead.
 import { computed, inject } from 'vue';
 import { PublishContainer, PublishFields, PublishFieldsProvider } from '@ui';
-import { connectionContextKey } from './context';
+import { connectionContextKey, connectionVisibleValuesKey } from './context';
 
 type BlueprintField = { handle: string; [key: string]: unknown };
 
@@ -32,6 +32,7 @@ const props = withDefaults(defineProps<{
 });
 
 const context = inject(connectionContextKey, null);
+const connectionVisibleValues = inject(connectionVisibleValuesKey, null);
 
 const connection = computed(() => props.connection ?? context?.value.connection ?? {});
 const blueprint = computed(() => props.blueprint ?? context?.value.blueprint);
@@ -53,6 +54,10 @@ const visibleFields = computed<BlueprintField[]>(() => {
 
     return props.except ? fields.filter((field) => !props.except.includes(field.handle)) : fields;
 });
+
+const updateVisibleValues = (values: Record<string, unknown>): void => {
+    if (connectionVisibleValues) connectionVisibleValues[connection.value.id as string] = values;
+};
 </script>
 
 <template>
@@ -65,6 +70,7 @@ const visibleFields = computed<BlueprintField[]>(() => {
             :extra-values="extraValues"
             :name="containerName"
             :track-dirty-state="false"
+            @update:visible-values="updateVisibleValues"
         >
             <slot name="before" :connection />
             <slot :connection :fields="visibleFields" :pick>
