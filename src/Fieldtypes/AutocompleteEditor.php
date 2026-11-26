@@ -49,6 +49,7 @@ class AutocompleteEditor extends Fieldtype
                 'options' => [
                     'bold' => __('Bold'),
                     'italic' => __('Italic'),
+                    'link' => __('Link'),
                     'h1' => __('Heading 1'),
                     'h2' => __('Heading 2'),
                     'h3' => __('Heading 3'),
@@ -58,7 +59,7 @@ class AutocompleteEditor extends Fieldtype
                     'bulletlist' => __('Unordered List'),
                     'orderedlist' => __('Ordered List'),
                 ],
-                'default' => ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
+                'default' => ['bold', 'italic', 'link', 'h2', 'h3', 'bulletlist', 'orderedlist'],
                 'if' => ['markdown' => 'equals true'],
             ],
             'markdown' => [

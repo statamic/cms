@@ -330,6 +330,39 @@ test('block markers are escaped inside list items', () => {
     expect(markdownToContent(contentToMarkdown(content))).toEqual(content);
 });
 
+test('links round trip, including ones whose destination needs angle brackets', () => {
+    const link = (href, title = null) => ({ type: 'link', attrs: { href, title } });
+
+    const content = [
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'Download the ' },
+                { type: 'text', text: 'brochure', marks: [link('https://example.com/brochure.pdf')] },
+                { type: 'text', text: ', ' },
+                { type: 'text', text: 'price list', marks: [link('https://example.com/price list (2026).pdf')] },
+                { type: 'text', text: ' or ' },
+                { type: 'text', text: 'terms', marks: [link('https://example.com/terms', 'Our "terms"')] },
+                { type: 'text', text: ' for ' },
+                { type: 'mention', attrs: { value: 'first_name' } },
+            ],
+        },
+    ];
+
+    const markdown = contentToMarkdown(content);
+
+    expect(markdown).toBe(
+        'Download the [brochure](https://example.com/brochure.pdf), [price list](<https://example.com/price list (2026).pdf>) or [terms](https://example.com/terms "Our \\"terms\\"") for [[ first_name ]]',
+    );
+    expect(markdownToContent(markdown)).toEqual(content);
+});
+
+test('bare urls stay text, like they do in the sent email', () => {
+    const content = [{ type: 'paragraph', content: [{ type: 'text', text: 'Visit https://example.com' }] }];
+
+    expect(markdownToContent('Visit https://example.com')).toEqual(content);
+});
+
 test.each([
     ['first_name', true],
     ['user.last-name', true],

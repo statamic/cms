@@ -32,7 +32,7 @@ class AutocompleteEditorTest extends TestCase
         $this->assertFalse($fieldtype->config('enable_line_breaks'));
         $this->assertTrue($fieldtype->config('markdown'));
         $this->assertSame(
-            ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
+            ['bold', 'italic', 'link', 'h2', 'h3', 'bulletlist', 'orderedlist'],
             $fieldtype->config('buttons')
         );
     }

@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { expect, test, vi } from 'vitest';
 import AutocompleteEditor from '@/components/ui/AutocompleteEditor/AutocompleteEditor.vue';
 
@@ -121,6 +121,67 @@ test('inserting a mention produces a node with value and label attrs', async () 
             content: [{ type: 'mention', attrs: { value: 'jesse', label: 'Jesse Leite' } }],
         },
     ]);
+});
+
+async function linkSelection(wrapper, url) {
+    await wrapper.find('button[aria-label="Link"]').trigger('click');
+    await flushPromises();
+
+    const input = document.querySelector('[data-ui-popover-content] input');
+    input.value = url;
+    input.dispatchEvent(new Event('input'));
+    input.form.requestSubmit();
+    await flushPromises();
+}
+
+test('the link button links the selected text, assuming a website when there is no scheme', async () => {
+    const wrapper = await mountEditor({ buttons: ['link'] });
+    const { editor } = wrapper.vm;
+
+    editor.commands.insertContent('Get the brochure');
+    editor.commands.setTextSelection({ from: 9, to: 17 });
+    await linkSelection(wrapper, ' example.com/brochure.pdf ');
+
+    expect(editor.getJSON().content).toEqual([
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'Get the ' },
+                {
+                    type: 'text',
+                    text: 'brochure',
+                    marks: [{ type: 'link', attrs: { href: 'https://example.com/brochure.pdf', title: null } }],
+                },
+            ],
+        },
+    ]);
+
+    wrapper.unmount();
+});
+
+test('linking a selection skips the mentions in it', async () => {
+    const wrapper = await mountEditor({ buttons: ['link'] });
+    const { editor } = wrapper.vm;
+    const link = { type: 'link', attrs: { href: 'mailto:hello@example.com', title: null } };
+
+    editor.commands.insertContent([
+        { type: 'text', text: 'Hi ' },
+        { type: 'mention', attrs: { value: 'jesse' } },
+    ]);
+    editor.commands.selectAll();
+    await linkSelection(wrapper, 'mailto:hello@example.com');
+
+    expect(editor.getJSON().content).toEqual([
+        {
+            type: 'paragraph',
+            content: [
+                { type: 'text', text: 'Hi ', marks: [link] },
+                { type: 'mention', attrs: { value: 'jesse', label: null } },
+            ],
+        },
+    ]);
+
+    wrapper.unmount();
 });
 
 function mentionBadge(wrapper) {

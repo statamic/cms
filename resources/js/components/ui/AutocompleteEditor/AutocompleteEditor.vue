@@ -36,7 +36,9 @@ import { __, clone } from '@/bootstrap/globals';
 import { Autocomplete } from './extensions/Autocomplete';
 import { isValidMentionValue } from './mentionToken';
 import { DocumentBlock, DocumentInline } from './extensions/Document';
+import { Link } from './extensions/Link';
 import AutocompleteEditorToolbar from './AutocompleteEditorToolbar.vue';
+import EditorLinkButton from './EditorLinkButton.vue';
 
 const props = defineProps({
     modelValue: { type: Array, default: () => [] },
@@ -44,7 +46,7 @@ const props = defineProps({
     loadOptions: { type: Function, default: null },
     inline: { type: Boolean, default: false },
     enableLineBreaks: { type: Boolean, default: false },
-    buttons: { type: Array, default: () => ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'] },
+    buttons: { type: Array, default: () => ['bold', 'italic', 'link', 'h2', 'h3', 'bulletlist', 'orderedlist'] },
     trigger: { type: String, default: '@' },
     placeholder: { type: String, default: '' },
     readOnly: { type: Boolean, default: false },
@@ -70,6 +72,13 @@ const buttonDefinitions = {
         svg: 'text-italic',
         command: (editor) => editor.chain().focus().toggleItalic().run(),
         active: (editor) => editor.isActive('italic'),
+    },
+    link: {
+        name: 'link',
+        text: __('Link'),
+        svg: 'insert-link',
+        component: EditorLinkButton,
+        active: (editor) => editor.isActive('link'),
     },
     bulletlist: {
         name: 'bulletlist',
@@ -188,6 +197,7 @@ function getExtensions() {
 
     if (enabled.includes('bold')) extensions.push(Bold);
     if (enabled.includes('italic')) extensions.push(Italic);
+    if (enabled.includes('link')) extensions.push(Link);
 
     if (!props.inline) {
         if (enabled.includes('bulletlist')) extensions.push(BulletList);
@@ -296,6 +306,10 @@ watch(
 
 :deep(.ProseMirror :is(em, i)) {
     font-style: italic;
+}
+
+:deep(.ProseMirror a) {
+    @apply break-words text-blue-600 underline dark:text-blue-400;
 }
 
 :deep(.ProseMirror :is(h1, h2, h3, h4, h5, h6)) {
