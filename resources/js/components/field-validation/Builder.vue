@@ -43,7 +43,7 @@
                 <template #option="option">
                     <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
                     <template v-else>
-                        {{ option.display }} <code class="px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
+                        <span class="shrink-0 whitespace-nowrap">{{ option.display }}</span> <code class="min-w-0 truncate px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                     </template>
                 </template>
 
