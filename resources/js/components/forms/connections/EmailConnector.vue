@@ -56,7 +56,7 @@ const recipients = (to: string[] | string): string =>
                 <div class="flex items-center gap-1.75">
                     <Badge size="lg" pill color="white" class="px-3 text-gray-950 gap-1">
                         <Icon name="mail-sign-at" class="size-3.5 me-1 opacity-100! text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                        {{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}
+                        <span class="st-text-trim-optical-cap">{{ email.to?.length ? __('Message sent to :email', { email: recipients(email.to) }) : __('New Email') }}</span>
                     </Badge>
                     <ConnectionSummary
                         v-show="collapsed"

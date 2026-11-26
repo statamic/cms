@@ -105,7 +105,7 @@ const onConditionsUpdated = (conditions) => emit('update:conditions', conditions
                             :class="config.iconClass"
                             aria-hidden="true"
                         />
-                        {{ __(config?.display) || config?.handle }}
+                        <span class="st-text-trim-optical-cap">{{ __(config?.display) || config?.handle }}</span>
                     </Badge>
                     <Badge
                         v-if="collapsed"
