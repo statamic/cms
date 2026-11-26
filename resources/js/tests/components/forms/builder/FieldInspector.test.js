@@ -264,8 +264,9 @@ test('an edit is applied to its field when another field is selected before the 
 
 test('returning to a field shows its own conditions, not the last field\'s', async () => {
     const method = { _id: 'method-id', handle: 'method', fieldtype: 'radio', config: { type: 'radio', display: 'Method', options: { email: 'Email', phone: 'Phone' } } };
-    const field = textField({ config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } } });
-    const other = textField({ _id: 'email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
+    // Ids of their own, so the inspector's module-level cache from earlier tests doesn't cover them
+    const field = textField({ _id: 'stale-phone-id', config: { type: 'text', display: 'Phone', if: { method: 'equals phone' } } });
+    const other = textField({ _id: 'stale-email-id', handle: 'email', config: { type: 'text', display: 'Email' } });
 
     const { inspecting } = setup({ field, fields: [method, other] });
     await flushPromises();
