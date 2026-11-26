@@ -35,6 +35,12 @@ class Checkboxes extends FormFieldtype
                 'value_header' => __('Label').' ('.__('Optional').')',
                 'add_button' => __('Add Option'),
             ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::form-fieldtypes.checkboxes.config.inline.instructions'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
         ];
     }
 

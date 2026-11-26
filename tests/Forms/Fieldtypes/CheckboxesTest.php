@@ -31,6 +31,7 @@ class CheckboxesTest extends TestCase
                 'sports' => 'Sports',
                 'reading' => 'Reading',
             ],
+            'inline' => false,
         ], $fieldtype->toFieldArray());
     }
 
@@ -52,6 +53,7 @@ class CheckboxesTest extends TestCase
                 'music' => 'Music',
                 'sports' => 'Sports',
             ],
+            'inline' => false,
             'default' => ['music'],
         ], $fieldtype->toFieldArray());
     }

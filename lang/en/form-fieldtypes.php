@@ -1,8 +1,10 @@
 <?php
 
 return [
+    'checkboxes.config.inline.instructions' => 'Show the checkboxes in a row.',
     'image_choice.config.aspect_ratio.instructions' => 'Shape of the image area for each option.',
     'image_choice.config.columns.instructions' => 'How many options appear per row.',
+    'multi_choice.config.inline.instructions' => 'Show the radio buttons in a row.',
     'opinion_scale.config.high_label.instructions' => 'Shown below the highest value.',
     'opinion_scale.config.low_label.instructions' => 'Shown below the lowest value.',
     'opinion_scale.config.middle_label.instructions' => 'Shown below the middle value.',
@@ -14,4 +16,5 @@ return [
     'upload.config.max_files.instructions' => 'The maximum number of files that may be uploaded.',
     'upload.config.min_files.instructions' => 'The minimum number of files that must be uploaded.',
     'upload.config.store.instructions' => 'Store uploaded files permanently in an asset container.',
+    'yes_no.config.inline.instructions' => 'Show the radio buttons in a row.',
 ];

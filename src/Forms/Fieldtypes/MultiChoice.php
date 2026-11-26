@@ -36,6 +36,12 @@ class MultiChoice extends FormFieldtype
                     'type' => 'text',
                 ],
             ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::form-fieldtypes.multi_choice.config.inline.instructions'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
         ];
     }
 

@@ -86,11 +86,11 @@ class GroupTest extends TestCase
                 ['type' => 'checkboxes', 'options' => [
                     ['key' => 'a', 'value' => 'Apple'],
                     ['key' => 'b', 'value' => 'Banana', 'hidden' => true],
-                ]],
+                ], 'inline' => false],
             ],
             'checkboxes (core options)' => [
                 ['type' => 'checkboxes', 'options' => ['a' => 'Apple', 'b' => 'Banana']],
-                ['type' => 'checkboxes', 'options' => ['a' => 'Apple', 'b' => 'Banana']],
+                ['type' => 'checkboxes', 'options' => ['a' => 'Apple', 'b' => 'Banana'], 'inline' => false],
             ],
             'dictionary' => [
                 ['type' => 'dictionary', 'dictionary' => 'countries'],

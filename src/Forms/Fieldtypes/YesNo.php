@@ -23,7 +23,14 @@ class YesNo extends FormFieldtype
 
     public function configFieldItems(): array
     {
-        return [];
+        return [
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::form-fieldtypes.yes_no.config.inline.instructions'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
+        ];
     }
 
     public function toFieldArray(): array
