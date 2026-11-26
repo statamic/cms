@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
+use Statamic\Events\SubmissionFinalizing;
 use Statamic\Exceptions\FormRestrictedException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Asset;
@@ -18,6 +19,7 @@ use Statamic\Forms\Logic\PageLogic;
 use Statamic\Rules\AllowedFile;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SubmitForm
 {
@@ -105,7 +107,15 @@ class SubmitForm
 
                 throw_unless($accepted, new SilentFormFailureException);
 
+                $response = SubmissionFinalizing::dispatch($this->submission);
+
                 $createdAssets->deleteTemporaryFiles();
+
+                if ($response === false || $response instanceof RedirectResponse) {
+                    $this->submission->save();
+
+                    return new SubmissionResult($this->submission, redirect: $response ?: null);
+                }
             }
         } catch (ValidationException|SilentFormFailureException $e) {
             $createdAssets?->revert();

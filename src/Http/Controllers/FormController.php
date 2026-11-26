@@ -56,9 +56,9 @@ class FormController extends Controller
 
             $result = $action->submit($request->all(), $request->allFiles());
 
-            $result->isFinalized()
-                ? $this->forgetPartialSubmission($form)
-                : $this->setPartialSubmission($form, $result->submission);
+            $result->nextPage
+                ? $this->setPartialSubmission($form, $result->submission)
+                : $this->forgetPartialSubmission($form);
 
             return $this->formSuccess($params, $result);
         } catch (FormRestrictedException $e) {
@@ -140,12 +140,19 @@ class FormController extends Controller
     private function formSuccess(array $params, SubmissionResult $result, bool $silentFailure = false)
     {
         $submission = $result->submission;
+        $wantsJson = request()->ajax() || request()->wantsJson();
 
-        $redirect = $result->nextPage
-            ? Uri::of($this->previousUrl())->withQuery(['page' => $result->nextPage])->__toString()
-            : $this->formSuccessRedirect($params, $result->submission);
+        if ($result->redirect && ! $wantsJson) {
+            return $result->redirect;
+        }
 
-        if (request()->ajax() || request()->wantsJson()) {
+        $redirect = match (true) {
+            $result->redirect !== null => $result->redirect->getTargetUrl(),
+            $result->nextPage !== null => Uri::of($this->previousUrl())->withQuery(['page' => $result->nextPage])->__toString(),
+            default => $this->formSuccessRedirect($params, $result->submission),
+        };
+
+        if ($wantsJson) {
             return response([
                 'success' => true,
                 'submission_created' => ! $silentFailure,
