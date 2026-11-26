@@ -6,6 +6,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Statamic\CP\Column;
 use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
+use function Statamic\trans as __;
+
 class Submissions extends ResourceCollection
 {
     use HasRequestedColumns;
@@ -33,7 +35,17 @@ class Submissions extends ResourceCollection
     {
         $columns = $this->blueprint
             ->columns()
-            ->ensurePrepended(Column::make('datestamp')->label('Date'));
+            ->ensurePrepended(Column::make('datestamp')->label(__('Date')));
+
+        $status = Column::make('status')
+            ->label(__('Status'))
+            ->listable(true)
+            ->visible(true)
+            ->defaultVisibility(true)
+            ->defaultOrder($columns->count() + 1)
+            ->sortable(false);
+
+        $columns->put('status', $status);
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);

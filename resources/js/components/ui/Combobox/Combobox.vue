@@ -47,6 +47,8 @@ interface Props {
     /** When `true`, the options dropdown will close after selecting an option. */
     closeOnSelect?: boolean;
     disabled?: boolean;
+    /** When `true`, a `taggable` combobox only shows its search input while the dropdown is open, so the selected option is displayed while it's closed. */
+    hideInputWhenClosed?: boolean;
     /** When `true`, the focus outline will be more discrete. */
     discreteFocusOutline?: boolean;
     /** Icon name. [Browse available icons](/?path=/story/components-icon--all-icons) */
@@ -103,6 +105,7 @@ const props = withDefaults(defineProps<Props>(), {
     closeOnSelect: undefined,
     disabled: false,
     discreteFocusOutline: false,
+    hideInputWhenClosed: false,
     icon: null,
     id: null,
     ignoreFilter: false,
@@ -278,7 +281,10 @@ const shouldShowLimitIndicator = computed(() => props.multiple && props.maxSelec
 
 const shouldShowInput = computed(() => {
     if (!props.searchable) return false;
-    if (props.taggable) return true;
+
+    if (props.taggable) {
+        return props.hideInputWhenClosed ? dropdownOpen.value : true;
+    }
 
     return dropdownOpen.value || props.modelValue === null || (props.multiple && props.placeholder);
 });

@@ -4,12 +4,13 @@ namespace Tests\Feature\GraphQL;
 
 use Closure;
 use Facades\Statamic\API\ResourceAuthorizer;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\GraphQL\CastableToValidationString;
-use Statamic\Facades\Blueprint;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Form;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -25,8 +26,6 @@ class FormTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        BlueprintRepository::partialMock();
 
         Form::all()->each->delete();
     }
@@ -113,22 +112,24 @@ GQL;
     #[Test]
     public function it_queries_the_fields()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'text',
-                'display' => 'Your Name',
-                'instructions' => 'Enter your name',
-                'placeholder' => 'Type here...',
-                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
-                'width' => 50,
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'short_answer',
+                            'display' => 'Your Name',
+                            'instructions' => 'Enter your name',
+                            'placeholder' => 'Type here...',
+                            'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                            'width' => 50,
+                        ]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'width' => 33, 'unless' => ['subject' => 'equals spam']]],
+                    ],
+                ],
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House'], 'if' => ['name' => 'not empty']],
-            'message' => ['type' => 'textarea', 'width' => 33, 'unless' => ['subject' => 'equals spam']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -196,15 +197,17 @@ GQL;
     #[Test]
     public function it_queries_the_validation_rules()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => ['type' => 'text', 'validate' => ['required']],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'validate' => ['required_if:select_field,disco']],
-        ]);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'validate' => ['required']]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'validate' => ['required_if:select_field,disco']]],
+                    ],
+                ],
+            ],
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -232,29 +235,26 @@ GQL;
     #[Test]
     public function it_queries_the_sections()
     {
-        Form::make('contact')->title('Contact Us')->save();
-
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'text',
-                'display' => 'Your Name',
-                'instructions' => 'Enter your name',
-                'placeholder' => 'Type here...',
-                'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
-                'width' => 50,
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'display' => 'My Section',
+                    'instructions' => 'The section instructions',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'short_answer',
+                            'display' => 'Your Name',
+                            'instructions' => 'Enter your name',
+                            'placeholder' => 'Type here...',
+                            'invalid' => 'This isnt in the fieldtypes config fields so it shouldnt be output',
+                            'width' => 50,
+                        ]],
+                        ['handle' => 'subject', 'field' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']]],
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'width' => 33]],
+                    ],
+                ],
             ],
-            'subject' => ['type' => 'select', 'options' => ['disco' => 'Disco', 'house' => 'House']],
-            'message' => ['type' => 'textarea', 'width' => 33],
-        ]);
-
-        // Set section display and instructions. You wouldn't really do this for a form blueprint,
-        // but this is just to test the section type which doesn't get tested anywhere else.
-        $contents = $blueprint->contents();
-        $contents['tabs']['main']['sections'][0]['display'] = 'My Section';
-        $contents['tabs']['main']['sections'][0]['instructions'] = 'The section instructions';
-        $blueprint->setContents($contents);
-
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        ])->save();
 
         $query = <<<'GQL'
 {
@@ -322,27 +322,311 @@ GQL;
     }
 
     #[Test]
-    public function it_returns_string_based_validation_rules_for_mimes_mimetypes_dimension_size_and_image()
+    public function it_queries_the_pages()
     {
-        Form::make('contact')->title('Contact Us')->save();
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
 
-        $blueprint = Blueprint::makeFromFields([
-            'name' => [
-                'type' => 'assets',
-                'display' => 'Asset',
-                'validate' => [
-                    'mimes:image/jpeg,image/png',
-                    'mimetypes:image/jpeg,image/png',
-                    'dimensions:1024',
-                    'size:1000',
-                    'image:jpeg',
-                    'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
-                    'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
+        Form::make('contact')->title('Contact Us')->formFields([
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                            ],
+                        ],
+                    ],
                 ],
             ],
-        ]);
+        ])->save();
 
-        BlueprintRepository::shouldReceive('find')->with('forms.contact')->andReturn($blueprint);
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+        }
+        pages {
+            id
+            display
+            instructions
+            sections {
+                display
+                instructions
+                fields {
+                    handle
+                    type
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => [
+                        ['display' => 'Your Details'],
+                        ['display' => null],
+                    ],
+                    'pages' => [
+                        [
+                            'id' => 'about_you',
+                            'display' => 'About You',
+                            'instructions' => 'Tell us who you are',
+                            'sections' => [
+                                [
+                                    'display' => 'Your Details',
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'name', 'type' => 'text'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 'your_message',
+                            'display' => null,
+                            'instructions' => null,
+                            'sections' => [
+                                [
+                                    'display' => null,
+                                    'instructions' => null,
+                                    'fields' => [
+                                        ['handle' => 'message', 'type' => 'textarea'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_pages_of_a_single_page_form()
+    {
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        pages {
+            id
+            display
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'pages' => [
+                        [
+                            'id' => 'main',
+                            'display' => null,
+                            'sections' => [
+                                ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_expands_imported_fieldset_sections()
+    {
+        Fieldset::make('address')->setContents([
+            'sections' => [
+                [
+                    'display' => 'Street',
+                    'fields' => [
+                        ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                [
+                    'display' => 'Location',
+                    'fields' => [
+                        ['handle' => 'city', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'address', 'prefix' => 'home_'],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        sections {
+            display
+            fields {
+                handle
+            }
+        }
+        pages {
+            sections {
+                display
+                fields {
+                    handle
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $expected = [
+            ['display' => 'Your Details', 'fields' => [['handle' => 'name']]],
+            ['display' => 'Street', 'fields' => [['handle' => 'home_street']]],
+            ['display' => 'Location', 'fields' => [['handle' => 'home_city']]],
+        ];
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'form' => [
+                    'sections' => $expected,
+                    'pages' => [
+                        ['sections' => $expected],
+                    ],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_queries_the_access_restrictions()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Form::make('contact')->save();
+        Form::make('members')->data(['require_login' => true, 'require_login_message' => 'Members only.'])->save();
+        Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+        $limited = tap(Form::make('limited')->data(['submission_limit' => 1]))->save();
+        $limited->makeSubmission()->save();
+
+        $query = <<<'GQL'
+{
+    forms {
+        handle
+        status
+        require_login
+        closed_message
+        require_login_message
+    }
+}
+GQL;
+
+        $closed = 'This form is no longer accepting submissions.';
+        $login = 'You must be logged in to submit this form.';
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'forms' => [
+                    ['handle' => 'applications', 'status' => 'closed', 'require_login' => false, 'closed_message' => 'Applications have closed.', 'require_login_message' => $login],
+                    ['handle' => 'contact', 'status' => 'open', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'limited', 'status' => 'limit_reached', 'require_login' => false, 'closed_message' => $closed, 'require_login_message' => $login],
+                    ['handle' => 'members', 'status' => 'open', 'require_login' => true, 'closed_message' => $closed, 'require_login_message' => 'Members only.'],
+                ],
+            ]]);
+    }
+
+    #[Test]
+    public function it_cannot_query_the_restriction_message()
+    {
+        Form::make('contact')->save();
+
+        $query = <<<'GQL'
+{
+    form(handle: "contact") {
+        restriction_message
+    }
+}
+GQL;
+
+        $this
+            ->post('/graphql', ['query' => $query])
+            ->assertSee('Cannot query field \"restriction_message\" on type \"Form\"', false);
+    }
+
+    #[Test]
+    public function it_returns_string_based_validation_rules_for_mimes_mimetypes_dimension_size_and_image()
+    {
+        Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => 'name', 'field' => [
+                            'type' => 'assets',
+                            'display' => 'Asset',
+                            'validate' => [
+                                'mimes:image/jpeg,image/png',
+                                'mimetypes:image/jpeg,image/png',
+                                'dimensions:1024',
+                                'size:1000',
+                                'image:jpeg',
+                                'new Tests\Feature\GraphQL\TestValidationRuleWithToString',
+                                'new Tests\Feature\GraphQL\TestValidationRuleWithoutToString',
+                            ],
+                        ]],
+                    ],
+                ],
+            ],
+        ])->save();
 
         $query = <<<'GQL'
 {

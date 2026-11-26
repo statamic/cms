@@ -10,6 +10,8 @@ use Statamic\Forms\Form;
 use Statamic\Statamic;
 
 /**
+ * @deprecated Forms always have a blueprint.
+ *
  * @phpstan-consistent-constructor
  */
 class BlueprintUndefinedException extends LogicException implements ProvidesSolution

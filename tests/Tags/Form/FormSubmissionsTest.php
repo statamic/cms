@@ -3,6 +3,7 @@
 namespace Tests\Tags\Form;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\Form;
 
 class FormSubmissionsTest extends FormTestCase
 {
@@ -36,5 +37,42 @@ EOT
 
         $this->assertStringContainsString('Email: san@holo.com<br>Message: foo', $output);
         $this->assertStringContainsString('Email: foba@bett.com<br>Message: bar', $output);
+    }
+
+    #[Test]
+    public function it_only_renders_finalized_submissions_by_default()
+    {
+        $this->createSubmissions();
+
+        $output = $this->tag('{{ form:submissions in="contact" }}[{{ message }}]{{ /form:submissions }}');
+
+        $this->assertEquals('[finalized]', trim($output));
+    }
+
+    #[Test]
+    public function it_renders_submissions_filtered_by_status()
+    {
+        $this->createSubmissions();
+
+        $this->assertEquals('[partial]', trim($this->tag('{{ form:submissions in="contact" status:is="partial" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[finalized]', trim($this->tag('{{ form:submissions in="contact" status:is="finalized" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[spam]', trim($this->tag('{{ form:submissions in="contact" status:is="spam" }}[{{ message }}]{{ /form:submissions }}')));
+        $this->assertEquals('[finalized][partial][spam]', trim($this->tag('{{ form:submissions in="contact" status:is="any" sort="message" }}[{{ message }}]{{ /form:submissions }}')));
+    }
+
+    #[Test]
+    public function a_condition_on_a_field_named_partial_still_only_renders_finalized_submissions()
+    {
+        $this->createSubmissions();
+
+        $this->assertEquals('[finalized]', trim($this->tag('{{ form:submissions in="contact" partial:doesnt_exist="true" }}[{{ message }}]{{ /form:submissions }}')));
+    }
+
+    private function createSubmissions()
+    {
+        $form = Form::find('contact');
+        $form->makeSubmission()->data(['email' => 'san@holo.com', 'message' => 'finalized'])->save();
+        $form->makeSubmission()->data(['email' => 'foba@bett.com', 'message' => 'partial'])->asPartial()->save();
+        $form->makeSubmission()->data(['email' => 'spam@bot.com', 'message' => 'spam'])->markAsSpam()->save();
     }
 }

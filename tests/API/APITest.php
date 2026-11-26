@@ -2,8 +2,10 @@
 
 namespace Tests\API;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\CP\LivePreview;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -280,6 +282,248 @@ class APITest extends TestCase
 
         $this->assertEndpointNotFound('/api/asset-containers/main');
         $this->assertEndpointSuccessful('/api/asset-containers/avatars');
+    }
+
+    #[Test]
+    public function it_queries_form_sections()
+    {
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->title('Contact Us')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'instructions' => 'Tell us who you are',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                    ],
+                ],
+                [
+                    'fields' => [
+                        ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message', 'width' => 50]],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.sections', [
+                [
+                    'display' => 'Your Details',
+                    'instructions' => 'Tell us who you are',
+                    'fields' => [
+                        'name' => ['type' => 'text', 'display' => 'Your Name', 'handle' => 'name', 'width' => 100],
+                    ],
+                ],
+                [
+                    'display' => null,
+                    'instructions' => null,
+                    'fields' => [
+                        'message' => ['type' => 'textarea', 'display' => 'Message', 'width' => 50, 'handle' => 'message'],
+                    ],
+                ],
+            ])
+            ->assertJsonCount(1, 'data.pages')
+            ->assertJsonPath('data.pages.0.id', 'main')
+            ->assertJsonPath('data.pages.0.display', null)
+            ->assertJsonPath('data.pages.0.sections.*.display', ['Your Details', null]);
+    }
+
+    #[Test]
+    public function it_expands_imported_fieldset_sections_in_form_sections_and_pages()
+    {
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Fieldset::make('address')->setContents([
+            'sections' => [
+                [
+                    'display' => 'Street',
+                    'fields' => [
+                        ['handle' => 'street', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                [
+                    'display' => 'Location',
+                    'instructions' => 'Where are you?',
+                    'fields' => [
+                        ['handle' => 'city', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        Facades\Form::make('contact')->formFields([
+            'sections' => [
+                [
+                    'display' => 'Your Details',
+                    'fields' => [
+                        ['handle' => 'name', 'field' => ['type' => 'short_answer']],
+                        ['import' => 'address', 'prefix' => 'home_', 'config' => ['city' => ['display' => 'Home City']]],
+                        ['handle' => 'email', 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $expected = [
+            [
+                'display' => 'Your Details',
+                'instructions' => null,
+                'fields' => [
+                    'name' => ['type' => 'text', 'handle' => 'name', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Street',
+                'instructions' => null,
+                'fields' => [
+                    'home_street' => ['type' => 'text', 'handle' => 'home_street', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Location',
+                'instructions' => 'Where are you?',
+                'fields' => [
+                    'home_city' => ['type' => 'text', 'display' => 'Home City', 'handle' => 'home_city', 'width' => 100],
+                ],
+            ],
+            [
+                'display' => 'Your Details',
+                'instructions' => null,
+                'fields' => [
+                    'email' => ['type' => 'text', 'handle' => 'email', 'width' => 100],
+                ],
+            ],
+        ];
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.sections', $expected)
+            ->assertJsonPath('data.pages.0.sections', $expected);
+    }
+
+    #[Test]
+    public function it_queries_form_pages()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->title('Contact Us')->formFields([
+            'pages' => [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'fields' => [
+                                ['handle' => 'name', 'field' => ['type' => 'short_answer', 'display' => 'Your Name']],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'sections' => [
+                        [
+                            'fields' => [
+                                ['handle' => 'message', 'field' => ['type' => 'long_answer', 'display' => 'Message']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ])->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.pages', [
+                [
+                    'id' => 'about_you',
+                    'display' => 'About You',
+                    'instructions' => 'Tell us who you are',
+                    'sections' => [
+                        [
+                            'display' => 'Your Details',
+                            'instructions' => null,
+                            'fields' => [
+                                'name' => ['type' => 'text', 'display' => 'Your Name', 'handle' => 'name', 'width' => 100],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'id' => 'your_message',
+                    'display' => null,
+                    'instructions' => null,
+                    'sections' => [
+                        [
+                            'display' => null,
+                            'instructions' => null,
+                            'fields' => [
+                                'message' => ['type' => 'textarea', 'display' => 'Message', 'handle' => 'message', 'width' => 100],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonPath('data.sections.*.display', ['Your Details', null]);
+    }
+
+    #[Test]
+    public function it_queries_form_access_restrictions()
+    {
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+        Carbon::setTestNow('2026-07-06 12:00:00');
+
+        Facades\Config::set('statamic.api.resources.forms', true);
+
+        Facades\Form::make('contact')->save();
+        Facades\Form::make('members')->data(['require_login' => true, 'require_login_message' => 'Members only.'])->save();
+        Facades\Form::make('applications')->data(['close_date' => '2026-07-01 09:00', 'closed_message' => 'Applications have closed.'])->save();
+        $limited = tap(Facades\Form::make('limited')->data(['submission_limit' => 1]))->save();
+        $limited->makeSubmission()->save();
+
+        $this
+            ->get('/api/forms/contact')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonPath('data.require_login_message', 'You must be logged in to submit this form.')
+            ->assertJsonMissingPath('data.restriction_message');
+
+        $this
+            ->get('/api/forms/members')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.require_login', true)
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonPath('data.require_login_message', 'Members only.')
+            ->assertJsonMissingPath('data.restriction_message');
+
+        $this
+            ->get('/api/forms/applications')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'closed')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.closed_message', 'Applications have closed.')
+            ->assertJsonPath('data.require_login_message', 'You must be logged in to submit this form.')
+            ->assertJsonMissingPath('data.restriction_message');
+
+        $this
+            ->get('/api/forms/limited')
+            ->assertSuccessful()
+            ->assertJsonPath('data.status', 'limit_reached')
+            ->assertJsonPath('data.require_login', false)
+            ->assertJsonPath('data.closed_message', 'This form is no longer accepting submissions.')
+            ->assertJsonMissingPath('data.restriction_message');
     }
 
     #[Test]

@@ -79,6 +79,84 @@ class ExportSubmissionsTest extends TestCase
             ->assertDontSee('email');
     }
 
+    #[Test]
+    public function it_only_exports_finalized_submissions()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+        FormSubmission::make()->form($form)->id('1700000005')->data(['name' => 'Echo', '_marked_spam_at' => 1700000000])->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv')
+            ->assertOk();
+
+        $this->assertEqualsCanonicalizing(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_only_exports_finalized_submissions_when_sorted()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+        FormSubmission::make()->form($form)->id('1700000005')->data(['name' => 'Echo', '_marked_spam_at' => 1700000000])->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv', ['sort' => 'name', 'order' => 'asc'])
+            ->assertOk();
+
+        $this->assertEquals(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_only_exports_finalized_submissions_with_the_listings_default_sort()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+        FormSubmission::make()->form($form)->id('1700000005')->data(['name' => 'Echo', '_marked_spam_at' => 1700000000])->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv', ['sort' => 'datestamp', 'order' => 'desc'])
+            ->assertOk();
+
+        $this->assertEquals(['Bravo', 'Alice', 'Charlie'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_only_exports_finalized_submissions_when_filtered_without_a_status_filter()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+
+        $response = $this
+            ->actingAs(tap(User::make()->makeSuper())->save())
+            ->export($form, 'csv', ['sort' => 'name', 'search' => 'a'])
+            ->assertOk();
+
+        $this->assertEquals(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($response->getContent()));
+    }
+
+    #[Test]
+    public function it_exports_submissions_filtered_by_status()
+    {
+        $form = $this->createFormWithSubmissions();
+        FormSubmission::make()->form($form)->id('1700000004')->data(['name' => 'Delta'])->asPartial()->save();
+        FormSubmission::make()->form($form)->id('1700000005')->data(['name' => 'Echo', '_marked_spam_at' => 1700000000])->save();
+
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        $finalized = $this->export($form, 'csv', ['sort' => 'name', 'filters' => base64_encode(json_encode(['submission_status' => ['status' => 'finalized']]))]);
+        $this->assertEquals(['Alice', 'Bravo', 'Charlie'], $this->namesFromCsv($finalized->getContent()));
+
+        $partial = $this->export($form, 'csv', ['sort' => 'name', 'filters' => base64_encode(json_encode(['submission_status' => ['status' => 'partial']]))]);
+        $this->assertEquals(['Delta'], $this->namesFromCsv($partial->getContent()));
+
+        $spam = $this->export($form, 'csv', ['sort' => 'name', 'filters' => base64_encode(json_encode(['submission_status' => ['status' => 'spam']]))]);
+        $this->assertEquals(['Echo'], $this->namesFromCsv($spam->getContent()));
+    }
+
     private function createFormWithSubmissions()
     {
         $blueprint = Blueprint::makeFromFields(['name' => ['type' => 'text']]);

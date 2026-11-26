@@ -2,6 +2,7 @@
 
 namespace Tests\Actions;
 
+use Facades\Statamic\Console\Processes\Composer;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Actions\DuplicateForm;
 use Statamic\Facades\Form;
@@ -32,14 +33,14 @@ class DuplicateFormTest extends TestCase
     #[Test]
     public function it_duplicates_a_form()
     {
-        Form::make('a')->title('Original A')->honeypot('a')->save();
-        Form::make('b')->title('Original B')->honeypot('b')->save();
-        Form::make('c')->title('Original C')->honeypot('c')->save();
+        Form::make('a')->title('Original A')->honeypot('a')->formFields($this->fields('name'))->save();
+        Form::make('b')->title('Original B')->honeypot('b')->formFields($this->fields('email'))->save();
+        Form::make('c')->title('Original C')->honeypot('c')->formFields($this->fields('message'))->save();
 
         $this->assertEquals([
-            'a' => ['title' => 'Original A', 'honeypot' => 'a'],
-            'b' => ['title' => 'Original B', 'honeypot' => 'b'],
-            'c' => ['title' => 'Original C', 'honeypot' => 'c'],
+            'a' => ['title' => 'Original A', 'honeypot' => 'a', 'fields' => $this->fields('name')],
+            'b' => ['title' => 'Original B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
+            'c' => ['title' => 'Original C', 'honeypot' => 'c', 'fields' => $this->fields('message')],
         ], $this->formData());
 
         (new DuplicateForm)->run(
@@ -48,11 +49,38 @@ class DuplicateFormTest extends TestCase
         );
 
         $this->assertEquals([
-            'a' => ['title' => 'Original A', 'honeypot' => 'a'],
-            'b' => ['title' => 'Original B', 'honeypot' => 'b'],
-            'c' => ['title' => 'Original C', 'honeypot' => 'c'],
-            'd' => ['title' => 'Duplicate of B', 'honeypot' => 'b'],
+            'a' => ['title' => 'Original A', 'honeypot' => 'a', 'fields' => $this->fields('name')],
+            'b' => ['title' => 'Original B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
+            'c' => ['title' => 'Original C', 'honeypot' => 'c', 'fields' => $this->fields('message')],
+            'd' => ['title' => 'Duplicate of B', 'honeypot' => 'b', 'fields' => $this->fields('email')],
         ], $this->formData());
+    }
+
+    #[Test]
+    public function it_is_visible_with_statamic_pro()
+    {
+        config(['statamic.editions.pro' => true]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->assertTrue((new DuplicateForm)->visibleTo(Form::make('a')));
+    }
+
+    #[Test]
+    public function it_is_visible_with_forms_pro()
+    {
+        config(['statamic.editions.pro' => false]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(true);
+
+        $this->assertTrue((new DuplicateForm)->visibleTo(Form::make('a')));
+    }
+
+    #[Test]
+    public function it_is_not_visible_without_statamic_pro_or_forms_pro()
+    {
+        config(['statamic.editions.pro' => false]);
+        Composer::shouldReceive('isInstalled')->with('statamic/forms-pro')->andReturn(false);
+
+        $this->assertFalse((new DuplicateForm)->visibleTo(Form::make('a')));
     }
 
     #[Test]
@@ -81,6 +109,20 @@ class DuplicateFormTest extends TestCase
         return Form::all()->mapWithKeys(fn ($form) => [$form->handle() => [
             'title' => $form->title(),
             'honeypot' => $form->honeypot(),
+            'fields' => $form->formFields()->contents(),
         ]])->all();
+    }
+
+    private function fields(string $handle)
+    {
+        return [
+            'sections' => [
+                [
+                    'fields' => [
+                        ['handle' => $handle, 'field' => ['type' => 'short_answer']],
+                    ],
+                ],
+            ],
+        ];
     }
 }
