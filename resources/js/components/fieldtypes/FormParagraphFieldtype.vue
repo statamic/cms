@@ -9,5 +9,6 @@ defineExpose(expose);
 </script>
 
 <template>
-    <Text :text="__(config.text)" />
+    <Text v-if="config.text" :text="__(config.text)" />
+    <Text v-else variant="subtle" :text="__('Empty paragraph')" />
 </template>
