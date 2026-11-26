@@ -41,7 +41,7 @@
                 @added="ifSearchNotFoundAddCustom"
             >
                 <template #option="option">
-                    <template v-if="option.create">{{ __('Add ":value"', { value: option.value }) }}</template>
+                    <span v-if="option.create" class="truncate">{{ __('Add ":value"', { value: option.value }) }}</span>
                     <template v-else>
                         <span class="shrink-0 whitespace-nowrap">{{ option.display }}</span> <code class="min-w-0 truncate px-1 rounded-sm text-[0.8rem]">{{ valueWithoutTrailingColon(option.value) }}</code>
                     </template>
