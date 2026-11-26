@@ -309,6 +309,10 @@ class Email extends Connector
     // Like the assets fieldtype, a site with a single container uses it without asking.
     private function linkableAssetContainer(): ?string
     {
+        if ($container = config('statamic.forms.email_link_container')) {
+            return $container;
+        }
+
         $containers = AssetContainer::all();
 
         return $containers->count() === 1 ? $containers->first()->handle() : null;

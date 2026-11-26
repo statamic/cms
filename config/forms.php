@@ -38,6 +38,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Email Link Container
+    |--------------------------------------------------------------------------
+    |
+    | The asset container people can link to from an email's message. When
+    | null, the only container is used, provided there's exactly one.
+    |
+    */
+
+    'email_link_container' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Send Email Job
     |--------------------------------------------------------------------------
     |
