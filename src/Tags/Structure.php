@@ -295,11 +295,11 @@ class Structure extends Tags
             return false;
         }
 
-        if ($url === '#') {
+        if (Str::startsWith($url, '#')) {
             return false;
         }
 
-        if ($this->siteAbsoluteUrl === $absoluteUrl) {
+        if ($this->siteAbsoluteUrl === URL::removeQueryAndFragment($absoluteUrl)) {
             return false;
         }
 
