@@ -119,6 +119,10 @@ export default {
         config: {
             required: true,
         },
+        showUniqueValueRules: {
+            type: Boolean,
+            default: true,
+        },
     },
 
     data() {
@@ -148,6 +152,7 @@ export default {
             return clone(RULES)
                 .filter((rule) => (rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true))
                 .filter((rule) => (rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true))
+                .filter((rule) => this.showUniqueValueRules || !rule.uniqueValue)
                 .map((rule) => {
                     return this.prepareRenderableRule(rule);
                 });

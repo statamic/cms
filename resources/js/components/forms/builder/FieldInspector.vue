@@ -426,7 +426,7 @@ onBeforeUnmount(() => {
                         </a>
                     </div>
 
-                    <FieldValidationBuilder :config="values" @updated="values.validate = $event" />
+                    <FieldValidationBuilder :config="values" :show-unique-value-rules="false" @updated="values.validate = $event" />
                 </div>
             </TabContent>
         </Tabs>

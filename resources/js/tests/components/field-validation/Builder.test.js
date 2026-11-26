@@ -10,9 +10,9 @@ globalThis.__ = (key) => key;
 globalThis.__n = (key) => key;
 globalThis.clone = (value) => structuredClone(value);
 
-const mountBuilder = () =>
+const mountBuilder = (props = {}) =>
     mount(Builder, {
-        props: { config: {} },
+        props: { config: {}, ...props },
         global: {
             mocks: {
                 $config: { get: () => '12.0.0' },
@@ -47,4 +47,12 @@ test('an unfinished rule is not committed when the input loses focus', async () 
     await wrapper.find('input').trigger('focusout');
 
     expect(wrapper.emitted('updated')?.length ?? 0).toBe(emitsBefore);
+});
+
+test('unique value rules can be hidden', () => {
+    const uniqueValueRules = (wrapper) =>
+        wrapper.vm.allRules.map((rule) => rule.value).filter((value) => value.includes('\\Statamic\\Rules\\Unique'));
+
+    expect(uniqueValueRules(mountBuilder())).toHaveLength(3);
+    expect(uniqueValueRules(mountBuilder({ showUniqueValueRules: false }))).toEqual([]);
 });
