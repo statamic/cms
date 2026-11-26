@@ -314,14 +314,17 @@ export default [
     {
         label: 'Unique Entry Value',
         value: 'new \\Statamic\\Rules\\UniqueEntryValue({collection}, {id}, {site})',
+        uniqueValue: true,
     },
     {
         label: 'Unique Term Value',
         value: 'new \\Statamic\\Rules\\UniqueTermValue({taxonomy}, {id}, {site})',
+        uniqueValue: true,
     },
     {
         label: 'Unique User Value',
         value: 'new \\Statamic\\Rules\\UniqueUserValue({id})',
+        uniqueValue: true,
     },
     {
         label: 'URL',
