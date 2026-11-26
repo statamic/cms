@@ -78,7 +78,7 @@
                             size="lg"
                             class="*:st-text-trim-optical max-w-full whitespace-normal! py-1.25 supports-[text-box:ex_alphabetic]:py-2.5 rounded-2xl!"
                         >
-                            <span class="min-w-0 break-all leading-[1.125rem]">{{ rule }}</span>
+                            <span class="min-w-0 break-all font-mono text-[0.8125rem] leading-[1.125rem]">{{ rule }}</span>
 
                             <button
                                 type="button"
