@@ -211,7 +211,7 @@ class Form implements Arrayable, Augmentable, ContainsQueryableValues, FormContr
 
         if (
             in_array(Arr::get($field, 'field.type'), ['radio', 'checkboxes'])
-            && Arr::get($field, 'field.appearance') === 'inline'
+            && in_array(Arr::get($field, 'field.appearance'), ['inline', 'chips'])
         ) {
             Arr::set($field, 'field.inline', true);
             Arr::pull($field, 'field.appearance');

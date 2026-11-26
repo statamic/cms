@@ -144,6 +144,10 @@ class ConvertFieldsFromBlueprintTest extends TestCase
                 ['type' => 'checkboxes', 'display' => 'Colors', 'appearance' => 'inline', 'options' => ['red' => 'Red']],
                 ['type' => 'checkboxes', 'display' => 'Colors', 'inline' => true, 'options' => ['red' => 'Red']],
             ],
+            'multi_choice, converts chips appearance to inline' => [
+                ['type' => 'radio', 'display' => 'Color', 'appearance' => 'chips', 'options' => ['red' => 'Red']],
+                ['type' => 'multi_choice', 'display' => 'Color', 'inline' => true, 'options' => ['red' => 'Red']],
+            ],
             'non-form field should be preserved' => [
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
                 ['type' => 'video', 'display' => 'Video', 'default' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],

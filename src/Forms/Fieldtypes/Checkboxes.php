@@ -36,7 +36,7 @@ class Checkboxes extends FormFieldtype
                 'add_button' => __('Add Option'),
             ],
             'inline' => [
-                'display' => __('Inline'),
+                'display' => __('Show options in a row?'),
                 'instructions' => __('statamic::form-fieldtypes.checkboxes.config.inline.instructions'),
                 'type' => 'toggle',
                 'default' => false,
@@ -50,6 +50,7 @@ class Checkboxes extends FormFieldtype
             'type' => 'checkboxes',
             'options' => $this->options(),
             ...Arr::except($this->config(), ['type', 'options']),
+            'appearance' => $this->config('inline') ? 'inline' : 'default',
         ];
     }
 
