@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import axios from 'axios';
 import { keys } from '@api';
 import Layout from '@/pages/layout/Layout.vue';
@@ -9,6 +9,7 @@ import Head from '@/pages/layout/Head.vue';
 import { Badge, Button, Card, Header, Heading, Icon, Panel, PanelHeader } from '@ui';
 import FormStatusIndicator from '@/components/forms/FormStatusIndicator.vue';
 import { Link } from '@inertiajs/vue3';
+import { connectionVisibleValuesKey } from '@/components/forms/connections/context';
 
 defineOptions({ layout: [Layout, PanelLayout, FormsLayout] });
 
@@ -26,6 +27,7 @@ const errors = ref({});
 const saving = ref(false);
 const saveBinding = ref(null);
 const value = ref(props.value);
+const visibleValues = {};
 
 const save = () => {
     if (saving.value) return;
@@ -33,7 +35,7 @@ const save = () => {
     errors.value = {};
     saving.value = true;
 
-    axios.patch(props.action, value.value)
+    axios.patch(props.action, value.value.map((connection) => visibleValues[connection.id] ?? connection))
         .then((response) => {
             value.value = response.data;
             nextTick(() => Statamic.$dirty.remove('connections'));
@@ -49,6 +51,8 @@ const save = () => {
         })
         .finally(() => (saving.value = false));
 };
+
+provide(connectionVisibleValuesKey, visibleValues);
 
 watch(value, () => Statamic.$dirty.add('connections'), { deep: true });
 
