@@ -1135,6 +1135,11 @@ class CoreModifiers extends Modifier
         // Remove the hash (#) if present
         $hex = ltrim($value, '#');
 
+        // Expand shorthand values like "fff" or "fff8" to their full form
+        if (in_array(strlen($hex), [3, 4])) {
+            $hex = implode('', array_map(fn ($char) => $char.$char, str_split($hex)));
+        }
+
         // Parse the hex value into RGB components
         $rgb = sscanf($hex, '%02x%02x%02x');
 
