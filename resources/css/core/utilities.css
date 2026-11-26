@@ -200,14 +200,11 @@
 }
 
 @utility st-text-trim-truncate {
-    /* =Jay. st-text-trim-optical plus truncate. Tailwind's truncate uses overflow: hidden, which cuts off ascenders and descenders once the line box is trimmed, so this only clips sideways */
+    /* =Jay. st-text-trim-cap plus truncate. Tailwind's truncate uses overflow: hidden, which cuts off ascenders and descenders once the line box is trimmed, so this only clips sideways */
     overflow-x: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @supports (text-box: ex alphabetic) {
-        text-box: ex alphabetic;
-        padding-top: calc((1cap - 1ex) / 2);
-    }
+    text-box: cap alphabetic;
 }
 
 @utility placeholder-xs {
