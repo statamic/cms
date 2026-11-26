@@ -72,7 +72,7 @@
         /* Safari and Firefox don't render pseudo-elements on inputs, so the empty stars need an element of their own. */
         .star-rating-outline {
             position: absolute;
-            inset: 0;
+            inset: 0 var(--star-rating-gap) 0 0;
             pointer-events: none;
             background-color: var(--_empty);
             mask-image: var(--_star-stroke-mask), var(--_star-fill-mask);
