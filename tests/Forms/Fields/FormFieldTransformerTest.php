@@ -363,6 +363,23 @@ class FormFieldTransformerTest extends TestCase
     }
 
     #[Test]
+    public function it_uses_the_field_handle_in_the_preview()
+    {
+        $vue = FormFieldTransformer::toVue([
+            'handle' => 'details',
+            'field' => [
+                'type' => 'group',
+                'fields' => [
+                    ['handle' => 'size', 'field' => ['type' => 'dropdown', 'options' => ['s' => 'Small']]],
+                ],
+            ],
+        ]);
+
+        $this->assertSame('details', $vue['preview']['config']['handle']);
+        $this->assertSame([['value' => 's', 'label' => 'Small']], $vue['preview']['meta']['size']['options']);
+    }
+
+    #[Test]
     public function it_saves_a_toggle_as_false_where_the_default_is_true()
     {
         $formFieldtype = new class extends FormFieldtype

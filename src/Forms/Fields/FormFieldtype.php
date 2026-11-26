@@ -202,7 +202,7 @@ abstract class FormFieldtype implements Arrayable
 
     public function toField(): Field
     {
-        return new Field($this->handle(), $this->toFieldArray());
+        return new Field($this->field?->handle() ?? $this->handle(), $this->toFieldArray());
     }
 
     abstract public function toFieldArray(): array;
