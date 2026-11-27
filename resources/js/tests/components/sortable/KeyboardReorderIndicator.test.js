@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import KeyboardReorderIndicator from '@/components/sortable/KeyboardReorderIndicator.vue';
 
-const keys = (props) => mount(KeyboardReorderIndicator, { props: { moving: true, ...props } }).findAll('kbd').map((kbd) => kbd.text());
+const keys = (props) => mount(KeyboardReorderIndicator, { props: { moving: true, ...props } }).findAll('kbd').map((kbd) => kbd.attributes('data-key'));
 
 test('a list shows only ↑ ↓', () => {
     expect(keys({})).toEqual(['↑', '↓']);
