@@ -14,6 +14,11 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    /** The tooltip shown on focus when `keyboardReorder` is on, e.g. to mention left and right in a tree. Defaults to up and down. */
+    keyboardInstructions: {
+        type: String,
+        default: null,
+    },
 });
 
 const emit = defineEmits(['keyboard-reorder']);
@@ -35,7 +40,7 @@ const tooltip = computed(() => {
     if (!props.keyboardReorder) return null;
 
     return {
-        content: __('messages.keyboard_item_reorder_handle_instructions'),
+        content: props.keyboardInstructions ?? __('messages.keyboard_item_reorder_handle_instructions'),
         focusOnly: true,
     };
 });

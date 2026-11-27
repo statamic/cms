@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }" @focusout="queueDropTreeTabStop">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -124,6 +124,25 @@ export default {
         blueprints: { type: Array },
     },
 
+    // Moving a page with the keyboard (see Branch.vue): each branch asks the tree what it can do and has it do the moving, so the same rules
+    // apply as for dragging. Only an editable tree offers it.
+    provide() {
+        if (!this.editable) return {};
+
+        return {
+            pageTreeKeyboard: {
+                siblingsOf: (stat) => this.siblingsOf(stat),
+                indexOf: (stat) => this.siblingsOf(stat).indexOf(stat),
+                canMoveUp: (stat) => this.canKeyboardMove(stat, 'up'),
+                canMoveDown: (stat) => this.canKeyboardMove(stat, 'down'),
+                canIndent: (stat) => this.canKeyboardMove(stat, 'in'),
+                canOutdent: (stat) => this.canKeyboardMove(stat, 'out'),
+                move: (stat, direction) => this.keyboardMove(stat, direction),
+                positionKey: (stat) => `${stat.parent?.data.id ?? ''}|${this.siblingsOf(stat).indexOf(stat)}|${stat.level}`,
+            },
+        };
+    },
+
     data() {
         return {
             loading: false,
@@ -194,6 +213,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.unwatchTreeTabStop?.();
         this.saveKeyBinding?.destroy();
     },
 
@@ -214,8 +234,31 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$nextTick(() => this.watchTreeTabStop());
                 this.$emit('loaded', this.pages);
             });
+        },
+
+        // The tree makes one page a Tab stop whenever its pages change (a move, opening or closing one), so Tab sometimes landed on a
+        // page and sometimes went straight to its drag handle. Tab goes from handle to handle instead, and a page only takes focus
+        // when the arrow keys move onto it.
+        watchTreeTabStop() {
+            this.unwatchTreeTabStop?.();
+            this.unwatchTreeTabStop = this.$watch(() => this.$refs.tree?.activeDescendant, () => this.queueDropTreeTabStop());
+        },
+
+        // After the tree has moved focus (it does that on the next tick), so it's the page focus ended up on that counts
+        queueDropTreeTabStop() {
+            setTimeout(() => this.dropTreeTabStop());
+        },
+
+        dropTreeTabStop() {
+            const tree = this.$refs.tree;
+            const focused = document.activeElement;
+
+            if (!tree?.activeDescendant || (focused?.matches('.tree-node') && tree.$el.contains(focused))) return;
+
+            tree.activeDescendant = null;
         },
 
         refresh() {
@@ -393,11 +436,72 @@ export default {
         },
 
         nodeOpened(node) {
-            this.collapsedState.splice(this.collapsedState.indexOf(node.data.id), 1);
+            const index = this.collapsedState.indexOf(node.data.id);
+            if (index > -1) this.collapsedState.splice(index, 1);
         },
 
         nodeClosed(node) {
             this.collapsedState.push(node.data.id);
+        },
+
+        // The pages beside this one, at its level: its parent's children, or the top level
+        siblingsOf(stat) {
+            return stat.parent ? stat.parent.children : (this.$refs.tree?.stats ?? []);
+        },
+
+        // How many levels this page and its children take up, counting itself as one
+        heightOf(stat) {
+            return 1 + Math.max(0, ...stat.children.map((child) => this.heightOf(child)));
+        },
+
+        // Whether a page can move up or down past the page beside it, in under the page above it, or out a level. The same rules as
+        // dragging: nothing goes above, or into, the root page, and nothing nests deeper than the structure's max depth.
+        canKeyboardMove(stat, direction) {
+            if (this.isRoot(stat)) return false;
+
+            const siblings = this.siblingsOf(stat);
+            const index = siblings.indexOf(stat);
+            const firstMovable = this.expectsRoot && !stat.parent ? 1 : 0;
+
+            switch (direction) {
+                case 'up':
+                    return index > firstMovable;
+                case 'down':
+                    return index > -1 && index < siblings.length - 1;
+                case 'in': {
+                    const above = siblings[index - 1];
+                    if (!above || this.isRoot(above)) return false;
+                    return stat.level + this.heightOf(stat) <= this.maxDepth;
+                }
+                case 'out':
+                    return !!stat.parent;
+            }
+
+            return false;
+        },
+
+        keyboardMove(stat, direction) {
+            if (!this.canKeyboardMove(stat, direction)) return;
+
+            const tree = this.$refs.tree;
+            const siblings = this.siblingsOf(stat);
+            const index = siblings.indexOf(stat);
+
+            if (direction === 'up' || direction === 'down') {
+                tree.move(stat, stat.parent || null, direction === 'up' ? index - 1 : index + 1);
+            } else if (direction === 'in') {
+                // Into the page above, as its last child, opening it so you can see where it went. Opening it fires the tree's open
+                // event, and nodeOpened takes it out of the collapsed state.
+                const above = siblings[index - 1];
+                above.open = true;
+                tree.move(stat, above, above.children.length);
+            } else if (direction === 'out') {
+                // Out of its parent, to just after it
+                const parent = stat.parent;
+                tree.move(stat, parent.parent || null, this.siblingsOf(parent).indexOf(parent) + 1);
+            }
+
+            this.treeUpdated();
         },
 
         statHandler(stat) {

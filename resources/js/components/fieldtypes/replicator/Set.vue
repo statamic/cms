@@ -198,11 +198,12 @@ function onSetDropdownClosed() {
                     'bg-gray-200/50 dark:bg-gray-950/35 rounded-b-none': !collapsed && hasFields
                 }"
             >
+                <!-- Narrow padding, with a margin making up the difference, keeps its focus ring slim (like a tree's) without moving anything -->
                 <DragHandle
                     v-if="!readOnly"
                     :keyboard-reorder="canReorder"
                     :class="sortableHandleClass"
-                    class="shrink-0"
+                    class="shrink-0 px-0.5! mx-0.5"
                     @keyboard-reorder="startMovingFromHandle"
                 />
                 <button type="button" class="show-focus-within_target flex flex-1 min-w-0 cursor-pointer items-center gap-4 overflow-x-auto p-2 py-1.75 pe-4 focus:outline-none st-mask-horizontal-overflow" @click="toggleCollapsedState">
