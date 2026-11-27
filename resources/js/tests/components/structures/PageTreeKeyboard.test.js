@@ -108,6 +108,17 @@ test('nesting puts it last under the page above, and opens that page', () => {
 
     expect(self.$refs.tree.move).toHaveBeenCalledWith(contact, about, 1);
     expect(about.open).toBe(true);
+});
+
+test('opening a page only takes that page out of the collapsed state', () => {
+    const { self, about, contact } = tree();
+    const opened = PageTree.methods.nodeOpened.bind(self);
+
+    opened(about);
+    expect(self.collapsedState).toEqual(['team']);
+
+    // A page that wasn't collapsed leaves the others alone
+    opened(contact);
     expect(self.collapsedState).toEqual(['team']);
 });
 

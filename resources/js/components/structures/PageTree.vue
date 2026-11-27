@@ -436,7 +436,8 @@ export default {
         },
 
         nodeOpened(node) {
-            this.collapsedState.splice(this.collapsedState.indexOf(node.data.id), 1);
+            const index = this.collapsedState.indexOf(node.data.id);
+            if (index > -1) this.collapsedState.splice(index, 1);
         },
 
         nodeClosed(node) {
@@ -489,11 +490,10 @@ export default {
             if (direction === 'up' || direction === 'down') {
                 tree.move(stat, stat.parent || null, direction === 'up' ? index - 1 : index + 1);
             } else if (direction === 'in') {
-                // Into the page above, as its last child, opening it so you can see where it went
+                // Into the page above, as its last child, opening it so you can see where it went. Opening it fires the tree's open
+                // event, and nodeOpened takes it out of the collapsed state.
                 const above = siblings[index - 1];
                 above.open = true;
-                const collapsed = this.collapsedState.indexOf(above.data.id);
-                if (collapsed > -1) this.collapsedState.splice(collapsed, 1);
                 tree.move(stat, above, above.children.length);
             } else if (direction === 'out') {
                 // Out of its parent, to just after it
