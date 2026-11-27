@@ -17,6 +17,7 @@ use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Events\SubmissionCreating;
 use Statamic\Events\SubmissionFinalized;
+use Statamic\Events\SubmissionFinalizing;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Events\SubmissionSaving;
 use Statamic\Exceptions\FormRestrictedException;
@@ -2092,6 +2093,108 @@ class SubmitFormTest extends TestCase
         Bus::assertDispatched(CreateAssetsFromFileUploads::class, 1);
 
         $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    public function it_does_not_finalize_when_a_finalizing_listener_returns_a_redirect()
+    {
+        Event::fake([SubmissionCreated::class, SubmissionFinalized::class]);
+
+        Event::listen(SubmissionFinalizing::class, fn () => null);
+        Event::listen(SubmissionFinalizing::class, fn ($event) => redirect('https://checkout.example.com/'.$event->submission->get('email')));
+        Event::listen(SubmissionFinalizing::class, fn () => redirect('https://never.example.com'));
+
+        $result = $this->action()->submit(['name' => 'Test User', 'email' => 'test@example.com']);
+
+        $this->assertEquals('https://checkout.example.com/test@example.com', $result->redirect->getTargetUrl());
+
+        $stored = $this->form->submission($result->submission->id());
+        $this->assertEquals('partial', $stored->status());
+        $this->assertEquals('Test User', $stored->get('name'));
+
+        Event::assertNotDispatched(SubmissionCreated::class);
+        Event::assertNotDispatched(SubmissionFinalized::class);
+
+        $stored->finalize();
+
+        $this->assertEquals('finalized', $this->form->submission($stored->id())->status());
+        Event::assertDispatched(SubmissionCreated::class, 1);
+        Event::assertDispatched(SubmissionFinalized::class, 1);
+    }
+
+    #[Test]
+    public function it_does_not_finalize_when_a_finalizing_listener_returns_false()
+    {
+        Event::fake([SubmissionFinalized::class]);
+
+        Event::listen(SubmissionFinalizing::class, fn () => false);
+
+        $result = $this->action()->submit(['name' => 'Test User', 'email' => 'test@example.com']);
+
+        $this->assertNull($result->redirect);
+        $this->assertEquals('partial', $this->form->submission($result->submission->id())->status());
+        Event::assertNotDispatched(SubmissionFinalized::class);
+    }
+
+    #[Test]
+    public function it_finalizes_when_a_finalizing_listener_returns_something_other_than_a_redirect()
+    {
+        Event::listen(SubmissionFinalizing::class, fn () => 'https://checkout.example.com');
+
+        $result = $this->action()->submit(['email' => 'test@example.com']);
+
+        $this->assertNull($result->redirect);
+        $this->assertTrue($result->isFinalized());
+    }
+
+    #[Test]
+    public function it_only_dispatches_the_finalizing_event_on_the_final_page()
+    {
+        Event::fake([SubmissionFinalizing::class]);
+
+        $form = $this->multiPageForm();
+
+        $first = app(SubmitForm::class)->form($form)->page('one')->submit(['name' => 'Olaf']);
+        $second = app(SubmitForm::class)->form($form)->page('two')->resume($first->submission)->submit(['email' => 'olaf@example.com']);
+
+        Event::assertNotDispatched(SubmissionFinalizing::class);
+
+        app(SubmitForm::class)->form($form)->page('three')->resume($second->submission)->submit(['message' => 'Hi']);
+
+        Event::assertDispatched(SubmissionFinalizing::class, 1);
+
+        $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    public function it_keeps_a_redirected_submission_until_it_is_finalized_when_the_form_does_not_store_submissions()
+    {
+        $this->form->store(false)->save();
+
+        Event::listen(SubmissionFinalizing::class, fn () => redirect('https://checkout.example.com'));
+
+        $result = $this->action()->submit(['email' => 'test@example.com']);
+
+        $this->assertEquals('partial', $this->form->submission($result->submission->id())->status());
+
+        $this->form->submission($result->submission->id())->finalize();
+
+        $this->assertNull($this->form->submission($result->submission->id()));
+    }
+
+    #[Test]
+    public function it_does_not_store_anything_when_a_finalizing_listener_throws_a_validation_exception()
+    {
+        Event::listen(SubmissionFinalizing::class, fn () => throw ValidationException::withMessages(['*' => 'Payments are unavailable.']));
+
+        try {
+            $this->action()->submit(['email' => 'test@example.com']);
+            $this->fail('Expected a validation exception.');
+        } catch (ValidationException $e) {
+            $this->assertEquals(['*' => ['Payments are unavailable.']], $e->errors());
+        }
+
+        $this->assertCount(0, $this->form->querySubmissions()->get());
     }
 
     #[Test]

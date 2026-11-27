@@ -12,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\SubmissionFinalizing;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Fieldset as FieldsetRepository;
@@ -1701,6 +1702,67 @@ EOT
 
         $this->assertCount(1, $submissions);
         $this->assertEquals('spam', $submissions->first()->status());
+    }
+
+    #[Test]
+    public function it_follows_the_finalizing_redirect_and_forgets_the_partial_submission()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        Event::listen(SubmissionFinalizing::class, fn () => redirect('https://checkout.example.com/pay')->withCookie(cookie('payment', 'tr_123')));
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com', '_redirect' => '/thanks'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('https://checkout.example.com/pay')
+            ->assertCookie('payment', 'tr_123')
+            ->assertSessionMissing('form.survey.partial_submission');
+
+        $this->assertEquals('partial', $form->submission($submission->id())->status());
+
+        $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    public function it_shows_the_normal_success_and_forgets_the_partial_submission_when_finalizing_is_held_without_a_redirect()
+    {
+        $this->createMultiPageForm();
+
+        $form = Form::find('survey');
+        $form->save();
+
+        $submission = tap($form->makeSubmission()->data(['name' => 'Olaf'])->asPartial())->save();
+        session()->put('form.survey.partial_submission', $submission->id());
+
+        Event::listen(SubmissionFinalizing::class, fn () => false);
+
+        $this
+            ->post('/!/forms/survey', ['_page' => 'page_two', 'email' => 'olaf@example.com', '_redirect' => '/thanks'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/thanks')
+            ->assertSessionHas('form.survey.success')
+            ->assertSessionMissing('form.survey.partial_submission');
+
+        $this->assertEquals('partial', $form->submission($submission->id())->status());
+
+        $form->querySubmissions()->get()->each->delete();
+    }
+
+    #[Test]
+    public function it_returns_the_finalizing_redirect_url_in_ajax_responses()
+    {
+        Event::listen(SubmissionFinalizing::class, fn () => redirect('https://checkout.example.com/pay'));
+
+        $this
+            ->postJson('/!/forms/contact', ['email' => 'san@holo.com', 'message' => 'hello'])
+            ->assertOk()
+            ->assertJson(['success' => true, 'redirect' => 'https://checkout.example.com/pay']);
     }
 
     #[Test]

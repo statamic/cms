@@ -3,12 +3,14 @@
 namespace Statamic\Forms;
 
 use Statamic\Contracts\Forms\Submission;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 readonly class SubmissionResult
 {
     public function __construct(
         public Submission $submission,
-        public ?string $nextPage = null
+        public ?string $nextPage = null,
+        public ?RedirectResponse $redirect = null,
     ) {
     }
 
