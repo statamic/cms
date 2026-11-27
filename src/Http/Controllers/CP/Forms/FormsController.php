@@ -77,11 +77,15 @@ class FormsController extends CpController
         ]);
     }
 
-    public function show($form)
+    public function show(Request $request, $form)
     {
         $this->authorize('view', $form);
 
         $user = User::current();
+
+        if ($url = $this->sameTabUrl($request, $form)) {
+            return redirect($url);
+        }
 
         if (
             $user->can('editFields', $form)
@@ -91,6 +95,29 @@ class FormsController extends CpController
         }
 
         return redirect()->route('statamic.cp.forms.submissions.index', $form->handle());
+    }
+
+    /**
+     * When switching from one form to another, stay on the tab you were on.
+     */
+    private function sameTabUrl(Request $request, $form): ?string
+    {
+        $previous = parse_url($request->headers->get('referer', ''), PHP_URL_PATH);
+        $forms = preg_quote(parse_url(cp_route('forms.index'), PHP_URL_PATH), '#');
+
+        if (! $previous || ! preg_match("#^{$forms}/[^/]+/(builder|logic|connect|submissions|edit)(?:/|$)#", $previous, $matches)) {
+            return null;
+        }
+
+        [$ability, $route] = match ($matches[1]) {
+            'builder' => ['editFields', 'forms.builder.edit'],
+            'logic' => ['editFields', 'forms.logic.edit'],
+            'connect' => ['editConnections', 'forms.connect.index'],
+            'submissions' => ['viewSubmissions', 'forms.submissions.index'],
+            'edit' => ['edit', 'forms.edit'],
+        };
+
+        return User::current()->can($ability, $form) ? cp_route($route, $form->handle()) : null;
     }
 
     public function create()
