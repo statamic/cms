@@ -29,9 +29,9 @@
             :aria-label="__('messages.keyboard_tree_reorder_instructions')"
         />
         <div v-if="canKeyboardMove" class="sr-only" aria-live="polite">{{ reorderStatus }}</div>
-        <!-- While it's being moved with the keyboard: ↑ ↓ outside the row, on the side it was started from (the handle or the menu), as
-             replicator sets do. ← → move it in and out a level too, but the hint keeps to the two, as four keys was too busy. -->
-        <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" />
+        <!-- While it's being moved with the keyboard: the arrow keys outside the row, on the side it was started from (the handle or the menu),
+             as replicator sets do. ← and → only show when they'd do something, so the hint stays as short as it can. -->
+        <KeyboardReorderIndicator :moving="moving" :side="moveOrigin" horizontal :can="moveKeys" />
         <div class="flex flex-1 items-center px-1.5 text-xs leading-normal">
             <div class="flex gap-2 sm:gap-3 grow items-center py-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
@@ -167,7 +167,13 @@ export default {
             instructions: () => __('messages.keyboard_tree_reorder_instructions'),
         });
 
-        return { canKeyboardMove, moving, reorderFocusEl, reorderStatus, startMoving, moveOrigin };
+        // Which of ← → would do something right now, for the hint. Worked out once it's moving (and again after each move), as the tree
+        // isn't ready to ask when the page first loads
+        const moveKeys = computed(() =>
+            moving.value ? { in: !!tree?.canIndent(props.stat), out: !!tree?.canOutdent(props.stat) } : { in: false, out: false },
+        );
+
+        return { canKeyboardMove, moving, reorderFocusEl, reorderStatus, startMoving, moveOrigin, moveKeys };
     },
 
     data() {
