@@ -5,16 +5,18 @@ namespace Statamic\Fields;
 use Faker\Generator;
 use Illuminate\Support\Arr;
 
+use function Statamic\trans as __;
+
 class SampleValue
 {
     public static function sentence(): string
     {
-        return 'Lorem ipsum dolor sit amet';
+        return __('Lorem ipsum dolor sit amet');
     }
 
     public static function paragraph(): string
     {
-        return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+        return __('statamic::messages.sample_value_paragraph');
     }
 
     public static function randomKeys(array $keys, Generator $faker, mixed $max = null): array

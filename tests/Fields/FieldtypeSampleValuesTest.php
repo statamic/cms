@@ -9,7 +9,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\SampleValue;
 use Tests\TestCase;
 
 class FieldtypeSampleValuesTest extends TestCase
@@ -60,6 +59,7 @@ class FieldtypeSampleValuesTest extends TestCase
     public static function previewValueProvider()
     {
         $options = ['options' => ['red' => 'Red', 'blue' => 'Blue']];
+        $paragraph = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
 
         return [
             'text' => [['type' => 'text', 'display' => 'Favourite Colour'], 'Lorem ipsum dolor sit amet'],
@@ -70,8 +70,8 @@ class FieldtypeSampleValuesTest extends TestCase
             'text url' => [['type' => 'text', 'input_type' => 'url'], 'https://example.com'],
             'text tel' => [['type' => 'text', 'display' => 'Call me', 'input_type' => 'tel'], '555-0100'],
             'slug' => [['type' => 'slug', 'display' => 'Slug'], 'lorem-ipsum-dolor-sit-amet'],
-            'textarea' => [['type' => 'textarea'], SampleValue::paragraph()],
-            'markdown' => [['type' => 'markdown'], SampleValue::paragraph()],
+            'textarea' => [['type' => 'textarea'], $paragraph],
+            'markdown' => [['type' => 'markdown'], $paragraph],
             'hidden' => [['type' => 'hidden'], null],
             'hidden with default' => [['type' => 'hidden', 'display' => 'Source', 'default' => 'newsletter'], 'newsletter'],
             'revealer' => [['type' => 'revealer', 'display' => 'More'], null],
@@ -113,7 +113,8 @@ class FieldtypeSampleValuesTest extends TestCase
 
     public static function textMatchingProvider()
     {
-        $sentence = SampleValue::sentence();
+        $sentence = 'Lorem ipsum dolor sit amet';
+        $paragraph = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
 
         return [
             'input type wins over handle' => [['handle' => 'name', 'input_type' => 'email'], 'name@example.com'],
@@ -135,7 +136,7 @@ class FieldtypeSampleValuesTest extends TestCase
             'phone number' => [['handle' => 'phone_number'], '555-0100'],
             'zip code' => [['handle' => 'zip_code'], '97477'],
             'job title' => [['handle' => 'job_title'], 'Product Manager'],
-            'message' => [['handle' => 'your_message'], SampleValue::paragraph()],
+            'message' => [['handle' => 'your_message'], $paragraph],
             'hotel is not a phone' => [['handle' => 'hotel'], $sentence],
             'statement is not a state' => [['handle' => 'statement'], $sentence],
             'website title is a url' => [['handle' => 'website_title'], 'https://example.com'],

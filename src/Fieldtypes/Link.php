@@ -302,7 +302,7 @@ class Link extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return 'https://example.com';
+        return __('statamic::messages.sample_value_url');
     }
 
     public function fakeValue(Generator $faker): mixed

@@ -180,9 +180,9 @@ class Text extends Fieldtype
     public function previewValue(): mixed
     {
         return match ($this->sampleKind()) {
-            'email' => 'name@example.com',
-            'url' => 'https://example.com',
-            'phone' => '555-0100',
+            'email' => __('statamic::messages.sample_value_email'),
+            'url' => __('statamic::messages.sample_value_url'),
+            'phone' => __('statamic::messages.sample_value_phone'),
             'first_name' => __('Jane'),
             'last_name' => __('Doe'),
             'name' => __('Jane Doe'),
@@ -191,7 +191,7 @@ class Text extends Fieldtype
             'city' => __('Springfield'),
             'state' => __('Oregon'),
             'country' => __('Canada'),
-            'postcode' => '97477',
+            'postcode' => __('statamic::messages.sample_value_postcode'),
             'job' => __('Product Manager'),
             'subject' => __('A question about your services'),
             'paragraph' => SampleValue::paragraph(),
