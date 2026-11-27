@@ -540,6 +540,50 @@ class FormBuilderTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('invalidHandles')]
+    public function it_doesnt_validate_the_handle_of_fields_that_have_already_been_saved($handle)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $form = tap(Form::make('test')->formFields([
+            'sections' => [
+                ['fields' => [['handle' => $handle, 'field' => ['type' => 'short_answer', 'display' => 'Name']]]],
+            ],
+        ]))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => $handle,
+                                    'type' => 'inline',
+                                    'fieldtype' => 'short_answer',
+                                    'config' => ['type' => 'short_answer', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue(Form::find('test')->blueprint()->hasField($handle));
+    }
+
+    #[Test]
     #[DataProvider('internalSubmissionKeyHandles')]
     public function it_allows_handles_matching_internal_submission_keys_without_the_underscore($handle)
     {
