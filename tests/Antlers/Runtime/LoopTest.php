@@ -3,7 +3,10 @@
 namespace Tests\Antlers\Runtime;
 
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Value;
+use Statamic\Tags\Tags;
 use Statamic\View\Antlers\Language\Runtime\GlobalRuntimeState;
 use Statamic\View\Antlers\Language\Runtime\NodeProcessor;
 use Statamic\View\Antlers\Language\Utilities\StringUtilities;
@@ -239,5 +242,109 @@ EXPECTED;
             StringUtilities::normalizeLineEndings($expected),
             StringUtilities::normalizeLineEndings($responseContent)
         );
+    }
+
+    public function test_this_does_not_overwrite_an_existing_this_value()
+    {
+        $data = ['items' => [['this' => 'mine'], ['this' => 'yours']]];
+
+        $this->assertSame('mine,yours,', $this->renderString('{{ items }}{{ this }},{{ /items }}', $data));
+    }
+
+    public function test_this_is_the_current_item_in_nested_loops()
+    {
+        $data = [
+            'items' => [
+                ['name' => 'A', 'children' => [['name' => 'a1'], ['name' => 'a2']]],
+                ['name' => 'B', 'children' => [['name' => 'b1']]],
+            ],
+        ];
+
+        $template = '{{ items }}{{ this:name }}[{{ children }}{{ this:name }}{{ /children }}]{{ this:name }} {{ /items }}';
+
+        $this->assertSame('A[a1a2]A B[b1]B ', $this->renderString($template, $data));
+    }
+
+    public function test_this_is_the_original_object_in_a_tag_pair_loop()
+    {
+        $items = [$this->augmentable('One'), $this->augmentable('Two')];
+
+        (new class extends Tags
+        {
+            public static $handle = 'list_items';
+            public static $items = [];
+
+            public function index()
+            {
+                return collect(self::$items);
+            }
+        })::register();
+
+        $capture = $this->registerCaptureTag();
+        app('statamic.tags')['list_items']::$items = $items;
+
+        $this->renderString('{{ list_items }}{{ capture_this :item="this" }}{{ /list_items }}', [], true);
+
+        $this->assertSame($items, $capture::$received);
+    }
+
+    public function test_this_is_the_original_object_in_a_variable_loop()
+    {
+        $items = [$this->augmentable('One'), $this->augmentable('Two')];
+        $capture = $this->registerCaptureTag();
+
+        $this->renderString('{{ items }}{{ capture_this :item="this" }}{{ /items }}', ['items' => $items], true);
+
+        $this->assertSame($items, $capture::$received);
+    }
+
+    public function test_this_is_the_value_in_a_simple_list()
+    {
+        $this->assertSame('one,two,', $this->renderString('{{ items }}{{ this }},{{ /items }}', ['items' => ['one', 'two']]));
+    }
+
+    public function test_this_resolves_fields_of_the_current_item()
+    {
+        $data = ['items' => [$this->augmentable('One'), $this->augmentable('Two')]];
+
+        $this->assertSame('One,Two,', $this->renderString('{{ items }}{{ this:title }},{{ /items }}', $data));
+    }
+
+    private function augmentable(string $title): Augmentable
+    {
+        return new class($title) implements Augmentable
+        {
+            use HasAugmentedData;
+
+            public function __construct(private string $title)
+            {
+            }
+
+            public function augmentedArrayData()
+            {
+                return ['title' => $this->title];
+            }
+        };
+    }
+
+    private function registerCaptureTag(): string
+    {
+        $tag = new class extends Tags
+        {
+            public static $handle = 'capture_this';
+            public static $received = [];
+
+            public function index()
+            {
+                self::$received[] = $this->params->get('item');
+
+                return '';
+            }
+        };
+
+        $tag::$received = [];
+        $tag::register();
+
+        return $tag::class;
     }
 }

@@ -1572,6 +1572,7 @@ class NodeProcessor
 
                     $currentProcessorCanHandleTagValue = false;
                     $tagCallbackResult = null;
+                    $tagLoopItems = null;
 
                     $lockData = $this->data;
                     $shouldProcessAsTag = $this->shouldProcessAsTag($node);
@@ -1858,6 +1859,7 @@ class NodeProcessor
 
                         if (is_object($output)) {
                             if ($output instanceof Collection) {
+                                $tagLoopItems = $output->all();
                                 $output = RuntimeValues::resolveWithRuntimeIsolation($output);
                             }
 
@@ -1894,7 +1896,7 @@ class NodeProcessor
                                 // the scope or overall output of the tag result
                                 if ($node->hasScopeAdjustingParameters) {
                                     $tagAssocOutput = $output;
-                                    $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output));
+                                    $output = Arr::assoc($output) ? (string) $tag->parse($output) : (string) $tag->parseLoop($this->addLoopIterationVariables($output, $tagLoopItems));
                                     $tagCallbackResult = null;
                                     $currentProcessorCanHandleTagValue = false;
 
@@ -2453,7 +2455,7 @@ class NodeProcessor
                                     }
                                 } else {
                                     if (! $executedParamModifiers || $tagCallbackResult != null) {
-                                        $val = $this->addLoopIterationVariables($val);
+                                        $val = $this->addLoopIterationVariables($val, $tagCallbackResult != null ? $tagLoopItems : null);
                                     }
 
                                     $runtimeData = $this->getActiveData();
@@ -2608,7 +2610,7 @@ class NodeProcessor
         ob_start();
 
         try {
-            extract($this->getActiveData());
+            extract(Arr::except($this->getActiveData(), 'this'));
             eval('?>'.$buffer.'<?php ');
         } catch (ParseError $e) {
             throw new SyntaxError("{$e->getMessage()} on line {$e->getLine()} of:\n\n{$buffer}");
@@ -2678,7 +2680,7 @@ class NodeProcessor
         ob_start();
 
         try {
-            extract($this->getActiveData());
+            extract(Arr::except($this->getActiveData(), 'this'));
             extract($___extraContext);
             $___antlersVarBefore = get_defined_vars();
             eval('?>'.$___phpBuffer.'<?php ');
@@ -2719,9 +2721,10 @@ class NodeProcessor
      * Adds standard Antlers loop variables to the array data.
      *
      * @param  array  $loop  The loop data.
+     * @param  array|null  $items  The loop's items before they were augmented.
      * @return array
      */
-    protected function addLoopIterationVariables($loop)
+    protected function addLoopIterationVariables($loop, $items = null)
     {
         $index = 0;
         $total = count($loop);
@@ -2738,7 +2741,13 @@ class NodeProcessor
             }
         }
 
+        if (! is_null($items) && count($items) !== count($loop)) {
+            $items = null;
+        }
+
         foreach ($loop as $key => &$value) {
+            $item = $items[$key] ?? $value;
+
             if ($value instanceof Augmentable) {
                 $value = RuntimeValues::resolveWithRuntimeIsolation($value);
             }
@@ -2764,6 +2773,10 @@ class NodeProcessor
             $value['no_results'] = false;
             $value['first'] = $index === 0;
             $value['last'] = $index === $lastIndex;
+
+            if (! array_key_exists('this', $value)) {
+                $value['this'] = $item;
+            }
 
             $loopData[$index] = $value;
 
