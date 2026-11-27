@@ -30,7 +30,7 @@
                     variant="ghost"
                     @click="sync"
                     :loading="syncing"
-                    v-tooltip="__('Regenerate from: :field', { field: config.from })"
+                    v-tooltip="__('Regenerate from: :field', { field: sourceDisplay })"
                 />
             </template>
         </Input>
@@ -83,6 +83,19 @@ export default {
             }
 
             return data_get(this.publishContainer?.values, key);
+        },
+
+        sourceDisplay() {
+            const handle = this.config.from || 'title';
+
+            if (this.fieldPathPrefix) return handle;
+
+            const field = (this.publishContainer?.blueprint?.tabs ?? [])
+                .flatMap((tab) => tab.sections)
+                .flatMap((section) => section.fields)
+                .find((field) => field.handle === handle);
+
+            return field?.display || handle;
         },
 
         language() {
