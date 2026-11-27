@@ -783,6 +783,9 @@ class FormBuilderTest extends TestCase
         $user = User::make()->assignRole('test')->save();
         $form = tap(Form::make('test'))->save();
 
+        $fieldset = Fieldset::make('some_fieldset')->setContents(['fields' => []]);
+        Fieldset::shouldReceive('find')->with('some_fieldset')->andReturn($fieldset);
+
         $payload = [
             'pages' => [
                 [
@@ -809,6 +812,116 @@ class FormBuilderTest extends TestCase
             ->actingAs($user)
             ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
             ->assertSuccessful();
+    }
+
+    #[Test]
+    public function it_validates_that_imported_fieldsets_exist()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'import1',
+                                    'type' => 'import',
+                                    'fieldset' => 'missing',
+                                    'prefix' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['import1.fieldset' => 'Fieldset missing does not exist.']);
+
+        $this->assertEmpty(Form::find('test')->formFields()->items());
+    }
+
+    #[Test]
+    public function it_validates_that_fieldtypes_exist()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            '_id' => 'section1',
+                            'display' => 'Section',
+                            'fields' => [
+                                [
+                                    '_id' => 'field1',
+                                    'handle' => 'name',
+                                    'type' => 'inline',
+                                    'fieldtype' => 'missing',
+                                    'config' => ['type' => 'missing', 'display' => 'Name'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors(['field1.fieldtype' => 'Fieldtype missing does not exist.']);
+    }
+
+    #[Test]
+    #[DataProvider('malformedFieldProvider')]
+    public function it_validates_malformed_fields($field, $error)
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        ['_id' => 'section1', 'display' => 'Section', 'fields' => [$field]],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.builder.update', $form->handle()), $payload)
+            ->assertSessionHasErrors("pages.0.sections.0.fields.0.{$error}");
+    }
+
+    public static function malformedFieldProvider()
+    {
+        return [
+            'missing id' => [['type' => 'import', 'fieldset' => 'contact'], '_id'],
+            'missing type' => [['_id' => 'field1', 'handle' => 'name', 'fieldtype' => 'short_answer'], 'type'],
+            'unknown type' => [['_id' => 'field1', 'handle' => 'name', 'type' => 'unknown', 'fieldtype' => 'short_answer'], 'type'],
+            'inline field without fieldtype' => [['_id' => 'field1', 'handle' => 'name', 'type' => 'inline', 'config' => []], 'fieldtype'],
+            'reference field without fieldtype' => [['_id' => 'field1', 'handle' => 'name', 'type' => 'reference', 'field_reference' => 'contact.name'], 'fieldtype'],
+            'import without fieldset' => [['_id' => 'import1', 'type' => 'import'], 'fieldset'],
+        ];
     }
 
     #[Test]

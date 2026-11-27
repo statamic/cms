@@ -199,6 +199,8 @@ return [
     'email_connection_template_syntax' => 'Only users who can configure forms may use template syntax.',
     'email_field_reference' => "References a field that doesn't exist on this form.",
     'fieldset_imported_recursively' => 'Fieldset :handle is being imported recursively.',
+    'fieldset_not_found' => 'Fieldset :handle does not exist.',
+    'fieldtype_not_found' => 'Fieldtype :handle does not exist.',
     'form_chart_hidden_field' => 'Field :field is hidden and cannot be charted.',
     'form_chart_not_applicable' => 'Chart :chart cannot be used for field :field.',
     'form_chart_unknown_chart' => 'Chart :chart does not exist.',

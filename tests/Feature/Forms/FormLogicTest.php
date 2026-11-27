@@ -220,6 +220,35 @@ class FormLogicTest extends TestCase
     }
 
     #[Test]
+    public function it_validates_the_field_type()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure forms']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+        $form = tap(Form::make('test'))->save();
+
+        $payload = [
+            'pages' => [
+                [
+                    '_id' => 'page1',
+                    'sections' => [
+                        [
+                            'display' => 'Section',
+                            'fields' => [
+                                ['type' => 'unknown', 'handle' => 'name', 'fieldtype' => 'short_answer', 'config' => ['type' => 'short_answer']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this
+            ->actingAs($user)
+            ->patch(cp_route('forms.logic.update', $form->handle()), $payload)
+            ->assertSessionHasErrors('pages.0.sections.0.fields.0.type');
+    }
+
+    #[Test]
     public function it_round_trips_sections_without_adding_a_display_or_losing_other_keys()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure forms']]);

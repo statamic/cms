@@ -62,6 +62,19 @@ class FormFieldsControllerTest extends TestCase
     }
 
     #[Test]
+    public function it_requires_values_when_editing_a_field()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'edit test form']]);
+        $user = User::make()->assignRole('test')->save();
+        $form = tap(Form::make('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->postJson(cp_route('forms.builder.fields.edit', $form->handle()), ['type' => 'short_answer'])
+            ->assertJsonValidationErrors('values');
+    }
+
+    #[Test]
     public function it_requires_type_parameter_for_edit()
     {
         $this->setTestRoles(['test' => ['access cp', 'edit test form']]);

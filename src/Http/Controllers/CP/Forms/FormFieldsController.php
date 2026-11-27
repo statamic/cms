@@ -25,7 +25,7 @@ class FormFieldsController extends CpController
 
         $request->validate([
             'type' => 'required',
-            'values' => 'array',
+            'values' => 'required|array',
         ]);
 
         $fieldtype = FormFieldtypeRepository::find($request->type);
