@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use Statamic\Support\Str;
 
+/** @internal */
 class OldInput
 {
     /**
