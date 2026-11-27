@@ -58,7 +58,7 @@ class FormBuilderController extends CpController
             'pages.*.sections' => ['required', 'array', 'min:1'],
         ]);
 
-        $this->validateFields($request);
+        $this->validateFields($request, $form);
 
         $this->validateUniqueHandles($request);
 
@@ -110,9 +110,10 @@ class FormBuilderController extends CpController
         ];
     }
 
-    private function validateFields(Request $request): void
+    private function validateFields(Request $request, $form): void
     {
         $errors = [];
+        $savedFields = $form->formFields()->fields();
 
         foreach ($request->pages as $page) {
             foreach ($page['sections'] ?? [] as $section) {
@@ -123,6 +124,10 @@ class FormBuilderController extends CpController
 
                     $fieldtype = FormFieldtypeRepository::find($field['fieldtype']);
                     $blueprint = $this->configBlueprint($fieldtype->configBlueprint());
+
+                    if ($savedFields->has($field['handle'] ?? null)) {
+                        $blueprint->removeField('handle');
+                    }
 
                     $fields = $blueprint
                         ->fields()
