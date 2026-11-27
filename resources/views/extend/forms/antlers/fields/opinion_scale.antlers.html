@@ -8,7 +8,7 @@
             name="{{ name }}"
             value="{{ scale_value }}"
             {{ if js_driver }}{{ js_attributes }}{{ /if }}
-            {{ if value !== null && value !== '' && (value | to_string) === (scale_value | to_string) }}checked{{ /if }}
+            {{ if (value | to_string) === (scale_value | to_string) }}checked{{ /if }}
             {{ if validate|contains:required }}required{{ /if }}
             {{ if error }}
                 aria-invalid="true" aria-describedby="{{ id }}-error"

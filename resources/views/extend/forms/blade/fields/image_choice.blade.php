@@ -10,7 +10,7 @@
         $image = $option['image'] ?? null;
         $isSelected = $isMultiple
             ? in_array($key, is_array($selected) ? $selected : [], true)
-            : $selected === $key;
+            : (string) $selected === (string) $key;
     @endphp
 
     <label>

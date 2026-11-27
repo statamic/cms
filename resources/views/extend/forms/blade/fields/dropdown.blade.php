@@ -33,7 +33,7 @@
             if ($isMultiple) {
                 $selected = in_array($option, $value ?? []);
             } else {
-                $selected = $option == $value;
+                $selected = (string) $value === (string) $option;
             }
         @endphp
         <option

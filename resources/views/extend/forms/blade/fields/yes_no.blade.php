@@ -10,7 +10,7 @@
             name="{{ $name }}"
             value="{{ $option }}"
             @if (isset($js_driver)) {!! $js_attributes !!} @endif
-            @checked($value == $option)
+            @checked((string) $value === (string) $option)
             @required(in_array('required', $validate ?? []))
             @if ($error)
                 aria-invalid="true" aria-describedby="{{ $id }}-error"

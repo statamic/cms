@@ -10,7 +10,7 @@
             name="{{ $name }}"
             value="{{ $scale_value }}"
             @if (isset($js_driver)) {!! $js_attributes !!} @endif
-            @checked(! in_array($value, [null, ''], true) && (string) $value === (string) $scale_value)
+            @checked((string) $value === (string) $scale_value)
             @required(in_array('required', $validate ?? []))
             @if ($error)
                 aria-invalid="true" aria-describedby="{{ $id }}-error"
