@@ -115,7 +115,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
         <div class="fieldtype-source-container px-0.5 max-[1000px]:ps-2 pt-6">
             <Input icon="magnifying-glass" :legible-text="false" input-class="rounded-xl placeholder-xs" :placeholder="__('Search Field Types...')" v-model="search" />
 
-            <ul class="py-10 max-[1000px]:pb-20 grid gap-8 @container">
+            <ul class="py-10 max-[1000px]:pb-20 grid grid-cols-1 gap-8 @container">
                 <li
                     v-for="group in displayedFieldtypes"
                     :key="group.handle"
@@ -137,7 +137,7 @@ const displayedFieldtypes = computed(() => isSearching.value ? [{ fieldtypes: se
                         />
                         {{ group.title }}
                     </h2>
-                    <ul class="fieldtype-source grid gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
+                    <ul class="fieldtype-source grid grid-cols-1 gap-2 gap-y-1.75 @min-[250px]:grid-cols-2">
                         <li
                             v-for="fieldtype in group.fieldtypes"
                             :key="fieldtype.handle"
