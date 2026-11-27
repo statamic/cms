@@ -38,7 +38,6 @@ class MultiChoice extends FormFieldtype
             ],
             'inline' => [
                 'display' => __('Show options in a row?'),
-                'instructions' => __('statamic::form-fieldtypes.multi_choice.config.inline.instructions'),
                 'type' => 'toggle',
                 'default' => false,
             ],

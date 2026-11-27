@@ -37,7 +37,6 @@ class Checkboxes extends FormFieldtype
             ],
             'inline' => [
                 'display' => __('Show options in a row?'),
-                'instructions' => __('statamic::form-fieldtypes.checkboxes.config.inline.instructions'),
                 'type' => 'toggle',
                 'default' => false,
             ],

@@ -26,7 +26,6 @@ class YesNo extends FormFieldtype
         return [
             'inline' => [
                 'display' => __('Show options in a row?'),
-                'instructions' => __('statamic::form-fieldtypes.yes_no.config.inline.instructions'),
                 'type' => 'toggle',
                 'default' => false,
             ],
