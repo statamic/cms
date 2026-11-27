@@ -250,6 +250,9 @@ class FormsController extends CpController
                     'submission_limit' => [
                         'display' => __('Submission Limit'),
                         'type' => 'integer',
+                        'if' => [
+                            'store' => 'equals true',
+                        ],
                         'instructions' => __('statamic::messages.form_configure_submission_limit_instructions'),
                     ],
                     'submission_limit_period' => [
@@ -263,6 +266,7 @@ class FormsController extends CpController
                             'month' => __('Per Month'),
                         ],
                         'if' => [
+                            'store' => 'equals true',
                             'submission_limit' => 'not empty',
                         ],
                         'instructions' => __('statamic::messages.form_configure_submission_limit_period_instructions'),

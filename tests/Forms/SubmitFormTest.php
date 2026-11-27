@@ -5,6 +5,7 @@ namespace Tests\Forms;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -248,6 +249,21 @@ class SubmitFormTest extends TestCase
         $this->expectException(FormRestrictedException::class);
 
         $this->action()->submit(['email' => 'test@example.com']);
+    }
+
+    #[Test]
+    public function it_holds_a_lock_while_submitting_a_form_with_a_submission_limit()
+    {
+        $this->form->data(['submission_limit' => 1])->save();
+
+        Event::listen(FormSubmitted::class, function () use (&$lockWasAvailable) {
+            $lockWasAvailable = Cache::lock('form-submission-limit-contact')->get();
+        });
+
+        $this->action()->submit(['email' => 'test@example.com']);
+
+        $this->assertFalse($lockWasAvailable);
+        $this->assertTrue(Cache::lock('form-submission-limit-contact')->get());
     }
 
     #[Test]
