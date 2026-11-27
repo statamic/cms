@@ -1,4 +1,6 @@
 <div>
     <h2>{{ $heading }}</h2>
-    <p>{{ $subheading }}</p>
+    @if ($subheading)
+        <p>{!! $subheading !!}</p>
+    @endif
 </div>
