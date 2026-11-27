@@ -7,6 +7,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\MessageBag;
 use Statamic\Fields\Field;
 use Statamic\Forms\Fields\FormField;
+use Statamic\Forms\OldInput;
 use Statamic\Forms\RenderableField;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -136,7 +137,7 @@ trait RendersForms
         $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
 
         $missing = Str::random();
-        $hasOld = ! $field->form() || $errors->any();
+        $hasOld = ! $field->form() || OldInput::shouldFill($errorBag);
         $old = $hasOld ? old($field->handle(), $missing) : $missing;
         $default = $field->value() ?? $field->defaultValue();
         $value = $old === $missing ? $default : $old;

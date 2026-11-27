@@ -199,6 +199,19 @@ class FormCreateAlpineTest extends FormTestCase
     }
 
     #[Test]
+    public function it_renders_old_data_in_x_data_flashed_without_form_errors()
+    {
+        // Simulates old input flashed by something other than a form submission,
+        // for example a failed login or a custom controller redirecting with input.
+        $this->withSession(['_old_input' => ['name' => 'Frodo Braggins']]);
+        request()->setLaravelSession(app('session.store'));
+
+        $output = $this->tag('{{ form:contact js="alpine" }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('&quot;name&quot;:&quot;Frodo Braggins&quot;', $output);
+    }
+
+    #[Test]
     public function it_renders_scoped_x_data_on_form_tag()
     {
         $output = $this->tag('{{ form:contact js="alpine:my_form" }}{{ /form:contact }}');

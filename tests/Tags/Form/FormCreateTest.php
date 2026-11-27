@@ -8,6 +8,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -1386,6 +1388,51 @@ EOT
 
         $output = $this->tag('{{ form:newsletter }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:newsletter }}');
         $this->assertStringContainsString('[email=]', $output);
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ old ?? "null" }}]{{ /fields }}{{ /form:contact }}');
+        $this->assertStringContainsString('[email=not-an-email]', $output);
+
+        $output = $this->tag('{{ form:newsletter }}{{ fields }}[{{ handle }}={{ old ?? "null" }}]{{ /fields }}{{ /form:newsletter }}');
+        $this->assertStringContainsString('[email=null]', $output);
+    }
+
+    #[Test]
+    public function it_renders_old_input_flashed_without_form_errors()
+    {
+        // Simulates old input flashed by something other than a form submission,
+        // for example a failed login or a custom controller redirecting with input.
+        $this->withSession(['_old_input' => ['name' => 'Frodo Braggins']]);
+        request()->setLaravelSession(app('session.store'));
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ old ?? "null" }}]{{ /fields }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('[name=Frodo Braggins]', $output);
+        $this->assertStringContainsString('[email=null]', $output);
+        $this->assertStringContainsString('[message=null]', $output);
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ value }}]{{ /fields }}{{ /form:contact }}');
+
+        $this->assertStringContainsString('[name=Frodo Braggins]', $output);
+        $this->assertStringContainsString('[email=]', $output);
+    }
+
+    #[Test]
+    public function it_renders_old_input_flashed_with_a_non_form_error_bag()
+    {
+        // Simulates old input flashed by something other than a form submission,
+        // while a non-form error bag (e.g. from a failed login) is also in the session.
+        $this->withSession([
+            '_old_input' => ['name' => 'Frodo Braggins', 'email' => 'flashed@example.com'],
+            'errors' => (new ViewErrorBag)->put('default', new MessageBag(['email' => 'Invalid.'])),
+        ]);
+        request()->setLaravelSession(app('session.store'));
+
+        $output = $this->tag('{{ form:contact }}{{ fields }}[{{ handle }}={{ old ?? "null" }}]{{ /fields }}{{ /form:contact }}');
+
+        // The old input can't be attributed to another form submission, so it's rendered.
+        $this->assertStringContainsString('[name=Frodo Braggins]', $output);
+        $this->assertStringContainsString('[email=flashed@example.com]', $output);
+        $this->assertStringContainsString('[message=null]', $output);
     }
 
     #[Test]
