@@ -6,7 +6,11 @@
         <div class="flex flex-1 items-center px-1.5 text-xs leading-normal">
             <div class="flex gap-2 sm:gap-3 grow items-center py-3" @click="$emit('branch-clicked', page)">
                 <ui-status-indicator :status="page.status" v-tooltip="getStatusTooltip()" />
-                <ui-icon v-if="isRoot" name="home" class="size-4" v-tooltip="__('This is the root page')" />
+                <template v-if="isRoot">
+                    <!-- Out of the Tab order: Chrome would otherwise make it an empty stop, because the tooltip listens for focus -->
+                    <ui-icon name="home" class="size-4" tabindex="-1" v-tooltip="__('This is the root page')" />
+                    <span class="sr-only">{{ __('This is the root page') }}</span>
+                </template>
                 <a
                     @click.prevent="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium is-top-level-branch': isTopLevelBranch }"
