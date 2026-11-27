@@ -21,7 +21,7 @@ return [
     'assets.config.query_scopes' => 'Lege fest, welche Abfragebereiche (Query-Scopes) beim Abrufen auswählbarer Dateien angewendet werden sollen.',
     'assets.config.restrict' => 'Verhindern, dass Benutzer:innen zu anderen Ordnern navigieren können.',
     'assets.config.show_filename' => 'Dateiname neben dem Vorschaubild einblenden.',
-    'assets.config.show_set_alt' => 'Bei allen Bildern einen Link zum Erfassen des Alt-Texts einblenden.',
+    'assets.config.show_set_alt' => 'Bei Bildern ohne Alternativtext einen Link zum Erfassen einblenden.',
     'assets.dynamic_folder_pending_field' => 'Dieses Feld ist verfügbar, sobald :field festgelegt ist.',
     'assets.dynamic_folder_pending_save' => 'Dieses Feld ist nach dem Speichern verfügbar.',
     'assets.title' => 'Dateien',
