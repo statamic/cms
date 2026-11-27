@@ -178,6 +178,7 @@ onMounted(() => {
                                 option-value="value"
                                 :searchable="false"
                                 :size
+                                adaptive-width
                             >
                                 <template #option="{ icon, label }">
                                     <span class="inline-flex items-center gap-2">
