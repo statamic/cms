@@ -48,6 +48,7 @@ use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Search\Searchable;
+use Statamic\Stache\Cache\CompiledStore;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -284,6 +285,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
         $this->flushDescendantsCache($this);
 
+        CompiledStore::persistAll();
+
         if ($withEvents) {
             EntryDeleted::dispatch($this);
         }
@@ -474,6 +477,10 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
             optional(Collection::findByMount($this))->updateEntryUris();
             $this->updateChildPageUris();
         }
+
+        // The store wrote the entry when it was handed it. What followed from that (its
+        // terms, its place in a structure) is written now, before anyone is told it's saved.
+        CompiledStore::persistAll();
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);

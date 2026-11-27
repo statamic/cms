@@ -12,6 +12,7 @@ use Statamic\Events\StacheWarmed;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\Blink;
 use Statamic\Facades\File;
+use Statamic\Stache\Cache\CompiledStore;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
 use Symfony\Component\Lock\LockFactory;
@@ -116,6 +117,9 @@ class Stache
         Blink::forget('collection-structure-tree*');
         Blink::forget('structure-*');
 
+        // Cleared means cleared now, as it is with any other store, and not when the request ends.
+        CompiledStore::persistAll();
+
         StacheCleared::dispatch();
 
         return $this;
@@ -141,6 +145,8 @@ class Stache
         }
 
         $this->stopTimer();
+
+        $this->tidyCompiledStore();
 
         $lock->release();
 
@@ -280,6 +286,20 @@ class Stache
         return true;
     }
 
+    /**
+     * A warm replaces most of what the compiled store holds, leaving the
+     * files it replaced behind. This is the moment to clear them out.
+     */
+    private function tidyCompiledStore(): void
+    {
+        $store = $this->cacheStore()->getStore();
+
+        if ($store instanceof CompiledStore) {
+            $store->persist();
+            $store->collectGarbage();
+        }
+    }
+
     protected function warmInParallel($stores)
     {
         try {
@@ -308,6 +328,9 @@ class Stache
             }
 
             Concurrency::driver($driver)->run($closures);
+
+            // What the other processes have written is this one's to read now.
+            CompiledStore::resetAll();
         } catch (\Exception $e) {
             Log::warning('Parallel warming failed, falling back to sequential: '.$e->getMessage());
             $stores->each->warm();
