@@ -74,12 +74,12 @@ class Ranking extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Rank your favorite seasons',
+                'display' => __('statamic::form-fieldtypes.ranking.example.display'),
                 'options' => [
-                    'spring' => 'Spring',
-                    'summer' => 'Summer',
-                    'autumn' => 'Autumn',
-                    'winter' => 'Winter',
+                    'spring' => __('statamic::form-fieldtypes.ranking.example.options.spring'),
+                    'summer' => __('statamic::form-fieldtypes.ranking.example.options.summer'),
+                    'autumn' => __('statamic::form-fieldtypes.ranking.example.options.autumn'),
+                    'winter' => __('statamic::form-fieldtypes.ranking.example.options.winter'),
                 ],
             ],
             'value' => ['summer', 'spring', 'autumn', 'winter'],

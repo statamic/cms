@@ -92,13 +92,13 @@ class Dropdown extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => "What's your go-to karaoke song?",
-                'placeholder' => 'Select a song...',
+                'display' => __('statamic::form-fieldtypes.dropdown.example.display'),
+                'placeholder' => __('statamic::form-fieldtypes.dropdown.example.placeholder'),
                 'options' => [
-                    'bohemian' => 'Bohemian Rhapsody',
-                    'wrecking' => 'I Will Survive',
-                    'sweet' => 'Sweet Caroline',
-                    'never' => 'Never Gonna Give You Up',
+                    'bohemian' => __('statamic::form-fieldtypes.dropdown.example.options.bohemian'),
+                    'wrecking' => __('statamic::form-fieldtypes.dropdown.example.options.wrecking'),
+                    'sweet' => __('statamic::form-fieldtypes.dropdown.example.options.sweet'),
+                    'never' => __('statamic::form-fieldtypes.dropdown.example.options.never'),
                 ],
             ],
             'value' => 'never',

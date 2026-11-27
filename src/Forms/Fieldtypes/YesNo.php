@@ -60,7 +60,7 @@ class YesNo extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Would you recommend us to a friend?',
+                'display' => __('statamic::form-fieldtypes.yes_no.example.display'),
             ],
             'value' => 'yes',
         ];

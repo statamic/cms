@@ -66,7 +66,7 @@ class Number extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How many cups of coffee do you drink per day?',
+                'display' => __('statamic::form-fieldtypes.number.example.display'),
             ],
             'value' => 4,
         ];

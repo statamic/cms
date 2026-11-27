@@ -39,9 +39,9 @@ class ShortAnswer extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => "What's your secret talent?",
+                'display' => __('statamic::form-fieldtypes.short_answer.example.display'),
             ],
-            'value' => 'I can whistle with crackers in my mouth',
+            'value' => __('statamic::form-fieldtypes.short_answer.example.value'),
         ];
     }
 }

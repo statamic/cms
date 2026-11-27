@@ -39,9 +39,9 @@ class LongAnswer extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Tell us about your dream vacation',
+                'display' => __('statamic::form-fieldtypes.long_answer.example.display'),
             ],
-            'value' => 'A cozy cabin in the mountains with a stack of books, endless coffee, and absolutely no wifi.',
+            'value' => __('statamic::form-fieldtypes.long_answer.example.value'),
         ];
     }
 }

@@ -46,8 +46,8 @@ class Banner extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Important',
-                'content' => 'Please review the following information before continuing.',
+                'display' => __('statamic::form-fieldtypes.banner.example.display'),
+                'content' => __('statamic::form-fieldtypes.banner.example.content'),
                 'state' => 'tip',
             ],
         ];

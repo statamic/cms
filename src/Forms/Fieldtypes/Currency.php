@@ -85,7 +85,7 @@ class Currency extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How much do you usually spend on coffee per week?',
+                'display' => __('statamic::form-fieldtypes.currency.example.display'),
                 'currency' => 'USD',
             ],
             'value' => 30,

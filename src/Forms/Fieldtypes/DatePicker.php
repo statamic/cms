@@ -5,6 +5,8 @@ namespace Statamic\Forms\Fieldtypes;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class DatePicker extends FormFieldtype
 {
     protected static $fieldtype = 'date';
@@ -24,7 +26,7 @@ class DatePicker extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'What is your birthday?',
+                'display' => __('statamic::form-fieldtypes.date_picker.example.display'),
             ],
             'value' => '1990-01-15',
         ];

@@ -65,12 +65,12 @@ class Checkboxes extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'What toppings do you want?',
+                'display' => __('statamic::form-fieldtypes.checkboxes.example.display'),
                 'options' => [
-                    'pepperoni' => 'Pepperoni',
-                    'mushrooms' => 'Mushrooms',
-                    'pineapple' => 'Pineapple (controversial)',
-                    'anchovies' => 'Anchovies (brave choice)',
+                    'pepperoni' => __('statamic::form-fieldtypes.checkboxes.example.options.pepperoni'),
+                    'mushrooms' => __('statamic::form-fieldtypes.checkboxes.example.options.mushrooms'),
+                    'pineapple' => __('statamic::form-fieldtypes.checkboxes.example.options.pineapple'),
+                    'anchovies' => __('statamic::form-fieldtypes.checkboxes.example.options.anchovies'),
                 ],
             ],
             'value' => ['pepperoni', 'pineapple'],

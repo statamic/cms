@@ -99,11 +99,11 @@ class OpinionScale extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How likely are you to recommend us?',
+                'display' => __('statamic::form-fieldtypes.opinion_scale.example.display'),
                 'min' => 0,
                 'max' => 5,
-                'low_label' => 'Not likely',
-                'high_label' => 'Very likely',
+                'low_label' => __('statamic::form-fieldtypes.opinion_scale.example.low_label'),
+                'high_label' => __('statamic::form-fieldtypes.opinion_scale.example.high_label'),
             ],
             'value' => 8,
         ];

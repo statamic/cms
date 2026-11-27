@@ -66,11 +66,11 @@ class MultiChoice extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Why were you late to work?',
+                'display' => __('statamic::form-fieldtypes.multi_choice.example.display'),
                 'options' => [
-                    'traffic' => 'Traffic was bad',
-                    'alarm' => "My alarm didn't go off",
-                    'racoon' => 'A raccoon stole my keys',
+                    'traffic' => __('statamic::form-fieldtypes.multi_choice.example.options.traffic'),
+                    'alarm' => __('statamic::form-fieldtypes.multi_choice.example.options.alarm'),
+                    'racoon' => __('statamic::form-fieldtypes.multi_choice.example.options.racoon'),
                 ],
             ],
             'value' => 'racoon',

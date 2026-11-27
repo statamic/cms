@@ -70,7 +70,7 @@ class Upload extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Upload your resume',
+                'display' => __('statamic::form-fieldtypes.upload.example.display'),
                 'store' => false,
             ],
         ];

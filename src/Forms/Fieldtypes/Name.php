@@ -40,9 +40,9 @@ class Name extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Your Name',
+                'display' => __('statamic::form-fieldtypes.name.example.display'),
             ],
-            'value' => 'Jamie Schmidt',
+            'value' => __('statamic::form-fieldtypes.name.example.value'),
         ];
     }
 }

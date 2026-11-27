@@ -38,10 +38,10 @@ class Phone extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Phone Number',
-                'placeholder' => '(555) 123-4567',
+                'display' => __('statamic::form-fieldtypes.phone.example.display'),
+                'placeholder' => __('statamic::form-fieldtypes.phone.example.placeholder'),
             ],
-            'value' => '(555) 867-5309',
+            'value' => __('statamic::form-fieldtypes.phone.example.value'),
         ];
     }
 }

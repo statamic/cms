@@ -73,7 +73,7 @@ class Dictionary extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Where have you been on vacation recently?',
+                'display' => __('statamic::form-fieldtypes.dictionary.example.display'),
                 'dictionary' => 'countries',
             ],
             'value' => ['GBR', 'USA', 'NLD', 'DEU'],

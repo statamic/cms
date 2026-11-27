@@ -105,7 +105,7 @@ class StarRating extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How would you rate your experience?',
+                'display' => __('statamic::form-fieldtypes.star_rating.example.display'),
                 'max_stars' => 5,
                 'allow_half_stars' => true,
             ],

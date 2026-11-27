@@ -49,9 +49,9 @@ class Email extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Email Address',
+                'display' => __('statamic::form-fieldtypes.email.example.display'),
             ],
-            'value' => 'jamie@schmidt.family',
+            'value' => __('statamic::form-fieldtypes.email.example.value'),
         ];
     }
 }

@@ -68,8 +68,8 @@ class Toggle extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Agreement',
-                'inline_label' => 'I promise not to spoil the ending',
+                'display' => __('statamic::form-fieldtypes.toggle.example.display'),
+                'inline_label' => __('statamic::form-fieldtypes.toggle.example.inline_label'),
             ],
             'value' => true,
         ];

@@ -50,9 +50,9 @@ class Website extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Your Website',
+                'display' => __('statamic::form-fieldtypes.website.example.display'),
             ],
-            'value' => 'https://schmidt.family',
+            'value' => __('statamic::form-fieldtypes.website.example.value'),
         ];
     }
 }
