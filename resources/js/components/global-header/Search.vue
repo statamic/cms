@@ -16,8 +16,8 @@ import { Icon } from '@ui';
             "
         >
             <Icon name="magnifying-glass" class="size-5 flex-none text-white/50 group-hover:text-white/70" />
-            <span class="max-sm:sr-only leading-none st-text-trim-optical-cap">{{ __('Search') }}</span>
-            <kbd class="ml-auto hidden self-center rounded-md bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-white/60 group-hover:text-white/70 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
+            <span data-global-header-search-text class="max-sm:sr-only leading-none st-text-trim-optical-cap">{{ __('Search') }}</span>
+            <kbd data-global-header-search-text class="ml-auto hidden self-center rounded-md bg-white/5 px-[0.3125rem] py-[0.0625rem] text-[0.625rem]/4 font-medium text-white/60 group-hover:text-white/70 ring-1 ring-white/7.5 [word-spacing:-0.15em] ring-inset md:block">
                 <kbd class="font-sans">⌘ </kbd><kbd class="font-sans">K</kbd>
             </kbd>
         </div>

@@ -220,8 +220,8 @@ main.nav-closed {
         [data-global-header-search] {
             width: calc(var(--spacing) * 9);
             overflow: clip;
-            /* Hide everything except the search icon */
-            > *:not(svg) {
+            /* Hide everything except the search icon. Named with a data attribute: a tag-name target here (*, span) makes Chrome restyle the whole page on every change (#16091) */
+            [data-global-header-search-text] {
                 display: none;
             }
         }
