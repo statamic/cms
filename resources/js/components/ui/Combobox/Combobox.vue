@@ -598,11 +598,14 @@ defineExpose({
                             }"
                         >
                             <div class="relative max-h-[300px] overflow-y-auto py-2" data-ui-combobox-viewport>
-                                <!-- Hidden width measurer for wide dropdown mode -->
+                                <!-- Hidden width measurer for wide dropdown mode. Icons and images get an empty space of the same size, so options with one are measured wide enough. -->
                                 <div v-if="adaptiveWidth" aria-hidden="true" class="h-0 overflow-y-clip px-2">
-                                    <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="py-1.5 px-2 text-sm whitespace-nowrap">
-                                        <span v-if="labelHtml" v-html="getOptionLabel(option)" />
-                                        <template v-else>{{ getOptionLabel(option) }}</template>
+                                    <div v-for="option in filteredOptions" :key="getOptionValue(option)" class="flex items-center gap-2 py-1.5 px-2 text-sm whitespace-nowrap">
+                                        <span v-if="option.image" class="size-5 shrink-0" />
+                                        <span v-else-if="option.icon" class="size-4 shrink-0" />
+                                        <span v-if="option.create">{{ __('Add ":value"', { value: getOptionLabel(option) }) }}</span>
+                                        <span v-else-if="labelHtml" v-html="getOptionLabel(option)" />
+                                        <span v-else>{{ __(getOptionLabel(option)) }}</span>
                                     </div>
                                 </div>
 
