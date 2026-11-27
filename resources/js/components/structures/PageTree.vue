@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </ui-panel-header>
-            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }">
+            <div v-if="!loading" class="page-tree" :class="{ 'page-tree--ready': ready }" @focusout="queueDropTreeTabStop">
                 <Draggable
                     ref="tree"
                     v-model="treeData"
@@ -213,6 +213,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.unwatchTreeTabStop?.();
         this.saveKeyBinding?.destroy();
     },
 
@@ -233,8 +234,31 @@ export default {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
+                this.$nextTick(() => this.watchTreeTabStop());
                 this.$emit('loaded', this.pages);
             });
+        },
+
+        // The tree makes one page a Tab stop whenever its pages change (a move, opening or closing one), so Tab sometimes landed on a
+        // page and sometimes went straight to its drag handle. Tab goes from handle to handle instead, and a page only takes focus
+        // when the arrow keys move onto it.
+        watchTreeTabStop() {
+            this.unwatchTreeTabStop?.();
+            this.unwatchTreeTabStop = this.$watch(() => this.$refs.tree?.activeDescendant, () => this.queueDropTreeTabStop());
+        },
+
+        // After the tree has moved focus (it does that on the next tick), so it's the page focus ended up on that counts
+        queueDropTreeTabStop() {
+            setTimeout(() => this.dropTreeTabStop());
+        },
+
+        dropTreeTabStop() {
+            const tree = this.$refs.tree;
+            const focused = document.activeElement;
+
+            if (!tree?.activeDescendant || (focused?.matches('.tree-node') && tree.$el.contains(focused))) return;
+
+            tree.activeDescendant = null;
         },
 
         refresh() {

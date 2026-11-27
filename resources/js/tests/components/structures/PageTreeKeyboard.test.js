@@ -130,3 +130,23 @@ test('a move it cannot make does nothing', () => {
     expect(self.$refs.tree.move).not.toHaveBeenCalled();
     expect(self.treeUpdated).not.toHaveBeenCalled();
 });
+
+test('a page is only a Tab stop while it has focus, so Tab goes from handle to handle', () => {
+    const el = document.createElement('div');
+    el.innerHTML = '<div class="tree-node" tabindex="0"></div><button>handle</button>';
+    document.body.append(el);
+    const [page, handle] = el.children;
+    const stat = { data: { id: 'about' } };
+    const self = { $refs: { tree: { $el: el, activeDescendant: stat } } };
+    const drop = PageTree.methods.dropTreeTabStop.bind(self);
+
+    page.focus();
+    drop();
+    expect(self.$refs.tree.activeDescendant).toBe(stat);
+
+    handle.focus();
+    drop();
+    expect(self.$refs.tree.activeDescendant).toBe(null);
+
+    el.remove();
+});
