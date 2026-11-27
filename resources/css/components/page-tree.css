@@ -7,7 +7,7 @@
     }
     .tree-node {
         @apply dark:pb-0.25;
-        /* The tree item takes focus (Tab lands on it, then the arrow keys move between items). Its own ring would be square and wrap the
+        /* The tree item takes focus when the arrow keys move onto it (Tab goes from handle to handle). Its own ring would be square and wrap the
            indent, so the ring goes inside the row instead, following its corners */
         &:focus-visible {
             outline: none;
