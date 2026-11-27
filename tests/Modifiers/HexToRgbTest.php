@@ -21,6 +21,14 @@ class HexToRgbTest extends TestCase
         $this->assertEquals('184, 255, 243', $modified);
     }
 
+    #[Test]
+    public function it_converts_shorthand_hex_values_to_rgb(): void
+    {
+        $this->assertEquals('255, 255, 255', $this->modify('#fff'));
+        $this->assertEquals('17, 34, 51', $this->modify('123'));
+        $this->assertEquals('170, 187, 204', $this->modify('#abcd'));
+    }
+
     private function modify(string $value)
     {
         return Modify::value($value)->hexToRgb()->fetch();
