@@ -122,6 +122,22 @@ class TaxonomyTest extends TestCase
     }
 
     #[Test]
+    public function the_default_blueprint_title_is_not_singularized_for_non_english_locales()
+    {
+        app()->setLocale('de');
+
+        $taxonomy = (new Taxonomy)->handle('verzeichnis')->title('Verzeichnis');
+
+        BlueprintRepository::shouldReceive('in')->with('taxonomies/verzeichnis')->andReturn(collect());
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
+            (new Blueprint)->setContents(['title' => 'This will change'])
+        );
+        BlueprintRepository::shouldReceive('getAdditionalNamespaces')->andReturn(collect());
+
+        $this->assertEquals('Verzeichnis', $taxonomy->termBlueprint()->title());
+    }
+
+    #[Test]
     public function it_dispatches_an_event_when_getting_entry_blueprint()
     {
         Event::fake();
