@@ -15,7 +15,6 @@ use function Statamic\trans as __;
 class Dictionary extends FormFieldtype
 {
     protected static $fieldtype = 'dictionary';
-    protected $description = 'Select from a predefined list like countries, timezones, or currencies.';
     protected $icon = 'fieldtype-dictionary';
     protected $categories = ['choice'];
     protected $keywords = ['countries', 'timezones', 'currencies'];
@@ -74,7 +73,7 @@ class Dictionary extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Where have you been on vacation recently?',
+                'display' => __('statamic::form-fieldtypes.dictionary.example.display'),
                 'dictionary' => 'countries',
             ],
             'value' => ['GBR', 'USA', 'NLD', 'DEU'],

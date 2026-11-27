@@ -12,7 +12,6 @@ use function Statamic\trans as __;
 class Banner extends FormFieldtype
 {
     protected static $fieldtype = 'info';
-    protected $description = 'A banner to highlight important information in your form.';
     protected $icon = 'banner';
     protected $categories = ['information'];
     protected $collectsValue = false;
@@ -47,8 +46,8 @@ class Banner extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Important',
-                'content' => 'Please review the following information before continuing.',
+                'display' => __('statamic::form-fieldtypes.banner.example.display'),
+                'content' => __('statamic::form-fieldtypes.banner.example.content'),
                 'state' => 'tip',
             ],
         ];

@@ -21,7 +21,7 @@ const allFieldtypes = computed(() => {
     options.push({
         handle: 'section',
         title: __('Section'),
-        description: __('Sections group fields into clearly defined areas, helping you structure, organize, and navigate your form.'),
+        description: __('statamic::messages.form_builder_section_description'),
         categories: ['structure'],
         keywords: [],
         icon: 'add-section',
@@ -33,7 +33,7 @@ const allFieldtypes = computed(() => {
         options.push({
             handle: 'page_break',
             title: __('Page Break'),
-            description: __('Page Breaks split a form into multiple steps, turning a long form into a more manageable, step-by-step experience.'),
+            description: __('statamic::messages.form_builder_page_break_description'),
             categories: ['structure'],
             keywords: [],
             icon: 'page',
@@ -46,7 +46,7 @@ const allFieldtypes = computed(() => {
         options.push({
             handle: 'fieldset',
             title: __('Link Existing'),
-            description: __('Link one or more existing fields from a fieldset.'),
+            description: __('statamic::messages.form_builder_link_existing_description'),
             categories: ['fieldsets'],
             keywords: [],
             icon: 'link',

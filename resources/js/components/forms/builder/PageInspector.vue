@@ -53,7 +53,7 @@ watch(() => page.value.instructions, dirty);
                         <Input v-model="page.display" :placeholder="placeholderTitle" focus />
                     </Field>
 
-                    <Field :label="__('Help Text')" :instructions="__('Additional field instructions like this.')">
+                    <Field :label="__('Help Text')" :instructions="__('statamic::messages.form_fields_instructions_instructions')">
                         <Textarea v-model="page.instructions" :rows="2" resize="vertical" />
                     </Field>
                     <Button
@@ -70,7 +70,7 @@ watch(() => page.value.instructions, dirty);
         <ConfirmationModal
             v-model:open="confirmingDelete"
             :title="__('Delete Page')"
-            :body-text="__('Are you sure you want to delete this page? All sections and fields in this page will also be deleted.')"
+            :body-text="__('statamic::messages.form_builder_delete_page_confirmation')"
             :button-text="__('Delete')"
             danger
             @confirm="handleDeletePage"

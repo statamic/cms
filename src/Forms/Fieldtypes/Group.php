@@ -14,7 +14,6 @@ use function Statamic\trans as __;
 class Group extends FormFieldtype
 {
     protected static $fieldtype = 'group';
-    protected $description = 'Group related fields together.';
     protected $icon = 'fieldtype-group';
     protected $categories = ['structure'];
 

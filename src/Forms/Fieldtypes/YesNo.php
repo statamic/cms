@@ -16,7 +16,6 @@ class YesNo extends FormFieldtype
 {
     protected static $title = 'Yes/No';
     protected static $fieldtype = 'radio';
-    protected $description = 'A simple yes or no question.';
     protected $icon = 'checkmark-circle';
     protected $categories = ['choice'];
     protected $order = 2;
@@ -61,7 +60,7 @@ class YesNo extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Would you recommend us to a friend?',
+                'display' => __('statamic::form-fieldtypes.yes_no.example.display'),
             ],
             'value' => 'yes',
         ];

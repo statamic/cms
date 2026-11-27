@@ -61,7 +61,7 @@ class Lists extends Fieldtype
 
     public function previewValue(): mixed
     {
-        return ['Lorem', 'Ipsum', 'Dolor'];
+        return [__('Lorem'), __('Ipsum'), __('Dolor')];
     }
 
     public function fakeValue(Generator $faker): mixed

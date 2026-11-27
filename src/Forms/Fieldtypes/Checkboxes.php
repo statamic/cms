@@ -17,7 +17,6 @@ class Checkboxes extends FormFieldtype
     use HasHideableOptions;
 
     protected static $fieldtype = 'checkboxes';
-    protected $description = 'Respondents can select multiple options from a list.';
     protected $icon = 'fieldtype-checkboxes';
     protected $categories = ['choice'];
     protected $order = 4;
@@ -66,12 +65,12 @@ class Checkboxes extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'What toppings do you want?',
+                'display' => __('statamic::form-fieldtypes.checkboxes.example.display'),
                 'options' => [
-                    'pepperoni' => 'Pepperoni',
-                    'mushrooms' => 'Mushrooms',
-                    'pineapple' => 'Pineapple (controversial)',
-                    'anchovies' => 'Anchovies (brave choice)',
+                    'pepperoni' => __('statamic::form-fieldtypes.checkboxes.example.options.pepperoni'),
+                    'mushrooms' => __('statamic::form-fieldtypes.checkboxes.example.options.mushrooms'),
+                    'pineapple' => __('statamic::form-fieldtypes.checkboxes.example.options.pineapple'),
+                    'anchovies' => __('statamic::form-fieldtypes.checkboxes.example.options.anchovies'),
                 ],
             ],
             'value' => ['pepperoni', 'pineapple'],

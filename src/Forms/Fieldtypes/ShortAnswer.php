@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class ShortAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = 'A simple field for short, one-line answers.';
     protected $icon = 'text-short';
     protected $categories = ['text'];
     protected $keywords = ['text'];
@@ -40,9 +39,9 @@ class ShortAnswer extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => "What's your secret talent?",
+                'display' => __('statamic::form-fieldtypes.short_answer.example.display'),
             ],
-            'value' => 'I can whistle with crackers in my mouth',
+            'value' => __('statamic::form-fieldtypes.short_answer.example.value'),
         ];
     }
 }

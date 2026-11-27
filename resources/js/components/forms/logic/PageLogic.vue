@@ -161,7 +161,7 @@ watch(
             <LogicEmptyState
                 v-if="rules.length === 0"
                 :heading="__('No page logic yet')"
-                :description="__('Send users to different pages based on their answers.')"
+                :description="__('statamic::messages.form_logic_page_empty_description')"
             >
                 <AddLogicRuleButton
                     v-if="availablePages.length > 0"

@@ -17,7 +17,6 @@ class MultiChoice extends FormFieldtype
     use HasHideableOptions;
 
     protected static $fieldtype = 'radio';
-    protected $description = 'A question with a range of answer options. Respondents can only choose one answer.';
     protected $icon = 'fieldtype-radio';
     protected $categories = ['choice'];
     protected $keywords = ['radio'];
@@ -67,11 +66,11 @@ class MultiChoice extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Why were you late to work?',
+                'display' => __('statamic::form-fieldtypes.multi_choice.example.display'),
                 'options' => [
-                    'traffic' => 'Traffic was bad',
-                    'alarm' => "My alarm didn't go off",
-                    'racoon' => 'A raccoon stole my keys',
+                    'traffic' => __('statamic::form-fieldtypes.multi_choice.example.options.traffic'),
+                    'alarm' => __('statamic::form-fieldtypes.multi_choice.example.options.alarm'),
+                    'racoon' => __('statamic::form-fieldtypes.multi_choice.example.options.racoon'),
                 ],
             ],
             'value' => 'racoon',

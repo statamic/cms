@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Website extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = "Collects a website address and ensures it's properly formatted.";
     protected $icon = 'website';
     protected $categories = ['contact'];
     protected $keywords = ['url'];
@@ -51,9 +50,9 @@ class Website extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Your Website',
+                'display' => __('statamic::form-fieldtypes.website.example.display'),
             ],
-            'value' => 'https://schmidt.family',
+            'value' => __('statamic::form-fieldtypes.website.example.value'),
         ];
     }
 }

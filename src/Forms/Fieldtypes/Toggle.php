@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class Toggle extends FormFieldtype
 {
     protected static $fieldtype = 'toggle';
-    protected $description = 'A simple yes or no switch.';
     protected $icon = 'fieldtype-toggle';
     protected $categories = ['choice'];
     protected $order = 5;
@@ -69,8 +68,8 @@ class Toggle extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Agreement',
-                'inline_label' => 'I promise not to spoil the ending',
+                'display' => __('statamic::form-fieldtypes.toggle.example.display'),
+                'inline_label' => __('statamic::form-fieldtypes.toggle.example.inline_label'),
             ],
             'value' => true,
         ];

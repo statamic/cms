@@ -5,10 +5,11 @@ namespace Statamic\Forms\Fieldtypes;
 use Statamic\Forms\Fields\FormFieldtype;
 use Statamic\Support\Arr;
 
+use function Statamic\trans as __;
+
 class TimePicker extends FormFieldtype
 {
     protected static $fieldtype = 'time';
-    protected $description = 'Lets respondents pick a time of day.';
     protected $icon = 'time-clock';
     protected $categories = ['datetime'];
 
@@ -24,7 +25,7 @@ class TimePicker extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'When do you usually eat lunch?',
+                'display' => __('statamic::form-fieldtypes.time_picker.example.display'),
             ],
             'value' => '12:30',
         ];

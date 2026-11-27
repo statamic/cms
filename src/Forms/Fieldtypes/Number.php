@@ -14,7 +14,6 @@ use function Statamic\trans as __;
 class Number extends FormFieldtype
 {
     protected static $fieldtype = 'integer';
-    protected $description = 'Collects a number. You can set minimum and maximum values.';
     protected $icon = 'number';
     protected $categories = ['number'];
     protected $keywords = ['integer', 'float'];
@@ -67,7 +66,7 @@ class Number extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How many cups of coffee do you drink per day?',
+                'display' => __('statamic::form-fieldtypes.number.example.display'),
             ],
             'value' => 4,
         ];

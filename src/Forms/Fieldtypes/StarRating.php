@@ -17,7 +17,6 @@ use function Statamic\trans as __;
 class StarRating extends FormFieldtype
 {
     protected static $fieldtype = 'star_rating';
-    protected $description = 'A star rating input for collecting ratings.';
     protected $icon = 'star';
     protected $categories = ['rate'];
     protected $order = 3;
@@ -106,7 +105,7 @@ class StarRating extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'How would you rate your experience?',
+                'display' => __('statamic::form-fieldtypes.star_rating.example.display'),
                 'max_stars' => 5,
                 'allow_half_stars' => true,
             ],

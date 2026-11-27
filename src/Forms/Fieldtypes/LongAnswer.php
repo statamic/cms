@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class LongAnswer extends FormFieldtype
 {
     protected static $fieldtype = 'textarea';
-    protected $description = 'A larger field for detailed responses, comments, or messages.';
     protected $icon = 'text-long';
     protected $categories = ['text'];
     protected $keywords = ['textarea'];
@@ -40,9 +39,9 @@ class LongAnswer extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Tell us about your dream vacation',
+                'display' => __('statamic::form-fieldtypes.long_answer.example.display'),
             ],
-            'value' => 'A cozy cabin in the mountains with a stack of books, endless coffee, and absolutely no wifi.',
+            'value' => __('statamic::form-fieldtypes.long_answer.example.value'),
         ];
     }
 }

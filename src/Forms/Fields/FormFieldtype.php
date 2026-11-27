@@ -78,7 +78,17 @@ abstract class FormFieldtype implements Arrayable
 
     public function description(): ?string
     {
-        return $this->description;
+        if ($this->description) {
+            return __($this->description);
+        }
+
+        $translation = __($key = 'statamic::form-fieldtypes.'.static::handle().'.description');
+
+        if ($translation !== $key) {
+            return $translation;
+        }
+
+        return null;
     }
 
     public function categories(): array

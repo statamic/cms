@@ -10,7 +10,6 @@ use function Statamic\trans as __;
 class Email extends FormFieldtype
 {
     protected static $fieldtype = 'text';
-    protected $description = "Collects an email address and ensures it's properly formatted.";
     protected $icon = 'mail-sign-at';
     protected $categories = ['contact'];
     protected $order = 2;
@@ -50,9 +49,9 @@ class Email extends FormFieldtype
     {
         return [
             'config' => [
-                'display' => 'Email Address',
+                'display' => __('statamic::form-fieldtypes.email.example.display'),
             ],
-            'value' => 'jamie@schmidt.family',
+            'value' => __('statamic::form-fieldtypes.email.example.value'),
         ];
     }
 }

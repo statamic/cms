@@ -16,7 +16,6 @@ use function Statamic\trans as __;
 class OpinionScale extends FormFieldtype
 {
     protected static $fieldtype = 'opinion_scale';
-    protected $description = 'An opinion scale for measuring agreement or satisfaction.';
     protected $icon = 'scale-up';
     protected $categories = ['rate'];
     protected $order = 2;
@@ -102,11 +101,11 @@ class OpinionScale extends FormFieldtype
 
         return [
             'config' => [
-                'display' => 'How likely are you to recommend us?',
+                'display' => __('statamic::form-fieldtypes.opinion_scale.example.display'),
                 'min' => 0,
                 'max' => 5,
-                'low_label' => 'Not likely',
-                'high_label' => 'Very likely',
+                'low_label' => __('statamic::form-fieldtypes.opinion_scale.example.low_label'),
+                'high_label' => __('statamic::form-fieldtypes.opinion_scale.example.high_label'),
             ],
             'value' => (int) round($min + ($max - $min) * 0.8),
         ];

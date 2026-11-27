@@ -490,9 +490,8 @@ onUnmounted(() => {
         <p
             v-if="fieldView === FieldView.Collapsed"
             class="mx-auto text-center max-w-5xl max-[600px]:p-5 px-5.75 sm:px-6.25 mb-5 text-sm text-gray-600 dark:text-gray-300"
-        >
-            <strong>{{ fieldCount }}</strong> {{ __n('field on this form|fields on this form', fieldCount) }}
-        </p>
+            v-html="__n('statamic::messages.form_builder_field_count', fieldCount)"
+        />
     </div>
 
     <Button

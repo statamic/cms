@@ -141,7 +141,7 @@ const hasErrors = computed(() => {
             :class="{ 'opacity-60': field.config.hidden }"
             :label="__(field.config.display)"
             :instructions="field.config.instructions"
-            :error="hasErrors ? __('This field has errors. Please fix them before saving.') : null"
+            :error="hasErrors ? __('statamic::messages.form_builder_field_has_errors') : null"
         >
             <template #label>
                 <Label :class="['', { 'cursor-pointer': !isInspecting }]">
