@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'activate_account_notification_body' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
+    'activate_account_notification_body' => 'Vous recevez cet e-mail car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
     'activate_account_notification_subject' => 'Activez votre compte',
     'addon_has_more_releases_beyond_license_body' => 'Vous pouvez mettre à jour, mais vous devrez mettre à niveau ou acheter une nouvelle licence.',
     'addon_has_more_releases_beyond_license_heading' => 'Cet addon a plus de versions au-delà de votre limite de licence.',
@@ -146,7 +146,7 @@ return [
     'form_configure_email_from_instructions' => 'Laissez vide pour revenir à la valeur par défaut du site.',
     'form_configure_email_markdown_instructions' => 'Rendez la version HTML de cet e-mail en utilisant Markdown.',
     'form_configure_email_reply_to_instructions' => 'Laissez le champ vide pour un retour à l’expéditeur.',
-    'form_configure_email_to_instructions' => 'Adresse(s) email du(des) destinataire(s) - séparateur virgule.',
+    'form_configure_email_to_instructions' => 'Adresse(s) e-mail du(des) destinataire(s) - séparateur virgule.',
     'form_configure_email_views_instructions' => 'Laissez ces deux champs vides pour utiliser la mise en page par défaut.',
     'form_configure_handle_instructions' => 'Utilisé pour référencer ce formulaire sur le frontal. Ceci ne sera pas facile à modifier par la suite.',
     'form_configure_honeypot_behavior_instructions' => 'Détermine le traitement des soumissions détectées par le « honeypot » (piège à robots). Elles peuvent être ignorées silencieusement, ou bien stockées et marquées comme spam pour être examinées.',
@@ -265,7 +265,7 @@ return [
     'publish_actions_schedule' => 'Les modifications apportées à la copie de travail s’appliqueront à l’entrée et celle-ci paraîtra publiée à la date sélectionnée.',
     'publish_actions_unpublish' => 'La révision actuelle sera dépubliée.',
     'relationship_item_unavailable' => 'Cet élément n\'est pas disponible. Il a peut-être été supprimé, ou vous n\'avez pas l\'autorisation de le voir.',
-    'reset_password_notification_body' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
+    'reset_password_notification_body' => 'Vous recevez cet e-mail car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
     'reset_password_notification_no_action' => 'Si vous n’avez pas demandé de réinitialisation de mot de passe, aucune autre action n’est requise.',
     'reset_password_notification_subject' => 'Notification de réinitialisation du mot de passe',
     'role_change_handle_warning' => 'Après avoir modifié l’identifiant, toutes les références à ce dernier dans les Utilisateurs et les Groupes devront être mises à jour manuellement.',
@@ -336,7 +336,7 @@ return [
     'uploader_choose_new_filename' => 'Choisir un nouveau nom de fichier',
     'uploader_discard_use_existing' => 'Annuler et utiliser le fichier existant',
     'uploader_overwrite_existing' => 'Écraser le fichier existant',
-    'user_activation_email_not_sent_error' => 'L’email d’activation n’a pas pû être envoyé. Merci de vérifier votre configuration email et de réessayer.',
+    'user_activation_email_not_sent_error' => 'L’e-mail d’activation n’a pas pû être envoyé. Merci de vérifier votre configuration e-mail et de réessayer.',
     'user_groups_intro' => 'Les groupes d’utilisateurs vous permettent d’organiser les utilisateurs et d’appliquer des rôles basés sur des autorisations dans leur ensemble.',
     'user_groups_role_instructions' => 'Affectez des rôles afin de donner aux utilisateurs de ce groupe toutes les autorisations correspondantes.',
     'user_groups_title_instructions' => 'Habituellement un nom au pluriel, comme "Editeurs" ou "Photographes".',

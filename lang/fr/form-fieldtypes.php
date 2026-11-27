@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'banner.title' => 'Bannière',
     'checkboxes.title' => 'Cases à cocher',
     'date_picker.title' => 'Sélecteur de date',
     'dropdown.title' => 'Liste déroulante',
@@ -16,6 +17,8 @@ return [
     'star_rating.title' => 'Evaluation par étoiles',
     'time_picker.title' => 'Sélecteur d’heure',
     'upload.title' => 'Téléverser un fichier',
+    'website.title' => 'Site web',
+    'yes_no.title' => 'Oui/Non',
     'image_choice.config.aspect_ratio.instructions' => 'Forme de la zone d’image pour chaque option.',
     'image_choice.config.columns.instructions' => 'Nombre d’options affichées par ligne.',
     'opinion_scale.config.high_label.instructions' => 'S’affiche sous la valeur la plus élevée.',

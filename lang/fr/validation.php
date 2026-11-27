@@ -155,7 +155,7 @@ return [
     'duplicate_uri' => 'URI en doublon :value',
     'elevated_session_resend_code_unavailable' => 'Le renvoi du code n’est disponible que pour la méthode de vérification par code.',
     'elevated_session_verification_code' => 'Le code de vérification est incorrect.',
-    'email_available' => 'Un utilisateur possédant cet email existe déjà.',
+    'email_available' => 'Un utilisateur possédant cet e-mail existe déjà.',
     'email_connection_template_syntax' => 'Seuls les utilisateurs autorisés à configurer des formulaires peuvent utiliser la syntaxe de modèle.',
     'email_field_reference' => 'Fait référence à un champ qui n’existe pas dans ce formulaire.',
     'fieldset_imported_recursively' => 'Le jeu de champs :handle est importé de manière récursive.',
