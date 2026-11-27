@@ -1,5 +1,53 @@
 # Release Notes
 
+## 6.44.1 (2026-11-27)
+
+### What's fixed
+- Forms 2: Match form builder category headings to custom CP themes [#16036](https://github.com/statamic/cms/issues/16036) by @jaygeorge
+- Forms 2: Use the tooltip prop on toggle items [#15999](https://github.com/statamic/cms/issues/15999) by @duncanmcclean
+- Show duplicate form action when Forms Pro is installed [#16037](https://github.com/statamic/cms/issues/16037) by @duncanmcclean
+- Hide collection command palette actions without permission [#16018](https://github.com/statamic/cms/issues/16018) by @lazerg
+- Fit date and time fields in narrow columns [#16055](https://github.com/statamic/cms/issues/16055) by @jaygeorge
+- Forms 2: Stop short page names getting cut off in the logic tree [#16059](https://github.com/statamic/cms/issues/16059) by @jaygeorge
+- Forms 2: Centre badge and picker text in form logic and connections [#16068](https://github.com/statamic/cms/issues/16068) by @jaygeorge
+- Resize elastic textareas when fonts finish loading [#16042](https://github.com/statamic/cms/issues/16042) by @duncanmcclean
+- Stop long validation rules overlapping in the Rules dropdown [#16078](https://github.com/statamic/cms/issues/16078) by @jaygeorge
+- Forms 2: Stop the field inspector losing logic and validation rules [#16079](https://github.com/statamic/cms/issues/16079) by @jaygeorge
+- Remove duplicate Save button on form configure page [#16077](https://github.com/statamic/cms/issues/16077) by @duncanmcclean
+- Forms 2: Preserve the fake flag when replacing submission data [#16003](https://github.com/statamic/cms/issues/16003) by @duncanmcclean
+- Don't offer group fields as email recipients [#16043](https://github.com/statamic/cms/issues/16043) by @duncanmcclean
+- Forms 2: Fix submit button label not persisting [#16056](https://github.com/statamic/cms/issues/16056) by @duncanmcclean
+- Fix field inspector not loading on form logic page [#16038](https://github.com/statamic/cms/issues/16038) by @duncanmcclean
+- Forms 2: Resolve Image Choice images from the configured container [#16007](https://github.com/statamic/cms/issues/16007) by @duncanmcclean
+- Fix form fields named "title" breaking the form's title in the CP [#16061](https://github.com/statamic/cms/issues/16061) by @jasonbaciulis
+- Fix Opinion Scale max, example value and selected answer in the CP [#16046](https://github.com/statamic/cms/issues/16046) by @duncanmcclean
+- Fix Image Choice fieldtype when the `assets` container doesn't exist [#16039](https://github.com/statamic/cms/issues/16039) by @duncanmcclean
+- Show a placeholder for empty paragraphs in the form builder [#16072](https://github.com/statamic/cms/issues/16072) by @duncanmcclean
+- Remove linked field overrides when values are reverted [#16041](https://github.com/statamic/cms/issues/16041) by @duncanmcclean
+- Fix dropdown previews inside groups in the forms builder [#16040](https://github.com/statamic/cms/issues/16040) by @duncanmcclean
+- Forms 2: Match the form tabs bar to custom CP themes [#16081](https://github.com/statamic/cms/issues/16081) by @jaygeorge
+- Fix form submissions with an empty upload field that has file size rules [#16026](https://github.com/statamic/cms/issues/16026) by @el-schneider
+- Fix scroll area keeping the height of the previous page in Safari [#16051](https://github.com/statamic/cms/issues/16051) by @duncanmcclean
+- Allow conditionally required connector fields [#16076](https://github.com/statamic/cms/issues/16076) by @duncanmcclean
+- Fix star rating outlines not showing in Safari & Firefox [#16050](https://github.com/statamic/cms/issues/16050) by @duncanmcclean
+- Hide unique value validation rules in the form builder [#16080](https://github.com/statamic/cms/issues/16080) by @duncanmcclean
+- Stop the root page icon being an empty Tab stop [#16092](https://github.com/statamic/cms/issues/16092) by @jaygeorge
+- Stop long fieldtype labels widening the form builder sidebar [#16097](https://github.com/statamic/cms/issues/16097) by @jaygeorge
+- Stop the field logic dropdown wrapping longer options [#16094](https://github.com/statamic/cms/issues/16094) by @jaygeorge
+- Stop a global header rule slowing down large publish forms [#16095](https://github.com/statamic/cms/issues/16095) by @jaygeorge
+- Forms 2: Render paragraph and heading fields the same way in Antlers and Blade [#16001](https://github.com/statamic/cms/issues/16001) by @duncanmcclean
+- Forms 2: Don't pre-select choice options keyed 0 [#16005](https://github.com/statamic/cms/issues/16005) by @duncanmcclean
+- Forms 2: Hide the submission limit when submissions aren't stored [#16006](https://github.com/statamic/cms/issues/16006) by @duncanmcclean
+- Keep the current tab when switching forms [#16057](https://github.com/statamic/cms/issues/16057) by @jaygeorge
+- Fill old input that wasn't flashed by a form submission [#16028](https://github.com/statamic/cms/issues/16028) by @andjsch
+- Forms 2: Validate malformed form builder requests [#16000](https://github.com/statamic/cms/issues/16000) by @duncanmcclean
+- Support shorthand hex values in hex_to_rgb modifier [#16063](https://github.com/statamic/cms/issues/16063) by @bardrop
+- French translations [#16019](https://github.com/statamic/cms/issues/16019) by @ebeauchamps
+- French translations [#16096](https://github.com/statamic/cms/issues/16096) by @ebeauchamps
+- Dutch translations [#16058](https://github.com/statamic/cms/issues/16058) by @wiegertschouten
+
+
+
 ## 6.44.0 (2026-11-24)
 
 ### What's new
