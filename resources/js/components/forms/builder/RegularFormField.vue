@@ -43,10 +43,9 @@ const iconColorClass = computed(() => categoryColorClasses[fieldtypeCategory.val
 
 const hasLogic = computed(() => KEYS.some(key => props.field.config[key] && Object.keys(props.field.config[key]).length > 0));
 
-const hasErrors = computed(() => {
-    const allErrors = errors?.value ?? {};
-    return Object.keys(allErrors).some(key => key.startsWith(`${props.field._id}.`));
-});
+const fieldErrors = computed(() => Object.entries(errors?.value ?? {})
+    .filter(([key]) => key.startsWith(`${props.field._id}.`))
+    .flatMap(([, messages]) => messages));
 </script>
 
 <template>
@@ -141,7 +140,7 @@ const hasErrors = computed(() => {
             :class="{ 'opacity-60': field.config.hidden }"
             :label="__(field.config.display)"
             :instructions="field.config.instructions"
-            :error="hasErrors ? __('This field has errors. Please fix them before saving.') : null"
+            :errors="fieldErrors"
         >
             <template #label>
                 <Label :class="['', { 'cursor-pointer': !isInspecting }]">

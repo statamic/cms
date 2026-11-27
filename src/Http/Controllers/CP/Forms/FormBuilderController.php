@@ -138,7 +138,7 @@ class FormBuilderController extends CpController
                         ->preProcess();
 
                     try {
-                        $fields->validate([], ['handle.not_in' => __('statamic::validation.reserved')]);
+                        $fields->validate([], ['handle.not_in' => __('statamic::validation.reserved_field_handle', ['handle' => $field['handle']])]);
                     } catch (ValidationException $e) {
                         foreach ($e->errors() as $handle => $messages) {
                             $errors["{$field['_id']}.{$handle}"] = $messages;
