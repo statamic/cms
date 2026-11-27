@@ -10,6 +10,7 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\View\Antlers\Parser;
 use Statamic\Facades\Compare;
+use Statamic\Fieldtypes;
 use Statamic\Support\Str;
 use Statamic\View\Antlers\Language\Parser\DocumentTransformer;
 use Statamic\View\Cascade;
@@ -26,6 +27,21 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
     protected $fieldtype;
     protected $augmentable;
     protected $shallow = false;
+    private $augmentedFor;
+    private $augmented;
+
+    /**
+     * Fieldtypes whose augmented value only depends on the raw value and the
+     * field's config, so it can be kept rather than worked out on every read.
+     */
+    private const REMEMBERS_AUGMENTED_VALUE = [
+        Fieldtypes\ButtonGroup::class => true,
+        Fieldtypes\Radio::class => true,
+        Fieldtypes\Select::class => true,
+        Fieldtypes\Text::class => true,
+        Fieldtypes\Textarea::class => true,
+        Fieldtypes\Toggle::class => true,
+    ];
 
     public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
@@ -84,9 +100,22 @@ class Value implements ArrayAccess, IteratorAggregate, JsonSerializable
 
         if ($raw === null) {
             $raw = $this->fieldtype->field()?->defaultValue() ?? null;
+
+            return $this->getAugmentedValue($raw);
         }
 
-        return $this->getAugmentedValue($raw);
+        if ($this->augmentedFor === $this->fieldtype) {
+            return $this->augmented;
+        }
+
+        $value = $this->getAugmentedValue($raw);
+
+        if (isset(self::REMEMBERS_AUGMENTED_VALUE[get_class($this->fieldtype)])) {
+            $this->augmentedFor = $this->fieldtype;
+            $this->augmented = $value;
+        }
+
+        return $value;
     }
 
     private function getAugmentedValue($raw)

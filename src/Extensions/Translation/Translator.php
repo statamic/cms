@@ -7,7 +7,6 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Translation\Translator as BaseTranslator;
 use Statamic\Statamic;
-use Statamic\Support\Str;
 
 class Translator extends BaseTranslator
 {
@@ -21,7 +20,7 @@ class Translator extends BaseTranslator
 
     public function parseKey($key)
     {
-        if (Statamic::isCpRoute() && Str::startsWith($key, 'validation.')) {
+        if (is_string($key) && str_starts_with($key, 'validation.') && Statamic::isCpRoute()) {
             $key = 'statamic::'.$key;
         }
 

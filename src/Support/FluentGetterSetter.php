@@ -12,6 +12,8 @@ class FluentGetterSetter
     protected $setter;
     protected $afterSetter;
 
+    private static array $readers = [];
+
     /**
      * Instantiate fluent getter/setter helper.
      *
@@ -132,7 +134,12 @@ class FluentGetterSetter
 
     private function getProperty($object, $property)
     {
-        return (fn () => $this->{$property})->call($object);
+        $class = get_class($object);
+
+        // One property reader per class, rather than a new bound closure on every read.
+        $reader = self::$readers[$class] ??= Closure::bind(static fn ($object, $property) => $object->{$property}, null, $class);
+
+        return $reader($object, $property);
     }
 
     private function setProperty($object, $property, $value)
