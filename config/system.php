@@ -165,6 +165,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Scheduled Entries Frequency
+    |--------------------------------------------------------------------------
+    |
+    | How often to check for entries that have reached their scheduled date,
+    | as a cron expression. Each check covers everything that has become
+    | due since the last one, so a lower frequency only delays updates.
+    |
+    */
+
+    'scheduled_entries_frequency' => env('STATAMIC_SCHEDULED_ENTRIES_FREQUENCY', '* * * * *'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Cache Tags
     |--------------------------------------------------------------------------
     |
