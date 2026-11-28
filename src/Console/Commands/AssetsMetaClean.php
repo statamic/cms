@@ -8,6 +8,9 @@ use Illuminate\Support\Str;
 use Statamic\Assets\AssetContainer as AssetsContainer;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 
 use function Laravel\Prompts\progress;
 
@@ -55,7 +58,9 @@ class AssetsMetaClean extends Command
             label: 'Deleting orphaned asset metadata...',
             steps: $flatOrphanedMetaFiles,
             callback: function (array $metaFile, $progress) use ($containers) {
-                $containers->get($metaFile['container'])->disk()->delete($metaFile['path']);
+                $this->metaAsContent()
+                    ? File::delete($metaFile['path'])
+                    : $containers->get($metaFile['container'])->disk()->delete($metaFile['path']);
                 $progress->advance();
             }
         );
@@ -82,14 +87,46 @@ class AssetsMetaClean extends Command
     {
         $assetPaths = $container->files()->flip();
 
-        return $container->metaFiles()
+        return $this->metaFiles($container)
             ->filter(fn (string $path) => Str::endsWith($path, '.yaml'))
-            ->reject(fn (string $path) => $assetPaths->has($this->metaPathToAssetPath($path)))
+            ->reject(fn (string $path) => $assetPaths->has($this->metaPathToAssetPath($container, $path)))
             ->values();
     }
 
-    private function metaPathToAssetPath(string $metaPath): string
+    private function metaAsContent(): bool
     {
+        return (bool) config('statamic.assets.meta_as_content');
+    }
+
+    private function contentMetaDirectory(AssetsContainer $container): string
+    {
+        return Path::tidy(Stache::store('assets')->directory().$container->handle());
+    }
+
+    private function metaFiles(AssetsContainer $container): Collection
+    {
+        if (! $this->metaAsContent()) {
+            return $container->metaFiles();
+        }
+
+        $directory = $this->contentMetaDirectory($container);
+
+        if (! File::isDirectory($directory)) {
+            return collect();
+        }
+
+        return File::withAbsolutePaths()->getFilesRecursively($directory)->map(fn ($path) => Path::tidy($path))->values();
+    }
+
+    private function metaPathToAssetPath(AssetsContainer $container, string $metaPath): string
+    {
+        if ($this->metaAsContent()) {
+            return Str::of($metaPath)
+                ->after($this->contentMetaDirectory($container).'/')
+                ->beforeLast('.yaml')
+                ->value();
+        }
+
         $pathWithoutYamlExtension = Str::endsWith($metaPath, '.yaml')
             ? substr($metaPath, 0, -5)
             : $metaPath;
@@ -105,6 +142,12 @@ class AssetsMetaClean extends Command
 
     private function deleteEmptyMetaDirectories(AssetsContainer $container, Collection $metaFiles): void
     {
+        if ($this->metaAsContent()) {
+            $this->deleteEmptyContentMetaDirectories($container, $metaFiles);
+
+            return;
+        }
+
         $metaDirectories = $metaFiles
             ->map(fn (string $metaFile) => dirname($metaFile))
             ->unique()
@@ -119,6 +162,21 @@ class AssetsMetaClean extends Command
 
             if ($disk->isEmpty($metaDirectory)) {
                 $disk->filesystem()->deleteDirectory($metaDirectory);
+            }
+        });
+    }
+
+    private function deleteEmptyContentMetaDirectories(AssetsContainer $container, Collection $metaFiles): void
+    {
+        $root = $this->contentMetaDirectory($container);
+
+        $metaFiles->each(function (string $metaFile) use ($root) {
+            $directory = dirname($metaFile);
+
+            // Walk up the mirrored folder tree, but never remove the container's own directory.
+            while (Str::startsWith($directory, $root.'/') && File::isDirectory($directory) && File::isEmpty($directory)) {
+                File::delete($directory);
+                $directory = dirname($directory);
             }
         });
     }
