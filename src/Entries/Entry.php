@@ -74,6 +74,8 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
     protected $id;
     protected $collection;
     protected $blueprint;
+    protected $unsavedBlueprintKey;
+    protected static $unsavedBlueprintKeys = 0;
     protected $date;
     protected $locale;
     protected $afterSaveCallbacks = [];
@@ -186,7 +188,7 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
 
     public function blueprint($blueprint = null)
     {
-        $key = 'entry-'.($this->id() ?? 'obj-'.spl_object_id($this)).'-blueprint';
+        $key = $this->blueprintBlinkKey();
 
         return $this
             ->fluentlyGetOrSet('blueprint')
@@ -219,6 +221,19 @@ class Entry implements Arrayable, ArrayAccess, Augmentable, BulkAugmentable, Con
                 return $blueprint instanceof \Statamic\Fields\Blueprint ? $blueprint->handle() : $blueprint;
             })
             ->args(func_get_args());
+    }
+
+    /**
+     * Unsaved entries have no id, so they need a key of their own. PHP recycles
+     * spl_object_id() as soon as an object is freed, which would let a fresh
+     * entry pick up the blueprint cached for a dead one, so hand out ids that
+     * are never reused instead.
+     */
+    private function blueprintBlinkKey(): string
+    {
+        $id = $this->id() ?? 'obj-'.($this->unsavedBlueprintKey ??= ++static::$unsavedBlueprintKeys);
+
+        return "entry-{$id}-blueprint";
     }
 
     public function collectionHandle()
