@@ -5,6 +5,7 @@ namespace Tests\Policies;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 
 class CollectionPolicyTest extends PolicyTestCase
 {
@@ -43,6 +44,23 @@ class CollectionPolicyTest extends PolicyTestCase
 
         $this->assertTrue($userWithEnPermission->can('index', CollectionContract::class));
         $this->assertFalse($userWithDePermission->can('index', CollectionContract::class));
+    }
+
+    #[Test]
+    public function index_is_allowed_for_a_site_if_any_collection_is_viewable_in_that_site()
+    {
+        $this->withSites(['en', 'fr']);
+
+        $user = $this->userWithPermissions([
+            'view test entries',
+            'access en site',
+            'access fr site',
+        ]);
+
+        Collection::make('test')->sites(['en'])->save();
+
+        $this->assertTrue($user->can('index', [CollectionContract::class, Site::get('en')]));
+        $this->assertFalse($user->can('index', [CollectionContract::class, Site::get('fr')]));
     }
 
     #[Test]
