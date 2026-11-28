@@ -6,6 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\File;
+use Statamic\Forms\Fields\FormField;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use function Statamic\trans as __;
@@ -68,7 +69,10 @@ abstract class Exporter
 
     protected function columns(): Collection
     {
-        $available = $this->form->fields()->keys()->push('date');
+        $available = $this->form->formFields()->fields()
+            ->filter(fn (FormField $field) => $field->fieldtype()->collectsValue())
+            ->keys()
+            ->push('date');
 
         if ($this->columns === null) {
             return $available;
