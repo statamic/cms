@@ -8,6 +8,7 @@ import Heading from '@tiptap/extension-heading';
 import HardBreak from '@tiptap/extension-hard-break';
 import { BulletList, OrderedList, ListItem } from '@tiptap/extension-list';
 import { Autocomplete } from './extensions/Autocomplete';
+import { Link } from './extensions/Link';
 import { MENTION_TOKEN } from './mentionToken';
 
 // The serializer escapes inline syntax but not what only has meaning at the
@@ -110,6 +111,7 @@ const manager = new MarkdownManager({
         BulletList,
         OrderedList,
         ListItem,
+        Link,
         MarkdownAutocomplete,
     ],
 });

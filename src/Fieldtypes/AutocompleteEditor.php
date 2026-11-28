@@ -6,7 +6,9 @@ use Illuminate\Contracts\Support\Htmlable;
 use Statamic\Facades\Markdown;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
+use Statamic\Fieldtypes\Link\LinkPicker;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 use function Statamic\trans as __;
 
@@ -49,6 +51,7 @@ class AutocompleteEditor extends Fieldtype
                 'options' => [
                     'bold' => __('Bold'),
                     'italic' => __('Italic'),
+                    'link' => __('Link'),
                     'h1' => __('Heading 1'),
                     'h2' => __('Heading 2'),
                     'h3' => __('Heading 3'),
@@ -58,8 +61,17 @@ class AutocompleteEditor extends Fieldtype
                     'bulletlist' => __('Unordered List'),
                     'orderedlist' => __('Ordered List'),
                 ],
-                'default' => ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
+                'default' => ['bold', 'italic', 'link', 'h2', 'h3', 'bulletlist', 'orderedlist'],
                 'if' => ['markdown' => 'equals true'],
+            ],
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.autocomplete_editor.config.container'),
+                'type' => 'asset_container',
+                'mode' => 'select',
+                'max_items' => 1,
+                'width' => 50,
+                'if' => ['markdown' => 'equals true', 'buttons' => 'contains link'],
             ],
             'markdown' => [
                 'display' => __('Markdown'),
@@ -89,8 +101,14 @@ class AutocompleteEditor extends Fieldtype
 
     public function preload(): array
     {
+        if (! $this->config('markdown', true) || ! in_array('link', $this->config('buttons', []))) {
+            return ['options' => $this->getOptions()];
+        }
+
         return [
             'options' => $this->getOptions(),
+            'linkTypes' => $this->linkPicker()->types(),
+            'linkData' => (object) $this->getLinkData((string) $this->field->value()),
         ];
     }
 
@@ -118,6 +136,22 @@ class AutocompleteEditor extends Fieldtype
                 return ['value' => $value, 'label' => $item['value']];
             })
             ->values()
+            ->all();
+    }
+
+    private function linkPicker(): LinkPicker
+    {
+        return new LinkPicker(['container' => $this->config('container')]);
+    }
+
+    private function getLinkData(string $markdown): array
+    {
+        $html = Markdown::parser('default')->parse($markdown);
+
+        preg_match_all('/href="(statamic:\/\/[^"]+)"/', $html, $matches);
+
+        return collect($matches[1])
+            ->mapWithKeys(fn ($href) => $this->linkPicker()->data(rawurldecode(html_entity_decode($href))))
             ->all();
     }
 
@@ -167,6 +201,8 @@ class AutocompleteEditor extends Fieldtype
             ->newInstance(['html_input' => 'escape', 'allow_unsafe_links' => false])
             ->parse($markdown);
 
+        $html = static::resolveStatamicUrls($html);
+
         $html = str_replace('[[', '&#91;&#91;', $html);
         $html = preg_replace_callback(
             '/(?<!\\\\)\\\\++(?=\[*mention'.$nonce.'n\d+e)/',
@@ -183,6 +219,22 @@ class AutocompleteEditor extends Fieldtype
         $html = strtr($html, $mentions);
 
         return $inline ? static::unwrapParagraph($html) : $html;
+    }
+
+    // Links to entries and assets resolve to absolute URLs, since the content
+    // is usually read away from the site, like in a form's email.
+    private static function resolveStatamicUrls(string $html): string
+    {
+        return preg_replace_callback('/href="statamic:\/\/([^"]*)"/', function ($matches) {
+            $href = html_entity_decode($matches[1]);
+            $reference = Str::before(Str::before($href, '?'), '#');
+            [$handle, $id] = explode('::', rawurldecode($reference), 2) + [1 => ''];
+
+            $item = (Link::types()[$handle] ?? null)?->resolve($id);
+            $url = is_object($item) ? $item->absoluteUrl() : $item;
+
+            return 'href="'.e($url ? $url.Str::after($href, $reference) : '').'"';
+        }, $html);
     }
 
     // The HTML-context convenience over Mentions::replace(), which stays raw and

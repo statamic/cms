@@ -4,6 +4,7 @@ namespace Statamic\Forms\Connectors;
 
 use Illuminate\Routing\Router;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Forms\Connectors\Rules\EmailConnectionAddress;
@@ -247,6 +248,7 @@ class Email extends Connector
                                         'type' => 'autocomplete_editor',
                                         'display' => __('Message'),
                                         'options' => $this->mentionOptions(),
+                                        'container' => $this->linkableAssetContainer(),
                                         'instructions' => __('statamic::messages.form_configure_email_body_instructions'),
                                     ],
                                 ],
@@ -307,5 +309,17 @@ class Email extends Connector
                 ],
             ],
         ]);
+    }
+
+    // Like the assets fieldtype, a site with a single container uses it without asking.
+    private function linkableAssetContainer(): ?string
+    {
+        if ($container = config('statamic.forms.email_link_container')) {
+            return $container;
+        }
+
+        $containers = AssetContainer::all();
+
+        return $containers->count() === 1 ? $containers->first()->handle() : null;
     }
 }

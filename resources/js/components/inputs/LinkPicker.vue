@@ -3,7 +3,7 @@
         <section class="flex gap-3 items-center">
             <ui-select
                 v-model="linkType"
-                :options="linkTypes"
+                :options="linkTypeOptions"
                 option-label="title"
                 option-value="type"
                 class="w-1/4 min-w-24"
@@ -77,6 +77,7 @@
 
             <!-- Rel attribute -->
             <ui-input
+                v-if="!markdown"
                 type="text"
                 ref="input"
                 v-model="rel"
@@ -84,7 +85,7 @@
                 :placeholder="__('noopener, noreferrer')"
             />
 
-            <div class="flex items-center gap-2">
+            <div v-if="!markdown" class="flex items-center gap-2">
                 <ui-switch
                     v-model="targetBlank"
                 />
@@ -119,13 +120,14 @@
 </template>
 
 <script>
-import { Icon, StackContent, StackFooter } from '@/components/ui';
+// Imported directly, since the UI index imports this component through the autocomplete editor.
+import StackContent from '@/components/ui/Stack/Content.vue';
+import StackFooter from '@/components/ui/Stack/Footer.vue';
 
 export default {
-    emits: ['updated', 'canceled', 'deselected'],
+    emits: ['updated', 'canceled', 'item-loaded'],
 
     components: {
-        Icon,
         StackContent,
         StackFooter,
     },
@@ -135,9 +137,16 @@ export default {
     },
 
     props: {
-        bard: {},
-        config: Object,
+        config: { type: Object, default: () => ({}) },
         linkAttrs: Object,
+        /** Registered link types (entry, asset, custom), as preloaded by the `LinkPicker` PHP class. */
+        linkTypes: { type: [Object, Array], default: () => ({}) },
+        /** Item data for the `statamic://` links in the content, keyed by reference. */
+        linkData: { type: Object, default: () => ({}) },
+        /** The text being linked. An email address preselects the email link type. */
+        selectedText: { type: String, default: '' },
+        /** Markdown links can't store a rel or target, so those options are hidden. */
+        markdown: { type: Boolean, default: false },
     },
 
     data() {
@@ -155,10 +164,10 @@ export default {
     },
 
     computed: {
-        linkTypes() {
+        linkTypeOptions() {
             return [
                 { type: 'url', title: __('URL') },
-                ...Object.entries(this.bard.meta.linkTypes ?? {}).map(([handle, type]) => ({
+                ...Object.entries(this.linkTypes).map(([handle, type]) => ({
                     type: handle,
                     title: type.title,
                 })),
@@ -168,7 +177,7 @@ export default {
         },
 
         registeredLinkType() {
-            return this.bard.meta.linkTypes?.[this.linkType] ?? null;
+            return this.linkTypes[this.linkType] ?? null;
         },
 
         registeredLinkTypeComponent() {
@@ -222,15 +231,15 @@ export default {
         },
 
         selectedTextIsEmail() {
-            const { view, state } = this.bard.editor;
-            const { from, to } = view.state.selection;
-            const text = state.doc.textBetween(from, to, '');
-
-            return text.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+            return this.selectedText.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
         },
     },
 
     watch: {
+        linkAttrs(attrs) {
+            this.applyAttrs(attrs);
+        },
+
         linkType(type) {
             if (type != 'entry') {
                 this.appends = null;
@@ -260,9 +269,6 @@ export default {
     created() {
         this.applyAttrs(this.linkAttrs);
 
-        this.bard.events.on('link-selected', this.applyAttrs);
-        this.bard.events.on('link-deselected', () => this.$emit('deselected'));
-
         if (Object.keys(this.linkAttrs).length === 0 && this.selectedTextIsEmail) {
             this.linkType = 'mailto';
             this.urlData = { mailto: this.selectedTextIsEmail };
@@ -271,11 +277,6 @@ export default {
 
     mounted() {
         this.autofocus();
-    },
-
-    beforeUnmount() {
-        this.bard.events.off('link-selected');
-        this.bard.events.off('link-deselected');
     },
 
     methods: {
@@ -362,14 +363,8 @@ export default {
 
             if (item) {
                 this.setItemData(this.linkType, item);
-                this.putItemDataIntoMeta(`${this.linkType}::${item.id}`, item);
+                this.$emit('item-loaded', `${this.linkType}::${item.id}`, item);
             }
-        },
-
-        putItemDataIntoMeta(ref, item) {
-            let meta = this.bard.meta;
-            meta.linkData[ref] = item;
-            this.bard.updateMeta(meta);
         },
 
         getLinkTypeForUrl(url) {
@@ -401,7 +396,7 @@ export default {
                 return null;
             }
 
-            return this.bard.meta.linkData[ref];
+            return this.linkData[ref];
         },
 
         getAppendsForUrl(urlString) {

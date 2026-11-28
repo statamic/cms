@@ -447,6 +447,18 @@ class EmailTest extends TestCase
     }
 
     #[Test]
+    public function it_renders_links_in_the_body()
+    {
+        $email = $this->makeEmailWithConfig([
+            'body' => 'Hi [[ name ]], [download the brochure](<https://example.com/our brochure.pdf>).',
+        ], build: false);
+
+        $body = $email->render();
+
+        $this->assertStringContainsString('Hi Foo Bar, <a href="https://example.com/our%20brochure.pdf">download the brochure</a>.', $body);
+    }
+
+    #[Test]
     public function it_escapes_submitted_markdown_and_html_in_the_body()
     {
         $form = tap(Form::make('test')->formFields([

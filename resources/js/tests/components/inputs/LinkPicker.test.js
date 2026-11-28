@@ -1,47 +1,36 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
-import LinkToolbar from '@/components/fieldtypes/bard/LinkToolbar.vue';
+// The UI components import the picker through the autocomplete editor, so
+// loading them first catches anything left undefined by that cycle.
+import '@/components/ui';
+import LinkPicker from '@/components/inputs/LinkPicker.vue';
 
 window.__ = (key) => key;
 
-// The toolbar's autofocus() schedules a setTimeout that calls this.$refs.urlInput.focus().
+// The picker's autofocus() schedules a setTimeout that calls this.$refs.urlInput.focus().
 // Under a shallow mount that ref doesn't exist, so use fake timers to keep the leaked
 // timer from firing after the test finishes (which would throw an unhandled error).
 beforeEach(() => vi.useFakeTimers());
 afterEach(() => vi.useRealTimers());
 
-function makeBard({ linkTypes = {}, linkData = {} } = {}) {
-    return {
-        meta: { linkTypes, linkData },
-        editor: {
-            view: { state: { selection: { from: 0, to: 0 } } },
-            state: { doc: { textBetween: () => '' } },
-        },
-        events: { on: vi.fn(), off: vi.fn() },
-        updateMeta: vi.fn(),
-    };
-}
-
-function mountToolbar({ linkTypes = {}, linkAttrs = {}, config = {} } = {}) {
-    const bard = makeBard({ linkTypes });
-
-    const wrapper = mount(LinkToolbar, {
+function mountPicker({ linkTypes = {}, linkAttrs = {}, config = {} } = {}) {
+    const wrapper = mount(LinkPicker, {
         shallow: true,
-        props: { bard, config, linkAttrs },
+        props: { config, linkAttrs, linkTypes },
     });
 
-    return { wrapper, bard };
+    return { wrapper };
 }
 
-test('linkTypes orders url first, registered types in the middle, and mailto/tel last', () => {
-    const { wrapper } = mountToolbar({
+test('linkTypeOptions orders url first, registered types in the middle, and mailto/tel last', () => {
+    const { wrapper } = mountPicker({
         linkTypes: {
             entry: { title: 'Entry', component: 'relationship', config: {}, meta: {} },
             custom: { title: 'Custom Type', component: 'custom', config: {}, meta: {} },
         },
     });
 
-    expect(wrapper.vm.linkTypes).toEqual([
+    expect(wrapper.vm.linkTypeOptions).toEqual([
         { type: 'url', title: 'URL' },
         { type: 'entry', title: 'Entry' },
         { type: 'custom', title: 'Custom Type' },
@@ -51,14 +40,14 @@ test('linkTypes orders url first, registered types in the middle, and mailto/tel
 });
 
 test('registeredLinkType is null for the built-in url type', () => {
-    const { wrapper } = mountToolbar();
+    const { wrapper } = mountPicker();
 
     expect(wrapper.vm.linkType).toBe('url');
     expect(wrapper.vm.registeredLinkType).toBeNull();
 });
 
-test('registeredLinkType resolves the matching type from bard meta, and its fieldtype component name', () => {
-    const { wrapper } = mountToolbar({
+test('registeredLinkType resolves the matching type from the link types, and its fieldtype component name', () => {
+    const { wrapper } = mountPicker({
         linkTypes: {
             entry: { title: 'Entry', component: 'relationship', config: { foo: 'bar' }, meta: {} },
         },
@@ -76,7 +65,7 @@ test('registeredLinkType resolves the matching type from bard meta, and its fiel
 });
 
 test('typeSelected sets the url to a statamic:// reference for the current link type', () => {
-    const { wrapper } = mountToolbar({
+    const { wrapper } = mountPicker({
         linkTypes: {
             entry: { title: 'Entry', component: 'relationship', config: {}, meta: {} },
         },
@@ -90,7 +79,7 @@ test('typeSelected sets the url to a statamic:// reference for the current link 
 });
 
 test('typeSelected clears the url when nothing is selected', () => {
-    const { wrapper } = mountToolbar({
+    const { wrapper } = mountPicker({
         linkTypes: {
             entry: { title: 'Entry', component: 'relationship', config: {}, meta: {} },
         },
@@ -110,7 +99,7 @@ test.each([
     ['mailto', false],
     ['tel', false],
 ])('canHaveTarget for link type "%s" is %s', async (linkType, expected) => {
-    const { wrapper } = mountToolbar({
+    const { wrapper } = mountPicker({
         linkTypes: {
             entry: { title: 'Entry', component: 'relationship', config: {}, meta: {} },
             custom: { title: 'Custom', component: 'custom', config: {}, meta: {} },
@@ -121,4 +110,13 @@ test.each([
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.canHaveTarget).toBe(expected);
+});
+
+test('renders its actions when loaded through the UI components', () => {
+    const wrapper = mount(LinkPicker, {
+        props: { linkAttrs: {} },
+        global: { stubs: { 'ui-select': true, 'ui-input': true, 'ui-separator': true, 'ui-switch': true, 'ui-description': true } },
+    });
+
+    expect(wrapper.find('[data-ui-stack-footer]').exists()).toBe(true);
 });

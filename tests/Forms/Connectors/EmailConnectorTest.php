@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Form;
 use Statamic\Facades\FormConnector;
 use Statamic\Facades\User;
@@ -153,6 +154,22 @@ class EmailConnectorTest extends TestCase
         $this->assertEquals([], $component['props']['defaults']['values']['to']);
         $this->assertArrayHasKey('meta', $component['props']['defaults']);
         $this->assertEquals(cp_route('forms.connect.email.preview', 'test'), $component['props']['previewUrl']);
+    }
+
+    #[Test]
+    public function it_links_to_assets_in_the_configured_container()
+    {
+        AssetContainer::make('documents')->disk('local')->save();
+        AssetContainer::make('images')->disk('local')->save();
+
+        $form = tap(Form::make('test'))->save();
+        $email = (new Email)->forForm($form);
+
+        $this->assertNull($email->blueprint()->field('body')->config()['container']);
+
+        config(['statamic.forms.email_link_container' => 'documents']);
+
+        $this->assertEquals('documents', $email->blueprint()->field('body')->config()['container']);
     }
 
     #[Test]

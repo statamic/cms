@@ -1,6 +1,7 @@
 <template>
     <div class="no-select flex flex-1 flex-wrap items-center gap-1">
-        <EditorToolbarButton
+        <component
+            :is="button.component ?? EditorToolbarButton"
             v-for="button in buttons"
             :key="button.name"
             :button="button"

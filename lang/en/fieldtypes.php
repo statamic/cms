@@ -26,6 +26,7 @@ return [
     'assets.title' => 'Assets',
     'asset_folders.config.container' => 'Choose which asset container to use for this field.',
     'autocomplete_editor.config.buttons' => 'Choose which buttons to show in the toolbar.',
+    'autocomplete_editor.config.container' => 'Assets from this container will be available in the link selector.',
     'autocomplete_editor.config.enable_line_breaks' => 'Allows adding line breaks to the content.',
     'autocomplete_editor.config.inline' => 'Disable all block-level elements like headings and lists.',
     'autocomplete_editor.config.markdown' => 'Allow formatting, stored as Markdown. When disabled, the content is plain text and mentions.',

@@ -7,18 +7,13 @@ use Facades\Statamic\Fieldtypes\RowId;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Statamic\Data\NestedFieldUpdater;
-use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Blink;
 use Statamic\Facades\GraphQL;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
-use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
 use Statamic\Fieldtypes\Bard\Augmentor;
-use Statamic\Fieldtypes\Link\LinkType;
+use Statamic\Fieldtypes\Link\LinkPicker;
 use Statamic\GraphQL\Types\BardSetsType;
 use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
@@ -649,7 +644,7 @@ class Bard extends Replicator
             'previews' => $previews,
             '__collaboration' => ['existing'],
             'linkData' => (object) $this->getLinkData($value),
-            'linkTypes' => $this->linkTypesForToolbar(),
+            'linkTypes' => $this->linkPicker()->types(),
         ];
 
         if (
@@ -766,7 +761,7 @@ class Bard extends Replicator
             $href = $node['attrs']['href'] ?? null;
 
             if (Str::startsWith($href, 'statamic://')) {
-                $data = $data->merge($this->getLinkDataForUrl($href));
+                $data = $data->merge($this->linkPicker()->data($href));
             }
         }
 
@@ -780,87 +775,13 @@ class Bard extends Replicator
         return $data->merge($childData);
     }
 
-    private function getLinkDataForUrl($url)
+    private function linkPicker(): LinkPicker
     {
-        $ref = str($url)->after('statamic://')->before('?')->before('#')->toString();
-        [$handle, $id] = explode('::', $ref, 2);
-
-        return [$ref => $this->linkDataForType($handle, $id)];
-    }
-
-    private function linkDataForType(string $handle, string $id): ?array
-    {
-        if (! $linkType = Link::types()[$handle] ?? null) {
-            return null;
-        }
-
-        if (! $config = $linkType->fieldtype($this->linkTypeField())) {
-            return null;
-        }
-
-        $nestedField = new Field($handle, $config);
-        $nestedField->setValue([$id]);
-        $fieldtype = $nestedField->fieldtype();
-
-        // Both of these build their preload `data` from getItemData(), so we can get the
-        // item without paying for the rest of the preload payload. Anything else may only
-        // implement preload(), so it gets the original treatment.
-        if ($fieldtype instanceof Relationship || $fieldtype instanceof AssetsFieldtype) {
-            return $fieldtype->getItemData([$id])->first();
-        }
-
-        return $fieldtype->preload()['data'][0] ?? null;
-    }
-
-    private function linkTypeField(): Field
-    {
-        return new Field('link', [
+        return new LinkPicker([
             'collections' => $this->config('link_collections'),
             'container' => $this->config('container'),
             'select_across_sites' => $this->config('select_across_sites'),
         ]);
-    }
-
-    private function linkTypesForToolbar(): array
-    {
-        $field = $this->linkTypeField();
-
-        // The cached payload contains site-dependent config (an entry link type falls back
-        // to the current site's routable collections) and user-dependent meta (asset link
-        // type permissions), so both need to be part of the key.
-        $key = vsprintf('bard-link-types-%s-%s-%s', [
-            Site::current()->handle(),
-            User::current()?->id() ?? 'guest',
-            md5(json_encode($field->config())),
-        ]);
-
-        return Blink::once($key, function () use ($field) {
-            return collect(Link::types())
-                ->filter(fn (LinkType $type): bool => $type->visible($field))
-                ->map(function (LinkType $type, string $handle) use ($field): ?array {
-                    if (! $config = $type->fieldtype($field)) {
-                        return null;
-                    }
-
-                    $nestedField = new Field($handle, $config);
-                    $nestedFieldtype = $nestedField->fieldtype();
-
-                    try {
-                        $meta = $nestedFieldtype->preload();
-                    } catch (CollectionNotFoundException) {
-                        $meta = [];
-                    }
-
-                    return [
-                        'title' => $type->title(),
-                        'component' => $nestedFieldtype->component(),
-                        'config' => $nestedFieldtype->config(),
-                        'meta' => $meta,
-                    ];
-                })
-                ->filter()
-                ->all();
-        });
     }
 
     private function wrapInlineValue($value)

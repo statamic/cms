@@ -2,19 +2,25 @@
 
 namespace Tests\Fieldtypes;
 
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\HtmlString;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\AutocompleteEditor;
 use Statamic\Fieldtypes\AutocompleteEditor\Mentions;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AutocompleteEditorTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     #[Test]
     public function it_is_not_selectable()
     {
@@ -32,7 +38,7 @@ class AutocompleteEditorTest extends TestCase
         $this->assertFalse($fieldtype->config('enable_line_breaks'));
         $this->assertTrue($fieldtype->config('markdown'));
         $this->assertSame(
-            ['bold', 'italic', 'h2', 'h3', 'bulletlist', 'orderedlist'],
+            ['bold', 'italic', 'link', 'h2', 'h3', 'bulletlist', 'orderedlist'],
             $fieldtype->config('buttons')
         );
     }
@@ -162,6 +168,40 @@ class AutocompleteEditorTest extends TestCase
         $fieldtype = $this->fieldtype();
 
         $this->assertSame([], $fieldtype->preload()['options']);
+    }
+
+    #[Test]
+    public function preload_includes_link_types_and_data_for_the_linked_entries()
+    {
+        $this->setUpLinkableEntries();
+
+        $fieldtype = $this->fieldtype();
+        $fieldtype->field()->setValue('See [about](statamic://entry::about) and [contact](statamic://entry::contact#form), or [Google](https://google.com).');
+
+        $meta = $fieldtype->preload();
+
+        $this->assertEquals(['entry'], array_keys($meta['linkTypes']));
+        $this->assertEquals(['entry::about', 'entry::contact'], array_keys((array) $meta['linkData']));
+        $this->assertEquals('Contact', $meta['linkData']->{'entry::contact'}['title']);
+    }
+
+    #[Test]
+    public function preload_leaves_out_links_when_the_link_button_is_disabled()
+    {
+        $meta = $this->fieldtype(['buttons' => ['bold']])->preload();
+
+        $this->assertArrayNotHasKey('linkTypes', $meta);
+        $this->assertArrayNotHasKey('linkData', $meta);
+    }
+
+    #[Test]
+    public function parse_markdown_resolves_entry_links_to_absolute_urls()
+    {
+        $this->setUpLinkableEntries();
+
+        $html = AutocompleteEditor::parseMarkdown('[a](statamic://entry::about?ref=email#team) [b](statamic://entry::missing) [c](https://example.com)', inline: true);
+
+        $this->assertSame('<a href="http://localhost/about?ref=email#team">a</a> <a href="">b</a> <a href="https://example.com">c</a>', $html);
     }
 
     #[Test]
@@ -543,6 +583,15 @@ class AutocompleteEditorTest extends TestCase
         );
 
         $this->assertSame($expected, AutocompleteEditor::renderHtml($markdown, $values));
+    }
+
+    private function setUpLinkableEntries(): void
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Collection::make('pages')->routes('/{slug}')->save();
+        EntryFactory::collection('pages')->id('about')->slug('about')->data(['title' => 'About'])->create();
+        EntryFactory::collection('pages')->id('contact')->slug('contact')->data(['title' => 'Contact'])->create();
     }
 
     private function fieldtype($config = [])
