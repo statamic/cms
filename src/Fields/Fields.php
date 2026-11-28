@@ -9,12 +9,15 @@ use Statamic\Exceptions\FieldsetNotFoundException;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Fieldset as FieldsetRepository;
 use Statamic\Support\Arr;
+use Statamic\Support\Traits\Hookable;
 
 /**
  * @phpstan-consistent-constructor
  */
 class Fields
 {
+    use Hookable;
+
     protected $items;
     protected $fields;
     protected $parent;
@@ -216,15 +219,21 @@ class Fields
 
     public function augment()
     {
-        return $this->newInstance()->setFields(
-            $this->fields->map->augment()
-        );
+        return $this->augmentFields(false);
     }
 
     public function shallowAugment()
     {
-        return $this->newInstance()->setFields(
-            $this->fields->map->shallowAugment()
+        return $this->augmentFields(true);
+    }
+
+    private function augmentFields(bool $shallow)
+    {
+        $fields = $this->runHooksWith('augmenting', ['fields' => $this, 'shallow' => $shallow])->fields;
+        $method = $shallow ? 'shallowAugment' : 'augment';
+
+        return $fields->newInstance()->setFields(
+            $fields->all()->map->{$method}()
         );
     }
 
