@@ -43,6 +43,7 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected static $extraConfigFields = [];
+    protected static $extraConfigFieldPositions = [];
     private static ?WeakMap $configDefaults = null;
     protected $icon;
 
@@ -227,26 +228,24 @@ abstract class Fieldtype implements Arrayable
         $fields = $this->configFieldItems();
         $extras = collect($this->extraConfigFieldItems());
         $extraSections = $extras->filter(fn ($_, $key) => is_int($key));
-        $extraFields = $extras
+        $positions = $this->extraConfigFieldPositions();
+        [$positionedFields, $extraFields] = $extras
             ->reject(fn ($_, $key) => is_int($key))
             ->map(fn ($field, $handle) => compact('handle', 'field'))
-            ->values()->all();
+            ->partition(fn ($extra) => isset($positions[$extra['handle']]))
+            ->map(fn ($group) => $group->values()->all())
+            ->all();
 
         if (empty($fields) && $extras->isEmpty()) {
             return [];
         }
 
         if (! $this->configFieldsUseSections()) {
-            $sections = [];
-
-            if (! empty($fields) || ! empty($extraFields)) {
-                $sections[] = [
-                    'fields' => collect($fields)
-                        ->map(fn ($field, $handle) => compact('handle', 'field'))
-                        ->merge($extraFields)
-                        ->values()->all(),
-                ];
-            }
+            $sections = empty($fields) ? [] : [[
+                'fields' => collect($fields)
+                    ->map(fn ($field, $handle) => compact('handle', 'field'))
+                    ->values()->all(),
+            ]];
         } else {
             $sections = collect($fields)->map(function ($section) {
                 $section['fields'] = collect($section['fields'])
@@ -254,19 +253,18 @@ abstract class Fieldtype implements Arrayable
                     ->values()->all();
 
                 return $section;
-            });
+            })->all();
+        }
 
-            if (! empty($extraFields)) {
-                if ($sections->containsOneItem()) {
-                    $section = $sections[0];
-                    $section['fields'] = array_merge($section['fields'], $extraFields);
-                    $sections[0] = $section;
-                } else {
-                    $sections[] = ['fields' => $extraFields];
-                }
+        [$sections, $unplaced] = $this->placeExtraConfigFields($sections, $positionedFields, $positions);
+
+        // Unplaced extras go at the end of the only section, or in a new one.
+        if (! empty($extraFields = array_merge($extraFields, $unplaced))) {
+            if (count($sections) === 1) {
+                $sections[0]['fields'] = array_merge($sections[0]['fields'], $extraFields);
+            } else {
+                $sections[] = ['fields' => $extraFields];
             }
-
-            $sections = $sections->all();
         }
 
         return array_merge($sections, $extraSections->map(function ($section) {
@@ -321,6 +319,40 @@ abstract class Fieldtype implements Arrayable
         return $this->configFields;
     }
 
+    /**
+     * Puts each positioned field right after the field it names. Returns the ones that can't be placed.
+     */
+    private function placeExtraConfigFields(array $sections, array $pending, array $positions): array
+    {
+        do {
+            $progress = false;
+
+            // Reversed, so fields after the same anchor keep their appended order.
+            foreach (array_reverse($pending, true) as $key => $extra) {
+                foreach ($sections as $index => $section) {
+                    $at = array_search($positions[$extra['handle']], array_column($section['fields'], 'handle'), true);
+
+                    if ($at !== false) {
+                        array_splice($sections[$index]['fields'], $at + 1, 0, [$extra]);
+                        unset($pending[$key]);
+                        $progress = $pending !== [];
+                        break;
+                    }
+                }
+            }
+        } while ($progress);
+
+        return [$sections, array_values($pending)];
+    }
+
+    protected function extraConfigFieldPositions(): array
+    {
+        return array_merge(
+            self::$extraConfigFieldPositions[static::class] ?? [],
+            Fieldtype::$extraConfigFieldPositions[Fieldtype::class] ?? [],
+        );
+    }
+
     protected function extraConfigFieldItems(): array
     {
         return array_merge(
@@ -334,11 +366,23 @@ abstract class Fieldtype implements Arrayable
         $existingConfig = self::$extraConfigFields[static::class] ?? [];
 
         self::$extraConfigFields[static::class] = array_merge($existingConfig, $config);
+
+        // Appending again resets the position.
+        foreach (array_keys($config) as $field) {
+            unset(self::$extraConfigFieldPositions[static::class][$field]);
+        }
     }
 
-    public static function appendConfigField(string $field, array $config): void
+    /**
+     * @param  string|null  $after  Handle of the config field to place this one after.
+     */
+    public static function appendConfigField(string $field, array $config, ?string $after = null): void
     {
         self::appendConfigFields([$field => $config]);
+
+        if ($after !== null) {
+            self::$extraConfigFieldPositions[static::class][$field] = $after;
+        }
     }
 
     public function icon()

@@ -538,6 +538,123 @@ class FieldtypeTest extends TestCase
     }
 
     #[Test]
+    public function it_can_place_an_appended_config_field_after_an_existing_one()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected function configFieldItems(): array
+            {
+                return [
+                    ['display' => 'Data', 'fields' => ['default' => ['type' => 'text'], 'format' => ['type' => 'text']]],
+                    ['display' => 'Advanced', 'fields' => ['antlers' => ['type' => 'toggle']]],
+                ];
+            }
+        };
+
+        $fieldtype::appendConfigField('conditional', ['type' => 'text'], after: 'default');
+
+        $sections = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'];
+
+        $this->assertCount(2, $sections);
+        $this->assertEquals(['default', 'conditional', 'format'], array_column($sections[0]['fields'], 'handle'));
+        $this->assertEquals(['antlers'], array_column($sections[1]['fields'], 'handle'));
+        $this->assertEquals('text', $fieldtype->configFields()->get('conditional')->type());
+    }
+
+    #[Test]
+    public function it_can_place_an_appended_config_field_in_a_linear_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('baz', ['type' => 'text'], after: 'foo');
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'baz', 'bar'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
+    public function it_appends_normally_when_the_field_to_place_after_is_missing()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('baz', ['type' => 'text'], after: 'missing');
+
+        $sections = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'];
+
+        $this->assertCount(1, $sections);
+        $this->assertEquals(['foo', 'baz'], array_column($sections[0]['fields'], 'handle'));
+    }
+
+    #[Test]
+    public function it_keeps_the_order_of_fields_placed_after_the_same_field()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('one', ['type' => 'text'], after: 'foo');
+        $fieldtype::appendConfigField('two', ['type' => 'text'], after: 'foo');
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'one', 'two', 'bar'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
+    public function it_can_place_an_appended_config_field_after_another_appended_one()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('second', ['type' => 'text'], after: 'first');
+        $fieldtype::appendConfigField('first', ['type' => 'text'], after: 'foo');
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'first', 'second', 'bar'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
+    public function appending_a_config_field_again_replaces_where_it_was_placed()
+    {
+        $fieldtype = new class extends Fieldtype
+        {
+            protected $configFields = [
+                'foo' => ['type' => 'textarea'],
+                'bar' => ['type' => 'text'],
+            ];
+        };
+
+        $fieldtype::appendConfigField('baz', ['type' => 'text'], after: 'foo');
+        $fieldtype::appendConfigField('baz', ['type' => 'text']);
+
+        $fields = $fieldtype->configBlueprint()->contents()['tabs']['main']['sections'][0]['fields'];
+
+        $this->assertEquals(['foo', 'bar', 'baz'], array_column($fields, 'handle'));
+    }
+
+    #[Test]
     public function it_wont_override_previously_appended_config_fields()
     {
         TestAppendConfigFields::appendConfigFields([
