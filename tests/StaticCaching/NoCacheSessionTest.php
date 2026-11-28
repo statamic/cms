@@ -65,6 +65,39 @@ class NoCacheSessionTest extends TestCase
     }
 
     #[Test]
+    public function when_pushing_a_region_it_will_filter_out_config()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            'config' => config()->all(),
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+        ], $region->context());
+    }
+
+    #[Test]
+    public function when_pushing_a_region_it_will_keep_a_config_variable_that_is_not_the_app_config()
+    {
+        $session = new Session('/');
+
+        $region = $session->pushRegion('', [
+            'foo' => 'bar',
+            'config' => ['mine' => true],
+        ], '');
+
+        $this->assertEquals([
+            'foo' => 'bar',
+            'config' => ['mine' => true],
+        ], $region->context());
+
+        $this->assertEquals(['mine' => true], $region->fragmentData()['config']);
+    }
+
+    #[Test]
     public function it_gets_the_fragment_data()
     {
         // fragment data should be the context,
@@ -87,6 +120,7 @@ class NoCacheSessionTest extends TestCase
         $this->assertEquals([
             'csrf_token' => 'abc',
             'now' => 'carbon',
+            'config' => config()->all(),
             'foo' => 'bar',
             'baz' => 'qux',
             'title' => 'local title',

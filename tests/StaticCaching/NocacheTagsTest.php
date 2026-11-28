@@ -146,6 +146,18 @@ EOT;
     }
 
     #[Test]
+    public function it_renders_config_inside_nocache_tags()
+    {
+        config(['foo.bar' => 'Configured']);
+
+        $this->withStandardFakeViews();
+        $this->viewShouldReturnRaw('default', '{{ nocache }}{{ config:foo:bar }}{{ /nocache }}');
+        $this->createPage('about');
+
+        $this->get('/about')->assertOk()->assertSee('Configured');
+    }
+
+    #[Test]
     public function it_only_adds_appropriate_fields_of_context_to_session()
     {
         // The tag won't do anything if it's not being used on a request with the cache middleware.
