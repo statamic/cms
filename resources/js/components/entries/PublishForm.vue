@@ -76,6 +76,7 @@
             :name="publishContainer"
             :reference="reference"
             :blueprint="fieldset"
+            :is-creating="isCreating"
             v-model="values"
             :extra-values="extraValues"
             v-model:meta="meta"

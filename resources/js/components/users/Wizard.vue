@@ -26,6 +26,7 @@
                 <ui-publish-container
                     ref="container"
                     :blueprint="blueprint"
+                    is-creating
                     v-model="values"
                     :meta="meta"
                     :extra-values="{

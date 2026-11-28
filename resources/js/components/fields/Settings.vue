@@ -102,6 +102,8 @@ export default {
     provide() {
         return {
             isInsideConfigFields: true,
+            // Lets config fieldtypes suggest the fields of the blueprint being edited, like the Conditions tab does.
+            suggestableConditionFieldsProvider: { suggestableFields: () => this.suggestableConditionFields },
             updateFieldSettingsValue: this.updateField,
             getFieldSettingsValue: this.getFieldValue,
             commitParentField: this.commit,

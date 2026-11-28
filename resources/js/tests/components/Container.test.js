@@ -16,6 +16,8 @@ window.Statamic = {
     $events: { $emit: () => {} },
 };
 
+const noEmit = window.Statamic.$events.$emit;
+
 const Probe = defineComponent({
     setup() {
         const { direction } = useContentDirection();
@@ -34,6 +36,7 @@ beforeEach(async () => {
 
 afterEach(() => {
     document.documentElement.removeAttribute('dir');
+    window.Statamic.$events.$emit = noEmit;
 });
 
 test('content direction is unaffected by the CP/document direction when the site has an explicit direction', () => {
@@ -123,4 +126,44 @@ test('setting field meta does not read the rest of the meta', async () => {
     await nextTick();
 
     expect(reads).toBe(readsAfterMount);
+});
+
+function captureEvents() {
+    const emitted = [];
+    window.Statamic.$events.$emit = (name, payload) => emitted.push([name, payload]);
+
+    return () => emitted.find(([name]) => name === 'publish-container-created')[1];
+}
+
+test('the container context and the created event tell whether the item is being created', async () => {
+    const created = captureEvents();
+    const blueprint = { tabs: [] };
+
+    let context;
+    mount(Container, {
+        props: { blueprint, site: 'default', isCreating: true },
+        slots: {
+            default: () =>
+                h(
+                    defineComponent({
+                        setup() {
+                            context = injectContainerContext();
+                            return () => null;
+                        },
+                    }),
+                ),
+        },
+    });
+
+    expect(context.isCreating.value).toBe(true);
+    expect(created().isCreating.value).toBe(true);
+    expect(created().blueprint.value).toEqual(blueprint);
+});
+
+test('a container is not being created by default', () => {
+    const created = captureEvents();
+
+    mount(Container, { props: { blueprint: { tabs: [] }, site: 'default' }, slots: { default: () => h('div') } });
+
+    expect(created().isCreating.value).toBe(false);
 });
