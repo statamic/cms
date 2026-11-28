@@ -11,6 +11,7 @@ use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
+use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -134,16 +135,14 @@ class AssetFolder implements Arrayable, ContainsQueryableValues, Contract
 
     public function delete()
     {
-        $paths = [];
-
-        // Iterate over all the assets in the folder, recursively.
-        foreach ($this->assets(true) as $asset) {
-            // Keep track of the paths for the event
-            $paths[] = $asset->path();
-
-            // Delete the asset. It'll remove its own data.
-            $asset->delete();
-        }
+        // Remove the references to all the deleted assets together, rather than one at a time.
+        UpdateAssetReferences::batch(function () {
+            // Iterate over all the assets in the folder, recursively.
+            foreach ($this->assets(true) as $asset) {
+                // Delete the asset. It'll remove its own data.
+                $asset->delete();
+            }
+        });
 
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
         $this->disk()->delete($this->path());
@@ -202,10 +201,15 @@ class AssetFolder implements Arrayable, ContainsQueryableValues, Contract
             throw new \Exception('Folder already exists.');
         }
 
-        $folder = $this->container->assetFolder($newPath)->save();
-        $this->container()->assetFolders($oldPath)->each->move($newPath);
-        $this->container()->assets($oldPath)->each->move($newPath);
-        $this->delete();
+        // Update the references to all the moved assets together, rather than one at a time.
+        $folder = UpdateAssetReferences::batch(function () use ($oldPath, $newPath) {
+            $folder = $this->container->assetFolder($newPath)->save();
+            $this->container()->assetFolders($oldPath)->each->move($newPath);
+            $this->container()->assets($oldPath)->each->move($newPath);
+            $this->delete();
+
+            return $folder;
+        });
 
         $this->path($newPath);
 

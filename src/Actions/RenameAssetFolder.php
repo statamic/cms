@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Listeners\UpdateAssetReferences;
 use Statamic\Rules\AlphaDashSpace;
 
 use function Statamic\trans as __;
@@ -40,7 +41,8 @@ class RenameAssetFolder extends Action
 
     public function run($folders, $values)
     {
-        return $folders->each->rename($values['name'], true);
+        // Update the references to the assets in all the folders together, rather than one folder at a time.
+        return UpdateAssetReferences::batch(fn () => $folders->each->rename($values['name'], true));
     }
 
     protected function fieldItems()
