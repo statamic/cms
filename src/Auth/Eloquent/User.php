@@ -24,6 +24,8 @@ class User extends BaseUser
     protected $model;
     protected $roles;
     protected $groups;
+    protected $storedRoles;
+    protected $storedGroups;
 
     public function model(?Model $model = null)
     {
@@ -105,17 +107,31 @@ class User extends BaseUser
             return $this;
         }
 
-        return $this->roles = $this->roles
-            ?? (new Roles($this))->all()->map(function ($row) {
+        if (is_null($this->roles)) {
+            $this->roles = (new Roles($this))->all()->map(function ($row) {
                 return Role::find($row->role_id);
             })->filter()->keyBy->handle();
+
+            $this->storedRoles = $this->sortedIds($this->roles);
+        }
+
+        return $this->roles;
     }
 
     protected function saveRoles()
     {
-        $roles = $this->explicitRoles()->map->id();
+        $roles = $this->sortedIds($this->explicitRoles());
 
-        (new Roles($this))->sync($roles);
+        if ($roles !== $this->storedRoles) {
+            (new Roles($this))->sync(collect($roles));
+
+            $this->storedRoles = $roles;
+        }
+    }
+
+    protected function sortedIds(Collection $items)
+    {
+        return $items->map->id()->sort()->values()->all();
     }
 
     public function assignRole($role)
@@ -162,10 +178,15 @@ class User extends BaseUser
 
     protected function getGroups()
     {
-        return $this->groups = $this->groups
-            ?? (new UserGroups($this))->all()->map(function ($row) {
+        if (is_null($this->groups)) {
+            $this->groups = (new UserGroups($this))->all()->map(function ($row) {
                 return UserGroup::find($row->group_id);
             })->keyBy->handle();
+
+            $this->storedGroups = $this->sortedIds($this->groups);
+        }
+
+        return $this->groups;
     }
 
     protected function setGroups($groups)
@@ -179,9 +200,13 @@ class User extends BaseUser
 
     protected function saveGroups()
     {
-        $groups = $this->groups()->map->id();
+        $groups = $this->sortedIds($this->groups());
 
-        (new UserGroups($this))->sync($groups);
+        if ($groups !== $this->storedGroups) {
+            (new UserGroups($this))->sync(collect($groups));
+
+            $this->storedGroups = $groups;
+        }
     }
 
     public function addToGroup($group)

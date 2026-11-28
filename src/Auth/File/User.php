@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
+use Statamic\Contracts\Auth\Passkey as PasskeyContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
@@ -18,6 +19,7 @@ use Statamic\Facades\YAML;
 use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Yaml\ParseException;
 
 /**
  * A user.
@@ -33,6 +35,7 @@ class User extends BaseUser
     protected Collection $passkeys;
     protected $password;
     protected $permissions;
+    protected $storedAccess;
 
     public function __construct()
     {
@@ -115,6 +118,150 @@ class User extends BaseUser
             rtrim(Stache::store('users')->directory(), '/'),
             $this->email(),
         ]);
+    }
+
+    public function deleteFile()
+    {
+        if ($current = $this->currentFile()) {
+            File::delete($current['path']);
+        }
+
+        $this->initialPath(null);
+    }
+
+    protected function wasDeleted(): bool
+    {
+        return $this->initialPath() && ! $this->currentFile();
+    }
+
+    public function writeFile($path = null)
+    {
+        $current = $this->currentFile();
+
+        if ($current) {
+            $this->mergeStoredAccess($current);
+        }
+
+        $path = $path ?? $this->buildPath();
+
+        if ($current && $current['path'] !== $path) {
+            File::delete($current['path']);
+        }
+
+        File::put($path, $this->fileContents());
+
+        $this->initialPath($path);
+
+        $this->syncStoredAccess();
+    }
+
+    public function syncStoredAccess()
+    {
+        $this->storedAccess = $this->currentAccess();
+
+        return $this;
+    }
+
+    protected function currentFile(): ?array
+    {
+        $initial = $this->initialPath();
+        $candidate = $initial ?? $this->path();
+
+        if ($file = $this->readFile($candidate)) {
+            if ($file['id'] === (string) $this->id()) {
+                return ['path' => $candidate, 'data' => $file['data']];
+            }
+        }
+
+        if (! $initial) {
+            return null;
+        }
+
+        $directory = dirname($initial);
+
+        foreach (@scandir($directory) ?: [] as $name) {
+            $path = $directory.'/'.$name;
+
+            if (! str_ends_with($name, '.yaml') || ! str_contains((string) File::get($path), (string) $this->id())) {
+                continue;
+            }
+
+            if (($file = $this->readFile($path)) && $file['id'] === (string) $this->id()) {
+                return ['path' => $path, 'data' => $file['data']];
+            }
+        }
+
+        return null;
+    }
+
+    protected function readFile($path): ?array
+    {
+        if (! File::exists($path)) {
+            return null;
+        }
+
+        try {
+            $data = YAML::file($path)->parse((string) File::get($path));
+        } catch (ParseException) {
+            $data = null;
+        }
+
+        $id = is_array($data) && ($data['id'] ?? null) ? (string) $data['id'] : null;
+
+        return ['id' => $id, 'data' => $id === null ? null : $data];
+    }
+
+    protected function mergeStoredAccess(array $current)
+    {
+        if (! $this->storedAccess) {
+            return;
+        }
+
+        $stored = $current['data'];
+        $access = $this->currentAccess();
+
+        foreach ($this->storedAccess as $key => $value) {
+            if ($access[$key] !== $value) {
+                continue;
+            }
+
+            if ($key === 'email') {
+                $this->email(pathinfo($current['path'], PATHINFO_FILENAME));
+            } elseif ($key === 'password_hash') {
+                $this->passwordHash($stored[$key] ?? $value);
+            } elseif ($key === 'passkeys') {
+                $this->setPasskeysFromFileData($stored['passkeys'] ?? []);
+            } elseif (Arr::has($stored, $key)) {
+                $this->set($key, $stored[$key]);
+            } else {
+                $this->remove($key);
+            }
+        }
+    }
+
+    protected function currentAccess()
+    {
+        return [
+            'email' => $this->email(),
+            'roles' => $this->get('roles') ?? [],
+            'groups' => $this->get('groups') ?? [],
+            'super' => (bool) $this->get('super'),
+            'password_hash' => $this->passwordHash(),
+            'passkeys' => $this->passkeys()->map(fn ($passkey) => $passkey->fileData())->all(),
+            'two_factor_secret' => $this->get('two_factor_secret'),
+            'two_factor_recovery_codes' => $this->get('two_factor_recovery_codes'),
+            'two_factor_confirmed_at' => $this->get('two_factor_confirmed_at'),
+        ];
+    }
+
+    protected function setPasskeysFromFileData(array $passkeys)
+    {
+        $this->setPasskeys(collect($passkeys)->map(function ($data) {
+            return app(PasskeyContract::class)
+                ->setUser($this)
+                ->setName($data['name'])
+                ->setCredential($data['credential']);
+        }));
     }
 
     /**
