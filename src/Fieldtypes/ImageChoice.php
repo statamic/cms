@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Faker\Generator;
+use Illuminate\Validation\Rule;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldtype;
@@ -31,6 +32,13 @@ class ImageChoice extends Fieldtype
         $data = Arr::wrap($data);
 
         return $this->config('multiple') ? $data : ($data[0] ?? null);
+    }
+
+    public function rules(): array
+    {
+        $rule = Rule::in(array_column($this->normalizedOptions(), 'key'));
+
+        return $this->config('multiple') ? ['array', $rule] : [$rule];
     }
 
     public function extraRenderableFieldData(): array

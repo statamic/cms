@@ -35,6 +35,7 @@ class DropdownTest extends TestCase
             'placeholder' => 'Choose a color',
             'multiple' => null,
             'max_items' => null,
+            'validate' => ['in:"red","blue","green"'],
         ], $fieldtype->toFieldArray());
     }
 
@@ -63,6 +64,7 @@ class DropdownTest extends TestCase
             'placeholder' => 'Choose colors',
             'multiple' => true,
             'max_items' => 2,
+            'validate' => ['array', 'in:"red","blue","green"'],
         ], $fieldtype->toFieldArray());
     }
 
@@ -88,6 +90,7 @@ class DropdownTest extends TestCase
             'placeholder' => 'Choose a color',
             'multiple' => null,
             'max_items' => null,
+            'validate' => ['in:"red","blue"'],
             'default' => 'red',
         ], $fieldtype->toFieldArray());
     }

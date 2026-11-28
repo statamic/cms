@@ -31,6 +31,7 @@ class MultiChoiceTest extends TestCase
                 'blue' => 'Blue',
                 'green' => 'Green',
             ],
+            'validate' => ['in:"red","blue","green"'],
         ], $fieldtype->toFieldArray());
     }
 
@@ -52,6 +53,7 @@ class MultiChoiceTest extends TestCase
                 'red' => 'Red',
                 'blue' => 'Blue',
             ],
+            'validate' => ['in:"red","blue"'],
             'default' => 'red',
         ], $fieldtype->toFieldArray());
     }
