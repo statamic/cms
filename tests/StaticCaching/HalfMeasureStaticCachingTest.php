@@ -249,39 +249,39 @@ class HalfMeasureStaticCachingTest extends TestCase
 
     #[Test]
     #[DefineEnvironment('shareErrorsEnabled')]
-    public function nocache_session_is_written_under_the_real_url_for_shared_errors()
+    public function shared_errors_are_only_cached_under_the_shared_errors_url()
     {
         \Illuminate\Support\Facades\Cache::flush();
 
-        // Regression: when share_errors is enabled, rendering an error repoints the
-        // singleton nocache Session URL at /__shared-errors/<site>/<status> (via
-        // RendersHttpExceptions::getCachedError and the middleware's copyError).
-        // Session::write() then persisted the regions list only under that shared
-        // URL. But half-measure caching also stores the error page under its real
-        // URL, so a repeat request to that same URL restored the session by its
-        // real URL, found nothing, caught a RegionNotFound, and fell through to a
-        // full dynamic re-render. The session must be persisted under both URLs.
+        // With share_errors enabled every error is served from the one shared copy,
+        // so it isn't also cached under its own URL. Caching it there too would add
+        // every distinct erroring URL to the cached URL index, which grows without
+        // bound when bots or broken relative links request endless unique URLs. The
+        // index is a single value rewritten under a lock on every cache write, so
+        // that growth slows down every request that caches a page.
 
         $this->withStandardFakeViews();
         $this->viewShouldReturnRaw('errors.layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('errors.404', '404 {{ nocache }}dynamic{{ /nocache }}');
 
-        $this->get('/this-does-not-exist')->assertNotFound();
+        $this->get('/this-does-not-exist')->assertNotFound()->assertSee('404 dynamic', false);
+        $this->get('/neither-does-this')->assertNotFound()->assertSee('404 dynamic', false);
+        $this->get('/this-does-not-exist')->assertNotFound()->assertSee('404 dynamic', false);
+
+        $this->assertEquals(['/__shared-errors/en/404'], app(Cacher::class)->getUrls()->values()->all());
 
         $store = \Statamic\Facades\StaticCache::cacheStore();
 
-        // Stored under the real request URL so repeat requests (served from the
-        // per-URL cache) can restore their nocache regions.
-        $this->assertNotNull(
-            $store->get('nocache::session.'.md5('http://localhost/this-does-not-exist')),
-            'Expected nocache session to be stored under the real request URL.'
-        );
-
-        // Still stored under the shared-errors URL so the same error served for
-        // other erroring URLs can restore its nocache regions.
+        // The shared copy's nocache regions are restored by the shared-errors URL...
         $this->assertNotNull(
             $store->get('nocache::session.'.md5('/__shared-errors/en/404')),
             'Expected nocache session to be stored under the shared-errors URL.'
+        );
+
+        // ...and nothing is cached under the real URL, so there's no session there to restore.
+        $this->assertNull(
+            $store->get('nocache::session.'.md5('http://localhost/this-does-not-exist')),
+            'nocache session must not be stored under the real URL for shared errors.'
         );
     }
 
