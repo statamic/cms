@@ -21,32 +21,15 @@
                         by {{ revision.user.name || revision.user.email }}
                     </template>
                 </Subheading>
+                <Subheading
+                    v-if="revision.publish_at"
+                    class="text-xs text-gray-500! dark:text-gray-400!"
+                    v-text="__('Scheduled to publish :date', { date: publishAt })"
+                />
             </div>
 
             <div class="flex items-center gap-1 ml-auto">
-                <Badge
-                    size="sm"
-                    :color="
-                        revision.action === 'working'
-                            ? 'gray'
-                            : {
-                                  publish: 'green',
-                                  revision: 'gray',
-                                  restore: 'gray',
-                                  unpublish: 'red',
-                              }[revision.action]
-                    "
-                    :text="
-                        revision.action === 'working'
-                            ? __('Working Copy')
-                            : {
-                                  publish: __('Published'),
-                                  revision: __('Revision'),
-                                  restore: __('Restored'),
-                                  unpublish: __('Unpublished'),
-                              }[revision.action]
-                    "
-                />
+                <Badge size="sm" :color="badgeColor" :text="badgeText" />
             </div>
 
             <revision-preview
@@ -120,6 +103,34 @@ export default {
     },
 
     computed: {
+        badgeColor() {
+            if (this.revision.action === 'working') return 'gray';
+            if (this.revision.publish_at) return 'amber';
+
+            return {
+                publish: 'green',
+                revision: 'gray',
+                restore: 'gray',
+                unpublish: 'red',
+            }[this.revision.action];
+        },
+
+        badgeText() {
+            if (this.revision.action === 'working') return __('Working Copy');
+            if (this.revision.publish_at) return __('Scheduled');
+
+            return {
+                publish: __('Published'),
+                revision: __('Revision'),
+                restore: __('Restored'),
+                unpublish: __('Unpublished'),
+            }[this.revision.action];
+        },
+
+        publishAt() {
+            return DateFormatter.format(this.revision.publish_at * 1000, 'datetime');
+        },
+
         time() {
             return DateFormatter.format(this.revision.date * 1000, 'time');
         },

@@ -45,9 +45,12 @@ class EntryRevisionsController extends CpController
     {
         $this->authorize('edit', $entry);
 
+        $request->validate(['publish_at' => 'nullable|date|after:now']);
+
         $entry->createRevision([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
+            'publish_at' => $request->date('publish_at'),
         ]);
 
         return new EntryResource($entry);
