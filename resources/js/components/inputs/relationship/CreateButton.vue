@@ -7,7 +7,7 @@
             size="sm"
             @click="create"
         />
-        <ui-dropdown v-else>
+        <ui-dropdown v-else-if="creatables.length > 1">
             <template #trigger>
                 <ui-button
                     :icon="icon"
@@ -16,15 +16,15 @@
                 />
             </template>
             <ui-dropdown-menu>
-                <ui-dropdown-label v-text="__('Choose Blueprint')" />
+                <ui-dropdown-label :text="menuLabel || __('Choose Blueprint')" />
                 <ui-dropdown-item
                     v-for="creatable in creatables"
                     :key="creatable.url"
                     @click="select(creatable)"
                 >
                     <div class="flex items-center justify-between">
-                        <span>{{ creatable.blueprint }}</span>
-                        <ui-badge size="sm">{{ creatable.parent_title }}</ui-badge>
+                        <span>{{ creatable.label ?? creatable.blueprint }}</span>
+                        <ui-badge v-if="creatable.hint ?? creatable.parent_title" size="sm">{{ creatable.hint ?? creatable.parent_title }}</ui-badge>
                     </div>
                 </ui-dropdown-item>
             </ui-dropdown-menu>
@@ -59,6 +59,7 @@ export default {
         stackSize: String,
         icon: String,
         text: String,
+        menuLabel: String,
     },
 
     data() {

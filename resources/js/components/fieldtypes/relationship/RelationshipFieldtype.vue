@@ -16,6 +16,7 @@
         :filters-url="filtersUrl"
         :selections-url="selectionsUrl"
         :creatables="creatables"
+        :create-menu-label="meta.createMenuLabel"
         :form-component="formComponent"
         :form-component-props="formComponentProps"
         :form-stack-size="formStackSize"

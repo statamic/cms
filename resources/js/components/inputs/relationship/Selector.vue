@@ -24,8 +24,11 @@
 
                     <div class="flex flex-1 flex-col gap-4 overflow-auto p-4">
                         <div class="flex items-center gap-2 sm:gap-3 min-h-16">
-                            <div class="flex flex-1 items-center gap-2 sm:gap-3">
-                                <Search ref="search" />
+                            <div class="@container flex flex-1 items-center gap-2 sm:gap-3">
+                                <div v-if="$slots.toolbar" class="w-2/5 @2xl:w-1/5 min-w-0 shrink-0">
+                                    <slot name="toolbar" />
+                                </div>
+                                <Search ref="search" :class="{ 'min-w-0 max-w-none!': $slots.toolbar }" />
                                 <Filters v-if="filters && filters.length" />
                             </div>
 
