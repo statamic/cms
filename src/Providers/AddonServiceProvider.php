@@ -191,6 +191,8 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     protected $fieldsetNamespace;
 
+    protected ?string $tagNamespace = null;
+
     /**
      * @var string
      */
@@ -331,7 +333,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->unique();
 
         foreach ($tags as $class) {
-            $class::register();
+            $class::register($this->tagNamespace);
         }
 
         return $this;
