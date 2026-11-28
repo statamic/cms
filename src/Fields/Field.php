@@ -23,6 +23,8 @@ use function Statamic\trans as __;
  */
 class Field implements Arrayable
 {
+    const LISTED_BY_DEFAULT = ['title', 'slug', 'date', 'author'];
+
     protected $handle;
     protected $prefix;
     protected $config;
@@ -239,7 +241,7 @@ class Field implements Arrayable
     public function isVisibleOnListing()
     {
         if (is_null($this->get('listable'))) {
-            return in_array($this->handle, ['title', 'slug', 'date', 'author']);
+            return in_array($this->handle, self::LISTED_BY_DEFAULT);
         }
 
         return ! in_array($this->get('listable'), [false, 'hidden'], true);
