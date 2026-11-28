@@ -569,6 +569,36 @@ EOT;
         $this->assertEquals('[1=parent][2=parent]', $result);
     }
 
+    /**
+     * @see https://github.com/statamic/cms/issues/16066
+     */
+    #[Test]
+    #[DataProvider('siteRootUrlProvider')]
+    public function it_doesnt_set_is_parent_for_links_to_the_site_root_with_an_anchor_or_query_string(string $url)
+    {
+        $template = '{{ nav:test }}[{{ id }}{{ if is_parent }}=parent{{ /if }}{{ if is_current }}=current{{ /if }}]{{ /nav:test }}';
+
+        $mock = \Mockery::mock(\Statamic\Facades\URL::getFacadeRoot())->makePartial();
+        \Statamic\Facades\URL::swap($mock);
+
+        $this->makeNav([
+            ['id' => '1', 'title' => 'Contact', 'url' => $url],
+        ]);
+
+        $mock->shouldReceive('getCurrent')->once()->andReturn('/about');
+        $result = (string) Antlers::parse($template, [], true);
+        $this->assertEquals('[1]', $result);
+    }
+
+    public static function siteRootUrlProvider()
+    {
+        return [
+            'anchor' => ['/#contact'],
+            'anchor on its own' => ['#contact'],
+            'query string' => ['/?foo=bar'],
+        ];
+    }
+
     #[Test]
     public function it_sets_is_current_and_is_parent_for_a_collection()
     {
