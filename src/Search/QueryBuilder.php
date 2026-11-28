@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Generator;
 use Statamic\Contracts\Search\Result;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Concerns\FakesQueries;
@@ -53,6 +54,35 @@ abstract class QueryBuilder extends BaseQueryBuilder
         $results = $this->getSearchResults($this->query);
 
         return $this->transformResults($results);
+    }
+
+    protected function getBaseItemsLazy(): Generator
+    {
+        $results = $this->getSearchResults($this->query);
+
+        // If withoutData mode, yield PlainResults directly (cheap, no hydration)
+        if (! $this->withData) {
+            foreach ($results as $i => $result) {
+                $plainResult = new PlainResult($result);
+                $plainResult->setIndex($this->index)->setScore($result['search_score'] ?? null);
+                yield $plainResult;
+            }
+
+            return;
+        }
+
+        // With data mode - batch hydrate to reduce database queries
+        // Use smaller batches when we know the limit and don't need filtering
+        $batchSize = $this->limit && empty($this->wheres) && empty($this->orderBys) && ! $this->randomize
+            ? ($this->offset ?? 0) + $this->limit
+            : 50;
+
+        foreach ($this->collect($results)->chunk($batchSize) as $batch) {
+            $hydrated = $this->transformResults($batch);
+            foreach ($hydrated as $item) {
+                yield $item;
+            }
+        }
     }
 
     public function transformResults($results)
