@@ -23,7 +23,13 @@ class YesNo extends FormFieldtype
 
     public function configFieldItems(): array
     {
-        return [];
+        return [
+            'inline' => [
+                'display' => __('Show options in a row?'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
+        ];
     }
 
     public function toFieldArray(): array

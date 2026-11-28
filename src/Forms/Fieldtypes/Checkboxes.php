@@ -35,6 +35,11 @@ class Checkboxes extends FormFieldtype
                 'value_header' => __('Label').' ('.__('Optional').')',
                 'add_button' => __('Add Option'),
             ],
+            'inline' => [
+                'display' => __('Show options in a row?'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
         ];
     }
 
@@ -44,6 +49,7 @@ class Checkboxes extends FormFieldtype
             'type' => 'checkboxes',
             'options' => $this->options(),
             ...Arr::except($this->config(), ['type', 'options']),
+            'appearance' => $this->config('inline') ? 'inline' : 'default',
         ];
     }
 

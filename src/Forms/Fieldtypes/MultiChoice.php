@@ -36,6 +36,11 @@ class MultiChoice extends FormFieldtype
                     'type' => 'text',
                 ],
             ],
+            'inline' => [
+                'display' => __('Show options in a row?'),
+                'type' => 'toggle',
+                'default' => false,
+            ],
         ];
     }
 
@@ -45,6 +50,7 @@ class MultiChoice extends FormFieldtype
             'type' => 'radio',
             'options' => $this->options(),
             ...Arr::except($this->config(), ['type', 'options']),
+            'appearance' => $this->config('inline') ? 'inline' : 'default',
         ];
     }
 

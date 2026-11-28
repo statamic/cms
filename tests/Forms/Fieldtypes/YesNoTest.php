@@ -26,6 +26,7 @@ class YesNoTest extends TestCase
                 'yes' => 'Yes',
                 'no' => 'No',
             ],
+            'inline' => false,
         ], $fieldtype->toFieldArray());
     }
 
@@ -44,6 +45,7 @@ class YesNoTest extends TestCase
                 'yes' => 'Yes',
                 'no' => 'No',
             ],
+            'inline' => false,
             'display' => 'Would you recommend this product?',
         ], $fieldtype->toFieldArray());
     }
