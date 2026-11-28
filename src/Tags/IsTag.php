@@ -5,8 +5,10 @@ namespace Statamic\Tags;
 use Statamic\Facades\User;
 use Statamic\Support\Arr;
 
-class Is extends Tags
+class IsTag extends Tags
 {
+    protected static $handle = 'is';
+
     /**
      * Maps to {{ is:[role] }}.
      *

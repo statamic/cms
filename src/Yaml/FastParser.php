@@ -100,7 +100,7 @@ class FastParser
 
     private function parseBlocks(string $yaml): array
     {
-        if ($yaml === '' || strpbrk($yaml, "\r\0\x0B") !== false || str_starts_with($yaml, "\xEF\xBB\xBF") || ! preg_match('//u', $yaml)) {
+        if ($yaml === '' || strpbrk($yaml, "\r\0\x0B\f") !== false || str_starts_with($yaml, "\xEF\xBB\xBF") || ! preg_match('//u', $yaml)) {
             $this->fail();
         }
 
