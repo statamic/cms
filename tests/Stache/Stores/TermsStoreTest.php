@@ -44,4 +44,36 @@ class TermsStoreTest extends TestCase
 
         $this->assertEquals($path, $this->parent->store('tags')->paths()->get('en::test'));
     }
+
+    #[Test]
+    public function the_watcher_removes_every_localization_of_a_term_whose_file_was_deleted()
+    {
+        config(['statamic.stache.watcher' => true]);
+
+        $this->setSites([
+            'en' => ['url' => '/', 'locale' => 'en_US'],
+            'fr' => ['url' => '/fr/', 'locale' => 'fr_FR'],
+        ]);
+        $taxonomyFile = $this->directory.'/tags.yaml';
+        $taxonomyYaml = file_get_contents($taxonomyFile);
+        Facades\Taxonomy::make('tags')->sites(['en', 'fr'])->save();
+
+        $path = $this->directory.'/tags/watcher-test.yaml';
+        file_put_contents($path, "title: 'Watcher test'\nlocalizations:\n  fr:\n    title: 'Test du watcher'\n");
+
+        try {
+            $store = $this->parent->store('tags');
+            $this->assertEquals($path, $store->paths()->get('en::watcher-test'));
+            $this->assertEquals($path, $store->paths()->get('fr::watcher-test'));
+
+            unlink($path);
+            $store->handleFileChanges();
+
+            $this->assertNull($store->paths()->get('en::watcher-test'));
+            $this->assertNull($store->paths()->get('fr::watcher-test'));
+        } finally {
+            @unlink($path);
+            file_put_contents($taxonomyFile, $taxonomyYaml);
+        }
+    }
 }

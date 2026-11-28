@@ -205,12 +205,6 @@ parameters:
 			path: ../src/Stache/Stores/Store.php
 
 		-
-			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:getKeyFromPath\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: ../src/Stache/Stores/Store.php
-
-		-
 			message: '#^Call to an undefined method Statamic\\Stache\\Stores\\Store\:\:makeItemFromFile\(\)\.$#'
 			identifier: method.notFound
 			count: 2
