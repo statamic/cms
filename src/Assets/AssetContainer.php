@@ -478,7 +478,13 @@ class AssetContainer implements Arrayable, ArrayAccess, AssetContainerContract, 
             return null;
         }
 
-        return $asset->hydrate()->syncOriginal();
+        $asset->hydrate()->syncOriginal();
+
+        if (! $asset->exists()) {
+            return null;
+        }
+
+        return $asset;
     }
 
     /**
